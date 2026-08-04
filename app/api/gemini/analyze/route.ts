@@ -45,7 +45,7 @@ Lütfen bu verilere göre kullanıcıya özel detaylı KPSS Akıllı Teşhis Rap
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       contents: [
         { role: 'user', parts: [{ text: systemInstruction + '\n' + userPrompt }] }
       ]

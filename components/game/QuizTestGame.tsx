@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
-import { MULTIPLE_CHOICE_QUESTIONS } from '@/lib/data/quizQuestions';
+import { MULTIPLE_CHOICE_QUESTIONS, getCurrentQuizQuestion, getFilteredQuizQuestions } from '@/lib/data/quizQuestions';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   CheckCircle2, 
   XCircle, 
   ArrowRight, 
   RotateCcw, 
+  Shuffle,
   Trophy, 
   Sparkles,
   Check,
@@ -30,30 +31,36 @@ const CATEGORIES = [
 export default function QuizTestGame() {
   const {
     quizTestIndex,
+    shuffledQuizQuestions,
     quizScore,
     quizSelectedOption,
     isQuizAnswered,
     answerQuizQuestion,
     nextQuizQuestion,
     resetQuizTest,
+    shuffleQuizQuestions,
     flyToCoords,
     setActiveTab,
     gameCategoryFilter,
     setGameCategoryFilter
   } = useAppStore();
 
-  const filteredQuestions = gameCategoryFilter === 'Genel'
-    ? MULTIPLE_CHOICE_QUESTIONS
-    : MULTIPLE_CHOICE_QUESTIONS.filter((q) => q.category === gameCategoryFilter || q.category.includes(gameCategoryFilter));
+  useEffect(() => {
+    if (shuffledQuizQuestions.length === 0) {
+      shuffleQuizQuestions();
+    }
+  }, [shuffledQuizQuestions.length, shuffleQuizQuestions]);
 
+  const filteredQuestions = shuffledQuizQuestions.length > 0
+    ? shuffledQuizQuestions
+    : getFilteredQuizQuestions(gameCategoryFilter);
   const safeIndex = quizTestIndex % (filteredQuestions.length || 1);
-  const currentQ = filteredQuestions[safeIndex] || MULTIPLE_CHOICE_QUESTIONS[0];
+  const currentQ = getCurrentQuizQuestion(quizTestIndex, gameCategoryFilter, filteredQuestions) || MULTIPLE_CHOICE_QUESTIONS[0];
 
   if (!currentQ) return null;
 
   const handleNext = () => {
     nextQuizQuestion();
-    flyToCoords([35.243, 38.963], 50, -5, 6.2);
   };
 
   return (
@@ -90,8 +97,17 @@ export default function QuizTestGame() {
 
           <button
             onClick={() => {
+              shuffleQuizQuestions();
+            }}
+            title="Soruları Karıştır"
+            className="p-1 rounded-lg hover:bg-white/10 text-indigo-300 hover:text-indigo-200 transition-all"
+          >
+            <Shuffle className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={() => {
               resetQuizTest();
-              flyToCoords([35.243, 38.963], 50, -5, 6.2);
             }}
             title="Sıfırla"
             className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-all"

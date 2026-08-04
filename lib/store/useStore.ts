@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 import { GeoFeature, ALL_GEO_FEATURES } from '../data/turkeyData';
-import { PIN_GAME_QUESTIONS, MULTIPLE_CHOICE_QUESTIONS } from '../data/quizQuestions';
+import { 
+  PIN_GAME_QUESTIONS, 
+  MULTIPLE_CHOICE_QUESTIONS,
+  getCurrentPinQuestion,
+  getCurrentQuizQuestion,
+  getFilteredPinQuestions,
+  getFilteredQuizQuestions,
+  shuffleArray,
+  PinGameQuestion,
+  MultipleChoiceQuestion
+} from '../data/quizQuestions';
 import confetti from 'canvas-confetti';
 
 export type MapStyleType = 'topographic' | 'hybrid' | 'dark' | 'satellite';
@@ -62,6 +72,7 @@ export interface AppState {
   clearFlyTarget: () => void;
 
   // Pin Guess Game State
+  shuffledPinQuestions: PinGameQuestion[];
   pinGameIndex: number;
   score: number;
   streak: number;
@@ -72,8 +83,10 @@ export interface AppState {
   submitPinGuess: (userLng: number, userLat: number) => void;
   nextPinQuestion: () => void;
   resetPinGame: () => void;
+  shufflePinQuestions: () => void;
 
   // Multiple Choice Quiz State
+  shuffledQuizQuestions: MultipleChoiceQuestion[];
   quizTestIndex: number;
   quizScore: number;
   quizSelectedOption: number | null;
@@ -81,6 +94,7 @@ export interface AppState {
   answerQuizQuestion: (optionIndex: number) => void;
   nextQuizQuestion: () => void;
   resetQuizTest: () => void;
+  shuffleQuizQuestions: () => void;
 
   // Gamification & Badges
   unlockedBadges: string[];
@@ -101,6 +115,7 @@ export interface AppState {
   // Tracked Weak Spots / Misplaced Geography Items
   missedItems: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
   resetStats: () => void;
+  hydrateUserData: (data: Partial<AppState>) => void;
 }
 
 // Haversine formula to calculate distance in km between two lat/lng points
@@ -125,7 +140,20 @@ export const useAppStore = create<AppState>((set, get) => ({
   setAiDrawerOpen: (open) => set({ isAiDrawerOpen: open }),
 
   gameCategoryFilter: 'Genel',
-  setGameCategoryFilter: (category) => set({ gameCategoryFilter: category }),
+  setGameCategoryFilter: (category) =>
+    set({
+      gameCategoryFilter: category,
+      shuffledPinQuestions: shuffleArray(getFilteredPinQuestions(category)),
+      shuffledQuizQuestions: shuffleArray(getFilteredQuizQuestions(category)),
+      pinGameIndex: 0,
+      quizTestIndex: 0,
+      isPinGuessed: false,
+      pinGuessCoords: null,
+      lastGuessDistanceKm: null,
+      lastGuessPoints: null,
+      quizSelectedOption: null,
+      isQuizAnswered: false,
+    }),
 
   mapStyle: 'topographic',
   setMapStyle: (style) => set({ mapStyle: style }),
@@ -212,6 +240,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   clearFlyTarget: () => set({ cameraFlyTarget: null }),
 
   // Pin Guessing Game Logic
+  shuffledPinQuestions: [],
   pinGameIndex: 0,
   score: 0,
   streak: 0,
@@ -219,6 +248,35 @@ export const useAppStore = create<AppState>((set, get) => ({
   lastGuessPoints: null,
   pinGuessCoords: null,
   isPinGuessed: false,
+
+  shufflePinQuestions: () => {
+    const state = get();
+    set({
+      shuffledPinQuestions: shuffleArray(getFilteredPinQuestions(state.gameCategoryFilter)),
+      pinGameIndex: 0,
+      isPinGuessed: false,
+      pinGuessCoords: null,
+      lastGuessDistanceKm: null,
+      lastGuessPoints: null
+    });
+  },
+
+  // Multiple Choice Quiz State
+  shuffledQuizQuestions: [],
+  quizTestIndex: 0,
+  quizScore: 0,
+  quizSelectedOption: null,
+  isQuizAnswered: false,
+
+  shuffleQuizQuestions: () => {
+    const state = get();
+    set({
+      shuffledQuizQuestions: shuffleArray(getFilteredQuizQuestions(state.gameCategoryFilter)),
+      quizTestIndex: 0,
+      quizSelectedOption: null,
+      isQuizAnswered: false
+    });
+  },
 
   // Analytics & Statistics Tracking State
   regionalStats: {
@@ -278,11 +336,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     missedItems: {}
   }),
 
+  hydrateUserData: (data) => set((s) => ({ ...s, ...data })),
+
   submitPinGuess: (userLng, userLat) => {
     const state = get();
     if (state.isPinGuessed) return;
 
-    const currentQ = PIN_GAME_QUESTIONS[state.pinGameIndex];
+    const currentQ = getCurrentPinQuestion(state.pinGameIndex, state.gameCategoryFilter, state.shuffledPinQuestions);
     if (!currentQ) return;
 
     const [targetLng, targetLat] = currentQ.targetCoords;
@@ -375,43 +435,59 @@ export const useAppStore = create<AppState>((set, get) => ({
       missedItems: updatedMissed
     });
 
-    // Moderate zoom (7.2) so user can visually see both their clicked point, the target, and the line connecting them!
-    get().flyToCoords(currentQ.targetCoords, 55, 10, 7.2);
+    // Smoothly fly and zoom to 7.0x at the target location when answer/guess is revealed
+    get().flyToCoords(currentQ.targetCoords, 0, 0, 7.0);
   },
 
   nextPinQuestion: () => {
     const state = get();
-    const nextIdx = (state.pinGameIndex + 1) % PIN_GAME_QUESTIONS.length;
-    set({
-      pinGameIndex: nextIdx,
-      isPinGuessed: false,
-      pinGuessCoords: null,
-      lastGuessDistanceKm: null,
-      lastGuessPoints: null
-    });
+    let questions = state.shuffledPinQuestions;
+    if (!questions || questions.length === 0) {
+      questions = shuffleArray(getFilteredPinQuestions(state.gameCategoryFilter));
+    }
+    const nextIdx = state.pinGameIndex + 1;
+    if (nextIdx >= questions.length) {
+      const reshuffled = shuffleArray(getFilteredPinQuestions(state.gameCategoryFilter));
+      set({
+        shuffledPinQuestions: reshuffled,
+        pinGameIndex: 0,
+        isPinGuessed: false,
+        pinGuessCoords: null,
+        lastGuessDistanceKm: null,
+        lastGuessPoints: null
+      });
+    } else {
+      set({
+        pinGameIndex: nextIdx,
+        isPinGuessed: false,
+        pinGuessCoords: null,
+        lastGuessDistanceKm: null,
+        lastGuessPoints: null
+      });
+    }
+    // Lock zoom to 5.5x at every question start
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
   },
 
   resetPinGame: () => {
+    const state = get();
     set({
+      shuffledPinQuestions: shuffleArray(getFilteredPinQuestions(state.gameCategoryFilter)),
       pinGameIndex: 0,
       isPinGuessed: false,
       pinGuessCoords: null,
       lastGuessDistanceKm: null,
       lastGuessPoints: null
     });
+    // Lock zoom to 5.5x at every question start
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
   },
-
-  // Multiple Choice Quiz Logic
-  quizTestIndex: 0,
-  quizScore: 0,
-  quizSelectedOption: null,
-  isQuizAnswered: false,
 
   answerQuizQuestion: (optionIndex) => {
     const state = get();
     if (state.isQuizAnswered) return;
 
-    const currentQ = MULTIPLE_CHOICE_QUESTIONS[state.quizTestIndex];
+    const currentQ = getCurrentQuizQuestion(state.quizTestIndex, state.gameCategoryFilter, state.shuffledQuizQuestions);
     if (!currentQ) return;
 
     const isCorrect = optionIndex === currentQ.correctIndex;
@@ -454,27 +530,47 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
 
     if (currentQ.targetCoords) {
-      get().flyToCoords(currentQ.targetCoords, 55, 10, 7.5);
+      get().flyToCoords(currentQ.targetCoords, 0, 0, 7.0);
     }
   },
 
   nextQuizQuestion: () => {
     const state = get();
-    const nextIdx = (state.quizTestIndex + 1) % MULTIPLE_CHOICE_QUESTIONS.length;
-    set({
-      quizTestIndex: nextIdx,
-      quizSelectedOption: null,
-      isQuizAnswered: false
-    });
+    let questions = state.shuffledQuizQuestions;
+    if (!questions || questions.length === 0) {
+      questions = shuffleArray(getFilteredQuizQuestions(state.gameCategoryFilter));
+    }
+    const nextIdx = state.quizTestIndex + 1;
+    if (nextIdx >= questions.length) {
+      const reshuffled = shuffleArray(getFilteredQuizQuestions(state.gameCategoryFilter));
+      set({
+        shuffledQuizQuestions: reshuffled,
+        quizTestIndex: 0,
+        quizSelectedOption: null,
+        isQuizAnswered: false
+      });
+    } else {
+      set({
+        quizTestIndex: nextIdx,
+        quizSelectedOption: null,
+        isQuizAnswered: false
+      });
+    }
+    // Lock zoom to 5.5x at every question start
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
   },
 
   resetQuizTest: () => {
+    const state = get();
     set({
+      shuffledQuizQuestions: shuffleArray(getFilteredQuizQuestions(state.gameCategoryFilter)),
       quizTestIndex: 0,
       quizScore: 0,
       quizSelectedOption: null,
       isQuizAnswered: false
     });
+    // Lock zoom to 5.5x at every question start
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
   },
 
   unlockedBadges: ['3D Coğrafyacı Çırağı'],

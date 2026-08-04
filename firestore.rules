@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Global Safety Net Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId)
+                    && isValidId(userId)
+                    && request.resource.data.uid == userId;
+      allow update: if isOwner(userId)
+                    && isValidId(userId)
+                    && request.resource.data.uid == userId;
+      allow delete: if isOwner(userId);
+
+      match /progress/{progressId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+                             && isValidId(progressId)
+                             && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      match /history/{historyId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+                             && isValidId(historyId)
+                             && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

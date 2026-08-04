@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+@import "maplibre-gl/dist/maplibre-gl.css";
 
 @layer base {
   body {

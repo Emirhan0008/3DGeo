@@ -2,10 +2,14 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
 import { useAppStore, MapStyleType } from '@/lib/store/useStore';
 import { ALL_GEO_FEATURES, GeoFeature } from '@/lib/data/turkeyData';
-import { PIN_GAME_QUESTIONS, MULTIPLE_CHOICE_QUESTIONS } from '@/lib/data/quizQuestions';
+import { 
+  PIN_GAME_QUESTIONS, 
+  MULTIPLE_CHOICE_QUESTIONS,
+  getCurrentPinQuestion,
+  getCurrentQuizQuestion
+} from '@/lib/data/quizQuestions';
 import { 
   Play, 
   Pause, 
@@ -153,12 +157,90 @@ const CATEGORY_STYLES: Record<GeoFeature['type'], { bg: string; ring: string; pu
   coastal: { bg: 'bg-teal-500', ring: 'ring-teal-400', pulse: 'bg-teal-400', badgeBg: 'bg-teal-950/90', text: 'text-teal-200', border: 'border-teal-400/60' }
 };
 
+// Turkey national border ring coordinates
+const TURKEY_BORDER_RING: [number, number][] = [
+  [26.04, 41.72], [27.20, 41.98], [28.00, 41.25], [29.90, 41.15],
+  [31.80, 41.80], [35.20, 42.10], [38.30, 41.00], [40.50, 41.35],
+  [41.55, 41.55], [43.50, 41.10], [44.80, 39.70], [44.30, 37.10],
+  [42.30, 37.10], [41.20, 37.30], [38.80, 36.70], [36.60, 36.60],
+  [35.90, 35.85], [36.20, 36.80], [34.30, 36.50], [32.80, 36.10],
+  [30.60, 36.30], [29.10, 36.20], [27.30, 36.70], [27.20, 37.30],
+  [26.30, 38.30], [26.00, 40.00], [26.20, 40.80], [26.04, 41.72]
+];
+
+function setupTurkeyNationalBordersAndMask(map: maplibregl.Map) {
+  if (map.getSource('turkey-border-src')) return;
+
+  // Outer dark mask over non-Turkey regions for maximum contrast
+  map.addSource('turkey-mask-src', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]],
+          TURKEY_BORDER_RING
+        ]
+      }
+    }
+  });
+
+  map.addLayer({
+    id: 'turkey-mask-layer',
+    type: 'fill',
+    source: 'turkey-mask-src',
+    paint: {
+      'fill-color': '#020617',
+      'fill-opacity': 0.52
+    }
+  });
+
+  // Glowing National Border Line
+  map.addSource('turkey-border-src', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: TURKEY_BORDER_RING
+      }
+    }
+  });
+
+  map.addLayer({
+    id: 'turkey-border-glow-layer',
+    type: 'line',
+    source: 'turkey-border-src',
+    paint: {
+      'line-color': '#f59e0b',
+      'line-width': 16,
+      'line-opacity': 0.6,
+      'line-blur': 6
+    }
+  });
+
+  map.addLayer({
+    id: 'turkey-border-line-layer',
+    type: 'line',
+    source: 'turkey-border-src',
+    paint: {
+      'line-color': '#fbbf24',
+      'line-width': 5.5,
+      'line-opacity': 1.0
+    }
+  });
+}
+
 export default function MapContainer() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const guessMarkerRef = useRef<maplibregl.Marker | null>(null);
   const targetMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const distanceMarkerRef = useRef<maplibregl.Marker | null>(null);
 
   const {
     mapStyle,
@@ -169,13 +251,17 @@ export default function MapContainer() {
     clearFlyTarget,
     activeTab,
     pinGameIndex,
+    shuffledPinQuestions,
     isPinGuessed,
     pinGuessCoords,
+    lastGuessDistanceKm,
     quizTestIndex,
+    shuffledQuizQuestions,
     isQuizAnswered,
     searchQuery,
     isBlindMapMode,
-    toggleBlindMapMode
+    toggleBlindMapMode,
+    gameCategoryFilter
   } = useAppStore();
 
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -190,7 +276,7 @@ export default function MapContainer() {
 
   // 1. Initialize MapLibre GL bounded strictly to Turkey
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (typeof window === 'undefined' || !mapContainerRef.current) return;
 
     const currentStore = useAppStore.getState();
     const styleFn = MAP_STYLE_CONFIGS[currentStore.mapStyle] || MAP_STYLE_CONFIGS.topographic;
@@ -199,7 +285,7 @@ export default function MapContainer() {
       container: mapContainerRef.current,
       style: styleFn(currentStore.isBlindMapMode),
       center: [35.243, 38.963], // Turkey Center
-      zoom: 6.2,
+      zoom: 5.5, // Default locked zoom
       pitch: 0,
       bearing: 0,
       maxPitch: 0,
@@ -207,18 +293,25 @@ export default function MapContainer() {
       touchPitch: false,
       pitchWithRotate: false,
       maxBounds: TURKEY_BOUNDS, // Strictly restrict map panning to Turkey only
-      minZoom: 5.5,
-      maxZoom: 9.5, // Prevent excessive zooming
+      minZoom: 5.0,
+      maxZoom: 9.5,
     });
 
     mapRef.current = map;
 
     map.on('load', () => {
       setMapLoaded(true);
+      setupTurkeyNationalBordersAndMask(map);
 
       // Add navigation and fullscreen controls
       map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
       map.addControl(new maplibregl.FullscreenControl(), 'bottom-right');
+    });
+
+    map.on('styledata', () => {
+      if (map.isStyleLoaded()) {
+        setupTurkeyNationalBordersAndMask(map);
+      }
     });
 
     map.on('pitch', () => setCurrentPitch(Math.round(map.getPitch())));
@@ -251,10 +344,10 @@ export default function MapContainer() {
 
     mapRef.current.flyTo({
       center: cameraFlyTarget.coords,
-      zoom: Math.min(cameraFlyTarget.zoom ?? 7.5, 8.2),
+      zoom: cameraFlyTarget.zoom ?? 5.5,
       pitch: 0,
       bearing: 0,
-      duration: 2000,
+      duration: 2200,
       essential: true,
     });
 
@@ -473,13 +566,17 @@ export default function MapContainer() {
       targetMarkerRef.current.remove();
       targetMarkerRef.current = null;
     }
+    if (distanceMarkerRef.current) {
+      distanceMarkerRef.current.remove();
+      distanceMarkerRef.current = null;
+    }
 
     // Clean previous line layer if exists
     if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
     if (map.getSource(lineSourceId)) map.removeSource(lineSourceId);
 
     if (activeTab === 'pin_game' && isPinGuessed && pinGuessCoords) {
-      const currentQ = PIN_GAME_QUESTIONS[pinGameIndex];
+      const currentQ = getCurrentPinQuestion(pinGameIndex, gameCategoryFilter, shuffledPinQuestions);
 
       // User Guess Marker (Red Pulse)
       const userEl = document.createElement('div');
@@ -506,7 +603,7 @@ export default function MapContainer() {
           .setLngLat(currentQ.targetCoords)
           .addTo(map);
 
-        // Draw GeoGuessr-style dashed line between click coords and target
+        // Draw GeoGuessr-style line between clicked position and true position
         map.addSource(lineSourceId, {
           type: 'geojson',
           data: {
@@ -533,9 +630,21 @@ export default function MapContainer() {
             'line-dasharray': [2, 2]
           }
         });
+
+        // Add floating distance badge at line midpoint
+        if (lastGuessDistanceKm !== null) {
+          const midLng = (pinGuessCoords[0] + currentQ.targetCoords[0]) / 2;
+          const midLat = (pinGuessCoords[1] + currentQ.targetCoords[1]) / 2;
+          const distEl = document.createElement('div');
+          distEl.className = 'px-2.5 py-0.5 bg-amber-500 text-slate-950 font-black text-[11px] border border-amber-300 rounded-full shadow-2xl animate-bounce';
+          distEl.innerHTML = `📏 ${lastGuessDistanceKm} km`;
+          distanceMarkerRef.current = new maplibregl.Marker({ element: distEl })
+            .setLngLat([midLng, midLat])
+            .addTo(map);
+        }
       }
     } else if (activeTab === 'quiz_test' && isQuizAnswered) {
-      const currentQ = MULTIPLE_CHOICE_QUESTIONS[quizTestIndex];
+      const currentQ = getCurrentQuizQuestion(quizTestIndex, gameCategoryFilter, shuffledQuizQuestions);
       if (currentQ && currentQ.targetCoords) {
         const targetEl = document.createElement('div');
         targetEl.className = 'relative flex items-center justify-center';
@@ -550,7 +659,7 @@ export default function MapContainer() {
           .addTo(map);
       }
     }
-  }, [activeTab, isPinGuessed, pinGuessCoords, pinGameIndex, isQuizAnswered, quizTestIndex, mapLoaded]);
+  }, [activeTab, isPinGuessed, pinGuessCoords, lastGuessDistanceKm, pinGameIndex, shuffledPinQuestions, isQuizAnswered, quizTestIndex, shuffledQuizQuestions, gameCategoryFilter, mapLoaded]);
 
   const resetCameraToTurkey = () => {
     if (mapRef.current) {

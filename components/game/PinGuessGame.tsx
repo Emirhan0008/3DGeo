@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
-import { PIN_GAME_QUESTIONS } from '@/lib/data/quizQuestions';
+import { PIN_GAME_QUESTIONS, getCurrentPinQuestion, getFilteredPinQuestions } from '@/lib/data/quizQuestions';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   HelpCircle, 
@@ -12,6 +12,7 @@ import {
   AlertCircle, 
   Sparkles,
   MapPin,
+  Shuffle,
   X,
   Filter,
   EyeOff
@@ -32,11 +33,13 @@ const CATEGORIES = [
 export default function PinGuessGame() {
   const {
     pinGameIndex,
+    shuffledPinQuestions,
     isPinGuessed,
     lastGuessDistanceKm,
     lastGuessPoints,
     nextPinQuestion,
     resetPinGame,
+    shufflePinQuestions,
     flyToCoords,
     setActiveTab,
     gameCategoryFilter,
@@ -47,20 +50,24 @@ export default function PinGuessGame() {
 
   const [showHint, setShowHint] = useState(false);
 
-  // Filter question set based on user's category selection (Default: Genel)
-  const filteredQuestions = gameCategoryFilter === 'Genel'
-    ? PIN_GAME_QUESTIONS
-    : PIN_GAME_QUESTIONS.filter((q) => q.category === gameCategoryFilter || q.category.includes(gameCategoryFilter));
+  useEffect(() => {
+    if (shuffledPinQuestions.length === 0) {
+      shufflePinQuestions();
+    }
+  }, [shuffledPinQuestions.length, shufflePinQuestions]);
 
+  // Filter question set based on user's category selection (shuffled list)
+  const filteredQuestions = shuffledPinQuestions.length > 0
+    ? shuffledPinQuestions
+    : getFilteredPinQuestions(gameCategoryFilter);
   const safeIndex = pinGameIndex % (filteredQuestions.length || 1);
-  const currentQ = filteredQuestions[safeIndex] || PIN_GAME_QUESTIONS[0];
+  const currentQ = getCurrentPinQuestion(pinGameIndex, gameCategoryFilter, filteredQuestions) || PIN_GAME_QUESTIONS[0];
 
   if (!currentQ) return null;
 
   const handleNext = () => {
     setShowHint(false);
     nextPinQuestion();
-    flyToCoords([35.243, 38.963], 50, -5, 6.2);
   };
 
   return (
@@ -103,10 +110,19 @@ export default function PinGuessGame() {
 
           <button
             onClick={() => {
-              resetPinGame();
-              flyToCoords([35.243, 38.963], 50, -5, 6.2);
+              shufflePinQuestions();
             }}
-            title="Yeniden Başlat"
+            title="Soruları Karıştır"
+            className="p-1 rounded-lg hover:bg-white/10 text-indigo-300 hover:text-indigo-200 transition-all"
+          >
+            <Shuffle className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={() => {
+              resetPinGame();
+            }}
+            title="Yeniden Başlat (Sıfırla & Karıştır)"
             className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -140,7 +156,7 @@ export default function PinGuessGame() {
             }`}
           >
             <EyeOff className="w-3 h-3 text-amber-400" />
-            <span>{isBlindMapMode ? '🙈 Dilsiz Mod' : 'Dilsiz Moda Geç'}</span>
+            <span>{isBlindMapMode ? '🙈 Dilsiz Harita: AÇIK' : 'Dilsiz Harita'}</span>
           </button>
         </div>
 

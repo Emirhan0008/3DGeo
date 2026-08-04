@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Kullanıcının KPSS Coğrafya profil ve istatistik verileri",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "score": { "type": "number" },
+        "streak": { "type": "number" },
+        "totalQuestionsAnswered": { "type": "number" },
+        "correctAnswersCount": { "type": "number" },
+        "totalDistanceErrorKm": { "type": "number" },
+        "pinGuessCount": { "type": "number text" },
+        "unlockedBadges": { "type": "array" },
+        "isBlindMapMode": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "Kullanıcının detaylı yanlış soruları ve bölge istatistikleri",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "regionalStats": { "type": "object" },
+        "categoryStats": { "type": "object" },
+        "missedItems": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId"]
+    },
+    "UserHistory": {
+      "title": "UserHistory",
+      "description": "Kullanıcının geçmiş test ve harita tahmin etkinlikleri",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "scoreEarned": { "type": "number" },
+        "details": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Kullanıcı profil kartı"
+    },
+    "/users/{userId}/progress/{progressId}": {
+      "schema": { "$ref": "#/entities/UserProgress" },
+      "description": "Kullanıcı soru ve harita ilerleme detayları"
+    },
+    "/users/{userId}/history/{historyId}": {
+      "schema": { "$ref": "#/entities/UserHistory" },
+      "description": "Kullanıcı geçmiş aktivite kayıtları"
+    }
+  }
+}

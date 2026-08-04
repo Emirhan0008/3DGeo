@@ -28,6 +28,8 @@ const CATEGORIES = [
   'Karstik & Kıyı'
 ];
 
+import AuthUserButton from './AuthUserButton';
+
 export default function Navbar() {
   const {
     activeTab,
@@ -212,6 +214,9 @@ export default function Navbar() {
           <span className="text-slate-600">|</span>
           <span className="text-orange-400">{streak}🔥</span>
         </div>
+
+        {/* Firebase User Auth */}
+        <AuthUserButton />
 
         {/* AI Tutor Button */}
         <button

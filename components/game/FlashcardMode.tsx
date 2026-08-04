@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ALL_GEO_FEATURES, GeoFeature } from '@/lib/data/turkeyData';
 import { useAppStore } from '@/lib/store/useStore';
+import { shuffleArray } from '@/lib/data/quizQuestions';
 import { 
   RotateCw, 
   Check, 
@@ -14,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  Shuffle,
   X
 } from 'lucide-react';
 
@@ -24,20 +26,40 @@ export default function FlashcardMode() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
+  const [shuffledCards, setShuffledCards] = useState<GeoFeature[]>([]);
 
-  // Filter items
-  const filteredList = ALL_GEO_FEATURES.filter((f) => {
-    if (selectedCategory === 'Hepsi') return true;
-    if (selectedCategory === 'Dağlar') return f.type === 'mountain';
-    if (selectedCategory === 'Akarsular') return f.type === 'river';
-    if (selectedCategory === 'Göller') return f.type === 'lake';
-    if (selectedCategory === 'Sınır Kapıları') return f.type === 'border_gate';
-    if (selectedCategory === 'Geçitler') return f.type === 'pass';
-    if (selectedCategory === 'Ovalar & Platolar') return f.type === 'plain' || f.type === 'plateau';
-    if (selectedCategory === 'Madenler') return f.type === 'mine';
-    return true;
-  });
+  // Filter and shuffle items whenever category changes or initially
+  const baseList = useMemo(() => {
+    const filtered = ALL_GEO_FEATURES.filter((f) => {
+      if (selectedCategory === 'Hepsi') return true;
+      if (selectedCategory === 'Dağlar') return f.type === 'mountain';
+      if (selectedCategory === 'Akarsular') return f.type === 'river';
+      if (selectedCategory === 'Göller') return f.type === 'lake';
+      if (selectedCategory === 'Sınır Kapıları') return f.type === 'border_gate';
+      if (selectedCategory === 'Geçitler') return f.type === 'pass';
+      if (selectedCategory === 'Ovalar & Platolar') return f.type === 'plain' || f.type === 'plateau';
+      if (selectedCategory === 'Madenler') return f.type === 'mine';
+      return true;
+    });
+    return shuffleArray(filtered);
+  }, [selectedCategory]);
 
+  const [customList, setCustomList] = useState<GeoFeature[] | null>(null);
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    setCustomList(null);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  };
+
+  const filteredList = customList ?? baseList;
+
+  const handleShuffle = () => {
+    setCustomList(shuffleArray([...filteredList]));
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  };
   const currentItem = filteredList[currentIndex] || filteredList[0];
 
   const handleNext = () => {
@@ -70,11 +92,7 @@ export default function FlashcardMode() {
           {['Hepsi', 'Dağlar', 'Akarsular', 'Göller', 'Sınır Kapıları', 'Geçitler', 'Ovalar & Platolar', 'Madenler'].map((cat) => (
             <button
               key={cat}
-              onClick={() => {
-                setSelectedCategory(cat);
-                setCurrentIndex(0);
-                setIsFlipped(false);
-              }}
+              onClick={() => handleCategoryChange(cat)}
               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all ${
                 selectedCategory === cat
                   ? 'bg-indigo-600 text-white shadow-md'
@@ -86,13 +104,23 @@ export default function FlashcardMode() {
           ))}
         </div>
 
-        <button
-          onClick={() => setActiveTab('map')}
-          title="Kapat"
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition-all shrink-0"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={handleShuffle}
+            title="Kartları Karıştır"
+            className="p-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition-all flex items-center gap-1 text-[11px] font-bold"
+          >
+            <Shuffle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Karıştır</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('map')}
+            title="Kapat"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition-all"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Counter Banner */}

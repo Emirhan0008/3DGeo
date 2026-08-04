@@ -33,6 +33,36 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+export function getFilteredPinQuestions(category: string, shuffle: boolean = false): PinGameQuestion[] {
+  let list = PIN_GAME_QUESTIONS;
+  if (category && category !== 'Genel') {
+    list = PIN_GAME_QUESTIONS.filter((q) => q.category === category || q.category.includes(category));
+  }
+  return shuffle ? shuffleArray(list) : list;
+}
+
+export function getFilteredQuizQuestions(category: string, shuffle: boolean = false): MultipleChoiceQuestion[] {
+  let list = MULTIPLE_CHOICE_QUESTIONS;
+  if (category && category !== 'Genel') {
+    list = MULTIPLE_CHOICE_QUESTIONS.filter((q) => q.category === category || q.category.includes(category));
+  }
+  return shuffle ? shuffleArray(list) : list;
+}
+
+export function getCurrentPinQuestion(pinGameIndex: number, category: string, customList?: PinGameQuestion[]): PinGameQuestion | undefined {
+  const list = customList && customList.length > 0 ? customList : getFilteredPinQuestions(category);
+  if (!list.length) return PIN_GAME_QUESTIONS[0];
+  const safeIndex = pinGameIndex % list.length;
+  return list[safeIndex];
+}
+
+export function getCurrentQuizQuestion(quizTestIndex: number, category: string, customList?: MultipleChoiceQuestion[]): MultipleChoiceQuestion | undefined {
+  const list = customList && customList.length > 0 ? customList : getFilteredQuizQuestions(category);
+  if (!list.length) return MULTIPLE_CHOICE_QUESTIONS[0];
+  const safeIndex = quizTestIndex % list.length;
+  return list[safeIndex];
+}
+
 export const PIN_GAME_QUESTIONS: PinGameQuestion[] = [
   // 1. DAĞLAR (Volkanik, Kırık, Kıvrım, Buzul)
   {
