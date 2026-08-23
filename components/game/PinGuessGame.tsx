@@ -54,6 +54,13 @@ export default function PinGuessGame() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [questionMode, setQuestionMode] = useState<'detailed' | 'name_only'>('detailed');
 
+  // Default to collapsed mode on mobile screens for unobstructed map view
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsCollapsed(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (shuffledPinQuestions.length === 0) {
       shufflePinQuestions();
@@ -93,17 +100,17 @@ export default function PinGuessGame() {
       <div 
         onDoubleClick={() => setIsCollapsed(false)}
         title="Çift Tıklayarak Kartı Açabilirsiniz"
-        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[92vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-white animate-in fade-in duration-200 cursor-pointer"
+        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-xl shadow-2xl px-2 py-1.5 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
       >
-        <div className="flex items-center gap-1.5 min-w-0 flex-1">
-          <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[10px] shrink-0 flex items-center gap-1">
-            <MapPin className="w-3 h-3" />
+        <div className="flex items-center gap-1 min-w-0 flex-1">
+          <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[9px] shrink-0 flex items-center gap-0.5">
+            <MapPin className="w-2.5 h-2.5" />
             ARANAN:
           </span>
-          <span className="font-black text-xs text-amber-300 leading-tight break-words">
+          <span className="font-black text-xs text-amber-300 leading-tight truncate">
             {displayTitle}
           </span>
-          <span className="text-[10px] text-slate-300 font-bold border-l border-white/20 pl-1.5 shrink-0">
+          <span className="text-[9px] text-slate-300 font-bold border-l border-white/20 pl-1 shrink-0">
             {safeIndex + 1}/{filteredQuestions.length}
           </span>
         </div>
@@ -112,19 +119,32 @@ export default function PinGuessGame() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              handleNext();
+            }}
+            title="Sonraki Soruya Geç"
+            className="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] rounded-lg flex items-center gap-0.5 shadow-md transition-all active:scale-95 shrink-0"
+          >
+            <span>Sonraki</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               setIsCollapsed(false);
             }}
-            className="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-lg flex items-center gap-1 border border-indigo-400 transition-all active:scale-95"
+            className="px-1.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-lg flex items-center gap-0.5 border border-indigo-400 transition-all active:scale-95 shrink-0"
           >
             <Maximize2 className="w-3 h-3" />
             <span>Aç</span>
           </button>
+
           <button
             onClick={(e) => {
               e.stopPropagation();
               setActiveTab('map');
             }}
-            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all"
+            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all shrink-0"
           >
             <X className="w-3 h-3" />
           </button>

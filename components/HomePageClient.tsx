@@ -10,6 +10,7 @@ import FlashcardMode from '@/components/game/FlashcardMode';
 import StatsModal from '@/components/ui/StatsModal';
 import AITutorDrawer from '@/components/ai/AITutorDrawer';
 import BadgeNotificationToast from '@/components/ui/BadgeNotificationToast';
+import RotateScreenBanner from '@/components/ui/RotateScreenBanner';
 import { useAppStore } from '@/lib/store/useStore';
 
 // Dynamic import MapContainer with SSR disabled to prevent WebGL window context crashes
@@ -43,6 +44,7 @@ export default function HomePageClient() {
         <FeatureDetailModal />
         <AITutorDrawer />
         <BadgeNotificationToast />
+        <RotateScreenBanner />
 
         {/* Tab Specific Gamification Overlays */}
         {activeTab === 'pin_game' && <PinGuessGame />}

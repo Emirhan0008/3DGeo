@@ -51,6 +51,13 @@ export default function QuizTestGame() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  // Default to collapsed mode on mobile screens for unobstructed map view
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsCollapsed(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (shuffledQuizQuestions.length === 0) {
       shuffleQuizQuestions();
@@ -82,17 +89,17 @@ export default function QuizTestGame() {
       <div 
         onDoubleClick={() => setIsCollapsed(false)}
         title="Çift Tıklayarak Kartı Açabilirsiniz"
-        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[92vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-white animate-in fade-in duration-200 cursor-pointer"
+        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2 py-1.5 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
       >
-        <div className="flex items-center gap-1.5 overflow-hidden">
-          <span className="px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 font-black text-[10px] shrink-0">
+        <div className="flex items-center gap-1 min-w-0 flex-1">
+          <span className="px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 font-black text-[9px] shrink-0">
             TEST:
           </span>
-          <span className="font-extrabold text-xs text-emerald-300 truncate max-w-[140px] sm:max-w-[200px]">
+          <span className="font-extrabold text-xs text-emerald-300 truncate max-w-[120px] sm:max-w-[200px]">
             {currentQ.category}
           </span>
-          <span className="text-[10px] text-slate-300 font-bold border-l border-white/20 pl-1.5 shrink-0">
-            {safeIndex + 1}/{filteredQuestions.length} ({quizScore}p)
+          <span className="text-[9px] text-slate-300 font-bold border-l border-white/20 pl-1 shrink-0">
+            {safeIndex + 1}/{filteredQuestions.length}
           </span>
         </div>
 
@@ -100,19 +107,32 @@ export default function QuizTestGame() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              handleNext();
+            }}
+            title="Sonraki Soruya Geç"
+            className="px-2 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg flex items-center gap-0.5 shadow-md transition-all active:scale-95 shrink-0"
+          >
+            <span>Sonraki</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               setIsCollapsed(false);
             }}
-            className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] rounded-lg flex items-center gap-1 border border-emerald-400 transition-all active:scale-95"
+            className="px-1.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] rounded-lg flex items-center gap-0.5 border border-emerald-400 transition-all active:scale-95 shrink-0"
           >
             <Maximize2 className="w-3 h-3" />
             <span>Aç</span>
           </button>
+
           <button
             onClick={(e) => {
               e.stopPropagation();
               setActiveTab('map');
             }}
-            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20"
+            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all shrink-0"
           >
             <X className="w-3 h-3" />
           </button>
