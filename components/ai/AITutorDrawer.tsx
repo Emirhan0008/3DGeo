@@ -99,14 +99,14 @@ export default function AITutorDrawer() {
     <aside
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute right-2 top-16 bottom-6 z-20 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out ${
+      className={`fixed right-3 top-20 z-30 backdrop-blur-2xl border-2 border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out ${
         isExpanded
           ? isHovered || isPinned
-            ? 'w-80 sm:w-96 bg-[#09090b]/95 opacity-100'
-            : 'w-80 sm:w-96 bg-[#09090b]/75 opacity-75 hover:opacity-100'
+            ? 'w-80 sm:w-96 bg-[#09090b]/95 opacity-100 bottom-28 max-h-[calc(100vh-180px)]'
+            : 'w-80 sm:w-96 bg-[#09090b]/85 opacity-85 hover:opacity-100 bottom-28 max-h-[calc(100vh-180px)]'
           : isHovered
-          ? 'w-12 bg-[#09090b]/95 opacity-100'
-          : 'w-12 bg-[#09090b]/60 opacity-60 hover:opacity-100'
+          ? 'w-12 h-auto max-h-[220px] bg-[#09090b]/95 opacity-100'
+          : 'w-12 h-auto max-h-[220px] bg-[#09090b]/75 opacity-80 hover:opacity-100'
       }`}
     >
       {/* Collapsed Strip State */}

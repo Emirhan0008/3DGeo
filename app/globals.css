@@ -49,6 +49,36 @@
   border-top-color: rgba(9, 9, 11, 0.95) !important;
 }
 
+/* Maplibre Zoom & Control Buttons Polish */
+.maplibregl-ctrl-bottom-right {
+  bottom: 1.25rem !important;
+  right: 1.25rem !important;
+  z-index: 25 !important;
+}
+
+.maplibregl-ctrl-group {
+  background: rgba(9, 9, 11, 0.9) !important;
+  border: 2px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(16px) !important;
+  overflow: hidden !important;
+}
+
+.maplibregl-ctrl-group button {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.maplibregl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+
+.maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.8) !important;
+}
+
 @keyframes spinSlow {
   from {
     transform: rotate(0deg);

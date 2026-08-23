@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { auth, googleProvider, db } from '@/lib/firebase';
 import {
   signInWithPopup,
@@ -21,6 +22,11 @@ export default function AuthUserButton() {
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Custom name for guest/email
   const [customName, setCustomName] = useState('');
@@ -281,8 +287,8 @@ export default function AuthUserButton() {
       )}
 
       {/* Auth Selector Modal */}
-      {showAuthModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+      {showAuthModal && mounted && createPortal(
+        <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-[#09090b] border-2 border-amber-400/80 rounded-2xl max-w-md w-full p-5 text-slate-100 shadow-2xl relative space-y-4">
             <button
               onClick={() => setShowAuthModal(false)}
@@ -463,7 +469,8 @@ export default function AuthUserButton() {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
