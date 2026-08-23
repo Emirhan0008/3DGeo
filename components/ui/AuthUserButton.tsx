@@ -18,20 +18,13 @@ import { useAppStore } from '@/lib/store/useStore';
 import { LogIn, LogOut, Loader2, AlertTriangle, ShieldCheck, Sparkles, X, Mail, Lock, User as UserIcon } from 'lucide-react';
 
 export default function AuthUserButton() {
-  const [user, setUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [localRumuz, setLocalRumuz] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const savedRumuz = typeof window !== 'undefined' ? localStorage.getItem('kpss3d_rumuz') : null;
-    if (savedRumuz) {
-      setCustomName(savedRumuz);
-    }
-  }, []);
-  
   // Custom name for guest/email
   const [customName, setCustomName] = useState('');
   const [email, setEmail] = useState('');
@@ -53,15 +46,38 @@ export default function AuthUserButton() {
     hydrateUserData
   } = useAppStore();
 
+  // Load saved local rumuz & stats on initial mount
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== 'undefined') {
+      const savedRumuz = localStorage.getItem('kpss3d_active_rumuz');
+      if (savedRumuz) {
+        setLocalRumuz(savedRumuz);
+        setCustomName(savedRumuz);
+        try {
+          const savedStatsStr = localStorage.getItem('kpss3d_stats_' + savedRumuz);
+          if (savedStatsStr) {
+            const parsed = JSON.parse(savedStatsStr);
+            hydrateUserData(parsed);
+          }
+        } catch (e) {
+          console.warn('Failed to parse local user stats:', e);
+        }
+      }
+    }
+    setLoading(false);
+  }, [hydrateUserData]);
+
+  // Firebase auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+      setFirebaseUser(currentUser);
       setLoading(false);
 
       if (currentUser) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const progressRef = doc(db, 'users', currentUser.uid, 'progress', 'current');
         try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const progressRef = doc(db, 'users', currentUser.uid, 'progress', 'current');
           const userSnap = await getDoc(userRef);
           const progressSnap = await getDoc(progressRef);
 
@@ -85,7 +101,7 @@ export default function AuthUserButton() {
           } else {
             await setDoc(userRef, {
               uid: currentUser.uid,
-              displayName: currentUser.displayName || 'KPSS Öğrencisi',
+              displayName: currentUser.displayName || localRumuz || 'KPSS Öğrencisi',
               email: currentUser.email || '',
               score,
               streak,
@@ -96,7 +112,7 @@ export default function AuthUserButton() {
               unlockedBadges,
               isBlindMapMode,
               updatedAt: new Date().toISOString()
-            });
+            }, { merge: true });
 
             await setDoc(progressRef, {
               userId: currentUser.uid,
@@ -104,10 +120,10 @@ export default function AuthUserButton() {
               categoryStats,
               missedItems,
               updatedAt: new Date().toISOString()
-            });
+            }, { merge: true });
           }
         } catch (err) {
-          console.warn('Error fetching or initializing user profile from Firestore:', err);
+          console.warn('Firebase sync warning (will fallback to localStorage):', err);
         }
       }
     });
@@ -115,6 +131,62 @@ export default function AuthUserButton() {
     return () => unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Sync state to localStorage & Firebase continuously
+  useEffect(() => {
+    const activeName = firebaseUser?.displayName || localRumuz;
+    if (!activeName || typeof window === 'undefined') return;
+
+    const currentStats = {
+      score,
+      streak,
+      totalQuestionsAnswered,
+      correctAnswersCount,
+      totalDistanceErrorKm,
+      pinGuessCount,
+      unlockedBadges,
+      isBlindMapMode,
+      regionalStats,
+      categoryStats,
+      missedItems,
+      updatedAt: new Date().toISOString()
+    };
+
+    // Save locally
+    try {
+      localStorage.setItem('kpss3d_stats_' + activeName, JSON.stringify(currentStats));
+    } catch (e) {
+      console.warn('LocalStorage save warning:', e);
+    }
+
+    // Debounced save to Firebase if logged into Firebase
+    if (firebaseUser) {
+      const timer = setTimeout(async () => {
+        try {
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          await setDoc(userRef, {
+            uid: firebaseUser.uid,
+            displayName: firebaseUser.displayName || activeName,
+            email: firebaseUser.email || '',
+            ...currentStats
+          }, { merge: true });
+
+          const progressRef = doc(db, 'users', firebaseUser.uid, 'progress', 'current');
+          await setDoc(progressRef, {
+            userId: firebaseUser.uid,
+            regionalStats,
+            categoryStats,
+            missedItems,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch (err) {
+          console.warn('Background Firebase sync warning:', err);
+        }
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [firebaseUser, localRumuz, score, streak, totalQuestionsAnswered, correctAnswersCount, unlockedBadges, isBlindMapMode, pinGuessCount, totalDistanceErrorKm, regionalStats, categoryStats, missedItems]);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -126,9 +198,9 @@ export default function AuthUserButton() {
       console.error('Sign-in error:', error);
       const err = error as { code?: string; message?: string };
       if (err?.code === 'auth/unauthorized-domain') {
-        setAuthErrorMsg('Vercel özel etki alanlarında (3-d-geo.vercel.app) Google OAuth izni yetkisi kısıtlıdır. E-Posta veya Misafir Girişi ile saniyeler içinde tüm puanlarınızı buluta kaydedebilirsiniz!');
+        setAuthErrorMsg('Vercel özel etki alanlarında Google OAuth yetkisi kısıtlıdır. Aşağıdaki "⚡ Hızlı Rumuz" seçeneğini kullanarak hiç şifresiz puanlarınızı anında kaydedebilirsiniz!');
       } else {
-        setAuthErrorMsg(err?.message || 'Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
+        setAuthErrorMsg(err?.message || 'Giriş yapılırken bir hata oluştu. Lütfen Rumuz İle Giriş yapın.');
       }
       setShowAuthModal(true);
     } finally {
@@ -149,6 +221,10 @@ export default function AuthUserButton() {
       const nameToSet = customName.trim() || email.split('@')[0];
       if (res.user) {
         await updateProfile(res.user, { displayName: nameToSet });
+      }
+      setLocalRumuz(nameToSet);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kpss3d_active_rumuz', nameToSet);
       }
       setShowAuthModal(false);
     } catch (error: unknown) {
@@ -181,71 +257,60 @@ export default function AuthUserButton() {
   const handleGuestSignIn = async () => {
     setLoading(true);
     setAuthErrorMsg(null);
+    const nameToSet = customName.trim() || 'KPSS Öğrencisi';
+
+    // Set local rumuz and persist in localStorage immediately (Vercel & Browser native)
+    setLocalRumuz(nameToSet);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kpss3d_active_rumuz', nameToSet);
+      
+      // Save current state under this rumuz
+      const currentStats = {
+        score,
+        streak,
+        totalQuestionsAnswered,
+        correctAnswersCount,
+        totalDistanceErrorKm,
+        pinGuessCount,
+        unlockedBadges,
+        isBlindMapMode,
+        regionalStats,
+        categoryStats,
+        missedItems,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem('kpss3d_stats_' + nameToSet, JSON.stringify(currentStats));
+    }
+
+    // Try optional background Firebase anonymous auth if enabled
     try {
       const anonUser = await signInAnonymously(auth);
-      const nameToSet = customName.trim() || 'KPSS Öğrencisi';
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('kpss3d_rumuz', nameToSet);
-      }
       if (anonUser.user) {
-        await updateProfile(anonUser.user, {
-          displayName: nameToSet
-        });
+        await updateProfile(anonUser.user, { displayName: nameToSet });
       }
-      setShowAuthModal(false);
-    } catch (error: unknown) {
-      console.error('Guest sign-in error:', error);
-      const err = error as { message?: string };
-      setAuthErrorMsg('Rumuz ile giriş sırasında hata oluştu: ' + (err?.message || 'Bilinmeyen hata'));
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      // Firebase anonymous auth disabled or restricted - perfectly fine! Local state is active.
+      console.warn('Firebase anonymous auth skipped/restricted, running in native Vercel Local Rumuz mode:', error);
     }
+
+    setLoading(false);
+    setShowAuthModal(false);
   };
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
     } catch (error) {
-      console.error('Sign-out error:', error);
+      console.warn('Sign-out warning:', error);
+    }
+    setFirebaseUser(null);
+    setLocalRumuz(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('kpss3d_active_rumuz');
     }
   };
 
-  useEffect(() => {
-    if (!user) return;
-
-    const timer = setTimeout(async () => {
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        await setDoc(userRef, {
-          uid: user.uid,
-          displayName: user.displayName || customName || 'KPSS Öğrencisi',
-          email: user.email || '',
-          score,
-          streak,
-          totalQuestionsAnswered,
-          correctAnswersCount,
-          totalDistanceErrorKm,
-          pinGuessCount,
-          unlockedBadges,
-          isBlindMapMode,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-
-        const progressRef = doc(db, 'users', user.uid, 'progress', 'current');
-        await setDoc(progressRef, {
-          userId: user.uid,
-          regionalStats,
-          categoryStats,
-          missedItems,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (err) {
-        console.error('Error syncing user stats to Firebase:', err);
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [user, score, streak, totalQuestionsAnswered, correctAnswersCount, unlockedBadges, isBlindMapMode, pinGuessCount, totalDistanceErrorKm, regionalStats, categoryStats, missedItems, customName]);
+  const activeDisplayName = firebaseUser?.displayName || localRumuz;
 
   if (loading) {
     return (
@@ -258,35 +323,35 @@ export default function AuthUserButton() {
 
   return (
     <>
-      {!user ? (
+      {!activeDisplayName ? (
         <button
           onClick={() => setShowAuthModal(true)}
           className="px-3 py-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-500/20 border border-amber-300/50 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
-          title="Giriş Yap & İlerlemeni Bulutta Sakla"
+          title="Rumuz Gir veya Giriş Yap"
         >
           <LogIn className="w-4 h-4 text-amber-300" />
-          <span>Giriş Yap</span>
+          <span>Giriş Yap / Rumuz</span>
         </button>
       ) : (
-        <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-950/80 to-slate-900/80 border-2 border-indigo-400/60 rounded-xl px-2.5 py-1 text-xs font-black shrink-0 shadow-md">
+        <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border-2 border-emerald-400/80 rounded-xl px-2.5 py-1 text-xs font-black shrink-0 shadow-lg">
           <div className="flex items-center gap-1.5">
-            {user.photoURL ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={user.photoURL} alt={user.displayName || 'User'} className="w-5 h-5 rounded-full border border-indigo-400" />
-            ) : (
-              <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">
-                {user.displayName?.[0] || 'Ö'}
-              </div>
-            )}
-            <span className="text-amber-300 font-black truncate max-w-[90px]">
-              {user.displayName?.split(' ')[0] || 'Öğrenci'}
-            </span>
+            <div className="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-[10px] shadow">
+              {activeDisplayName[0].toUpperCase()}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-amber-300 font-black truncate max-w-[95px] leading-tight">
+                {activeDisplayName}
+              </span>
+              <span className="text-[9px] text-emerald-400 font-bold leading-tight">
+                ● Kayıtlı
+              </span>
+            </div>
           </div>
 
           <button
             onClick={handleSignOut}
             className="p-1 text-slate-400 hover:text-rose-400 transition-colors ml-1 border-l border-white/10 pl-1.5"
-            title="Oturumu Kapat"
+            title="Oturumu Kapat / Rumuz Değiştir"
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
@@ -305,12 +370,12 @@ export default function AuthUserButton() {
             </button>
 
             <div className="flex items-center gap-2 border-b border-white/10 pb-3">
-              <div className="p-2 bg-gradient-to-tr from-amber-500 to-indigo-600 rounded-xl text-slate-950 font-black">
+              <div className="p-2 bg-gradient-to-tr from-amber-500 to-emerald-500 rounded-xl text-slate-950 font-black">
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-black text-base text-white">3D Coğrafya Oturum Açma</h3>
-                <p className="text-xs text-slate-400">Tüm puanlarını, rozetlerini ve test kayıtlarını kaydet.</p>
+                <h3 className="font-black text-base text-white">3D Coğrafya Rumuz & Oturum</h3>
+                <p className="text-xs text-slate-400">Puanlarını, rozetlerini ve test istatistiklerini kaydet.</p>
               </div>
             </div>
 
@@ -335,7 +400,7 @@ export default function AuthUserButton() {
                   authTab === 'guest' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-300 hover:text-white'
                 }`}
               >
-                ⚡ Hızlı Misafir
+                ⚡ Hızlı Rumuz
               </button>
               <button
                 onClick={() => setAuthTab('email_login')}
@@ -357,15 +422,15 @@ export default function AuthUserButton() {
               </button>
             </div>
 
-            {/* Tab 1: Guest Sign In */}
+            {/* Tab 1: Guest / Rumuz Sign In */}
             {authTab === 'guest' && (
               <div className="space-y-3 bg-white/5 border border-white/10 p-3.5 rounded-xl animate-in fade-in duration-150">
                 <div className="space-y-1">
                   <label className="text-xs font-black text-amber-300 block">
-                    ⚡ Misafir Öğrenci Modu
+                    ⚡ Rumuz İle Anında Başla (Vercel Uyumlu)
                   </label>
-                  <p className="text-[11px] text-slate-400">
-                    Şifre veya e-posta gerekmez. İsim girerek hemen başlayın, ilerlemeniz bulutta kaydedilir.
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Şifre veya izin gerekmez. Rumuzunuzu yazıp tıklayın; puanlarınız, rozetleriniz ve çözdüğünüz sorular tarayıcınızda kalıcı olarak saklanır.
                   </p>
                 </div>
 
@@ -373,7 +438,7 @@ export default function AuthUserButton() {
                   <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
-                    placeholder="Adınızı veya Rumuzunuzu Yazın"
+                    placeholder="Adınızı veya Rumuzunuzu Yazın (örn: emirhan)"
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-400"
@@ -385,7 +450,7 @@ export default function AuthUserButton() {
                   className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95"
                 >
                   <Sparkles className="w-4 h-4 text-emerald-300" />
-                  <span>Anında Misafir Girişi Yap</span>
+                  <span>Rumuz İle Giriş Yap & Kaydet</span>
                 </button>
               </div>
             )}
@@ -414,7 +479,7 @@ export default function AuthUserButton() {
                     <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
-                      placeholder="Ad Soyad"
+                      placeholder="Ad Soyad veya Rumuz"
                       value={customName}
                       onChange={(e) => setCustomName(e.target.value)}
                       className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-indigo-400"
@@ -471,7 +536,7 @@ export default function AuthUserButton() {
                   <span>Google Hesabı İle Giriş Yap</span>
                 </button>
                 <p className="text-[10px] text-slate-400 text-center">
-                  Google pop-up doğrulaması AI Studio Önizleme ortamlarında doğrudan çalışır.
+                  Google pop-up doğrulaması önizleme ortamlarında çalışır. Vercel yayınlarında Hızlı Rumuz önerilir.
                 </p>
               </div>
             )}
