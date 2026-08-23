@@ -60,6 +60,11 @@ export default function PinGuessGame() {
     }
   }, [shuffledPinQuestions.length, shufflePinQuestions]);
 
+  // Reset hint on every question change
+  useEffect(() => {
+    setShowHint(false);
+  }, [pinGameIndex, gameCategoryFilter]);
+
   const filteredQuestions = shuffledPinQuestions.length > 0
     ? shuffledPinQuestions
     : getFilteredPinQuestions(gameCategoryFilter);
@@ -76,27 +81,27 @@ export default function PinGuessGame() {
   // If user minimized the card to keep map 100% clear
   if (isCollapsed) {
     return (
-      <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 w-[94vw] max-w-xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-2xl shadow-2xl px-3 py-1.5 flex items-center justify-between gap-2 text-white animate-in fade-in slide-in-from-top-2 duration-200">
+      <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-30 w-[94vw] max-w-md sm:max-w-lg bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-2xl shadow-2xl px-3 py-1.5 flex items-center justify-between gap-2 text-white animate-in fade-in slide-in-from-top-2 duration-200">
         <div className="flex items-center gap-2 overflow-hidden">
-          <span className="px-2 py-0.5 rounded-lg bg-amber-400 text-slate-950 font-black text-xs shrink-0 flex items-center gap-1 shadow">
-            <MapPin className="w-3.5 h-3.5" />
+          <span className="px-2 py-0.5 rounded-lg bg-amber-400 text-slate-950 font-black text-[10px] sm:text-xs shrink-0 flex items-center gap-1 shadow">
+            <MapPin className="w-3 h-3" />
             ARANAN:
           </span>
-          <span className="font-black text-sm text-amber-300 truncate">
+          <span className="font-black text-xs sm:text-sm text-amber-300 truncate">
             {currentQ.title}
           </span>
           <span className="text-[10px] text-slate-300 font-bold hidden sm:inline border-l border-white/20 pl-2">
-            Soru {safeIndex + 1}/{filteredQuestions.length}
+            {safeIndex + 1}/{filteredQuestions.length}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => setIsCollapsed(false)}
-            className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[11px] rounded-xl flex items-center gap-1 border border-indigo-400 shadow-lg transition-all active:scale-95"
+            className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] sm:text-[11px] rounded-xl flex items-center gap-1 border border-indigo-400 shadow-lg transition-all active:scale-95"
             title="Soru Kartını Genişlet"
           >
-            <Maximize2 className="w-3.5 h-3.5" />
+            <Maximize2 className="w-3 h-3" />
             <span>Kartı Aç</span>
           </button>
           <button
@@ -104,7 +109,7 @@ export default function PinGuessGame() {
             className="p-1 rounded-lg bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-rose-200 border border-white/20 transition-all"
             title="Testi Kapat"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -113,7 +118,7 @@ export default function PinGuessGame() {
 
   return (
     <DraggableCard
-      className="absolute top-14 sm:top-16 left-1/2 -translate-x-1/2 z-30 w-[94vw] sm:w-[620px] md:w-[740px] lg:w-[820px] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/40 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-3 transition-all"
+      className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-30 w-[96vw] max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/40 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-2.5 sm:p-3 transition-all"
     >
       {/* Top Controls Bar */}
       <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2 gap-2">

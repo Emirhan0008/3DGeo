@@ -28,7 +28,7 @@ export default function FeatureDetailModal() {
 
   return (
     <DraggableCard
-      className="absolute left-4 sm:left-20 bottom-6 z-30 w-80 sm:w-96 bg-[#09090b]/90 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
+      className="absolute left-2 sm:left-20 bottom-6 z-30 w-[92vw] sm:w-96 max-w-sm bg-[#09090b]/90 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
     >
       {/* Top Banner */}
       <div className="p-3.5 bg-gradient-to-r from-indigo-950/80 via-[#09090b] to-slate-900 border-b border-white/10 flex items-start justify-between">

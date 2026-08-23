@@ -26,6 +26,10 @@ export default function AuthUserButton() {
 
   useEffect(() => {
     setMounted(true);
+    const savedRumuz = typeof window !== 'undefined' ? localStorage.getItem('kpss3d_rumuz') : null;
+    if (savedRumuz) {
+      setCustomName(savedRumuz);
+    }
   }, []);
   
   // Custom name for guest/email
@@ -180,6 +184,9 @@ export default function AuthUserButton() {
     try {
       const anonUser = await signInAnonymously(auth);
       const nameToSet = customName.trim() || 'KPSS Öğrencisi';
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kpss3d_rumuz', nameToSet);
+      }
       if (anonUser.user) {
         await updateProfile(anonUser.user, {
           displayName: nameToSet
@@ -189,7 +196,7 @@ export default function AuthUserButton() {
     } catch (error: unknown) {
       console.error('Guest sign-in error:', error);
       const err = error as { message?: string };
-      setAuthErrorMsg('Misafir girişi sırasında hata oluştu: ' + (err?.message || 'Bilinmeyen hata'));
+      setAuthErrorMsg('Rumuz ile giriş sırasında hata oluştu: ' + (err?.message || 'Bilinmeyen hata'));
     } finally {
       setLoading(false);
     }

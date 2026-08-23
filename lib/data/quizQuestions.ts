@@ -1036,15 +1036,81 @@ export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
     osymTip: 'Marmara\'da sadece Uludağ\'da yüksek kısımda buzul izi vardır.'
   },
   {
-    id: 'mc-33',
-    category: 'Dış Kuvvetler',
+    id: 'mc-34',
+    category: 'Madenler & Enerji',
     region: 'İç Anadolu',
-    questionText: 'Kurak ve yarı kurak arazilerde rüzgarın taşıdığı ince toz malzemelerin birikmesiyle oluşan toprağa ve rüzgar kara kumullarına hangi ilimizde rastlanmaz?',
-    options: ['Konya Karapınar', 'Manisa', 'Kayseri Develi', 'Iğdır Ovası', 'Rize Çamlıhemşin'],
-    correctIndex: 4,
-    targetCoords: [41.000, 41.000],
-    explanation: 'Rize nemli ve bol yağışlı Karadeniz iklimine sahip olduğu için rüzgar aşınım/birikim şekillerine rastlanmaz.',
-    osymTip: 'Rüzgar etkisi kurak alanlarda (İç A. / Güneydoğu) fazladır; Karadeniz\'de yok denecek kadar azdır.'
+    questionText: 'Türkiye\'de Linyit ile çalışan ve Türkiye\'nin en büyük termik santrallerinden biri olan santral hangisidir?',
+    options: ['Afşin - Elbistan', 'Hamitabat', 'Çatalağzı', 'Ambarlı', 'Ovaakça'],
+    correctIndex: 0,
+    targetCoords: [36.910, 38.250],
+    explanation: 'Maraş Afşin-Elbistan Santrali Linyit kömürü ile çalışan Türkiye\'nin en büyük termik santrallerindendir.',
+    osymTip: 'Afşin-Elbistan = Linyit; Hamitabat = Doğalgaz; Çatalağzı = Taşkömürü.'
+  },
+  {
+    id: 'mc-35',
+    category: 'Sınır Kapıları',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Türkiye\'nin Irak ile tek kara sınırı olan ve ticaret hacmi son derece yüksek olan sınır kapısı hangisidir?',
+    options: ['Habur Sınır Kapısı', 'Sarp Sınır Kapısı', 'Kapıkule Sınır Kapısı', 'İpsala Sınır Kapısı', 'Dilucu Sınır Kapısı'],
+    correctIndex: 0,
+    targetCoords: [42.365, 37.150],
+    explanation: 'Şırnak Silopi\'de bulunan Habur Sınır Kapısı Türkiye\'nin Irak ile olan tek sınır kapısıdır.',
+    osymTip: 'Irak = Habur Sınır Kapısı.'
+  },
+  {
+    id: 'mc-36',
+    category: 'Geçitler',
+    region: 'Karadeniz',
+    questionText: 'Trabzon ile Gümüşhane arasında yer alan ve Doğu Karadeniz\'i İç Anadolu\'ya bağlayan tarihi geçit hangisidir?',
+    options: ['Zigana (Kalkanlı) Geçidi', 'Gülek Boğazı', 'Sertavul Geçidi', 'Belen Geçidi', 'Ecevit Geçidi'],
+    correctIndex: 0,
+    targetCoords: [39.380, 40.640],
+    explanation: 'Zigana Geçidi Trabzon-Gümüşhane hattında yer alan tarihi İpek Yolu üzerindeki stratejik geçittir.',
+    osymTip: 'Trabzon - Gümüşhane = Zigana Geçidi.'
+  },
+  {
+    id: 'mc-37',
+    category: 'Toprak Tipleri',
+    region: 'Doğu Anadolu',
+    questionText: 'Erzurum-Kars Platosu\'nda çayır bitki örtüsü altında oluşan, organik madde bakımından en zengin "Kara Toprak" türü hangisidir?',
+    options: ['Çernozyom', 'Terra Rossa', 'Podzol', 'Rendzina', 'Laterit'],
+    correctIndex: 0,
+    targetCoords: [42.100, 40.200],
+    explanation: 'Çernozyom yüksek nemli dağ çayırları altında oluşan dünyanın en verimli toprağıdır; fakat sert iklimden dolayı tarımsal verim az değerlendirilir.',
+    osymTip: 'Erzurum-Kars + Dağ Çayırı = Çernozyom (Dünyanın en zengin humusu).'
+  },
+  {
+    id: 'mc-38',
+    category: 'Akarsular & Deltalar',
+    region: 'Karadeniz',
+    questionText: 'Samsun\'da Kızılırmak nehri taşıdığı alüvyonlarla Türkiye\'nin Karadeniz kıyısındaki en büyük delta ovasını oluşturmuştur. Bu ova hangisidir?',
+    options: ['Bafra Ovası', 'Çarşamba Ovası', 'Silifke Ovası', 'Gediz Ovası', 'Çukurova'],
+    correctIndex: 0,
+    targetCoords: [35.900, 41.570],
+    explanation: 'Kızılırmak Samsun Bafra Ovası\'nı; Yeşilırmak ise Çarşamba Ovası\'nı oluşturur.',
+    osymTip: 'Kızılırmak -> Bafra; Yeşilırmak -> Çarşamba.'
+  },
+  {
+    id: 'mc-39',
+    category: 'Fay Hatları & Deprem',
+    region: 'Marmara',
+    questionText: 'Bingöl Karlıova\'dan başlayıp Marmara Denizi altından geçerek Saros Körfezi\'ne ulaşan Türkiye\'nin en uzun doğrultu atımlı aktif fay hattı hangisidir?',
+    options: ['Kuzey Anadolu Fay Hattı (KAF)', 'Doğu Anadolu Fay Hattı (DAF)', 'Batı Anadolu Fay Hattı (BAF)', 'Tavrıs Fay Hattı', 'Sundance Fayı'],
+    correctIndex: 0,
+    targetCoords: [29.000, 40.800],
+    explanation: 'KAF (Kuzey Anadolu Fay Hattı) dünyadaki en hareketli doğrultu atımlı fay kuşaklarından biridir.',
+    osymTip: 'KAF: Bingöl Karlıova - Saros Körfezi arası uzanır.'
+  },
+  {
+    id: 'mc-40',
+    category: 'Madenler',
+    region: 'Ege',
+    questionText: 'Dünya rezervinin yaklaşık %72\'sine Türkiye\'nin sahip olduğu; Balıkesir Susurluk, Kütahya Emet, Eskişehir Kırka ve Bursa Mustafa Kemal Paşa\'da çıkarılan stratejik madenimiz hangisidir?',
+    options: ['Bor Mineralleri', 'Krom', 'Boksit', 'Bakır', 'Fosfat'],
+    correctIndex: 0,
+    targetCoords: [28.150, 39.910],
+    explanation: 'Türkiye Bor mineralleri rezervinde dünyada 1. sıradadır.',
+    osymTip: 'Susurluk, Emet, Kırka, Bigadiç = Bor.'
   }
 ];
 
