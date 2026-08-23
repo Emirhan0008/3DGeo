@@ -1,6 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const { stats } = await req.json();
@@ -45,7 +47,7 @@ Lütfen bu verilere göre kullanıcıya özel detaylı KPSS Akıllı Teşhis Rap
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.7-flash',
       contents: [
         { role: 'user', parts: [{ text: systemInstruction + '\n' + userPrompt }] }
       ]
@@ -53,10 +55,11 @@ Lütfen bu verilere göre kullanıcıya özel detaylı KPSS Akıllı Teşhis Rap
 
     const text = response.text || 'Rapor oluşturulamadı.';
     return NextResponse.json({ text });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Gemini Analyze API Error:', error);
+    const err = error as Error;
     return NextResponse.json(
-      { error: error?.message || 'Bir sunucu hatası oluştu.' },
+      { error: err?.message || 'Bir sunucu hatası oluştu.' },
       { status: 500 }
     );
   }

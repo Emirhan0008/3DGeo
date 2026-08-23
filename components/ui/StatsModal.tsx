@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
+import { ALL_BADGES } from '@/lib/data/badgesData';
 import { 
   Trophy, 
   Flame, 
@@ -24,20 +25,12 @@ import {
   Layers
 } from 'lucide-react';
 
-const ALL_BADGES = [
-  { name: '3D Coğrafyacı Çırağı', icon: '🐣', desc: 'Uygulamaya ilk adım attın.' },
-  { name: 'Tam İsabet Kaptan', icon: '🎯', desc: 'Pim bulma oyununda %100 tam isabet yaptın.' },
-  { name: '5\'li Seri Canavarı', icon: '🔥', desc: 'Üst üste 5 doğru cevap verdin.' },
-  { name: 'KPSS Coğrafya Üstadı', icon: '🎓', desc: '300 puan barajını aştın.' },
-  { name: 'Gümrük Muhafızı', icon: '🚪', desc: 'Tüm sınır kapılarını ezberledin.' },
-  { name: 'Mavi Vatan Uzmanı', icon: '🌊', desc: 'Akarsu ve gölleri eksiksiz bildin.' }
-];
-
 export default function StatsModal() {
   const {
     score,
     streak,
     unlockedBadges,
+    categoryMasteryProgress,
     totalQuestionsAnswered,
     correctAnswersCount,
     regionalStats,
@@ -503,30 +496,74 @@ export default function StatsModal() {
         </div>
       )}
 
-      {/* Badges Section */}
-      <div className="mt-3.5 pt-3 border-t border-white/10">
-        <h3 className="font-bold text-xs uppercase tracking-wider text-indigo-300 mb-2 flex items-center gap-1.5">
-          <Award className="w-4 h-4 text-indigo-400" />
-          Kazanılan Rozetler
-        </h3>
+      {/* Badges & Category Mastery Section */}
+      <div className="mt-4 pt-3.5 border-t border-white/10 space-y-2.5">
+        <div className="flex items-center justify-between">
+          <h3 className="font-extrabold text-xs uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>KATEGORİ UZMANLIK ROZETLERİ &amp; BAŞARIMLAR ({unlockedBadges.length}/{ALL_BADGES.length})</span>
+          </h3>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            %{Math.round((unlockedBadges.length / ALL_BADGES.length) * 100)} Tamamlandı
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {ALL_BADGES.map((badge) => {
             const isUnlocked = unlockedBadges.includes(badge.name);
+            const currentCount = (categoryMasteryProgress && categoryMasteryProgress[badge.trackerKey]) || 0;
+            const targetCount = badge.targetCount || 1;
+            const progressPct = Math.min(100, Math.round((currentCount / targetCount) * 100));
+
             return (
               <div
-                key={badge.name}
-                className={`p-2 rounded-xl border flex items-center gap-2 transition-all ${
+                key={badge.id}
+                className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
                   isUnlocked
-                    ? 'bg-indigo-500/20 border-indigo-500/40 text-slate-100 shadow-md'
-                    : 'bg-white/5 border-white/5 text-slate-600 opacity-40'
+                    ? 'bg-gradient-to-r from-amber-950/40 via-[#09090b] to-indigo-950/40 border-amber-500/50 shadow-lg shadow-amber-500/10'
+                    : 'bg-white/5 border-white/10 text-slate-400 opacity-80'
                 }`}
               >
-                <span className="text-lg shrink-0">{badge.icon}</span>
-                <div>
-                  <div className="font-bold text-xs leading-tight text-white">{badge.name}</div>
-                  <div className="text-[9px] text-slate-400 leading-tight mt-0.5">{badge.desc}</div>
+                <div className="flex items-start gap-2.5">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0 ${
+                    isUnlocked ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-md text-slate-950 font-black' : 'bg-white/10 text-slate-500'
+                  }`}>
+                    {badge.icon}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className={`font-extrabold text-xs truncate ${isUnlocked ? 'text-amber-300' : 'text-slate-300'}`}>
+                        {badge.name}
+                      </span>
+                      {isUnlocked && (
+                        <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 shrink-0">
+                          KAZANILDI ✓
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-[10px] text-slate-300 leading-tight mt-0.5">
+                      {badge.desc}
+                    </p>
+                  </div>
                 </div>
+
+                {!isUnlocked && (
+                  <div className="mt-2 pt-1.5 border-t border-white/5 space-y-1">
+                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-medium">
+                      <span>{badge.reqText}</span>
+                      <span className="font-extrabold text-amber-400">{currentCount}/{targetCount} (%{progressPct})</span>
+                    </div>
+                    <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500"
+                        style={{ width: `${progressPct}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

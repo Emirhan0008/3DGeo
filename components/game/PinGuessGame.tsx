@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { PIN_GAME_QUESTIONS, getCurrentPinQuestion, getFilteredPinQuestions } from '@/lib/data/quizQuestions';
+import { getFeatureImageUrl } from '@/lib/data/turkeyData';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   HelpCircle, 
@@ -136,6 +137,41 @@ export default function PinGuessGame() {
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      </div>
+
+      {/* Prominent Target Landform / Location Name Badge (Request #2) */}
+      <div className="mb-2.5 p-2.5 bg-gradient-to-r from-amber-500/25 via-indigo-600/25 to-purple-600/25 border-2 border-amber-400/80 rounded-xl shadow-lg flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <div className="p-1.5 bg-amber-400 text-slate-950 rounded-lg font-black text-xs shrink-0 flex items-center gap-1 shadow-md">
+            <MapPin className="w-4 h-4" />
+            <span>ARANAN YER:</span>
+          </div>
+          <span className="font-black text-base sm:text-lg text-amber-300 tracking-wide drop-shadow truncate">
+            {currentQ.title}
+          </span>
+        </div>
+        {currentQ.region && (
+          <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 shrink-0">
+            {currentQ.region}
+          </span>
+        )}
+      </div>
+
+      {/* Location Photograph Banner (Request #1) */}
+      <div className="relative w-full h-28 mb-2.5 rounded-xl overflow-hidden border border-white/10 shadow-md group">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={getFeatureImageUrl({ id: currentQ.targetFeatureId, title: currentQ.title, name: currentQ.title, category: currentQ.category })}
+          alt={currentQ.title}
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[10px] text-white/90">
+          <span className="px-2 py-0.5 rounded bg-black/60 font-bold border border-white/10 text-amber-300">
+            📸 Coğrafi Görsel
+          </span>
+          <span className="font-semibold text-slate-200">{currentQ.title} ({currentQ.category})</span>
         </div>
       </div>
 

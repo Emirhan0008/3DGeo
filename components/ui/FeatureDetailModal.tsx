@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAppStore } from '@/lib/store/useStore';
+import { getFeatureImageUrl } from '@/lib/data/turkeyData';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   Mountain, 
@@ -66,6 +67,23 @@ export default function FeatureDetailModal() {
 
       {/* Content */}
       <div className="p-3.5 space-y-2.5 max-h-[50vh] overflow-y-auto text-xs">
+        {/* Feature Photograph Image Banner */}
+        <div className="relative w-full h-36 rounded-xl overflow-hidden border border-white/10 shadow-lg group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={getFeatureImageUrl(selectedFeature)}
+            alt={selectedFeature.name}
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[10px] text-white/90 font-medium">
+            <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/15 text-indigo-300 font-bold">
+              📸 Coğrafi Görsel
+            </span>
+            <span className="text-slate-300 font-semibold">{selectedFeature.region}</span>
+          </div>
+        </div>
+
         {/* Description */}
         <p className="text-slate-300 leading-relaxed font-normal">
           {selectedFeature.description}

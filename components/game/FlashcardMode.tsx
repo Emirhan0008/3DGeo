@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { ALL_GEO_FEATURES, GeoFeature } from '@/lib/data/turkeyData';
+import { ALL_GEO_FEATURES, GeoFeature, getFeatureImageUrl } from '@/lib/data/turkeyData';
 import { useAppStore } from '@/lib/store/useStore';
 import { shuffleArray } from '@/lib/data/quizQuestions';
 import { 
@@ -137,9 +137,23 @@ export default function FlashcardMode() {
         {!isFlipped ? (
           /* Card Front */
           <div className="flex flex-col items-center justify-center text-center my-auto space-y-3">
-            <span className="px-3 py-1 rounded-full bg-white/5 border border-indigo-500/30 text-indigo-300 font-extrabold text-xs">
-              {currentItem.category || currentItem.type}
-            </span>
+            {/* Flashcard Photo Image */}
+            <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/10 shadow-md">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={getFeatureImageUrl(currentItem)}
+                alt={currentItem.name}
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[10px] text-white/90">
+                <span className="px-2 py-0.5 rounded bg-black/60 font-bold border border-white/10 text-indigo-300">
+                  {currentItem.category || currentItem.type}
+                </span>
+                <span className="font-semibold">{currentItem.region}</span>
+              </div>
+            </div>
+
             <h2 className="font-black text-xl text-white tracking-wide">
               {currentItem.name}
             </h2>
@@ -147,7 +161,7 @@ export default function FlashcardMode() {
               📍 {currentItem.region} Bölgesi {currentItem.elevation ? `• ${currentItem.elevation} m` : ''}
             </p>
 
-            <div className="pt-3 text-[11px] text-indigo-400 font-bold flex items-center gap-1.5 animate-pulse">
+            <div className="pt-1 text-[11px] text-indigo-400 font-bold flex items-center gap-1.5 animate-pulse">
               <RotateCw className="w-3.5 h-3.5" />
               <span>Detaylar ve KPSS Notu İçin Karta Tıklayın!</span>
             </div>

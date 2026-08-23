@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { MULTIPLE_CHOICE_QUESTIONS, getCurrentQuizQuestion, getFilteredQuizQuestions } from '@/lib/data/quizQuestions';
+import { getFeatureImageUrl } from '@/lib/data/turkeyData';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   CheckCircle2, 
@@ -123,6 +124,23 @@ export default function QuizTestGame() {
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      </div>
+
+      {/* Question Photo Banner */}
+      <div className="relative w-full h-28 mb-2.5 rounded-xl overflow-hidden border border-white/10 shadow-md">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={getFeatureImageUrl({ id: currentQ.focusFeatureId, title: currentQ.category, name: currentQ.category, category: currentQ.category })}
+          alt={currentQ.category}
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[10px] text-white/90">
+          <span className="px-2 py-0.5 rounded bg-black/60 font-bold border border-white/10 text-emerald-300">
+            📸 Soru Görseli
+          </span>
+          <span className="font-semibold text-slate-200">{currentQ.category}</span>
         </div>
       </div>
 

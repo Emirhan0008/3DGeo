@@ -88,25 +88,25 @@ export default function Navbar() {
       </div>
 
       {/* Center: Minimal Segmented Navigation Tabs */}
-      <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shrink-0">
+      <nav className="flex items-center gap-1.5 bg-[#09090b]/75 backdrop-blur-xl p-1 rounded-xl border border-white/20 shadow-lg shrink-0">
         <button
           onClick={() => setActiveTab('map')}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
             activeTab === 'map'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+              ? 'bg-indigo-600 text-white border-indigo-300 shadow-lg shadow-indigo-500/30 ring-1 ring-indigo-300'
+              : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-indigo-400/60 hover:text-white'
           }`}
         >
-          <Map className="w-3.5 h-3.5" />
+          <Map className="w-3.5 h-3.5 text-indigo-400 group-hover:text-white" />
           <span>Keşif</span>
         </button>
 
         <button
           onClick={() => setActiveTab('pin_game')}
-          className={`relative px-3 py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+          className={`relative px-3 py-1.5 rounded-lg text-[11px] font-black transition-all flex items-center gap-1.5 whitespace-nowrap border-2 ${
             activeTab === 'pin_game'
-              ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-xl shadow-amber-500/40 ring-2 ring-amber-400'
-              : 'bg-gradient-to-r from-amber-500/20 via-amber-500/35 to-amber-500/20 text-amber-200 border-amber-400/50 hover:bg-amber-500/30 animate-pulse shadow-md shadow-amber-500/20'
+              ? 'bg-amber-500 text-slate-950 border-amber-200 shadow-xl shadow-amber-500/40 ring-2 ring-amber-300'
+              : 'bg-amber-500/15 text-amber-300 border-amber-400/60 hover:bg-amber-500/25 hover:border-amber-300 shadow-md shadow-amber-500/20'
           }`}
         >
           <span className="relative flex h-2 w-2">
@@ -119,37 +119,37 @@ export default function Navbar() {
 
         <button
           onClick={() => setActiveTab('quiz_test')}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
             activeTab === 'quiz_test'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+              ? 'bg-emerald-600 text-white border-emerald-300 shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-300'
+              : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-emerald-400/60 hover:text-white'
           }`}
         >
-          <HelpCircle className="w-3.5 h-3.5" />
+          <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
           <span>KPSS Testi</span>
         </button>
 
         <button
           onClick={() => setActiveTab('flashcards')}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
             activeTab === 'flashcards'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+              ? 'bg-purple-600 text-white border-purple-300 shadow-lg shadow-purple-500/30 ring-1 ring-purple-300'
+              : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-purple-400/60 hover:text-white'
           }`}
         >
-          <BookOpen className="w-3.5 h-3.5" />
+          <BookOpen className="w-3.5 h-3.5 text-purple-400" />
           <span>Ezber</span>
         </button>
 
         <button
           onClick={() => setActiveTab('stats')}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
             activeTab === 'stats'
-              ? 'bg-cyan-600 text-white shadow-md shadow-cyan-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+              ? 'bg-cyan-600 text-white border-cyan-300 shadow-lg shadow-cyan-500/30 ring-1 ring-cyan-300'
+              : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-cyan-400/60 hover:text-white'
           }`}
         >
-          <BarChart3 className="w-3.5 h-3.5" />
+          <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
           <span>Analiz</span>
         </button>
       </nav>

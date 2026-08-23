@@ -11,7 +11,7 @@ import {
   PinGameQuestion,
   MultipleChoiceQuestion
 } from '../data/quizQuestions';
-import confetti from 'canvas-confetti';
+import { ALL_BADGES } from '../data/badgesData';
 
 export type MapStyleType = 'topographic' | 'hybrid' | 'dark' | 'satellite';
 export type ActiveTabType = 'map' | 'pin_game' | 'quiz_test' | 'flashcards' | 'stats' | 'ai_tutor';
@@ -96,8 +96,11 @@ export interface AppState {
   resetQuizTest: () => void;
   shuffleQuizQuestions: () => void;
 
-  // Gamification & Badges
+  // Gamification, Category Mastery & Badges
   unlockedBadges: string[];
+  categoryMasteryProgress: Record<string, number>;
+  latestUnlockedBadge: { name: string; icon: string; desc: string } | null;
+  clearLatestUnlockedBadge: () => void;
   totalQuestionsAnswered: number;
   correctAnswersCount: number;
 
@@ -109,7 +112,9 @@ export interface AppState {
 
   // Dilsiz Harita (Blind Outline Map) Mode
   isBlindMapMode: boolean;
+  hideLandformsInBlindMode: boolean;
   toggleBlindMapMode: () => void;
+  toggleHideLandformsInBlindMode: () => void;
   setBlindMapMode: (enabled: boolean) => void;
 
   // Tracked Weak Spots / Misplaced Geography Items
@@ -129,6 +134,69 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c);
+}
+
+// Process category mastery progress and check badge unlocks
+function processBadgeEvaluation(
+  isCorrect: boolean,
+  region: string | undefined,
+  category: string | undefined,
+  currentScore: number,
+  currentStreak: number,
+  points: number,
+  isBlindMapMode: boolean,
+  state: AppState
+) {
+  const newProgress = { ...state.categoryMasteryProgress };
+  const newBadges = [...state.unlockedBadges];
+  let newlyUnlockedBadge: { name: string; icon: string; desc: string } | null = null;
+
+  if (isCorrect) {
+    const reg = region || 'İç Anadolu';
+    const cat = category || 'Dağlar';
+
+    // Track regional progress
+    const regKey = `${reg}_Genel`;
+    newProgress[regKey] = (newProgress[regKey] || 0) + 1;
+
+    // Track Doğu Anadolu Akarsular
+    if (reg === 'Doğu Anadolu' && (cat === 'Akarsular' || cat === 'Göller')) {
+      newProgress['Doğu Anadolu_Akarsular'] = (newProgress['Doğu Anadolu_Akarsular'] || 0) + 1;
+    }
+
+    // Track Passes and Gates
+    if (cat === 'Geçitler' || cat === 'Sınır Kapıları') {
+      newProgress['PassesAndGates'] = (newProgress['PassesAndGates'] || 0) + 1;
+    }
+
+    // Track Blind Map Mode
+    if (isBlindMapMode) {
+      newProgress['BlindMapCorrect'] = (newProgress['BlindMapCorrect'] || 0) + 1;
+    }
+
+    if (points === 100) {
+      newProgress['TamIsabet'] = (newProgress['TamIsabet'] || 0) + 1;
+    }
+
+    // Check all badge requirements against ALL_BADGES
+    ALL_BADGES.forEach((b) => {
+      if (!newBadges.includes(b.name)) {
+        let isUnlocked = false;
+        if (b.trackerKey === 'TamIsabet' && points === 100) isUnlocked = true;
+        else if (b.trackerKey === 'Streak5' && currentStreak >= 5) isUnlocked = true;
+        else if (b.trackerKey === 'Score300' && currentScore >= 300) isUnlocked = true;
+        else if (b.trackerKey === 'InitialStep') isUnlocked = true;
+        else if ((newProgress[b.trackerKey] || 0) >= b.targetCount) isUnlocked = true;
+
+        if (isUnlocked) {
+          newBadges.push(b.name);
+          newlyUnlockedBadge = { name: b.name, icon: b.icon, desc: b.desc };
+        }
+      }
+    });
+  }
+
+  return { newProgress, newBadges, newlyUnlockedBadge };
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -301,10 +369,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   totalDistanceErrorKm: 0,
   pinGuessCount: 0,
 
+  // Gamification, Category Mastery & Badge State
+  categoryMasteryProgress: {},
+  latestUnlockedBadge: null,
+  clearLatestUnlockedBadge: () => set({ latestUnlockedBadge: null }),
+
   // Dilsiz Harita (Blind Outline Map) State
   isBlindMapMode: false,
-  toggleBlindMapMode: () => set((s) => ({ isBlindMapMode: !s.isBlindMapMode })),
-  setBlindMapMode: (enabled) => set({ isBlindMapMode: enabled }),
+  hideLandformsInBlindMode: true,
+  toggleBlindMapMode: () => set((s) => ({ 
+    isBlindMapMode: !s.isBlindMapMode,
+    hideLandformsInBlindMode: !s.isBlindMapMode ? true : s.hideLandformsInBlindMode
+  })),
+  toggleHideLandformsInBlindMode: () => set((s) => ({ hideLandformsInBlindMode: !s.hideLandformsInBlindMode })),
+  setBlindMapMode: (enabled) => set((s) => ({ 
+    isBlindMapMode: enabled,
+    hideLandformsInBlindMode: enabled ? true : s.hideLandformsInBlindMode
+  })),
 
   // Tracked Weak Spots / Misplaced Geography Items
   missedItems: {},
@@ -366,22 +447,28 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newStreak = isGoodGuess ? state.streak + 1 : 0;
     const newTotalScore = state.score + points;
 
-    if (isGoodGuess) {
-      confetti({
-        particleCount: points === 100 ? 100 : 40,
-        spread: 60,
-        origin: { y: 0.6 }
-      });
+    if (isGoodGuess && typeof window !== 'undefined') {
+      import('canvas-confetti').then((m) => {
+        const confettiFn = m.default || m;
+        confettiFn({
+          particleCount: points === 100 ? 100 : 40,
+          spread: 60,
+          origin: { y: 0.6 }
+        });
+      }).catch(() => {});
     }
 
-    // Check badges
-    const newBadges = [...state.unlockedBadges];
-    if (points === 100 && !newBadges.includes('Tam İsabet Kaptan')) {
-      newBadges.push('Tam İsabet Kaptan');
-    }
-    if (newStreak >= 5 && !newBadges.includes('5\'li Seri Canavarı')) {
-      newBadges.push('5\'li Seri Canavarı');
-    }
+    // Check badges & mastery progress
+    const evalResult = processBadgeEvaluation(
+      isGoodGuess,
+      currentQ.region,
+      currentQ.category,
+      newTotalScore,
+      newStreak,
+      points,
+      state.isBlindMapMode,
+      state
+    );
 
     // Update Analytics Stats
     const reg = currentQ.region || 'İç Anadolu';
@@ -425,7 +512,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       isPinGuessed: true,
       score: newTotalScore,
       streak: newStreak,
-      unlockedBadges: newBadges,
+      unlockedBadges: evalResult.newBadges,
+      categoryMasteryProgress: evalResult.newProgress,
+      latestUnlockedBadge: evalResult.newlyUnlockedBadge || state.latestUnlockedBadge,
       totalQuestionsAnswered: state.totalQuestionsAnswered + 1,
       correctAnswersCount: isGoodGuess ? state.correctAnswersCount + 1 : state.correctAnswersCount,
       regionalStats: updatedRegStats,
@@ -491,15 +580,26 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!currentQ) return;
 
     const isCorrect = optionIndex === currentQ.correctIndex;
-    if (isCorrect) {
-      confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
+    if (isCorrect && typeof window !== 'undefined') {
+      import('canvas-confetti').then((m) => {
+        const confettiFn = m.default || m;
+        confettiFn({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
+      }).catch(() => {});
     }
 
     const newScore = isCorrect ? state.quizScore + 100 : state.quizScore;
-    const newBadges = [...state.unlockedBadges];
-    if (newScore >= 300 && !newBadges.includes('KPSS Coğrafya Üstadı')) {
-      newBadges.push('KPSS Coğrafya Üstadı');
-    }
+    
+    // Check badges & mastery progress
+    const evalResult = processBadgeEvaluation(
+      isCorrect,
+      currentQ.region,
+      currentQ.category,
+      newScore,
+      state.streak,
+      isCorrect ? 100 : 0,
+      state.isBlindMapMode,
+      state
+    );
 
     // Update Analytics
     const reg = currentQ.region || 'İç Anadolu';
@@ -522,7 +622,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       quizSelectedOption: optionIndex,
       isQuizAnswered: true,
       quizScore: newScore,
-      unlockedBadges: newBadges,
+      unlockedBadges: evalResult.newBadges,
+      categoryMasteryProgress: evalResult.newProgress,
+      latestUnlockedBadge: evalResult.newlyUnlockedBadge || state.latestUnlockedBadge,
       totalQuestionsAnswered: state.totalQuestionsAnswered + 1,
       correctAnswersCount: isCorrect ? state.correctAnswersCount + 1 : state.correctAnswersCount,
       regionalStats: updatedRegStats,
