@@ -241,7 +241,7 @@ function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean
     if (map.getSource(id)) map.removeSource(id);
   });
 
-  // 1. Vignette Outer Dark Mask
+  // 1. Vignette Outer Dark Mask - Masks everywhere OUTSIDE Turkey so only Turkey is illuminated
   map.addSource('turkey-mask-src', {
     type: 'geojson',
     data: {
@@ -263,7 +263,7 @@ function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean
     source: 'turkey-mask-src',
     paint: {
       'fill-color': '#020617',
-      'fill-opacity': isBlind ? 0.45 : 0.35
+      'fill-opacity': isBlind ? 0.98 : 0.88
     }
   });
 
@@ -313,9 +313,9 @@ function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean
     type: 'line',
     source: 'turkey-border-src',
     paint: {
-      'line-color': '#0f172a',
-      'line-width': 8,
-      'line-opacity': 0.95
+      'line-color': '#020617',
+      'line-width': 12,
+      'line-opacity': 0.98
     }
   });
 
@@ -326,9 +326,9 @@ function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean
     source: 'turkey-border-src',
     paint: {
       'line-color': '#f59e0b',
-      'line-width': 14,
-      'line-opacity': 0.75,
-      'line-blur': 5
+      'line-width': 18,
+      'line-opacity': 0.90,
+      'line-blur': 4
     }
   });
 
@@ -338,8 +338,8 @@ function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean
     type: 'line',
     source: 'turkey-border-src',
     paint: {
-      'line-color': '#facc15',
-      'line-width': 4,
+      'line-color': '#fef08a',
+      'line-width': 4.5,
       'line-opacity': 1.0
     }
   });
