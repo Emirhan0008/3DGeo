@@ -6,11 +6,13 @@ interface DraggableCardProps {
   children: React.ReactNode;
   initialPosition?: { x: number; y: number };
   className?: string;
+  onDoubleClick?: (e: React.MouseEvent) => void;
 }
 
 export default function DraggableCard({
   children,
-  className = ''
+  className = '',
+  onDoubleClick
 }: DraggableCardProps) {
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -71,6 +73,7 @@ export default function DraggableCard({
     <div
       style={style}
       onMouseDown={handleMouseDown}
+      onDoubleClick={onDoubleClick}
       className={`transition-shadow select-none ${isDragging ? 'cursor-grabbing shadow-2xl scale-[1.01]' : 'cursor-grab'} ${className}`}
     >
       {children}
