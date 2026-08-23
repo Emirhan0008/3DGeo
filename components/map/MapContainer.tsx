@@ -1129,11 +1129,11 @@ export default function MapContainer() {
         </div>
       )}
 
-      {/* Pin Game Active Guidance Banner */}
+      {/* Pin Game Active Guidance Banner (Positioned Bottom-Left / Akdeniz area) */}
       {activeTab === 'pin_game' && !isPinGuessed && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-6 py-2.5 bg-gradient-to-r from-amber-600/90 via-orange-600/90 to-amber-600/90 backdrop-blur-lg border border-amber-400/50 rounded-2xl shadow-2xl text-white font-bold text-sm flex items-center gap-3 animate-pulse">
-          <MapPin className="w-5 h-5 text-amber-200" />
-          <span>Sorulan yerin konumunu harita üzerinde **TIKLAYIN!**</span>
+        <div className="absolute bottom-16 left-3 sm:left-16 z-20 px-3 py-1.5 bg-gradient-to-r from-amber-600/95 to-orange-600/95 backdrop-blur-md border-2 border-amber-300 rounded-xl shadow-2xl text-white font-extrabold text-[11px] sm:text-xs flex items-center gap-1.5 animate-pulse pointer-events-none">
+          <MapPin className="w-4 h-4 text-amber-200 shrink-0" />
+          <span>Sorulan yeri haritada **TIKLAYIN!**</span>
         </div>
       )}
     </div>

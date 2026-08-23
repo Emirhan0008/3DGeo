@@ -226,13 +226,10 @@ export default function Navbar() {
               ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
               : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
           }`}
-          title="Yapay Zeka KPSS Asistanı (Yakında Eklenecek)"
+          title="Yapay Zeka KPSS Asistanı"
         >
           <Bot className="w-4 h-4 text-indigo-400" />
           <span className="hidden xl:inline text-[11px]">AI Asistan</span>
-          <span className="px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[9px] border border-amber-500/40 font-black">
-            YAKINDA
-          </span>
         </button>
       </div>
     </header>
