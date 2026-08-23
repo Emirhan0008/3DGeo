@@ -1079,6 +1079,72 @@ export const BORDER_GATES_DATA: GeoFeature[] = [
       activeStatus: 'İnsani Yardım & Transit',
       railway: true
     }
+  },
+  {
+    id: 'bg-hamzabeyli',
+    name: 'Hamzabeyli Sınır Kapısı',
+    type: 'border_gate',
+    category: 'Bulgaristan Kapısı',
+    coordinates: [26.690, 41.960],
+    region: 'Marmara',
+    description: 'Edirne Lalapaşa\'da Bulgaristan\'a açılan Kapıkule alternatif gümrük kapısı.',
+    kpssTips: ['Kapıkule yoğunluğunu azaltmak için kullanılan Bulgaristan kapımızdır.'],
+    details: { connectedCountry: 'Bulgaristan', activeStatus: 'Açık', railway: false }
+  },
+  {
+    id: 'bg-pazarkule',
+    name: 'Pazarkule Sınır Kapısı',
+    type: 'border_gate',
+    category: 'Yunanistan Kapısı',
+    coordinates: [26.480, 41.660],
+    region: 'Marmara',
+    description: 'Edirne merkezde Yunanistan Kastanies\'e açılan sınır kapısı.',
+    kpssTips: ['Yunanistan ile İpsala\'dan sonraki ikinci karayolu geçiş noktasıdır.'],
+    details: { connectedCountry: 'Yunanistan', activeStatus: 'Açık', railway: false }
+  },
+  {
+    id: 'bg-turkgozu',
+    name: 'Türkgözü Sınır Kapısı',
+    type: 'border_gate',
+    category: 'Gürcistan Kapısı',
+    coordinates: [42.850, 41.500],
+    region: 'Doğu Anadolu',
+    description: 'Ardahan Posof\'ta Gürcistan\'a açılan sınır gümrük kapısı.',
+    kpssTips: ['Sarp Sınır Kapısı\'ndan sonra Gürcistan\'a açılan Doğu Anadolu kapısıdır.'],
+    details: { connectedCountry: 'Gürcistan', activeStatus: 'Açık', railway: false }
+  },
+  {
+    id: 'bg-aktas',
+    name: 'Aktaş Sınır Kapısı',
+    type: 'border_gate',
+    category: 'Gürcistan Kapısı',
+    coordinates: [43.220, 41.220],
+    region: 'Doğu Anadolu',
+    description: 'Ardahan Çıldır Aktaş Gölü yakınında Gürcistan\'a açılan modenize edilmiş sınır kapısı.',
+    kpssTips: ['Gürcistan ile 3. kara geçiş kapımızdır.'],
+    details: { connectedCountry: 'Gürcistan', activeStatus: 'Açık', railway: false }
+  },
+  {
+    id: 'bg-esendere',
+    name: 'Esendere Sınır Kapısı',
+    type: 'border_gate',
+    category: 'İran Kapısı',
+    coordinates: [44.580, 37.710],
+    region: 'Doğu Anadolu',
+    description: 'Hakkari Yüksekova\'da İran\'a açılan gümrük kapısı.',
+    kpssTips: ['Doğu Anadolu güneydoğu ucundan İran\'a geçiş sağlar.'],
+    details: { connectedCountry: 'İran', activeStatus: 'Açık', railway: false }
+  },
+  {
+    id: 'bg-akcakale',
+    name: 'Akçakale Sınır Kapısı',
+    type: 'border_gate',
+    category: 'Suriye Kapısı',
+    coordinates: [38.950, 36.700],
+    region: 'Güneydoğu Anadolu',
+    description: 'Şanlıurfa Akçakale\'de Suriye\'ye açılan sınır kapısı.',
+    kpssTips: ['Güneydoğu Anadolu ovalarının Suriye sınır gümrük noktasıdır.'],
+    details: { connectedCountry: 'Suriye', activeStatus: 'Açık', railway: false }
   }
 ];
 
@@ -1097,6 +1163,80 @@ export const PASSES_DATA: GeoFeature[] = [
       'Yeni Zigana Tüneli 14,5 km uzunluğu ile Türkiye ve Avrupa\'nın EN UZUN KARAYOLU TÜNELİDİR!'
     ],
     mnemonic: 'Zigana = Trabzon-Gümüşhane + Avrupa\'nın En Uzun Çift Tüp Tüneli (14.5 km)'
+  },
+  {
+    id: 'p-kop',
+    name: 'Kop Geçidi & Tüneli',
+    type: 'pass',
+    category: 'Kuzey Anadolu Geçitleri',
+    coordinates: [40.500, 40.020],
+    elevation: 2409,
+    region: 'Doğu Anadolu',
+    description: 'Gümüşhane ve Bayburt üzerinden Erzurum ve Doğu Anadolu\'yu Karadeniz\'e bağlayan 2.409 m rakımlı geçit.',
+    kpssTips: [
+      'Gümüşhane/Bayburt üzerinden Erzurum\'u Trabzon limanına ve Karadeniz sahil yoluna bağlar.',
+      'Çoruh ve Fırat havzaları arasında doğal su bölümü çizgisidir.'
+    ],
+    mnemonic: 'Kop Geçidi = Bayburt-Erzurum Arası Yüksek Geçit'
+  },
+  {
+    id: 'p-cankurtaran',
+    name: 'Cankurtaran Geçidi & Tüneli',
+    type: 'pass',
+    category: 'Doğu Karadeniz Geçidi',
+    coordinates: [41.420, 41.320],
+    elevation: 690,
+    region: 'Karadeniz',
+    description: 'Artvin Hopa sahilini Borçka ve iç kesimlere bağlayan Karçal Dağları geçidi.',
+    kpssTips: [
+      'Doğu Karadeniz sahili Hopa\'yı Artvin şehir merkezine bağlayan tünelli kilit geçittir.'
+    ]
+  },
+  {
+    id: 'p-ilgaz',
+    name: 'Ilgaz 15 Temmuz İstiklal Tüneli & Geçidi',
+    type: 'pass',
+    category: 'Batı Karadeniz Geçidi',
+    coordinates: [33.870, 41.080],
+    elevation: 1875,
+    region: 'Karadeniz',
+    description: 'Kastamonu ile Çankırı arasındaki Ilgaz Dağları\'nı aşan çift tüp tünelli geçit.',
+    kpssTips: [
+      'İç Anadolu\'yu (Ankara/Çankırı) Batı Karadeniz\'e (Kastamonu/İnebolu) bağlar.'
+    ]
+  },
+  {
+    id: 'p-egribel',
+    name: 'Eğribel Tüneli & Geçidi',
+    type: 'pass',
+    category: 'Doğu Karadeniz Geçidi',
+    coordinates: [38.450, 40.580],
+    elevation: 2200,
+    region: 'Karadeniz',
+    description: 'Giresun sahilini Şebinkarahisar ve Sivas iç kesimlerine bağlayan tünelli yüksek geçit.',
+    kpssTips: ['Giresun ile Sivas arasındaki ulaşımı kışın da kesintisiz kılar.']
+  },
+  {
+    id: 'p-sakaltutan',
+    name: 'Sakaltutan Geçidi',
+    type: 'pass',
+    category: 'Doğu Anadolu Geçidi',
+    coordinates: [39.750, 39.850],
+    elevation: 2160,
+    region: 'Doğu Anadolu',
+    description: 'Erzincan ile Erzurum arasındaki yüksek dağ geçidi.',
+    kpssTips: ['Doğu Anadolu içi karayolu ulaşımının çetin geçitlerindendir.']
+  },
+  {
+    id: 'p-sabuncubeli',
+    name: 'Sabuncubeli Tüneli',
+    type: 'pass',
+    category: 'Ege Ulaşım Tüneli',
+    coordinates: [27.350, 38.520],
+    elevation: 575,
+    region: 'Ege',
+    description: 'İzmir ile Manisa arasındaki Spil Dağı ve Yamanlar kütlesini aşan yoğun trafikli tünel geçidi.',
+    kpssTips: ['İzmir ile Manisa arasındaki seyahat süresini 15 dakikaya indiren tüneldir.']
   },
   {
     id: 'p-ovit',

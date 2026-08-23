@@ -1,3 +1,5 @@
+import { ALL_GEO_FEATURES } from './turkeyData';
+
 export interface PinGameQuestion {
   id: string;
   title: string;
@@ -63,7 +65,7 @@ export function getCurrentQuizQuestion(quizTestIndex: number, category: string, 
   return list[safeIndex];
 }
 
-export const PIN_GAME_QUESTIONS: PinGameQuestion[] = [
+const HANDCRAFTED_PIN_QUESTIONS: PinGameQuestion[] = [
   // 1. DAĞLAR (Volkanik, Kırık, Kıvrım, Buzul)
   {
     id: 'pin-1',
@@ -679,6 +681,107 @@ export const PIN_GAME_QUESTIONS: PinGameQuestion[] = [
     explanation: 'Denizli Sarayköy Kızıldere Türkiye\'nin ilk jeotermal santralidir.',
     kpssTip: 'KPSS Notu: Jeotermal elektrik üretiminde ilk ve lider bölgemiz Ege (Denizli/Aydın)\'dir.'
   }
+];
+
+function mapTypeToPinCategory(type: string, categoryName?: string): PinGameQuestion['category'] {
+  if (type === 'mountain') return 'Dağlar';
+  if (type === 'river') return 'Akarsular';
+  if (type === 'lake') return 'Göller';
+  if (type === 'border_gate') return 'Sınır Kapıları';
+  if (type === 'pass') return 'Geçitler';
+  if (type === 'plateau' || type === 'plain') return 'Platolar & Ovalar';
+  if (type === 'mine') return 'Madenler';
+  if (type === 'karstic' || type === 'coastal') return 'Karstik & Kıyı';
+
+  if (categoryName) {
+    if (categoryName.includes('Dağ') || categoryName.includes('Volkan')) return 'Dağlar';
+    if (categoryName.includes('Akarsu') || categoryName.includes('Nehir')) return 'Akarsular';
+    if (categoryName.includes('Göl')) return 'Göller';
+    if (categoryName.includes('Sınır') || categoryName.includes('Kapı')) return 'Sınır Kapıları';
+    if (categoryName.includes('Geçit') || categoryName.includes('Tünel')) return 'Geçitler';
+    if (categoryName.includes('Ova') || categoryName.includes('Plato')) return 'Platolar & Ovalar';
+    if (categoryName.includes('Maden') || categoryName.includes('Enerji') || categoryName.includes('Petrol')) return 'Madenler';
+  }
+  return 'Platolar & Ovalar';
+}
+
+const coveredFeatureIds = new Set(HANDCRAFTED_PIN_QUESTIONS.map((q) => q.targetFeatureId));
+
+const TURKEY_CITY_NAMES = [
+  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Afyon', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin', 'Aydın',
+  'Balıkesir', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum',
+  'Denizli', 'Diyarbakır', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun',
+  'Gümüşhane', 'Hakkari', 'Hatay', 'Isparta', 'Mersin', 'İstanbul', 'İzmir', 'Kars', 'Kastamonu',
+  'Kayseri', 'Kırklareli', 'Kırşehir', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Kahramanmaraş',
+  'Mardin', 'Muğla', 'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop',
+  'Sivas', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Şanlıurfa', 'Uşak', 'Van', 'Yozgat',
+  'Zonguldak', 'Aksaray', 'Bayburt', 'Karaman', 'Kırıkkale', 'Batman', 'Şırnak', 'Bartın', 'Ardahan',
+  'Iğdır', 'Yalova', 'Karabük', 'Kilis', 'Osmaniye', 'Düzce'
+];
+
+export function sanitizeQuestionText(text: string): string {
+  if (!text) return '';
+  let cleaned = text;
+
+  // Clean patterns like "Aksaray ve Niğde arasında", "Bursa ili sınırlarında", "Kayseri'de", "Trabzon'u Gümüşhane'ye bağlayan"
+  for (const city of TURKEY_CITY_NAMES) {
+    const regex = new RegExp(`\\b${city}('?(?:\'da|\'de|\'ta|\'te|\'den|\'dan|\'ün|\'ın|\'in|\'un|\'u|\'ı|\'e|\'a|[a-zâîûıiöüşğöç]*))?\\b\\s*(?:ili|ilinde|ilimiz|ilinin|ilçesi|ilçesinde|sınırlarında|sınırında|arasında)?`, 'gi');
+    cleaned = cleaned.replace(regex, '');
+  }
+
+  // Clean double spaces and orphaned words
+  cleaned = cleaned
+    .replace(/\s+/g, ' ')
+    .replace(/\s+,/g, ',')
+    .replace(/\(\s*\)/g, '')
+    .trim();
+
+  return cleaned;
+}
+
+const DYNAMIC_PIN_QUESTIONS: PinGameQuestion[] = ALL_GEO_FEATURES
+  .filter((f) => !coveredFeatureIds.has(f.id))
+  .map((f, index) => {
+    let qText = '';
+    const cleanDesc = f.description ? sanitizeQuestionText(f.description) : '';
+
+    if (cleanDesc && cleanDesc.length > 10) {
+      qText = `${cleanDesc} Bu coğrafi unsur haritada nerededir?`;
+    } else if (f.type === 'border_gate') {
+      qText = `Sınır kapılarımızdan biri olan ${f.name} haritada nerededir?`;
+    } else if (f.type === 'pass') {
+      qText = `Geçit ve tünellerimizden biri olan ${f.name} haritada nerededir?`;
+    } else if (f.type === 'mountain') {
+      qText = `Türkiye'nin önemli dağlarından ${f.name} haritada nerededir?`;
+    } else if (f.type === 'river') {
+      qText = `Türkiye'nin önemli akarsularından biri olan ${f.name} haritada nerededir?`;
+    } else if (f.type === 'lake') {
+      qText = `Türkiye'nin önemli göllerinden biri olan ${f.name} haritada nerededir?`;
+    } else if (f.type === 'plateau' || f.type === 'plain') {
+      qText = `Türkiye'nin önemli yer şekillerinden ${f.name} haritada nerededir?`;
+    } else if (f.type === 'mine') {
+      qText = `Türkiye'nin önemli maden / enerji alanlarından ${f.name} haritada nerededir?`;
+    } else {
+      qText = `${f.region ? f.region + ' bölgesindeki' : 'Türkiye\'deki'} ${f.name} haritada nerededir?`;
+    }
+
+    return {
+      id: `pin-auto-${f.id}-${index}`,
+      title: f.name,
+      questionText: qText,
+      category: mapTypeToPinCategory(f.type, f.category),
+      region: f.region,
+      targetFeatureId: f.id,
+      targetCoords: f.coordinates,
+      hint: f.kpssTips?.[0] ? sanitizeQuestionText(f.kpssTips[0]) : `${f.region || 'Türkiye'} bölgesinde yer alır.`,
+      explanation: `${f.name}: ${f.description || (f.category || 'Coğrafi unsur')}`,
+      kpssTip: f.kpssTips?.[0] ? `KPSS Notu: ${f.kpssTips[0]}` : `ÖSYM Konumu: ${f.name} - ${f.region || 'Türkiye'}`
+    };
+  });
+
+export const PIN_GAME_QUESTIONS: PinGameQuestion[] = [
+  ...HANDCRAFTED_PIN_QUESTIONS,
+  ...DYNAMIC_PIN_QUESTIONS
 ];
 
 export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
