@@ -105,12 +105,12 @@ export default function QuizTestGame() {
 
   return (
     <DraggableCard
-      className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-[90vw] md:w-[680px] lg:w-[750px] max-w-4xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-500/40 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-2.5 transition-all"
+      className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all"
     >
       {/* Top Header Controls */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2 gap-1.5">
-        <div className="flex items-center gap-1.5 overflow-x-auto shrink-0">
-          <span className="px-2 py-0.5 rounded bg-emerald-500/30 text-emerald-300 font-black text-[10px] sm:text-xs border border-emerald-400/40">
+      <div className="flex items-center justify-between border-b border-white/10 pb-1 mb-1 gap-1">
+        <div className="flex items-center gap-1 overflow-x-auto shrink-0">
+          <span className="px-1.5 py-0.5 rounded bg-emerald-500/30 text-emerald-300 font-black text-[9px] border border-emerald-400/40">
             TEST {safeIndex + 1}/{filteredQuestions.length}
           </span>
           <select
@@ -119,7 +119,7 @@ export default function QuizTestGame() {
               setGameCategoryFilter(e.target.value);
               resetQuizTest();
             }}
-            className="bg-white/10 border border-emerald-400/50 rounded px-1.5 py-0.5 text-[10px] sm:text-xs font-black text-emerald-300 focus:outline-none cursor-pointer max-w-[130px] truncate"
+            className="bg-white/10 border border-emerald-400/50 rounded px-1 py-0.5 text-[9px] font-black text-emerald-300 focus:outline-none cursor-pointer max-w-[100px] truncate"
           >
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat} className="bg-[#09090b] text-slate-100 font-bold">
@@ -129,50 +129,50 @@ export default function QuizTestGame() {
           </select>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
-          <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 border border-emerald-400/40 rounded-lg text-[10px] sm:text-xs font-black text-emerald-300">
-            <Trophy className="w-3 h-3 text-emerald-400" />
-            <span>{quizScore} Puan</span>
+        <div className="flex items-center gap-0.5 shrink-0">
+          <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-500/20 border border-emerald-400/40 rounded text-[9px] font-black text-emerald-300">
+            <Trophy className="w-2.5 h-2.5 text-emerald-400" />
+            <span>{quizScore} P</span>
           </div>
 
           <button
             onClick={shuffleQuizQuestions}
             title="Karıştır"
-            className="p-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-indigo-300 hover:text-white"
+            className="p-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-indigo-300 hover:text-white"
           >
-            <Shuffle className="w-3.5 h-3.5" />
+            <Shuffle className="w-3 h-3" />
           </button>
 
           <button
             onClick={resetQuizTest}
             title="Sıfırla"
-            className="p-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-slate-300 hover:text-white"
+            className="p-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-slate-300 hover:text-white"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3 h-3" />
           </button>
 
           <button
             onClick={() => setIsCollapsed(true)}
             title="Küçült"
-            className="p-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400/50 text-emerald-200 rounded text-[10px] font-black"
+            className="p-0.5 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400/50 text-emerald-200 rounded text-[9px] font-black"
           >
-            <Minimize2 className="w-3.5 h-3.5" />
+            <Minimize2 className="w-3 h-3" />
           </button>
 
           <button
             onClick={() => setActiveTab('map')}
-            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20"
+            className="p-0.5 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
         </div>
       </div>
 
-      {/* Main Content Layout - 2 Columns (Image on Left, Question & Options on Right) */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-start">
+      {/* Main Content Layout - 2 Columns */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 items-start">
         {/* Left Column (Image & Category Banner) */}
-        <div className="md:col-span-4 space-y-1.5">
-          <div className="relative w-full h-24 sm:h-28 rounded-xl overflow-hidden border border-white/15 shadow-inner">
+        <div className="md:col-span-4 space-y-1">
+          <div className="relative w-full h-16 sm:h-20 rounded-lg overflow-hidden border border-white/15 shadow-inner">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getFeatureImageUrl({ id: currentQ.focusFeatureId, title: currentQ.category, name: currentQ.category, category: currentQ.category })}
@@ -180,33 +180,33 @@ export default function QuizTestGame() {
               className="w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between text-[9px] text-white/90">
-              <span className="px-1.5 py-0.5 rounded bg-black/70 font-bold text-emerald-300">
-                Coğrafi Görsel
+            <div className="absolute bottom-0.5 left-1 right-1 flex items-center justify-between text-[8px] text-white/90">
+              <span className="px-1 py-0.2 rounded bg-black/70 font-bold text-emerald-300">
+                Görsel
               </span>
-              <span className="font-bold text-slate-200 truncate max-w-[110px]">{currentQ.category}</span>
+              <span className="font-bold text-slate-200 truncate max-w-[80px]">{currentQ.category}</span>
             </div>
           </div>
         </div>
 
         {/* Right Column (Question & Options) */}
-        <div className="md:col-span-8 space-y-1.5">
-          <div className="p-2 bg-white/5 border border-white/10 rounded-xl min-h-[46px] flex items-center">
-            <h3 className="font-bold text-xs sm:text-sm text-white leading-snug">
+        <div className="md:col-span-8 space-y-1">
+          <div className="p-1.5 bg-white/5 border border-white/10 rounded-lg min-h-[34px] flex items-center">
+            <h3 className="font-bold text-[10px] sm:text-[11px] text-white leading-snug">
               {sanitizeQuestionText(currentQ.questionText)}
             </h3>
           </div>
 
           {/* Options Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
             {currentQ.options.map((option, idx) => {
               let btnStyle = 'bg-white/5 border-white/15 hover:bg-white/15 hover:border-emerald-400 text-slate-100 font-bold';
 
               if (isQuizAnswered) {
                 if (idx === currentQ.correctIndex) {
-                  btnStyle = 'bg-emerald-500/30 border-2 border-emerald-400 text-emerald-100 font-black';
+                  btnStyle = 'bg-emerald-500/30 border border-emerald-400 text-emerald-100 font-black';
                 } else if (idx === quizSelectedOption) {
-                  btnStyle = 'bg-rose-500/30 border-2 border-rose-400 text-rose-100 font-black';
+                  btnStyle = 'bg-rose-500/30 border border-rose-400 text-rose-100 font-black';
                 } else {
                   btnStyle = 'bg-white/5 border-white/5 text-slate-500 opacity-40';
                 }
@@ -217,14 +217,14 @@ export default function QuizTestGame() {
                   key={idx}
                   disabled={isQuizAnswered}
                   onClick={() => answerQuizQuestion(idx)}
-                  className={`w-full px-2.5 py-1.5 rounded-xl border text-left text-[11px] sm:text-xs transition-all flex items-center justify-between active:scale-95 ${btnStyle}`}
+                  className={`w-full px-1.5 py-1 rounded-lg border text-left text-[9px] sm:text-[10px] transition-all flex items-center justify-between active:scale-95 ${btnStyle}`}
                 >
                   <span className="truncate pr-1">{option}</span>
                   {isQuizAnswered && idx === currentQ.correctIndex && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
                   )}
                   {isQuizAnswered && idx === quizSelectedOption && idx !== currentQ.correctIndex && (
-                    <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                    <XCircle className="w-3 h-3 text-rose-400 shrink-0" />
                   )}
                 </button>
               );
@@ -233,31 +233,31 @@ export default function QuizTestGame() {
 
           {/* Post-Answer Result & Explanation */}
           {isQuizAnswered && (
-            <div className="space-y-1.5 animate-in fade-in duration-200 pt-0.5">
-              <div className="p-1.5 bg-emerald-500/20 border border-emerald-400/60 rounded-xl flex items-center justify-between text-[11px]">
-                <span className="font-black text-emerald-300 flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  DOĞRU CEVAP:
+            <div className="space-y-1 animate-in fade-in duration-200">
+              <div className="p-1 bg-emerald-500/20 border border-emerald-400/60 rounded-lg flex items-center justify-between text-[9px]">
+                <span className="font-black text-emerald-300 flex items-center gap-0.5">
+                  <Check className="w-3 h-3 text-emerald-400" />
+                  DOĞRU:
                 </span>
-                <span className="px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-black">
+                <span className="px-1.5 py-0.2 rounded bg-emerald-400 text-slate-950 font-black">
                   {currentQ.options[currentQ.correctIndex]}
                 </span>
               </div>
 
-              <div className="p-2 bg-white/5 border border-white/10 rounded-xl text-[10px] sm:text-[11px] space-y-1">
+              <div className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-[9px] space-y-1">
                 <p className="text-slate-200 font-medium">{sanitizeQuestionText(currentQ.explanation)}</p>
-                <div className="p-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-200 font-bold flex items-start gap-1">
-                  <Sparkles className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-1 bg-amber-500/10 border border-amber-500/30 rounded text-amber-200 font-bold flex items-start gap-1">
+                  <Sparkles className="w-2.5 h-2.5 text-amber-400 shrink-0 mt-0.5" />
                   <span><strong>ÖSYM Notu:</strong> {sanitizeQuestionText(currentQ.osymTip)}</span>
                 </div>
               </div>
 
               <button
                 onClick={handleNext}
-                className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1 border border-emerald-300 shadow-md transition-all active:scale-95"
+                className="w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-lg text-[10px] flex items-center justify-center gap-1 border border-emerald-300 shadow-md transition-all active:scale-95"
               >
-                <span>SONRAKİ SORUYA GEÇ</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>SONRAKİ SORU</span>
+                <ArrowRight className="w-3 h-3" />
               </button>
             </div>
           )}

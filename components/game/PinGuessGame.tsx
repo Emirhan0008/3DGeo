@@ -117,12 +117,12 @@ export default function PinGuessGame() {
 
   return (
     <DraggableCard
-      className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-[90vw] md:w-[680px] lg:w-[750px] max-w-4xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/40 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-2.5 transition-all"
+      className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all"
     >
       {/* Top Controls Bar */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2 gap-1">
-        <div className="flex items-center gap-1.5 overflow-x-auto shrink-0">
-          <span className="px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-black text-[10px] sm:text-xs border border-indigo-400/40">
+      <div className="flex items-center justify-between border-b border-white/10 pb-1 mb-1 gap-1">
+        <div className="flex items-center gap-1 overflow-x-auto shrink-0">
+          <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-black text-[9px] border border-indigo-400/40">
             KONUM {safeIndex + 1}/{filteredQuestions.length}
           </span>
 
@@ -133,7 +133,7 @@ export default function PinGuessGame() {
               setGameCategoryFilter(e.target.value);
               resetPinGame();
             }}
-            className="bg-white/10 border border-amber-400/50 rounded px-1.5 py-0.5 text-[10px] sm:text-xs font-black text-amber-300 focus:outline-none cursor-pointer max-w-[130px] truncate"
+            className="bg-white/10 border border-amber-400/50 rounded px-1 py-0.5 text-[9px] font-black text-amber-300 focus:outline-none cursor-pointer max-w-[100px] truncate"
           >
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat} className="bg-[#09090b] text-slate-100 font-bold">
@@ -144,64 +144,64 @@ export default function PinGuessGame() {
 
           <button
             onClick={toggleBlindMapMode}
-            className={`px-2 py-0.5 rounded text-[10px] sm:text-xs font-black shrink-0 transition-all flex items-center gap-1 border ${
+            className={`px-1.5 py-0.5 rounded text-[9px] font-black shrink-0 transition-all flex items-center gap-0.5 border ${
               isBlindMapMode
                 ? 'bg-amber-500 text-slate-950 border-amber-300'
                 : 'bg-white/10 text-slate-300 border-white/20 hover:border-amber-400'
             }`}
           >
-            <EyeOff className="w-3 h-3 text-amber-400" />
-            <span>{isBlindMapMode ? 'Dilsiz Harita' : 'Normal Harita'}</span>
+            <EyeOff className="w-2.5 h-2.5 text-amber-400" />
+            <span>{isBlindMapMode ? 'Dilsiz' : 'Harita'}</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-0.5 shrink-0">
           <button
             onClick={() => setShowHint(!showHint)}
-            className="px-2 py-0.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/50 rounded-lg text-amber-300 text-[10px] sm:text-xs font-black flex items-center gap-1"
+            className="px-1.5 py-0.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/50 rounded text-amber-300 text-[9px] font-black flex items-center gap-0.5"
           >
-            <HelpCircle className="w-3 h-3 text-amber-400" />
+            <HelpCircle className="w-2.5 h-2.5 text-amber-400" />
             <span>İpucu</span>
           </button>
 
           <button
             onClick={shufflePinQuestions}
             title="Karıştır"
-            className="p-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-indigo-300 hover:text-white"
+            className="p-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-indigo-300 hover:text-white"
           >
-            <Shuffle className="w-3.5 h-3.5" />
+            <Shuffle className="w-3 h-3" />
           </button>
 
           <button
             onClick={resetPinGame}
             title="Sıfırla"
-            className="p-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-slate-300 hover:text-white"
+            className="p-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-slate-300 hover:text-white"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3 h-3" />
           </button>
 
           <button
             onClick={() => setIsCollapsed(true)}
             title="Küçült"
-            className="p-1 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-400/50 text-indigo-200 rounded text-[10px] font-black"
+            className="p-0.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-400/50 text-indigo-200 rounded text-[9px] font-black"
           >
-            <Minimize2 className="w-3.5 h-3.5" />
+            <Minimize2 className="w-3 h-3" />
           </button>
 
           <button
             onClick={() => setActiveTab('map')}
-            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20"
+            className="p-0.5 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
         </div>
       </div>
 
-      {/* Main Content Layout - 2 Columns (Image & Mode on Left, Target & Question on Right) */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-start">
+      {/* Main Content Layout - 2 Columns */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 items-start">
         {/* Left Column (Image & Method Selector) */}
-        <div className="md:col-span-4 space-y-1.5">
-          <div className="relative w-full h-24 sm:h-28 rounded-xl overflow-hidden border border-white/15 shadow-inner">
+        <div className="md:col-span-4 space-y-1">
+          <div className="relative w-full h-16 sm:h-20 rounded-lg overflow-hidden border border-white/15 shadow-inner">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getFeatureImageUrl({ id: currentQ.targetFeatureId, title: currentQ.title, name: currentQ.title, category: currentQ.category })}
@@ -209,25 +209,25 @@ export default function PinGuessGame() {
               className="w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between text-[9px] text-white/90">
-              <span className="px-1.5 py-0.5 rounded bg-black/70 font-bold border border-white/15 text-amber-300">
-                Coğrafi Görsel
+            <div className="absolute bottom-0.5 left-1 right-1 flex items-center justify-between text-[8px] text-white/90">
+              <span className="px-1 py-0.2 rounded bg-black/70 font-bold border border-white/15 text-amber-300">
+                Görsel
               </span>
-              <span className="font-bold text-slate-200 truncate max-w-[100px]">{currentQ.category}</span>
+              <span className="font-bold text-slate-200 truncate max-w-[80px]">{currentQ.category}</span>
             </div>
           </div>
 
           {/* Question Method Selector */}
-          <div className="p-1 bg-[#12131a] border border-indigo-500/30 rounded-lg flex items-center justify-between gap-1">
-            <span className="text-[10px] text-slate-300 font-extrabold flex items-center gap-1 shrink-0 px-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
+          <div className="p-0.5 bg-[#12131a] border border-indigo-500/30 rounded flex items-center justify-between gap-0.5">
+            <span className="text-[9px] text-slate-300 font-extrabold flex items-center gap-0.5 shrink-0 px-0.5">
+              <Sparkles className="w-2.5 h-2.5 text-amber-400" />
               Yöntem:
             </span>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-0.5 shrink-0">
               <button
                 type="button"
                 onClick={() => setQuestionMode('detailed')}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold transition-all border ${
+                className={`px-1 py-0.2 rounded text-[8px] font-extrabold transition-all border ${
                   questionMode === 'detailed'
                     ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-sm'
                     : 'bg-white/10 text-slate-300 border-white/15 hover:bg-white/20'
@@ -238,77 +238,77 @@ export default function PinGuessGame() {
               <button
                 type="button"
                 onClick={() => setQuestionMode('name_only')}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold transition-all border ${
+                className={`px-1 py-0.2 rounded text-[8px] font-extrabold transition-all border ${
                   questionMode === 'name_only'
                     ? 'bg-rose-500 text-white border-rose-400 shadow-sm'
                     : 'bg-white/10 text-slate-300 border-white/15 hover:bg-white/20'
                 }`}
               >
-                🎯 Sadece İsim
+                🎯 İsim
               </button>
             </div>
           </div>
 
           {showHint && (
-            <div className="p-1.5 bg-amber-500/15 border border-amber-500/40 rounded-lg text-[10px] text-amber-200 font-medium flex items-start gap-1 animate-in fade-in duration-150">
-              <Sparkles className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-1 bg-amber-500/15 border border-amber-500/40 rounded text-[9px] text-amber-200 font-medium flex items-start gap-1 animate-in fade-in duration-150">
+              <Sparkles className="w-2.5 h-2.5 text-amber-400 shrink-0 mt-0.5" />
               <span><strong>İpucu:</strong> {sanitizeQuestionText(currentQ.hint)}</span>
             </div>
           )}
         </div>
 
         {/* Right Column (Target Name & Question & Result) */}
-        <div className="md:col-span-8 space-y-1.5">
+        <div className="md:col-span-8 space-y-1">
           {/* Target Name Banner */}
-          <div className="p-1.5 bg-gradient-to-r from-amber-500/20 via-indigo-600/30 to-purple-600/20 border border-amber-400/80 rounded-xl flex items-center justify-between gap-2 shadow-sm">
-            <div className="flex items-center gap-1.5 min-w-0 flex-1">
-              <span className="px-2 py-0.5 bg-amber-400 text-slate-950 rounded-lg font-black text-[10px] shrink-0 flex items-center gap-0.5 shadow-sm">
-                <MapPin className="w-3 h-3" />
-                ARANAN YER:
+          <div className="p-1 bg-gradient-to-r from-amber-500/20 via-indigo-600/30 to-purple-600/20 border border-amber-400/80 rounded-lg flex items-center justify-between gap-1 shadow-sm">
+            <div className="flex items-center gap-1 min-w-0 flex-1">
+              <span className="px-1.5 py-0.2 bg-amber-400 text-slate-950 rounded font-black text-[9px] shrink-0 flex items-center gap-0.5 shadow-sm">
+                <MapPin className="w-2.5 h-2.5" />
+                ARANAN:
               </span>
-              <span className="font-black text-xs sm:text-sm text-amber-300 leading-tight truncate">
+              <span className="font-black text-[10px] sm:text-xs text-amber-300 leading-tight truncate">
                 {displayTitle}
               </span>
             </div>
             {currentQ.region && (
-              <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 shrink-0">
+              <span className="text-[8px] uppercase font-black px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 shrink-0">
                 {currentQ.region}
               </span>
             )}
           </div>
 
-          <div className="p-2 bg-white/5 border border-white/10 rounded-xl min-h-[50px] flex items-center">
-            <h3 className="font-bold text-xs sm:text-sm text-slate-100 leading-snug">
+          <div className="p-1.5 bg-white/5 border border-white/10 rounded-lg min-h-[34px] flex items-center">
+            <h3 className="font-bold text-[10px] sm:text-[11px] text-slate-100 leading-snug">
               {questionMode === 'name_only'
-                ? `${displayTitle} haritada tam olarak nerededir? İğneyi haritaya yerleştirin.`
+                ? `${displayTitle} haritada nerededir? İğneyi yerleştirin.`
                 : sanitizeQuestionText(currentQ.questionText)}
             </h3>
           </div>
 
           {/* Post-Guess Result Feedback */}
           {isPinGuessed && (
-            <div className="space-y-1.5 animate-in fade-in duration-200 pt-0.5">
-              <div className="p-1.5 bg-amber-500/20 border border-amber-400 rounded-xl flex items-center justify-between text-[11px] font-bold text-amber-300">
+            <div className="space-y-1 animate-in fade-in duration-200">
+              <div className="p-1 bg-amber-500/20 border border-amber-400 rounded-lg flex items-center justify-between text-[9px] font-bold text-amber-300">
                 <div className="flex items-center gap-1 truncate">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>Mesafe Sapması: </span>
+                  <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+                  <span>Sapma: </span>
                   <strong className="underline">{lastGuessDistanceKm} km</strong>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[10px]">
+                <span className="px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 font-black text-[9px]">
                   +{lastGuessPoints} P
                 </span>
               </div>
 
-              <p className="text-[10px] sm:text-[11px] text-slate-200 font-medium line-clamp-2">
+              <p className="text-[9px] text-slate-200 font-medium line-clamp-2">
                 {sanitizeQuestionText(currentQ.explanation)}
               </p>
 
               <button
                 onClick={handleNext}
-                className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1 border border-indigo-400 shadow-md transition-all active:scale-95"
+                className="w-full py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-lg text-[10px] flex items-center justify-center gap-1 border border-indigo-400 shadow-md transition-all active:scale-95"
               >
-                <span>SONRAKİ KONUMA GEÇ</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>SONRAKİ KONUM</span>
+                <ArrowRight className="w-3 h-3" />
               </button>
             </div>
           )}
