@@ -65,6 +65,55 @@ export function getCurrentQuizQuestion(quizTestIndex: number, category: string, 
   return list[safeIndex];
 }
 
+export function cleanFeatureTitle(title: string): string {
+  if (!title) return '';
+  return title
+    .replace(/\s*\((?!.*\d+\s*m)[^)]*\)/gi, '')
+    .trim();
+}
+
+const TURKEY_PROVINCES_AND_DISTRICTS = [
+  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Afyon', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan',
+  'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu',
+  'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ',
+  'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta',
+  'İstanbul', 'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kırıkkale', 'Kırklareli',
+  'Kırşehir', 'Kilis', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla',
+  'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop',
+  'Sivas', 'Şanlıurfa', 'Urfa', 'Şırnak', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van',
+  'Yalova', 'Yozgat', 'Zonguldak',
+  'Silopi', 'Susurluk', 'Emet', 'Kırka', 'Bigadiç', 'Mustafakemalpaşa', 'Fethiye', 'Bodrum', 'Kaş',
+  'Çarşamba', 'Bafra', 'Anamur', 'Alanya', 'Manavgat', 'Ceyhan', 'Seyhan', 'Elbistan', 'Afşin', 'Hamitabat', 'Çatalağzı'
+];
+
+export function sanitizeQuestionText(text: string): string {
+  if (!text) return '';
+  let clean = text;
+
+  // 1. Remove parenthetical city references e.g. "(Kayseri)", "(Güneydoğu)"
+  clean = clean.replace(/\s*\([A-ZÇĞİÖŞÜa-zçğıöşü\s\-,]+\)/g, (match) => {
+    const lower = match.toLowerCase();
+    if (TURKEY_PROVINCES_AND_DISTRICTS.some(c => lower.includes(c.toLowerCase()))) {
+      return '';
+    }
+    return match;
+  });
+
+  // 2. Remove "X ilinde", "X ve Y illeri sınırında", "X ilçesinde", etc.
+  TURKEY_PROVINCES_AND_DISTRICTS.forEach(city => {
+    const regex1 = new RegExp(`\\b${city}\\s+(ve\\s+[A-ZÇĞİÖŞÜa-zçğıöşü]+\\s+)?(illeri\\s+sınırında|ilinde|ilçesinde|ili\\s+sınırlarında|illerinde|arasında|sınırları\\s+içerisinde|sınırında|ilindedir|sınırındadır)\\b`, 'gi');
+    clean = clean.replace(regex1, 'bu bölgemizde');
+
+    const regex2 = new RegExp(`\\b${city}'[daeıkunüveöşz\\s]+\\b`, 'gi');
+    clean = clean.replace(regex2, 'ilgili yörede ');
+
+    const regexDirect = new RegExp(`\\b${city}\\b`, 'gi');
+    clean = clean.replace(regexDirect, 'ilgili yöre');
+  });
+
+  return clean.replace(/\s+/g, ' ').trim();
+}
+
 const HANDCRAFTED_PIN_QUESTIONS: PinGameQuestion[] = [
   // 1. DAĞLAR (Volkanik, Kırık, Kıvrım, Buzul)
   {
@@ -706,38 +755,6 @@ function mapTypeToPinCategory(type: string, categoryName?: string): PinGameQuest
 }
 
 const coveredFeatureIds = new Set(HANDCRAFTED_PIN_QUESTIONS.map((q) => q.targetFeatureId));
-
-const TURKEY_CITY_NAMES = [
-  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Afyon', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin', 'Aydın',
-  'Balıkesir', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum',
-  'Denizli', 'Diyarbakır', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun',
-  'Gümüşhane', 'Hakkari', 'Hatay', 'Isparta', 'Mersin', 'İstanbul', 'İzmir', 'Kars', 'Kastamonu',
-  'Kayseri', 'Kırklareli', 'Kırşehir', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Kahramanmaraş',
-  'Mardin', 'Muğla', 'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop',
-  'Sivas', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Şanlıurfa', 'Uşak', 'Van', 'Yozgat',
-  'Zonguldak', 'Aksaray', 'Bayburt', 'Karaman', 'Kırıkkale', 'Batman', 'Şırnak', 'Bartın', 'Ardahan',
-  'Iğdır', 'Yalova', 'Karabük', 'Kilis', 'Osmaniye', 'Düzce'
-];
-
-export function sanitizeQuestionText(text: string): string {
-  if (!text) return '';
-  let cleaned = text;
-
-  // Clean patterns like "Aksaray ve Niğde arasında", "Bursa ili sınırlarında", "Kayseri'de", "Trabzon'u Gümüşhane'ye bağlayan"
-  for (const city of TURKEY_CITY_NAMES) {
-    const regex = new RegExp(`\\b${city}('?(?:\'da|\'de|\'ta|\'te|\'den|\'dan|\'ün|\'ın|\'in|\'un|\'u|\'ı|\'e|\'a|[a-zâîûıiöüşğöç]*))?\\b\\s*(?:ili|ilinde|ilimiz|ilinin|ilçesi|ilçesinde|sınırlarında|sınırında|arasında)?`, 'gi');
-    cleaned = cleaned.replace(regex, '');
-  }
-
-  // Clean double spaces and orphaned words
-  cleaned = cleaned
-    .replace(/\s+/g, ' ')
-    .replace(/\s+,/g, ',')
-    .replace(/\(\s*\)/g, '')
-    .trim();
-
-  return cleaned;
-}
 
 const DYNAMIC_PIN_QUESTIONS: PinGameQuestion[] = ALL_GEO_FEATURES
   .filter((f) => !coveredFeatureIds.has(f.id))

@@ -47,5 +47,12 @@ service cloud.firestore {
         allow delete: if isOwner(userId);
       }
     }
+
+    match /rumuzes/{rumuzId} {
+      allow get: if isValidId(rumuzId);
+      allow list: if false;
+      allow create, update: if isValidId(rumuzId);
+      allow delete: if false;
+    }
   }
 }

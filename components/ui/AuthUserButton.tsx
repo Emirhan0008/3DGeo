@@ -15,18 +15,43 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useAppStore } from '@/lib/store/useStore';
-import { LogIn, LogOut, Loader2, AlertTriangle, ShieldCheck, Sparkles, X, Mail, Lock, User as UserIcon } from 'lucide-react';
+import { 
+  checkRumuzExists, 
+  saveRumuzProfile, 
+  verifyAndLoadRumuzProfile 
+} from '@/lib/rumuzService';
+import { 
+  LogIn, 
+  LogOut, 
+  Loader2, 
+  AlertTriangle, 
+  ShieldCheck, 
+  Sparkles, 
+  X, 
+  Mail, 
+  Lock, 
+  User as UserIcon,
+  KeyRound,
+  CloudCheck,
+  CheckCircle2
+} from 'lucide-react';
 
 export default function AuthUserButton() {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [localRumuz, setLocalRumuz] = useState<string | null>(null);
+  const [localPin, setLocalPin] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Custom name for guest/email
+  // Custom name & PIN for guest/rumuz auth
   const [customName, setCustomName] = useState('');
+  const [customPin, setCustomPin] = useState('');
+  const [isExistingRumuzDetected, setIsExistingRumuzDetected] = useState(false);
+
+  // Email auth
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authTab, setAuthTab] = useState<'guest' | 'email_login' | 'email_register' | 'google'>('guest');
@@ -46,26 +71,57 @@ export default function AuthUserButton() {
     hydrateUserData
   } = useAppStore();
 
-  // Load saved local rumuz & stats on initial mount
+  // Load saved local rumuz & sync from Cloud Firestore on initial mount
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== 'undefined') {
-      const savedRumuz = localStorage.getItem('kpss3d_active_rumuz');
-      if (savedRumuz) {
-        setLocalRumuz(savedRumuz);
-        setCustomName(savedRumuz);
-        try {
-          const savedStatsStr = localStorage.getItem('kpss3d_stats_' + savedRumuz);
-          if (savedStatsStr) {
-            const parsed = JSON.parse(savedStatsStr);
-            hydrateUserData(parsed);
+    async function initRumuzSession() {
+      if (typeof window !== 'undefined') {
+        const savedRumuz = localStorage.getItem('kpss3d_active_rumuz');
+        const savedPin = localStorage.getItem('kpss3d_active_pin');
+
+        if (savedRumuz) {
+          setLocalRumuz(savedRumuz);
+          setCustomName(savedRumuz);
+          if (savedPin) setLocalPin(savedPin);
+
+          // Try fetching latest cloud profile from Firestore across domains
+          if (savedPin) {
+            const result = await verifyAndLoadRumuzProfile(savedRumuz, savedPin);
+            if (result.success && result.profile) {
+              hydrateUserData({
+                score: result.profile.score ?? score,
+                streak: result.profile.streak ?? streak,
+                totalQuestionsAnswered: result.profile.totalQuestionsAnswered ?? totalQuestionsAnswered,
+                correctAnswersCount: result.profile.correctAnswersCount ?? correctAnswersCount,
+                totalDistanceErrorKm: result.profile.totalDistanceErrorKm ?? totalDistanceErrorKm,
+                pinGuessCount: result.profile.pinGuessCount ?? pinGuessCount,
+                unlockedBadges: result.profile.unlockedBadges ?? unlockedBadges,
+                isBlindMapMode: result.profile.isBlindMapMode ?? isBlindMapMode,
+                regionalStats: result.profile.regionalStats ?? regionalStats,
+                categoryStats: result.profile.categoryStats ?? categoryStats,
+                missedItems: result.profile.missedItems ?? missedItems
+              });
+              setLoading(false);
+              return;
+            }
           }
-        } catch (e) {
-          console.warn('Failed to parse local user stats:', e);
+
+          // Fallback to localStorage if offline or PIN mismatch
+          try {
+            const savedStatsStr = localStorage.getItem('kpss3d_stats_' + savedRumuz);
+            if (savedStatsStr) {
+              const parsed = JSON.parse(savedStatsStr);
+              hydrateUserData(parsed);
+            }
+          } catch (e) {
+            console.warn('Failed to parse local user stats:', e);
+          }
         }
       }
+      setLoading(false);
     }
-    setLoading(false);
+
+    initRumuzSession();
   }, [hydrateUserData]);
 
   // Firebase auth state listener
@@ -132,7 +188,7 @@ export default function AuthUserButton() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sync state to localStorage & Firebase continuously
+  // Sync state to localStorage & Cloud Firestore continuously whenever stats change
   useEffect(() => {
     const activeName = firebaseUser?.displayName || localRumuz;
     if (!activeName || typeof window === 'undefined') return;
@@ -148,18 +204,33 @@ export default function AuthUserButton() {
       isBlindMapMode,
       regionalStats,
       categoryStats,
-      missedItems,
-      updatedAt: new Date().toISOString()
+      missedItems
     };
 
-    // Save locally
+    // 1. Save locally as fallback cache
     try {
-      localStorage.setItem('kpss3d_stats_' + activeName, JSON.stringify(currentStats));
+      localStorage.setItem('kpss3d_stats_' + activeName, JSON.stringify({
+        ...currentStats,
+        updatedAt: new Date().toISOString()
+      }));
     } catch (e) {
       console.warn('LocalStorage save warning:', e);
     }
 
-    // Debounced save to Firebase if logged into Firebase
+    // 2. Cross-domain Cloud Rumuz Firestore sync
+    if (localRumuz && localPin) {
+      const rumuzTimer = setTimeout(async () => {
+        try {
+          await saveRumuzProfile(localRumuz, localPin, currentStats);
+        } catch (err) {
+          console.warn('Background Rumuz Firestore sync error:', err);
+        }
+      }, 1500);
+
+      return () => clearTimeout(rumuzTimer);
+    }
+
+    // 3. Debounced save to Firebase if logged into Firebase User Account
     if (firebaseUser) {
       const timer = setTimeout(async () => {
         try {
@@ -168,7 +239,8 @@ export default function AuthUserButton() {
             uid: firebaseUser.uid,
             displayName: firebaseUser.displayName || activeName,
             email: firebaseUser.email || '',
-            ...currentStats
+            ...currentStats,
+            updatedAt: new Date().toISOString()
           }, { merge: true });
 
           const progressRef = doc(db, 'users', firebaseUser.uid, 'progress', 'current');
@@ -186,7 +258,20 @@ export default function AuthUserButton() {
 
       return () => clearTimeout(timer);
     }
-  }, [firebaseUser, localRumuz, score, streak, totalQuestionsAnswered, correctAnswersCount, unlockedBadges, isBlindMapMode, pinGuessCount, totalDistanceErrorKm, regionalStats, categoryStats, missedItems]);
+  }, [firebaseUser, localRumuz, localPin, score, streak, totalQuestionsAnswered, correctAnswersCount, unlockedBadges, isBlindMapMode, pinGuessCount, totalDistanceErrorKm, regionalStats, categoryStats, missedItems]);
+
+  // Live Rumuz existence check when user types in the input
+  const handleRumuzInputChange = async (val: string) => {
+    setCustomName(val);
+    setAuthErrorMsg(null);
+    setSuccessMsg(null);
+    if (val.trim().length >= 3) {
+      const res = await checkRumuzExists(val.trim());
+      setIsExistingRumuzDetected(res.exists);
+    } else {
+      setIsExistingRumuzDetected(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -198,7 +283,7 @@ export default function AuthUserButton() {
       console.error('Sign-in error:', error);
       const err = error as { code?: string; message?: string };
       if (err?.code === 'auth/unauthorized-domain') {
-        setAuthErrorMsg('Vercel özel etki alanlarında Google OAuth yetkisi kısıtlıdır. Aşağıdaki "⚡ Hızlı Rumuz" seçeneğini kullanarak hiç şifresiz puanlarınızı anında kaydedebilirsiniz!');
+        setAuthErrorMsg('Vercel özel etki alanlarında Google OAuth kısıtlıdır. Yandaki "⚡ Benzersiz Rumuz" seçeneğini kullanarak şifrenizle tüm cihazlardan puanlarınızı eşitleyebilirsiniz!');
       } else {
         setAuthErrorMsg(err?.message || 'Giriş yapılırken bir hata oluştu. Lütfen Rumuz İle Giriş yapın.');
       }
@@ -254,47 +339,122 @@ export default function AuthUserButton() {
     }
   };
 
-  const handleGuestSignIn = async () => {
+  // Cross-Domain Unique Rumuz + Passcode Handler
+  const handleRumuzSignInOrRegister = async () => {
+    const nameToSet = customName.trim();
+    const pinToSet = customPin.trim();
+
+    if (!nameToSet) {
+      setAuthErrorMsg('Lütfen bir rumuz veya isim giriniz.');
+      return;
+    }
+
     setLoading(true);
     setAuthErrorMsg(null);
-    const nameToSet = customName.trim() || 'KPSS Öğrencisi';
+    setSuccessMsg(null);
 
-    // Set local rumuz and persist in localStorage immediately (Vercel & Browser native)
-    setLocalRumuz(nameToSet);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('kpss3d_active_rumuz', nameToSet);
-      
-      // Save current state under this rumuz
-      const currentStats = {
-        score,
-        streak,
-        totalQuestionsAnswered,
-        correctAnswersCount,
-        totalDistanceErrorKm,
-        pinGuessCount,
-        unlockedBadges,
-        isBlindMapMode,
-        regionalStats,
-        categoryStats,
-        missedItems,
-        updatedAt: new Date().toISOString()
-      };
-      localStorage.setItem('kpss3d_stats_' + nameToSet, JSON.stringify(currentStats));
-    }
-
-    // Try optional background Firebase anonymous auth if enabled
     try {
-      const anonUser = await signInAnonymously(auth);
-      if (anonUser.user) {
-        await updateProfile(anonUser.user, { displayName: nameToSet });
-      }
-    } catch (error) {
-      // Firebase anonymous auth disabled or restricted - perfectly fine! Local state is active.
-      console.warn('Firebase anonymous auth skipped/restricted, running in native Vercel Local Rumuz mode:', error);
-    }
+      // 1. Check if rumuz exists in Cloud Firestore
+      const existCheck = await checkRumuzExists(nameToSet);
 
-    setLoading(false);
-    setShowAuthModal(false);
+      if (existCheck.exists) {
+        // CASE A: Rumuz already registered in Cloud Firestore
+        if (!pinToSet) {
+          setAuthErrorMsg(`🔑 '${nameToSet}' rumuzu bulutta kayıtlı! Lütfen bu rumuza ait 4 haneli PIN / Şifrenizi giriniz.`);
+          setLoading(false);
+          return;
+        }
+
+        const verifyRes = await verifyAndLoadRumuzProfile(nameToSet, pinToSet);
+        if (!verifyRes.success || !verifyRes.profile) {
+          setAuthErrorMsg(verifyRes.errorMsg || '❌ Hatalı PIN / Şifre!');
+          setLoading(false);
+          return;
+        }
+
+        // Hydrate store with fetched cloud profile stats
+        const prof = verifyRes.profile;
+        hydrateUserData({
+          score: prof.score ?? score,
+          streak: prof.streak ?? streak,
+          totalQuestionsAnswered: prof.totalQuestionsAnswered ?? totalQuestionsAnswered,
+          correctAnswersCount: prof.correctAnswersCount ?? correctAnswersCount,
+          totalDistanceErrorKm: prof.totalDistanceErrorKm ?? totalDistanceErrorKm,
+          pinGuessCount: prof.pinGuessCount ?? pinGuessCount,
+          unlockedBadges: prof.unlockedBadges ?? unlockedBadges,
+          isBlindMapMode: prof.isBlindMapMode ?? isBlindMapMode,
+          regionalStats: prof.regionalStats ?? regionalStats,
+          categoryStats: prof.categoryStats ?? categoryStats,
+          missedItems: prof.missedItems ?? missedItems
+        });
+
+        // Set active local rumuz & pin
+        setLocalRumuz(prof.rumuz);
+        setLocalPin(pinToSet);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kpss3d_active_rumuz', prof.rumuz);
+          localStorage.setItem('kpss3d_active_pin', pinToSet);
+        }
+
+        setSuccessMsg(`⚡ HOŞ GELDİN ${prof.rumuz.toUpperCase()}! Tüm geçmişiniz ve rozetleriniz buluttan yüklendi.`);
+        setTimeout(() => {
+          setShowAuthModal(false);
+          setSuccessMsg(null);
+        }, 1200);
+
+      } else {
+        // CASE B: Rumuz is brand new and available
+        if (!pinToSet) {
+          setAuthErrorMsg(`🔑 '${nameToSet}' rumuzu henüz kullanılmıyor. Farklı domain ve cihazlardan erişebilmek için lütfen 4 haneli bir Şifre / PIN belirleyin.`);
+          setLoading(false);
+          return;
+        }
+
+        // Create new unique rumuz profile in Cloud Firestore
+        const savedProf = await saveRumuzProfile(nameToSet, pinToSet, {
+          score,
+          streak,
+          totalQuestionsAnswered,
+          correctAnswersCount,
+          totalDistanceErrorKm,
+          pinGuessCount,
+          unlockedBadges,
+          isBlindMapMode,
+          regionalStats,
+          categoryStats,
+          missedItems
+        });
+
+        setLocalRumuz(savedProf.rumuz);
+        setLocalPin(pinToSet);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kpss3d_active_rumuz', savedProf.rumuz);
+          localStorage.setItem('kpss3d_active_pin', pinToSet);
+        }
+
+        // Optional background anonymous auth
+        try {
+          const anonUser = await signInAnonymously(auth);
+          if (anonUser.user) {
+            await updateProfile(anonUser.user, { displayName: nameToSet });
+          }
+        } catch (err) {
+          console.warn('Anonymous auth skipped:', err);
+        }
+
+        setSuccessMsg(`🎉 BENZERSIZ RUMUZ OLUŞTURULDU: ${savedProf.rumuz}! Puanlarınız ve şifreniz buluta kaydedildi.`);
+        setTimeout(() => {
+          setShowAuthModal(false);
+          setSuccessMsg(null);
+        }, 1200);
+      }
+
+    } catch (err) {
+      console.error('Rumuz processing error:', err);
+      setAuthErrorMsg('Sistem hatası oluştu. Lütfen tekrar deneyiniz.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -305,8 +465,10 @@ export default function AuthUserButton() {
     }
     setFirebaseUser(null);
     setLocalRumuz(null);
+    setLocalPin(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('kpss3d_active_rumuz');
+      localStorage.removeItem('kpss3d_active_pin');
     }
   };
 
@@ -327,10 +489,10 @@ export default function AuthUserButton() {
         <button
           onClick={() => setShowAuthModal(true)}
           className="px-3 py-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-500/20 border border-amber-300/50 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
-          title="Rumuz Gir veya Giriş Yap"
+          title="Rumuz Gir veya Geçmiş Yükle"
         >
           <LogIn className="w-4 h-4 text-amber-300" />
-          <span>Giriş Yap / Rumuz</span>
+          <span>Rumuz Gir / Giriş Yap</span>
         </button>
       ) : (
         <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border-2 border-emerald-400/80 rounded-xl px-2.5 py-1 text-xs font-black shrink-0 shadow-lg">
@@ -342,8 +504,9 @@ export default function AuthUserButton() {
               <span className="text-amber-300 font-black truncate max-w-[95px] leading-tight">
                 {activeDisplayName}
               </span>
-              <span className="text-[9px] text-emerald-400 font-bold leading-tight">
-                ● Kayıtlı
+              <span className="text-[9px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5">
+                <CloudCheck className="w-3 h-3 text-emerald-300" />
+                Bulut Eşitlendi
               </span>
             </div>
           </div>
@@ -374,8 +537,8 @@ export default function AuthUserButton() {
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-black text-base text-white">3D Coğrafya Rumuz & Oturum</h3>
-                <p className="text-xs text-slate-400">Puanlarını, rozetlerini ve test istatistiklerini kaydet.</p>
+                <h3 className="font-black text-base text-white">Çapraz Domain Benzersiz Rumuz &amp; Geçmiş</h3>
+                <p className="text-xs text-slate-400">Rumuzunuzu anahtar/şifre gibi kullanarak tüm domainlerden geçmişinizi yükleyin.</p>
               </div>
             </div>
 
@@ -392,6 +555,14 @@ export default function AuthUserButton() {
               </div>
             )}
 
+            {/* Success Banner */}
+            {successMsg && (
+              <div className="p-3 bg-emerald-500/20 border-2 border-emerald-400/80 rounded-xl text-xs space-y-1 text-emerald-300 font-bold flex items-center gap-2 animate-in zoom-in-95 duration-150">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
             {/* Auth Mode Tabs */}
             <div className="grid grid-cols-3 gap-1 p-1 bg-white/5 border border-white/10 rounded-xl text-xs font-bold">
               <button
@@ -400,7 +571,7 @@ export default function AuthUserButton() {
                   authTab === 'guest' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-300 hover:text-white'
                 }`}
               >
-                ⚡ Hızlı Rumuz
+                ⚡ Benzersiz Rumuz
               </button>
               <button
                 onClick={() => setAuthTab('email_login')}
@@ -422,35 +593,56 @@ export default function AuthUserButton() {
               </button>
             </div>
 
-            {/* Tab 1: Guest / Rumuz Sign In */}
+            {/* Tab 1: Guest / Unique Rumuz + Passcode Auth */}
             {authTab === 'guest' && (
               <div className="space-y-3 bg-white/5 border border-white/10 p-3.5 rounded-xl animate-in fade-in duration-150">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-amber-300 block">
-                    ⚡ Rumuz İle Anında Başla (Vercel Uyumlu)
+                  <label className="text-xs font-black text-amber-300 block flex items-center justify-between">
+                    <span>⚡ Rumuz &amp; PIN İle Çapraz Domain Yükle</span>
+                    {isExistingRumuzDetected && (
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold border border-emerald-500/30">
+                        ● Kayıtlı Rumuz Bulundu
+                      </span>
+                    )}
                   </label>
                   <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Şifre veya izin gerekmez. Rumuzunuzu yazıp tıklayın; puanlarınız, rozetleriniz ve çözdüğünüz sorular tarayıcınızda kalıcı olarak saklanır.
+                    Farklı bir domain veya cihazda olsanız dahi, rumuzunuzu ve PIN şifrenizi girerek tüm puan, rozet ve test geçmişinizi anında geri yükleyebilirsiniz!
                   </p>
                 </div>
 
-                <div className="relative">
-                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    placeholder="Adınızı veya Rumuzunuzu Yazın (örn: emirhan)"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-400"
-                  />
+                <div className="space-y-2">
+                  <div className="relative">
+                    <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type="text"
+                      placeholder="Benzersiz Rumuzunuz (örn: emirhan0008)"
+                      value={customName}
+                      onChange={(e) => handleRumuzInputChange(e.target.value)}
+                      className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type="password"
+                      maxLength={8}
+                      placeholder={isExistingRumuzDetected ? "4 Haneli PIN / Şifrenizi Girin" : "4 Haneli Şifre / PIN Belirleyin (örn: 1234)"}
+                      value={customPin}
+                      onChange={(e) => setCustomPin(e.target.value)}
+                      className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-amber-300 focus:outline-none focus:border-amber-400 tracking-widest"
+                    />
+                  </div>
                 </div>
 
                 <button
-                  onClick={handleGuestSignIn}
-                  className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                  onClick={handleRumuzSignInOrRegister}
+                  className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95"
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-300" />
-                  <span>Rumuz İle Giriş Yap & Kaydet</span>
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>
+                    {isExistingRumuzDetected ? '⚡ Rumuz Geçmişini Buluttan Yükle' : '🔒 Rumuz Oluştur & Şifreyle Kaydet'}
+                  </span>
                 </button>
               </div>
             )}
@@ -547,5 +739,3 @@ export default function AuthUserButton() {
     </>
   );
 }
-
-

@@ -33,6 +33,29 @@
       },
       "required": ["userId"]
     },
+    "RumuzProfile": {
+      "title": "RumuzProfile",
+      "description": "Cross-domain unique rumuz profile and statistics key",
+      "type": "object",
+      "properties": {
+        "rumuz": { "type": "string", "maxLength": 100 },
+        "rumuzKey": { "type": "string", "maxLength": 100 },
+        "pin": { "type": "string", "maxLength": 64 },
+        "score": { "type": "number" },
+        "streak": { "type": "number" },
+        "totalQuestionsAnswered": { "type": "number" },
+        "correctAnswersCount": { "type": "number" },
+        "totalDistanceErrorKm": { "type": "number" },
+        "pinGuessCount": { "type": "number" },
+        "unlockedBadges": { "type": "array" },
+        "isBlindMapMode": { "type": "boolean" },
+        "regionalStats": { "type": "object" },
+        "categoryStats": { "type": "object" },
+        "missedItems": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["rumuz", "rumuzKey"]
+    },
     "UserHistory": {
       "title": "UserHistory",
       "description": "Kullanıcının geçmiş test ve harita tahmin etkinlikleri",
@@ -60,6 +83,10 @@
     "/users/{userId}/history/{historyId}": {
       "schema": { "$ref": "#/entities/UserHistory" },
       "description": "Kullanıcı geçmiş aktivite kayıtları"
+    },
+    "/rumuzes/{rumuzId}": {
+      "schema": { "$ref": "#/entities/RumuzProfile" },
+      "description": "Rumuz anahtarlı benzersiz çapraz domain istatistik kaydı"
     }
   }
 }
