@@ -13,8 +13,11 @@ import {
   Search, 
   Mountain,
   Sliders,
-  ChevronDown
+  ChevronDown,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
+import { useAppFullscreen } from '@/lib/utils';
 
 const CATEGORIES = [
   'Genel',
@@ -47,6 +50,7 @@ export default function Navbar() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const { isFullscreen, toggleFullscreen } = useAppFullscreen();
 
   // Search autocomplete items
   const filteredSearchItems = searchTerm.trim()
@@ -217,6 +221,22 @@ export default function Navbar() {
 
         {/* Firebase User Auth */}
         <AuthUserButton />
+
+        {/* App Fullscreen Toggle Button */}
+        <button
+          onClick={toggleFullscreen}
+          className={`p-1.5 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 active:scale-95 ${
+            isFullscreen
+              ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-md font-black'
+              : 'bg-white/5 hover:bg-white/10 text-slate-200 border-white/10'
+          }`}
+          title={isFullscreen ? 'Tam Ekrandan Çık' : 'Uygulamayı Tam Ekran Yap (Haritayı Büyüt)'}
+        >
+          {isFullscreen ? <Minimize2 className="w-4 h-4 text-slate-950" /> : <Maximize2 className="w-4 h-4 text-amber-400" />}
+          <span className="hidden sm:inline text-[11px]">
+            {isFullscreen ? 'Normal' : 'Tam Ekran'}
+          </span>
+        </button>
 
         {/* AI Tutor Button */}
         <button

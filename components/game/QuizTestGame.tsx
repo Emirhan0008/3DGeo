@@ -5,6 +5,7 @@ import { useAppStore } from '@/lib/store/useStore';
 import { MULTIPLE_CHOICE_QUESTIONS, getCurrentQuizQuestion, getFilteredQuizQuestions, sanitizeQuestionText } from '@/lib/data/quizQuestions';
 import { getFeatureImageUrl } from '@/lib/data/turkeyData';
 import DraggableCard from '@/components/ui/DraggableCard';
+import { useAppFullscreen } from '@/lib/utils';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -49,7 +50,7 @@ export default function QuizTestGame() {
   } = useAppStore();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  const { isFullscreen, toggleFullscreen } = useAppFullscreen();
 
   // Default to collapsed mode on mobile screens for unobstructed map view
   useEffect(() => {
@@ -141,10 +142,8 @@ export default function QuizTestGame() {
     );
   }
 
-  // Card classes depending on FullScreen or Floating Card Mode
-  const containerClasses = isFullScreen
-    ? "fixed inset-0 sm:inset-3 z-50 w-full sm:w-[95vw] md:w-[780px] lg:w-[860px] max-w-5xl mx-auto h-full sm:h-[92vh] max-h-[95vh] bg-[#09090b]/98 backdrop-blur-3xl border-0 sm:border-2 border-emerald-500/60 rounded-none sm:rounded-2xl shadow-2xl overflow-y-auto text-slate-100 p-3 sm:p-5 transition-all flex flex-col justify-between"
-    : "absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all";
+  // Card classes (compact floating card over map)
+  const containerClasses = "absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all";
 
   return (
     <DraggableCard
@@ -198,18 +197,18 @@ export default function QuizTestGame() {
             <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </button>
 
-          {/* Full Screen Toggle Button */}
+          {/* App Fullscreen Toggle Button */}
           <button
-            onClick={() => setIsFullScreen(!isFullScreen)}
-            title={isFullScreen ? "Tam Ekrandan Çık" : "Tam Ekran Yap"}
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Tam Ekrandan Çık" : "Uygulamayı Tam Ekran Yap (Haritayı Büyüt)"}
             className={`px-1.5 py-0.5 rounded text-[9px] sm:text-xs font-black flex items-center gap-0.5 border transition-all ${
-              isFullScreen 
+              isFullscreen 
                 ? 'bg-emerald-500 text-slate-950 border-emerald-300' 
                 : 'bg-emerald-600/40 hover:bg-emerald-600/60 border-emerald-400/60 text-emerald-200'
             }`}
           >
-            <Maximize2 className="w-3 h-3" />
-            <span className="hidden sm:inline">{isFullScreen ? 'Küçült' : 'Tam Ekran'}</span>
+            {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+            <span className="hidden sm:inline">{isFullscreen ? 'Normal' : 'Tam Ekran'}</span>
           </button>
 
           <button
@@ -230,10 +229,10 @@ export default function QuizTestGame() {
       </div>
 
       {/* Main Content Layout - 2 Columns */}
-      <div className={`grid grid-cols-1 ${isFullScreen ? 'md:grid-cols-12' : 'md:grid-cols-12'} gap-1.5 sm:gap-3 items-start my-auto`}>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 sm:gap-3 items-start my-auto">
         {/* Left Column (Image & Category Banner) */}
         <div className="md:col-span-4 space-y-1 sm:space-y-2">
-          <div className={`relative w-full ${isFullScreen ? 'h-32 sm:h-48' : 'h-16 sm:h-20'} rounded-lg overflow-hidden border border-white/15 shadow-inner transition-all`}>
+          <div className="relative w-full h-16 sm:h-20 rounded-lg overflow-hidden border border-white/15 shadow-inner transition-all">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getFeatureImageUrl({ id: currentQ.focusFeatureId, title: currentQ.category, name: currentQ.category, category: currentQ.category })}
@@ -252,7 +251,7 @@ export default function QuizTestGame() {
 
         {/* Right Column (Question & Options) */}
         <div className="md:col-span-8 space-y-1 sm:space-y-2">
-          <div className={`p-1.5 sm:p-2 bg-white/5 border border-white/10 rounded-lg ${isFullScreen ? 'min-h-[60px]' : 'min-h-[34px]'} flex items-center`}>
+          <div className="p-1.5 sm:p-2 bg-white/5 border border-white/10 rounded-lg min-h-[34px] flex items-center">
             <h3 className="font-bold text-[10px] sm:text-xs md:text-sm text-white leading-snug">
               {sanitizeQuestionText(currentQ.questionText)}
             </h3>
