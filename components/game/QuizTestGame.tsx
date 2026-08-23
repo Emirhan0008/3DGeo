@@ -71,7 +71,7 @@ export default function QuizTestGame() {
   // Collapsed State
   if (isCollapsed) {
     return (
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 w-[92vw] max-w-xs sm:max-w-md bg-[#09090b]/95 backdrop-blur-2xl border-2 border-t-0 border-emerald-400/80 rounded-b-xl shadow-2xl px-2.5 py-1 flex items-center justify-between gap-2 text-white animate-in fade-in duration-200">
+      <div className="absolute top-3 left-3 z-30 w-auto max-w-[90vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-white animate-in fade-in duration-200">
         <div className="flex items-center gap-1.5 overflow-hidden">
           <span className="px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 font-black text-[10px] shrink-0">
             TEST:
@@ -105,7 +105,7 @@ export default function QuizTestGame() {
 
   return (
     <DraggableCard
-      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 w-[95vw] max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-t-0 border-emerald-500/40 rounded-b-xl shadow-2xl overflow-hidden text-slate-100 p-2 sm:p-2.5 transition-all"
+      className="absolute top-3 left-3 z-30 w-[94vw] sm:w-[360px] md:w-[380px] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-500/40 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-2.5 transition-all"
     >
       {/* Top Header Controls */}
       <div className="flex items-center justify-between border-b border-white/10 pb-1.5 mb-1.5 gap-1.5">
@@ -168,29 +168,25 @@ export default function QuizTestGame() {
         </div>
       </div>
 
-      {/* Main Grid: 2 Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start">
-        {/* Left Column: Photo Banner */}
-        <div className="md:col-span-4 space-y-1.5">
-          <div className="relative w-full h-16 sm:h-24 rounded-lg overflow-hidden border border-white/15">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={getFeatureImageUrl({ id: currentQ.focusFeatureId, title: currentQ.category, name: currentQ.category, category: currentQ.category })}
-              alt={currentQ.category}
-              className="w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-            <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between text-[9px] text-white/90">
-              <span className="px-1.5 py-0.5 rounded bg-black/70 font-bold text-emerald-300">
-                Soru Görseli
-              </span>
-              <span className="font-bold text-slate-200 truncate max-w-[90px]">{currentQ.category}</span>
-            </div>
+      {/* Main Content Layout - Compact Vertical Stack */}
+      <div className="space-y-1.5">
+        <div className="relative w-full h-24 rounded-lg overflow-hidden border border-white/15">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={getFeatureImageUrl({ id: currentQ.focusFeatureId, title: currentQ.category, name: currentQ.category, category: currentQ.category })}
+            alt={currentQ.category}
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between text-[9px] text-white/90">
+            <span className="px-1.5 py-0.5 rounded bg-black/70 font-bold text-emerald-300">
+              Soru Görseli
+            </span>
+            <span className="font-bold text-slate-200 truncate max-w-[140px]">{currentQ.category}</span>
           </div>
         </div>
 
-        {/* Right Column: Question Text & Options */}
-        <div className="md:col-span-8 space-y-1.5">
+        <div className="space-y-1.5">
           <h3 className="font-bold text-xs text-white leading-tight">
             {sanitizeQuestionText(currentQ.questionText)}
           </h3>
