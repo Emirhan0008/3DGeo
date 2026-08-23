@@ -70,19 +70,19 @@ export default function Navbar() {
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={toggleSidebar}
-          className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 transition-all flex items-center gap-1 text-xs font-semibold"
+          className="p-1.5 bg-indigo-500/20 hover:bg-indigo-500/35 border-2 border-indigo-400/80 rounded-xl text-indigo-200 transition-all flex items-center gap-1.5 text-xs font-black shadow-md hover:shadow-indigo-500/30 active:scale-95"
           title="Katmanları Aç/Kapat"
         >
-          <Sliders className="w-4 h-4 text-indigo-400" />
-          <span className="hidden md:inline text-[11px]">Katmanlar</span>
+          <Sliders className="w-4 h-4 text-indigo-300" />
+          <span className="hidden md:inline text-xs">Katmanlar</span>
         </button>
 
-        <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setActiveTab('map')}>
-          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-indigo-500/20">
+        <div className="flex items-center gap-1.5 cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setActiveTab('map')}>
+          <div className="w-8 h-8 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-white/20">
             <Mountain className="w-4 h-4 text-white" />
           </div>
-          <span className="text-xs font-black tracking-tight text-white hidden sm:inline">
-            COĞRAFYA <span className="text-indigo-400">3D</span>
+          <span className="text-sm font-black tracking-tight text-white hidden sm:inline">
+            COĞRAFYA <span className="text-amber-400">3D</span>
           </span>
         </div>
       </div>

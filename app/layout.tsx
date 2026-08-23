@@ -2,8 +2,8 @@ import type {Metadata} from 'next';
 import './globals.css'; // Global styles
 
 export const metadata: Metadata = {
-  title: 'My Google AI Studio App',
-  description: 'My Google AI Studio App',
+  title: '3D Coğrafya - KPSS 3D Türkiye İnteraktif Haritası',
+  description: 'KPSS 3D Türkiye Coğrafyası Eğitim ve Oyunlaştırılmış İnteraktif Harita Uygulaması',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

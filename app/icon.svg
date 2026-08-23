@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="mountain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded card -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)" stroke="#334155" stroke-width="12" />
+
+  <!-- Outer Map Grid Ring -->
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#1e293b" stroke-width="12" stroke-dasharray="16 12" />
+
+  <!-- 3D Mountain Peaks (Turkey Topography) -->
+  <path d="M 120 360 L 220 200 L 290 310 L 390 160 L 440 360 Z" fill="url(#mountain)" opacity="0.9" />
+  <path d="M 220 200 L 290 310 L 250 360 L 120 360 Z" fill="#4338ca" opacity="0.6" />
+  <path d="M 390 160 L 440 360 L 340 360 Z" fill="#3730a3" opacity="0.7" />
+
+  <!-- Snow Caps -->
+  <polygon points="390,160 370,195 385,200 395,190 405,200 415,195" fill="#ffffff" />
+  <polygon points="220,200 205,225 215,230 225,220 235,228 240,225" fill="#e2e8f0" />
+
+  <!-- Contour / Topo Lines -->
+  <path d="M 100 290 Q 256 340 412 290" fill="none" stroke="url(#accent)" stroke-width="10" stroke-linecap="round" opacity="0.8" />
+  <path d="M 140 250 Q 256 290 372 250" fill="none" stroke="url(#accent)" stroke-width="8" stroke-linecap="round" opacity="0.5" />
+
+  <!-- Pin Marker in Center -->
+  <g transform="translate(0, -20)">
+    <path d="M 256 130 C 215 130 182 163 182 204 C 182 255 256 320 256 320 C 256 320 330 255 330 204 C 330 163 297 130 256 130 Z" fill="url(#primary)" filter="drop-shadow(0px 8px 12px rgba(0,0,0,0.5))" />
+    <circle cx="256" cy="195" r="26" fill="#ffffff" />
+    <circle cx="256" cy="195" r="14" fill="#b45309" />
+  </g>
+</svg>

@@ -494,28 +494,36 @@ function AccordionGroup({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border border-white/15 rounded-xl overflow-hidden bg-white/5 transition-all hover:border-white/25">
+    <div className={`border-2 rounded-xl overflow-hidden transition-all ${
+      isOpen 
+        ? 'border-indigo-400/80 bg-indigo-950/30 shadow-lg shadow-indigo-500/10' 
+        : 'border-white/20 bg-white/5 hover:border-indigo-400/60 hover:bg-white/10'
+    }`}>
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-2.5 hover:bg-white/10 text-left transition-colors select-none"
+        className="w-full flex items-center justify-between p-2.5 text-left transition-colors select-none cursor-pointer"
       >
         <div className="flex items-center gap-2 min-w-0 pr-2">
-          <span className="font-extrabold text-[11px] text-slate-200 truncate whitespace-nowrap">
+          <span className="font-extrabold text-xs text-slate-100 truncate whitespace-nowrap tracking-wide">
             {title}
           </span>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/25 text-indigo-300 border border-indigo-400/40 whitespace-nowrap">
+          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap shadow-sm ${
+            activeCount > 0 
+              ? 'bg-amber-400 text-slate-950 border-amber-300' 
+              : 'bg-white/10 text-slate-400 border-white/20'
+          }`}>
             {activeCount}/{totalCount}
           </span>
         </div>
         <ChevronDown
           className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-            isOpen ? 'rotate-180 text-amber-400' : 'text-slate-400'
+            isOpen ? 'rotate-180 text-amber-400' : 'text-slate-300'
           }`}
         />
       </button>
 
       {isOpen && (
-        <div className="p-2 space-y-1.5 border-t border-white/10 bg-black/40 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="p-2 space-y-1.5 border-t border-white/15 bg-black/60 animate-in fade-in slide-in-from-top-1 duration-150">
           {children}
         </div>
       )}

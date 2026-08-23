@@ -1,5 +1,5 @@
 {
-  "name": "KPSS 3D Türkiye Coğrafyası",
+  "name": "3D Coğrafya",
   "description": "3D İnteraktif Türkiye Coğrafyası KPSS Eğitim & Oyunlaştırma Web Uygulaması (Siyasi & Fiziki Hibrit)",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
