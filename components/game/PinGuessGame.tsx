@@ -197,41 +197,36 @@ export default function PinGuessGame() {
         </div>
       </div>
 
-      {/* Question Mode Selector & Small Warning Note */}
-      <div className="mb-1.5 p-1.5 bg-[#12131a] border border-indigo-500/30 rounded-lg flex flex-col gap-1">
-        <div className="flex items-center justify-between gap-1">
-          <span className="text-[10px] text-slate-300 font-extrabold flex items-center gap-1 shrink-0">
-            <Sparkles className="w-3 h-3 text-amber-400" />
-            Soru Yöntemi:
-          </span>
-          <div className="flex items-center gap-1 shrink-0">
-            <button
-              type="button"
-              onClick={() => setQuestionMode('detailed')}
-              className={`px-2 py-0.5 rounded text-[10px] font-extrabold transition-all border ${
-                questionMode === 'detailed'
-                  ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-sm'
-                  : 'bg-white/10 text-slate-300 border-white/15 hover:bg-white/20'
-              }`}
-            >
-              💡 Bilgili (Açıklamalı)
-            </button>
-            <button
-              type="button"
-              onClick={() => setQuestionMode('name_only')}
-              className={`px-2 py-0.5 rounded text-[10px] font-extrabold transition-all border ${
-                questionMode === 'name_only'
-                  ? 'bg-rose-500 text-white border-rose-400 shadow-sm'
-                  : 'bg-white/10 text-slate-300 border-white/15 hover:bg-white/20'
-              }`}
-            >
-              🎯 Sadece İsim (Zor)
-            </button>
-          </div>
+      {/* Question Mode Selector */}
+      <div className="mb-1.5 p-1 bg-[#12131a] border border-indigo-500/30 rounded-lg flex items-center justify-between gap-1">
+        <span className="text-[10px] text-slate-300 font-extrabold flex items-center gap-1 shrink-0 px-1">
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          Soru Yöntemi:
+        </span>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setQuestionMode('detailed')}
+            className={`px-2 py-0.5 rounded text-[10px] font-extrabold transition-all border ${
+              questionMode === 'detailed'
+                ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-sm'
+                : 'bg-white/10 text-slate-300 border-white/15 hover:bg-white/20'
+            }`}
+          >
+            💡 Bilgili (Açıklamalı)
+          </button>
+          <button
+            type="button"
+            onClick={() => setQuestionMode('name_only')}
+            className={`px-2 py-0.5 rounded text-[10px] font-extrabold transition-all border ${
+              questionMode === 'name_only'
+                ? 'bg-rose-500 text-white border-rose-400 shadow-sm'
+                : 'bg-white/10 text-slate-300 border-white/15 hover:bg-white/20'
+            }`}
+          >
+            🎯 Sadece İsim (Zor)
+          </button>
         </div>
-        <p className="text-[9px] text-amber-300/90 font-medium leading-tight">
-          * Not: Şehir isimleri sorular ve ipuçlarından kaldırılmıştır! İster coğrafi açıklamalarla ister sadece yer şekli adıyla sorulmasını seçebilirsiniz.
-        </p>
       </div>
 
       {/* Full-width Target Name Banner - Ensures complete title visibility without truncation */}

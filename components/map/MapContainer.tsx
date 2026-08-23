@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { useAppStore, MapStyleType } from '@/lib/store/useStore';
 import { ALL_GEO_FEATURES, GeoFeature } from '@/lib/data/turkeyData';
+import turkeyProvincesGeoJSON from '@/public/data/turkey-provinces.json';
 import { 
   PIN_GAME_QUESTIONS, 
   MULTIPLE_CHOICE_QUESTIONS,
@@ -220,157 +221,115 @@ const TURKEY_REGION_DIVISIONS: [number, number][][] = [
 ];
 
 function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean = false) {
-  if (!map.isStyleLoaded()) return;
+  if (!map || !map.isStyleLoaded()) return;
 
-  // Clean existing sources/layers if present
-  const layersToRemove = [
-    'turkey-border-line-layer',
-    'turkey-border-glow-layer',
-    'turkey-border-shadow-layer',
-    'turkey-regions-line-layer',
-    'turkey-provinces-line-layer',
-    'turkey-provinces-fill-layer',
-    'turkey-mask-layer'
-  ];
-  layersToRemove.forEach((id) => {
-    if (map.getLayer(id)) map.removeLayer(id);
-  });
-
-  const sourcesToRemove = ['turkey-border-src', 'turkey-mask-src', 'turkey-regions-src', 'turkey-provinces-src'];
-  sourcesToRemove.forEach((id) => {
-    if (map.getSource(id)) map.removeSource(id);
-  });
-
-  // 1. Vignette Outer Dark Mask - Masks everywhere OUTSIDE Turkey so only Turkey is illuminated
-  map.addSource('turkey-mask-src', {
-    type: 'geojson',
-    data: {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]],
-          DETAILED_TURKEY_BORDER_RING
-        ]
+  try {
+    // 1. Safely clean existing layers if present
+    const layersToRemove = [
+      'turkey-border-line-layer',
+      'turkey-border-glow-layer',
+      'turkey-border-shadow-layer',
+      'turkey-regions-line-layer',
+      'turkey-provinces-line-layer',
+      'turkey-provinces-fill-layer',
+      'turkey-mask-layer'
+    ];
+    layersToRemove.forEach((id) => {
+      if (map.getLayer(id)) {
+        try { map.removeLayer(id); } catch (_) {}
       }
-    }
-  });
+    });
 
-  map.addLayer({
-    id: 'turkey-mask-layer',
-    type: 'fill',
-    source: 'turkey-mask-src',
-    paint: {
-      'fill-color': '#020617',
-      'fill-opacity': isBlind ? 0.98 : 0.88
-    }
-  });
-
-  // 2. Turkey 81 Provinces GeoJSON Layer (Only Province/City borders, no districts/villages!)
-  map.addSource('turkey-provinces-src', {
-    type: 'geojson',
-    data: '/data/turkey-provinces.json'
-  });
-
-  map.addLayer({
-    id: 'turkey-provinces-fill-layer',
-    type: 'fill',
-    source: 'turkey-provinces-src',
-    paint: {
-      'fill-color': '#f8fafc',
-      'fill-opacity': isBlind ? 0.05 : 0.02
-    }
-  });
-
-  map.addLayer({
-    id: 'turkey-provinces-line-layer',
-    type: 'line',
-    source: 'turkey-provinces-src',
-    paint: {
-      'line-color': isBlind ? '#475569' : '#64748b',
-      'line-width': isBlind ? 1.8 : 1.2,
-      'line-opacity': isBlind ? 0.95 : 0.65
-    }
-  });
-
-  // 3. Turkey National Border GeoJSON Source
-  map.addSource('turkey-border-src', {
-    type: 'geojson',
-    data: {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'LineString',
-        coordinates: DETAILED_TURKEY_BORDER_RING
+    const sourcesToRemove = ['turkey-border-src', 'turkey-mask-src', 'turkey-regions-src', 'turkey-provinces-src'];
+    sourcesToRemove.forEach((id) => {
+      if (map.getSource(id)) {
+        try { map.removeSource(id); } catch (_) {}
       }
-    }
-  });
+    });
 
-  // Layer A: Dark Contrast Drop-Shadow Line (Underneath)
-  map.addLayer({
-    id: 'turkey-border-shadow-layer',
-    type: 'line',
-    source: 'turkey-border-src',
-    paint: {
-      'line-color': '#020617',
-      'line-width': 12,
-      'line-opacity': 0.98
-    }
-  });
+    // 2. Turkey 81 Provinces GeoJSON Source (Direct Object)
+    map.addSource('turkey-provinces-src', {
+      type: 'geojson',
+      data: turkeyProvincesGeoJSON as unknown as GeoJSON.GeoJSON
+    });
 
-  // Layer B: Vibrant Amber/Gold Outer Glow
-  map.addLayer({
-    id: 'turkey-border-glow-layer',
-    type: 'line',
-    source: 'turkey-border-src',
-    paint: {
-      'line-color': '#f59e0b',
-      'line-width': 18,
-      'line-opacity': 0.90,
-      'line-blur': 4
-    }
-  });
+    // Fill Turkey landmass to separate it clearly from surrounding area
+    map.addLayer({
+      id: 'turkey-provinces-fill-layer',
+      type: 'fill',
+      source: 'turkey-provinces-src',
+      paint: {
+        'fill-color': isBlind ? '#0f172a' : '#1e293b',
+        'fill-opacity': isBlind ? 0.12 : 0.08
+      }
+    });
 
-  // Layer C: Core Bright Yellow Border Line
-  map.addLayer({
-    id: 'turkey-border-line-layer',
-    type: 'line',
-    source: 'turkey-border-src',
-    paint: {
-      'line-color': '#fef08a',
-      'line-width': 4.5,
-      'line-opacity': 1.0
-    }
-  });
+    // All Province Internal Boundaries - High contrast visible lines
+    map.addLayer({
+      id: 'turkey-provinces-line-layer',
+      type: 'line',
+      source: 'turkey-provinces-src',
+      paint: {
+        'line-color': isBlind ? '#38bdf8' : '#0284c7',
+        'line-width': isBlind ? 2.2 : 1.8,
+        'line-opacity': 0.90
+      }
+    });
 
-  // 4. Regional Interior Division Lines
-  map.addSource('turkey-regions-src', {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: TURKEY_REGION_DIVISIONS.map((lineCoords) => ({
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: lineCoords
-        }
-      }))
-    }
-  });
+    // Outer Glow Border Line
+    map.addLayer({
+      id: 'turkey-border-glow-layer',
+      type: 'line',
+      source: 'turkey-provinces-src',
+      paint: {
+        'line-color': '#f59e0b',
+        'line-width': 5.0,
+        'line-opacity': 0.85
+      }
+    });
 
-  map.addLayer({
-    id: 'turkey-regions-line-layer',
-    type: 'line',
-    source: 'turkey-regions-src',
-    paint: {
-      'line-color': '#38bdf8', // Sky Blue
-      'line-width': 2.5,
-      'line-dasharray': [3, 3],
-      'line-opacity': 0.85
-    }
-  });
+    // Core Bright Yellow Highlight Line for Province & National Boundaries
+    map.addLayer({
+      id: 'turkey-border-line-layer',
+      type: 'line',
+      source: 'turkey-provinces-src',
+      paint: {
+        'line-color': '#fef08a',
+        'line-width': 2.0,
+        'line-opacity': 0.95
+      }
+    });
+
+    // 3. Regional Interior Division Lines
+    map.addSource('turkey-regions-src', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: TURKEY_REGION_DIVISIONS.map((lineCoords) => ({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: lineCoords
+          }
+        }))
+      }
+    });
+
+    map.addLayer({
+      id: 'turkey-regions-line-layer',
+      type: 'line',
+      source: 'turkey-regions-src',
+      paint: {
+        'line-color': '#f43f5e', // Rose Red
+        'line-width': 3.0,
+        'line-dasharray': [3, 3],
+        'line-opacity': 0.90
+      }
+    });
+  } catch (err) {
+    console.error('Error configuring Turkey map borders:', err);
+  }
 }
 
 export default function MapContainer() {
