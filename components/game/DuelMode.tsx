@@ -51,7 +51,6 @@ const CATEGORIES = [
 
 export default function DuelMode() {
   const {
-    activeTab,
     setActiveTab,
     activeDuelSession,
     setActiveDuelSession,
@@ -281,11 +280,21 @@ export default function DuelMode() {
       if (currentQ) {
         flyToCoords(currentQ.targetCoords, 0, 0, 6.8);
       }
+
+      // Auto-advance to next round after 4.5 seconds
+      let revealTimer: NodeJS.Timeout | null = null;
+      if (activeDuelPlayerKey === 'player1' || activeDuelSession.player2?.isBot) {
+        revealTimer = setTimeout(() => {
+          advanceDuelRound(activeDuelSession);
+        }, 4500);
+      }
+
+      return () => {
+        if (revealTimer) clearTimeout(revealTimer);
+      };
     }
   }, [
-    activeDuelSession?.status, 
-    activeDuelSession?.currentRound, 
-    activeDuelSession?.roundStartTime, 
+    activeDuelSession,
     activeDuelPlayerKey, 
     roundQuestions, 
     flyToCoords
@@ -1065,81 +1074,81 @@ export default function DuelMode() {
         </div>
       </div>
 
-      {/* Round Reveal Modal / Floating Banner when both answered or timer ended */}
+      {/* Ultra-Compact Round Reveal Bar / Pill at the bottom */}
       {isReveal && (
-        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-auto max-w-lg bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400 rounded-2xl shadow-2xl p-3 sm:p-4 text-white animate-in slide-in-from-bottom-5 duration-200">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
-            <span className="text-xs font-black text-amber-400 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" />
-              Tur Sonu İsabet Karşılaştırması
+        <div
+          id="duel-round-reveal-banner"
+          className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-30 w-[96vw] max-w-lg bg-[#09090b]/95 backdrop-blur-2xl border border-amber-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 text-white animate-in slide-in-from-bottom-2 duration-150 flex items-center justify-between gap-1.5"
+        >
+          {/* Left: Sen (Your Stats) */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="w-5 h-5 rounded-md bg-indigo-600 border border-indigo-400/50 flex items-center justify-center text-[10px] font-black text-white shrink-0">
+              {myPlayer?.rumuz.charAt(0).toUpperCase() || 'S'}
             </span>
-
-            {activeDuelPlayerKey === 'player1' && (
-              <button
-                onClick={() => advanceDuelRound(activeDuelSession)}
-                className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg shadow-md transition-all flex items-center gap-1 cursor-pointer"
-              >
-                <span>Sonraki Tur</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            {/* You */}
-            <div className="bg-indigo-950/50 border border-indigo-500/40 rounded-xl p-2">
-              <span className="text-[11px] font-black text-indigo-300 block truncate">
-                {myPlayer?.rumuz} (Sen)
-              </span>
+            <div className="leading-none min-w-0">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] font-black text-indigo-300 truncate max-w-[65px] sm:max-w-[85px]">
+                  {myPlayer?.rumuz} (Sen)
+                </span>
+                {lastRoundScore && (
+                  <span className={`text-[8px] font-extrabold px-1 py-0.2 rounded hidden sm:inline ${lastRoundScore.tierColor}`}>
+                    {lastRoundScore.tierName}
+                  </span>
+                )}
+              </div>
               {myPlayer?.currentGuess ? (
-                <div className="space-y-0.5 mt-1">
-                  <div className="text-amber-300 font-bold">
-                    📏 {myPlayer.currentGuess.distanceKm} km hata
-                  </div>
-                  <div className="text-[10px] text-slate-300">
-                    ⏱️ {myPlayer.currentGuess.timeTakenSec} sn
-                  </div>
-                  <div className="text-xs font-black text-emerald-400">
-                    +{myPlayer.currentGuess.pointsEarned} Puan
-                  </div>
-                  {lastRoundScore && (
-                    <div className={`text-[9px] font-bold ${lastRoundScore.tierColor}`}>
-                      {lastRoundScore.tierName}
-                    </div>
-                  )}
+                <div className="text-[10px] font-bold text-amber-300 mt-0.5 whitespace-nowrap">
+                  {Math.round(myPlayer.currentGuess.distanceKm)} km{' '}
+                  <span className="text-emerald-400 font-black">+{myPlayer.currentGuess.pointsEarned}P</span>
                 </div>
               ) : (
-                <span className="text-rose-400 font-bold text-[10px]">Zamanında tıklanmadı! (0 P)</span>
-              )}
-            </div>
-
-            {/* Opponent */}
-            <div className="bg-rose-950/50 border border-rose-500/40 rounded-xl p-2">
-              <span className="text-[11px] font-black text-rose-300 block truncate">
-                {otherPlayer?.rumuz || 'Rakip'}
-              </span>
-              {otherPlayer?.currentGuess ? (
-                <div className="space-y-0.5 mt-1">
-                  <div className="text-amber-300 font-bold">
-                    📏 {otherPlayer.currentGuess.distanceKm} km hata
-                  </div>
-                  <div className="text-[10px] text-slate-300">
-                    ⏱️ {otherPlayer.currentGuess.timeTakenSec} sn
-                  </div>
-                  <div className="text-xs font-black text-emerald-400">
-                    +{otherPlayer.currentGuess.pointsEarned} Puan
-                  </div>
-                  {opponentRoundScore && (
-                    <div className={`text-[9px] font-bold ${opponentRoundScore.tierColor}`}>
-                      {opponentRoundScore.tierName}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <span className="text-rose-400 font-bold text-[10px]">Zamanında tıklanmadı! (0 P)</span>
+                <span className="text-[9px] text-rose-400 font-bold mt-0.5 block">0P (Geçti)</span>
               )}
             </div>
           </div>
+
+          {/* Center: Target Location Badge */}
+          <div className="hidden xs:flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[10px] font-black max-w-[130px] sm:max-w-[170px] truncate shrink">
+            <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+            <span className="truncate">{sanitizedTitle}</span>
+          </div>
+
+          {/* Right: Opponent Stats */}
+          <div className="flex items-center gap-1.5 min-w-0 text-right">
+            <div className="leading-none min-w-0">
+              <div className="flex items-center justify-end gap-1">
+                {opponentRoundScore && (
+                  <span className={`text-[8px] font-extrabold px-1 py-0.2 rounded hidden sm:inline ${opponentRoundScore.tierColor}`}>
+                    {opponentRoundScore.tierName}
+                  </span>
+                )}
+                <span className="text-[10px] font-black text-rose-300 truncate max-w-[65px] sm:max-w-[85px]">
+                  {otherPlayer?.rumuz || 'Rakip'}
+                </span>
+              </div>
+              {otherPlayer?.currentGuess ? (
+                <div className="text-[10px] font-bold text-amber-300 mt-0.5 whitespace-nowrap">
+                  {Math.round(otherPlayer.currentGuess.distanceKm)} km{' '}
+                  <span className="text-emerald-400 font-black">+{otherPlayer.currentGuess.pointsEarned}P</span>
+                </div>
+              ) : (
+                <span className="text-[9px] text-rose-400 font-bold mt-0.5 block">0P (Geçti)</span>
+              )}
+            </div>
+            <span className="w-5 h-5 rounded-md bg-rose-600 border border-rose-400/50 flex items-center justify-center text-[10px] font-black text-white shrink-0">
+              {otherPlayer?.rumuz.charAt(0).toUpperCase() || 'R'}
+            </span>
+          </div>
+
+          {/* Advance / Next Round Button */}
+          <button
+            onClick={() => advanceDuelRound(activeDuelSession)}
+            className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950 font-black text-[10px] sm:text-xs rounded-lg shadow-md transition-all flex items-center gap-0.5 shrink-0 cursor-pointer ml-1"
+            title="Sonraki Soruya Geç"
+          >
+            <span>İlerle</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-950 font-black" />
+          </button>
         </div>
       )}
     </>
