@@ -417,9 +417,14 @@ export default function MapContainer() {
     map.on('pitch', () => setCurrentPitch(Math.round(map.getPitch())));
     map.on('zoom', () => setCurrentZoom(parseFloat(map.getZoom().toFixed(1))));
 
-    // Click handler for Pin Guess Game
+    // Click handler for Pin Guess Game & Map Dismiss
     map.on('click', (e) => {
       const storeState = useAppStore.getState();
+      // If any sidebar is open, treat this click exclusively as sidebar dismissal
+      if (storeState.isSidebarOpen || storeState.isAiDrawerOpen) {
+        storeState.closeAllSidebars();
+        return;
+      }
       if (storeState.activeTab === 'pin_game' && !storeState.isPinGuessed) {
         storeState.submitPinGuess(e.lngLat.lng, e.lngLat.lat);
       }
@@ -608,6 +613,11 @@ export default function MapContainer() {
 
       el.addEventListener('click', (e) => {
         e.stopPropagation();
+        const storeState = useAppStore.getState();
+        if (storeState.isSidebarOpen || storeState.isAiDrawerOpen) {
+          storeState.closeAllSidebars();
+          return;
+        }
         setSelectedFeature(feature);
 
         if (mapRef.current) {

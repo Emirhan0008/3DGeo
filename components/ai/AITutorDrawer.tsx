@@ -34,6 +34,14 @@ export default function AITutorDrawer() {
   const [isPinned, setIsPinned] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Sync state when store closes AI drawer
+  React.useEffect(() => {
+    if (!isAiDrawerOpen) {
+      setIsHovered(false);
+      setIsPinned(false);
+    }
+  }, [isAiDrawerOpen]);
+
   const [chatMessages, setChatMessages] = useState<
     Array<{ sender: 'user' | 'ai'; text: string }>
   >([
@@ -116,8 +124,19 @@ export default function AITutorDrawer() {
     >
       {/* Collapsed Strip State */}
       {!isExpanded ? (
-        <div className="w-full h-full flex flex-col items-center justify-between py-4 cursor-pointer hover:bg-white/5 transition-all">
-          <div className="flex flex-col items-center gap-3">
+        <div 
+          onClick={() => {
+            setAiDrawerOpen(true);
+            setIsPinned(true);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            setAiDrawerOpen(true);
+            setIsPinned(true);
+          }}
+          className="w-full h-full flex flex-col items-center justify-between py-4 cursor-pointer hover:bg-white/5 active:bg-white/10 transition-all select-none touch-manipulation"
+        >
+          <div className="flex flex-col items-center gap-3 pointer-events-none">
             <div className="p-2 bg-indigo-500/20 border border-indigo-500/40 rounded-xl text-indigo-300">
               <Bot className="w-5 h-5 text-indigo-400 animate-pulse" />
             </div>
@@ -126,21 +145,22 @@ export default function AITutorDrawer() {
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-2 overflow-hidden select-none">
+          <div className="flex-1 flex items-center justify-center my-2 overflow-hidden select-none pointer-events-none">
             <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-extrabold tracking-widest uppercase text-indigo-300 hover:text-white transition-colors whitespace-nowrap max-h-36 overflow-hidden">
               AI EĞİTMEN
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 pointer-events-none">
             <ChevronLeft className="w-4 h-4 text-indigo-400 animate-bounce" />
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                setAiDrawerOpen(true);
                 setIsPinned(true);
               }}
               title="Sohbeti Ekrana Sabitle"
-              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all pointer-events-auto"
             >
               <Pin className="w-3.5 h-3.5" />
             </button>
@@ -185,7 +205,7 @@ export default function AITutorDrawer() {
                 onClick={() => {
                   setIsPinned(false);
                   setIsHovered(false);
-                  if (isAiDrawerOpen) setAiDrawerOpen(false);
+                  setAiDrawerOpen(false);
                 }}
                 className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all"
               >

@@ -673,263 +673,1438 @@ export const MOUNTAINS_DATA: GeoFeature[] = [
 ];
 
 export const RIVERS_DATA: GeoFeature[] = [
+  // --- KARADENİZ'E DÖKÜLEN AKARSULAR ---
   {
     id: 'r-kizilirmak',
     name: 'Kızılırmak',
     type: 'river',
-    category: 'Açık Havza Akarsu',
+    category: 'Açık Havza Akarsu (Karadeniz)',
     coordinates: [36.002, 41.597],
     region: 'Karadeniz',
     description: 'Türkiye sınırları içerisinde doğup yine Türkiye denizlerine dökülen EN UZUN nehirdir (1.355 km).',
     kpssTips: [
-      'Sivas İmranlı\'dan doğar, Karadeniz\'e döküldüğü yerde Bafra Delta Ovası\'nı oluşturur.',
-      'Üzerinde Hirfanlı, Kesikköprü, Altınkaya, Deriner gibi büyük barajlar yer alır.',
-      'Tuz Çölü yakınlarından geçtiği için suyu yer yer tuzludur.'
+      'Sivas Kızıldağ\'dan doğar, Karadeniz\'e döküldüğü yerde Bafra Delta Ovası\'nı oluşturur.',
+      'Üzerinde Hirfanlı, Kesikköprü, Altınkaya, Deriner, Kapulukaya barajları yer alır.',
+      'Tuz Gölü ve jipsli arazilerden geçtiği için suyu yer yer tuzludur/kireçlidir.',
+      'İç Anadolu\'da dev bir yay (Kızılırmak Yayı) çizer.'
     ],
     details: {
       lengthKm: 1355,
       originMouth: 'Sivas Kızıldağ -> Bafra (Karadeniz)',
-      dams: ['Altınkaya', 'Deriner', 'Hirfanlı', 'Kesikköprü', 'Kapulukaya']
-    }
+      dams: ['Altınkaya', 'Derbent', 'Hirfanlı', 'Kesikköprü', 'Kapulukaya']
+    },
+    mnemonic: 'KIZILIRMAK = En Uzun Yerli Nehir -> Bafra Deltası + Altınkaya & Hirfanlı Barajları'
   },
   {
     id: 'r-yesilirmak',
     name: 'Yeşilırmak',
     type: 'river',
-    category: 'Açık Havza Akarsu',
+    category: 'Açık Havza Akarsu (Karadeniz)',
     coordinates: [36.628, 41.385],
     region: 'Karadeniz',
-    description: 'Sivas Kösedağ\'dan doğup Çarşamba Ovası\'nı oluşturan akarsu.',
+    description: 'Sivas Kösedağ\'dan doğup Çarşamba Ovası\'nı denizi doldurarak oluşturan akarsu.',
     kpssTips: [
-      'Çarşamba Delta Ovası\'nı denizi doldurarak oluşturmuştur.',
-      'Erozyon taşıma kapasitesi çok yüksektir.',
+      'Samsun Çarşamba Delta Ovası\'nı oluşturur.',
+      'Erozyon ve alüvyon taşıma kapasitesi çok yüksektir.',
+      'Başlıca kolları: Kelkit Çayı ve Çekerek Irmağı\'dır.',
       'Barajları: Hasan Uğurlu, Suat Uğurlu, Almus, Kılıçkaya.'
     ],
     details: {
       lengthKm: 519,
-      originMouth: 'Sivas -> Çarşamba (Karadeniz)',
+      originMouth: 'Sivas Kösedağ -> Çarşamba (Karadeniz)',
       dams: ['Hasan Uğurlu', 'Suat Uğurlu', 'Almus', 'Kılıçkaya']
+    },
+    mnemonic: 'Yeşilırmak -> Çarşamba Deltası + Hasan/Suat Uğurlu Barajları'
+  },
+  {
+    id: 'r-kelkit',
+    name: 'Kelkit Çayı (Yeşilırmak Kolu)',
+    type: 'river',
+    category: 'Fay Oluğu Akarsuyu',
+    coordinates: [37.500, 40.350],
+    region: 'Karadeniz',
+    description: 'Gümüşhane\'den doğup Kuzey Anadolu Fay Hattı (KAF) çöküntü oluğu boyunca akan Yeşilırmak\'ın en büyük kolu.',
+    kpssTips: [
+      'Kuzey Anadolu Fay zonu boyunca uzanan tektonik vadiden akar.',
+      'Niksar ve Erbaa ovalarını sulayarak Yeşilırmak ile birleşir.'
+    ],
+    details: {
+      lengthKm: 320,
+      dams: ['Kılıçkaya Barajı']
     }
   },
   {
     id: 'r-sakarya',
-    name: 'Sakarya Nehir',
+    name: 'Sakarya Nehri',
     type: 'river',
-    category: 'Çok Bölgeli Akarsu',
+    category: '4 Bölgeli Akarsu (Karadeniz)',
     coordinates: [30.655, 41.130],
     region: 'Marmara',
-    description: 'Eskişehir, Ankara, Bilecik, Sakarya illerinden geçerek Karadeniz\'e dökülen 4 farklı bölgeden geçen nehir.',
+    description: 'Eskişehir Çifteler\'den doğup İç Anadolu, Ege, Marmara ve Karadeniz olmak üzere 4 FARKLI COĞRAFİ BÖLGEDEN geçen nehir.',
     kpssTips: [
-      'İç Anadolu, Ege, Karadeniz ve Marmara olmak üzere 4 coğrafi bölgeden su toplar.',
-      'Karasu\'da Karadeniz\'e dökülür. Kirliliği yüksek akarsularımızdandır.'
+      '4 ayrı coğrafi bölgeden (İç Anadolu, Ege, Marmara, Karadeniz) su toplar.',
+      'Karasu\'da Karadeniz\'e dökülür; kıyı akıntıları ve derinlik nedeniyle büyük delta oluşturamaz.',
+      'En önemli kolları: Porsuk Çayı ve Ankara Çayı\'dır.',
+      'Sanayi ve evsel atıklar nedeniyle kirlilik oranı yüksektir.'
     ],
     details: {
       lengthKm: 824,
-      dams: ['Yenice', 'Gökçekaya', 'Sarıyar (Hasan Polatkan)']
-    }
-  },
-  {
-    id: 'r-firat',
-    name: 'Fırat Nehir',
-    type: 'river',
-    category: 'Sınır Aşan Akarsu (Uluslararası)',
-    coordinates: [38.800, 37.150],
-    region: 'Güneydoğu Anadolu',
-    description: 'Türkiye\'nin debisi ve hidroelektrik potansiyeli en yüksek nehri (Karasu ve Murat kollarının birleşimi).',
-    kpssTips: [
-      'Türkiye\'nin en büyük hidroelektrik santralleri Fırat üzerindedir (Atatürk, Keban, Karakaya).',
-      'Suriye ve Irak\'a geçerek Basra Körfezi\'ne dökülür (Sınır aşan akarsu).',
-      'GAP projesinin ana su kaynağıdır.'
-    ],
-    details: {
-      lengthKm: 2800,
-      originMouth: 'Doğu Anadolu -> Suriye/Irak -> Basra Körfezi',
-      dams: ['Atatürk Barajı (En Büyük)', 'Keban', 'Karakaya', 'Birecik', 'Karkamış']
+      originMouth: 'Afyon/Eskişehir -> Sakarya Karasu (Karadeniz)',
+      dams: ['Sarıyar (Hasan Polatkan)', 'Gökçekaya', 'Yenice']
     },
-    mnemonic: 'K-K-A = Keban, Karakaya, Atatürk (Fırat Dev Dev Barajlar!)'
+    mnemonic: 'Sakarya = 4 Bölge Gezen Nehir + Sarıyar & Gökçekaya Barajları'
   },
   {
-    id: 'r-dicle',
-    name: 'Dicle Nehir',
+    id: 'r-porsuk',
+    name: 'Porsuk Çayı (Sakarya Kolu)',
     type: 'river',
-    category: 'Sınır Aşan Akarsu',
-    coordinates: [41.250, 37.100],
-    region: 'Güneydoğu Anadolu',
-    description: 'Hazar Gölü güneyinden doğup Irak\'ta Fırat ile birleşerek Şattülarap\'ı oluşturan akarsu.',
+    category: 'Açık Havza / Şehir Akarsuyu',
+    coordinates: [30.520, 39.770],
+    region: 'İç Anadolu',
+    description: 'Kütahya Murat Dağı\'ndan doğup Eskişehir şehir merkezini güzelleştiren Sakarya Nehri\'nin en uzun kolu.',
     kpssTips: [
-      'Ilısu Barajı (Veysel Eroğlu) Dicle üzerindedir ve Hasankeyf antik kenti sular altında kalmıştır.',
-      'Irak ile Türkiye arasında yer yer doğal sınır oluşturur.'
+      'Eskişehir şehir içi gondol ve tekne turizmiyle tanınır.',
+      'Porsuk Barajı kentin su ihtiyacını karşılar.'
     ],
     details: {
-      dams: ['Ilısu (Veysel Eroğlu)', 'Kralkızı', 'Dicle', 'Batman']
+      lengthKm: 448,
+      dams: ['Porsuk Barajı']
     }
   },
   {
     id: 'r-coruh',
-    name: 'Çoruh Nehir',
+    name: 'Çoruh Nehri',
     type: 'river',
-    category: 'Sınır Aşan Akarsu / Rafting',
+    category: 'Sınır Aşan / Rafting & En Yüksek Barajlar',
     coordinates: [41.550, 41.600],
     region: 'Karadeniz',
     description: 'Dünyanın en hızlı akan ve en derin vadilerinden geçen akarsularından biri. Gürcistan Batum\'dan Karadeniz\'e dökülür.',
     kpssTips: [
-      'Türkiye\'nin akış hızı ve debi rejimi en yüksek rafting nehridir.',
-      'Üzerinde Türkiye\'nin EN YÜKSEK BARAJI olan YUSUFELİ BARAJI (275 m) inşa edilmiştir!',
-      'Deriner ve Borçka barajları da bu nehirdedir.'
+      'Türkiye\'nin akış hızı, aşındırma gücü ve rafting potansiyeli EN YÜKSEK nehridir.',
+      'Üzerinde Türkiye\'nin EN YÜKSEK BARAJI olan YUSUFELİ BARAJI (275 m) yer alır!',
+      'Deriner (249 m), Borçka, Muratlı ve Artvin barajları da bu vadidedir.',
+      'Sınır aşan nehirdir; Gürcistan topraklarından Karadeniz\'e dökülür.'
     ],
-    mnemonic: 'Çoruh = Derin Vadi + Yusufeli (En Yüksek Baraj) + Rafting'
+    details: {
+      lengthKm: 431,
+      originMouth: 'Mescit Dağları (Erzurum) -> Batum (Karadeniz)',
+      dams: ['Yusufeli (En Yüksek - 275m)', 'Deriner (249m)', 'Borçka', 'Muratlı', 'Artvin']
+    },
+    mnemonic: 'Çoruh = Hızlı Akış + Yusufeli (275m Zirve Baraj) + Deriner + Rafting'
   },
   {
-    id: 'r-aras-kura',
-    name: 'Aras ve Kura Nehirleri',
+    id: 'r-bartin',
+    name: 'Bartın Çayı',
     type: 'river',
-    category: 'Kapalı Havza Akarsu (Hazar Denizi)',
-    coordinates: [43.800, 40.000],
-    region: 'Doğu Anadolu',
-    description: 'Erzurum ve Kars platolarından doğup Ermenistan/Azerbaycan sınırlarından geçerek Hazar Denizi\'ne dökülen nehirler.',
+    category: 'Üzerinde Taşımacılık Yapılan Tek Akarsu',
+    coordinates: [32.225, 41.685],
+    region: 'Karadeniz',
+    description: 'Türkiye\'de denize döküldüğü ağız kısmından itibaren yaklaşık 15 km boyunca İÇ ULAŞIM ve TAŞIMACILIK YAPILABİLEN TEK AKARSU.',
     kpssTips: [
-      'Okyanuslara veya açık denizlere dökülmeyip HAZAR GÖLÜ (KAPALI HAVZA)\'ne dökülürler!',
-      'Aras Nehri Türkiye - Ermenistan doğal sınırını oluşturur.'
-    ]
+      'ÖSYM KPSS KİLİT SORU: Türkiye\'de üzerinde deniz/yük taşımacılığı yapılabilen TEK akarsu Bartın Çayı\'dır!',
+      'Akış rejimi düzenli ve vadi eğimi az olduğu için küçük tonajlı gemiler girebilir.'
+    ],
+    details: {
+      lengthKm: 107,
+      originMouth: 'Küre Dağları -> Karadeniz (Bartın Boğazı)'
+    },
+    mnemonic: 'BARTIN ÇAYI = Türkiye\'de TAŞIMACILIK (Ulaşım) Yapılan TEK Akarsu!'
   },
+  {
+    id: 'r-filyos',
+    name: 'Filyos (Yenice) Çayı',
+    type: 'river',
+    category: 'Karadeniz Sanayi & Liman Havzası',
+    coordinates: [32.020, 41.570],
+    region: 'Karadeniz',
+    description: 'Karabük ve Zonguldak arasından geçerek Karadeniz Filyos Limanı\'na dökülen kilit akarsu.',
+    kpssTips: [
+      'Karabük Demir-Çelik Fabrikası ve Filyos Endüstri Bölgesi için hayati önem taşır.',
+      'Karadeniz Doğalgazı karaya Filyos Limanı ve vadisinden çıkarılmaktadır.'
+    ],
+    details: {
+      lengthKm: 288
+    }
+  },
+  {
+    id: 'r-harsit',
+    name: 'Harşit (Doğankent) Çayı',
+    type: 'river',
+    category: 'Doğu Karadeniz Akarsuyu',
+    coordinates: [38.920, 40.980],
+    region: 'Karadeniz',
+    description: 'Gümüşhane dağlarından doğup derin vadilerle Tirebolu (Giresun)\'dan Karadeniz\'e ulaşan akarsu.',
+    kpssTips: [
+      'Tarihi Harşit Savunması\'nın yapıldığı derin vadi sistemidir.',
+      'Hidroelektrik potansiyeli yüksektir (Kürtün, Torul ve Doğankent barajları).'
+    ],
+    details: {
+      lengthKm: 160,
+      dams: ['Torul Barajı', 'Kürtün Barajı', 'Doğankent HES']
+    }
+  },
+
+  // --- MARMARA'YA DÖKÜLEN AKARSULAR ---
+  {
+    id: 'r-susurluk',
+    name: 'Susurluk (Simav) Çayı',
+    type: 'river',
+    category: 'Marmara Havzası Akarsuyu',
+    coordinates: [28.450, 40.380],
+    region: 'Marmara',
+    description: 'İç Batı Anadolu\'dan doğup Nilüfer ve Kemalpaşa çaylarını alarak Marmara Denizi\'ne (Kapıdağ doğusu) dökülen akarsu.',
+    kpssTips: [
+      'Güney Marmara\'nın en büyük akarsu havzasıdır.',
+      'Nilüfer Çayı (Bursa sanayi atıkları) ile birleştiği için Marmara\'nın en kirli akarsularındandır.',
+      'Manyas ve Uluabat göllerinin fazla sularını tahliye eder.'
+    ],
+    details: {
+      lengthKm: 321,
+      dams: ['Çaygören Barajı']
+    }
+  },
+  {
+    id: 'r-gonen',
+    name: 'Gönen Çayı',
+    type: 'river',
+    category: 'Güney Marmara Akarsuyu',
+    coordinates: [27.650, 40.380],
+    region: 'Marmara',
+    description: 'Kaz Dağları\'ndan doğup Çanakkale ve Balıkesir üzerinden Marmara Denizi\'ne dökülen çeltik (pirinç) sulama akarsuyu.',
+    kpssTips: [
+      'Gönen Ovası\'nda dünyaca ünlü pirinç üretiminin ana can damarıdır.'
+    ],
+    details: {
+      lengthKm: 134,
+      dams: ['Gönen Barajı']
+    }
+  },
+
+  // --- EGE'YE DÖKÜLEN AKARSULAR (GRABEN NEHİRLERİ) ---
   {
     id: 'r-meric',
-    name: 'Meriç Nehir',
+    name: 'Meriç Nehri',
     type: 'river',
-    category: 'Sınır Oluşturan Akarsu',
+    category: 'Sınır Aşan / Sınır Çizen Nehir (Ege)',
     coordinates: [26.350, 41.200],
     region: 'Marmara',
-    description: 'Bulgaristan\'dan doğup Türkiye - Yunanistan doğal sınırını çizerek Ege Denizi\'ne dökülen nehir.',
+    description: 'Bulgaristan Rila Dağları\'ndan doğup Türkiye - Yunanistan sınırını çizerek Saros Körfezi/Enez\'den Ege Denizi\'ne dökülen nehir.',
     kpssTips: [
-      'Türkiye - Yunanistan kara sınırının büyük bölümünü oluşturur.',
-      'Ergene nehri Meriç\'in en önemli koludur (Pirinç tarımı ve Ergene Ovası sulaması).'
+      'Türkiye - Yunanistan doğal kara sınırının büyük bölümünü oluşturur.',
+      'Yurtdışından doğup Türkiye\'de denize dökülen nehirlerimizdendir (Meriç ve Asi).',
+      'En büyük kolu Ergene Nehri\'dir. Taşkınlarıyla ve pirinç (çeltik) üretimiyle bilinir.'
+    ],
+    details: {
+      lengthKm: 480,
+      originMouth: 'Bulgaristan -> Edirne Sınırı -> Ege Denizi (Enez)'
+    },
+    mnemonic: 'Meriç = Bulgaristan\'dan Gelir + Yunanistan Sınırı + Ergene Çeltik Tarlaları'
+  },
+  {
+    id: 'r-ergene',
+    name: 'Ergene Nehri (Meriç Kolu)',
+    type: 'river',
+    category: 'Marmara İç Havza / Kirlilik & Pirinç',
+    coordinates: [26.850, 41.300],
+    region: 'Marmara',
+    description: 'Yıldız Dağları\'ndan doğup Trakya içinden geçerek Meriç ile birleşen akarsu.',
+    kpssTips: [
+      'Türkiye\'de pirinç (çeltik) üretiminin 1. sırasında yer alan havzadır (Edirne/Tekirdağ).',
+      'Trakya sanayi tesisleri nedeniyle Türkiye\'nin EN KİRLİ akarsularından biridir.'
+    ],
+    details: {
+      lengthKm: 285
+    }
+  },
+  {
+    id: 'r-bakircay',
+    name: 'Bakırçay',
+    type: 'river',
+    category: 'Graben / Menderesli Akarsu (Ege)',
+    coordinates: [27.000, 39.000],
+    region: 'Ege',
+    description: 'Madra ve Yunt dağları arasındaki graben oluğundan akıp Çandarlı Körfezi\'nde Dikili Deltası\'nı oluşturan Ege akarsuyu.',
+    kpssTips: [
+      'Ege grabenleri içerisinde en kuzeydeki akarsudur (Şifre: B-G-K-B sıralamasının ilki).',
+      'Çandarlı Körfezi\'nde Dikili alüvyal deltası oluşturur.',
+      'Akış hızı ve hidroelektrik potansiyeli düşüktür; sık menderesler çizer.'
+    ],
+    details: {
+      lengthKm: 129,
+      dams: ['Yortanlı Barajı']
+    },
+    mnemonic: 'Ege Akarsuları Kuzeyden Güneye: B-G-K-B (Bakırçay, Gediz, Küçük Menderes, Büyük Menderes)'
+  },
+  {
+    id: 'r-gediz',
+    name: 'Gediz Nehri',
+    type: 'river',
+    category: 'Graben / Delta Akarsuyu (Ege)',
+    coordinates: [27.050, 38.600],
+    region: 'Ege',
+    description: 'İç Batı Anadolu\'dan (Murat Dağı) doğup Manisa ve İzmir Menemen Ovası\'ndan geçerek Ege Denizi\'ne dökülen nehir.',
+    kpssTips: [
+      'Menemen Delta Ovası\'nı oluşturmuştur.',
+      'İzmir Körfezi dolmasın diye Osmanlı döneminde yatağı kuzeye (Çamaltı Tuzlası yanına) kaydırılmıştır!',
+      'Gediz Deltası (İzmir Kuş Cenneti) uluslararası Ramsar koruma alanıdır.',
+      'Üzerinde Demirköprü Barajı yer alır.'
+    ],
+    details: {
+      lengthKm: 401,
+      originMouth: 'Murat Dağı -> Menemen Deltası (İzmir Körfezi Dışı)',
+      dams: ['Demirköprü Barajı']
+    },
+    mnemonic: 'Gediz = Menemen Deltası + Demirköprü Barajı + Yatağı Değiştirilen Nehir'
+  },
+  {
+    id: 'r-kucuk-menderes',
+    name: 'Küçük Menderes Nehri',
+    type: 'river',
+    category: 'Graben / Antik Liman Dolduran Akarsu',
+    coordinates: [27.300, 37.950],
+    region: 'Ege',
+    description: 'Bozdağlar ile Aydın Dağları arasındaki grabenden akıp Selçuk\'ta denize dökülen ve Efes Antik Limanı\'nı dolduran akarsu.',
+    kpssTips: [
+      'Selçuk Delta Ovası\'nı oluşturmuştur.',
+      'Taşıdığı alüvyonlarla tarihi EFES ANTİK KENTİ\'nin denizle bağını kesip içeride kalmasına yol açmıştır!',
+      'Kirlilik oranı kimyasal tarım ilaçları nedeniyle yüksektir.'
+    ],
+    details: {
+      lengthKm: 175
+    },
+    mnemonic: 'Küçük Menderes -> Selçuk Deltası + Efes Limanını Dolduran Nehir'
+  },
+  {
+    id: 'r-buyuk-menderes',
+    name: 'Büyük Menderes Nehri',
+    type: 'river',
+    category: 'Ege\'nin En Uzun Nehri / Balat Deltası',
+    coordinates: [27.200, 37.550],
+    region: 'Ege',
+    description: 'Ege Bölgesi\'nin EN UZUN NEHRİDİR (548 km). Milet Antik Limanı\'nı doldurup Bafa Gölü\'nü oluşturan nehir.',
+    kpssTips: [
+      'Ege Bölgesi\'nin en uzun akarsuyudur ve dünyada "Menderes" (kıvrım) coğrafi terimine adını vermiştir!',
+      'Balat Delta Ovası\'nı oluşturmuştur.',
+      'Taşıdığı alüvyonlarla Latmos Körfezi\'nin önünü kapatarak Bafa (Çamiçi) Gölü\'nü (Alüvyal Set) meydana getirmiştir.',
+      'Milet Antik Kenti\'nin denizden kopmasına neden olmuştur.',
+      'Barajları: Adıgüzel, Kemer barajları.'
+    ],
+    details: {
+      lengthKm: 548,
+      originMouth: 'Afyon Dinar -> Balat Deltası (Ege Denizi)',
+      dams: ['Adıgüzel Barajı', 'Kemer Barajı', 'Cindere Barajı']
+    },
+    mnemonic: 'Büyük Menderes = Ege\'nin En Uzunu + Balat Deltası + Bafa Gölü Oluşumu'
+  },
+
+  // --- AKDENİZ'E DÖKÜLEN AKARSULAR ---
+  {
+    id: 'r-dalaman',
+    name: 'Dalaman Çayı',
+    type: 'river',
+    category: 'Akdeniz / Rafting Akarsuyu',
+    coordinates: [28.700, 36.700],
+    region: 'Ege',
+    description: 'Batı Toroslar ve Menteşe yöresinden doğup Köyceğiz-Dalaman arasından Akdeniz\'e dökülen rafting akarsuyu.',
+    kpssTips: [
+      'Rafting ve doğa sporları açısından Türkiye\'nin önde gelen akarsularındandır.',
+      'Akdeniz ile Ege coğrafi sınırında yer alır.'
+    ],
+    details: {
+      lengthKm: 229,
+      dams: ['Akköprü Barajı']
+    }
+  },
+  {
+    id: 'r-esen',
+    name: 'Eşen (Kocaçay) Çayı',
+    type: 'river',
+    category: 'Akdeniz / Kanyon Vadisi Akarsuyu',
+    coordinates: [29.250, 36.300],
+    region: 'Akdeniz',
+    description: 'Muğla Seydikemer ve Antalya Kaş sınırında Saklıkent Kanyonu\'nu besleyerek Patara kumsalından Akdeniz\'e dökülen akarsu.',
+    kpssTips: [
+      'Ünlü Saklıkent Kanyonu ve Patara Plajı kordonunu besler.',
+      'Muğla ile Antalya illeri arasında doğal sınır oluşturur.'
+    ],
+    details: {
+      lengthKm: 146
+    }
+  },
+  {
+    id: 'r-manavgat',
+    name: 'Manavgat Çayı',
+    type: 'river',
+    category: 'Karstik Kaynaklı Düzenli Akarsu (Akdeniz)',
+    coordinates: [31.450, 36.750],
+    region: 'Akdeniz',
+    description: 'Batı Toroslar karstik gür kaynaklarından (Dumanlı Kaynağı) beslenen ve debisi yıl boyu en düzenli olan akarsulardan biri.',
+    kpssTips: [
+      'Karstik kaynaklarla (voklüz) beslendiği için Akdeniz ikliminde olmasına rağmen YAZIN BİLE KURUMAZ, rejimi oldukça düzenlidir!',
+      'Üzerinde Manavgat Şelalesi ve Oymapınar Barajı (Seydişehir Alüminyum Tesisleri enerjisini karşılar) yer alır.'
+    ],
+    details: {
+      lengthKm: 93,
+      dams: ['Oymapınar Barajı', 'Manavgat Barajı']
+    },
+    mnemonic: 'Manavgat = Karstik Voklüz Kaynak + Oymapınar Barajı + Düzenli Rejim'
+  },
+  {
+    id: 'r-koprucay',
+    name: 'Köprüçay',
+    type: 'river',
+    category: 'Kanyon / Rafting Akarsuyu',
+    coordinates: [31.180, 36.830],
+    region: 'Akdeniz',
+    description: 'Isparta dağlarından doğup Köprülü Kanyon Milli Parkı içinden geçerek Serik\'ten Akdeniz\'e dökülen kilit rafting çayı.',
+    kpssTips: [
+      'Türkiye\'nin en popüler Köprülü Kanyon Rafting merkezidir.',
+      'Karstik kireçtaşı kanyonlarını yarmıştır.'
+    ],
+    details: {
+      lengthKm: 184
+    }
+  },
+  {
+    id: 'r-aksu',
+    name: 'Aksu Çayı (Antalya)',
+    type: 'river',
+    category: 'Akdeniz Akarsuyu',
+    coordinates: [30.850, 36.850],
+    region: 'Akdeniz',
+    description: 'Eğirdir ve Kovada gölleri çevresinden doğup Antalya Ovası\'nı sulayarak Akdeniz\'e dökülen nehir.',
+    kpssTips: [
+      'Perge antik kentinin yanından geçer ve Antalya seracılığının ana su kaynağıdır.',
+      'Karacaören I ve II barajları bu akarsu üzerindedir.'
+    ],
+    details: {
+      lengthKm: 145,
+      dams: ['Karacaören I', 'Karacaören II']
+    }
+  },
+  {
+    id: 'r-duden',
+    name: 'Düden Çayı & Şelaleleri',
+    type: 'river',
+    category: 'Karstik Yeraltı Akarsuyu',
+    coordinates: [30.780, 36.850],
+    region: 'Akdeniz',
+    description: 'Toroslar karstik düdenlerinden yeraltına batıp (batan) kilometrelerce sonra tekrar yüzeye çıkarak falezlerden denize dökülen su.',
+    kpssTips: [
+      'Aşağı Düden (Karpuzkaldıran) 40 metre yükseklikteki traverten falezlerinden doğrudan denize dökülür!',
+      'Karstik batan-çıkan (düden) hidrografyasının en belirgin simgesidir.'
     ]
+  },
+  {
+    id: 'r-goksu',
+    name: 'Göksu Nehri',
+    type: 'river',
+    category: 'Akdeniz / Silifke Deltası',
+    coordinates: [34.000, 36.300],
+    region: 'Akdeniz',
+    description: 'Orta Toroslar\'dan doğup Taşeli Platosu\'nu derin kanyonlarla yararak Silifke Delta Ovası\'nı oluşturan akarsu.',
+    kpssTips: [
+      'Silifke Delta Ovası\'nı ve Göksu Deltası Özel Çevre Koruma Alanı\'nı (Caretta Caretta & Kuş Cenneti) oluşturmuştur.',
+      'Mavi Tünel projesi ile Göksu\'nun suları Konya Ovası\'na (KOP) aktarılmaktadır!',
+      'Gezende ve Ermenek barajları üzerindedir.'
+    ],
+    details: {
+      lengthKm: 260,
+      originMouth: 'Orta Toroslar -> Silifke Deltası (Akdeniz)',
+      dams: ['Ermenek Barajı (Çok Yüksek Kemer)', 'Gezende Barajı']
+    },
+    mnemonic: 'Göksu = Silifke Deltası + Ermenek Barajı + Mavi Tünel KOP Kaynağı'
+  },
+  {
+    id: 'r-seyhan',
+    name: 'Seyhan Nehri',
+    type: 'river',
+    category: 'Çukurova Deltası / Akdeniz',
+    coordinates: [34.900, 36.720],
+    region: 'Akdeniz',
+    description: 'Zamantı ve Göksu kollarının birleşmesiyle Adana merkezden geçip Çukurova\'yı oluşturan büyük nehir.',
+    kpssTips: [
+      'Ceyhan ile birlikte Türkiye\'nin en büyük delta ovası olan ÇUKUROVA\'yı oluşturur.',
+      'En büyük kolu Kayseri/Aladağlar\'dan gelen Zamantı Irmağı\'dır.',
+      'Üzerinde Seyhan Barajı ve Çatalan Barajı yer alır.'
+    ],
+    details: {
+      lengthKm: 560,
+      dams: ['Seyhan Barajı', 'Çatalan Barajı', 'Yedigöze']
+    },
+    mnemonic: 'Seyhan & Ceyhan = Çukurova Deltası Mimarları'
+  },
+  {
+    id: 'r-ceyhan',
+    name: 'Ceyhan Nehri',
+    type: 'river',
+    category: 'Çukurova Deltası / Akdeniz',
+    coordinates: [35.550, 36.600],
+    region: 'Akdeniz',
+    description: 'Elbistan Ovası\'ndan doğup Kahramanmaraş ve Osmaniye üzerinden İskenderun Körfezi yanından Akdeniz\'e dökülen nehir.',
+    kpssTips: [
+      'Seyhan ile birlikte Çukurova deltasının doğu kanadını inşa etmiştir.',
+      'Barajları: Aslantaş, Menzelet, Sır, Berke (yüksek kemer baraj), Kılavuzlu.',
+      'Ağzında Akyatan ve Yumurtalık lagünleri yer alır.'
+    ],
+    details: {
+      lengthKm: 509,
+      dams: ['Berke Barajı (201m)', 'Menzelet', 'Sır', 'Aslantaş', 'Kılavuzlu']
+    }
   },
   {
     id: 'r-asi',
     name: 'Asi Nehri',
     type: 'river',
-    category: 'Ters Akan Akarsu',
+    category: 'Sınır Aşan / Ters Akan Nehir (Akdeniz)',
     coordinates: [35.950, 36.100],
     region: 'Akdeniz',
     description: 'Lübnan Bekaa Vadisi\'nden doğup Suriye\'den geçerek Hatay Samandağ\'dan Akdeniz\'e dökülen nehir.',
     kpssTips: [
-      'Güneyden Kuzeye doğru akan TERS nehir olarak bilinir.',
-      'Yurtdışından doğup Türkiye\'de denize dökülen akarsularımızdandır (Asi ve Meriç).'
+      'Güneyden Kuzeye doğru aktığı için halk arasında "TERS AKAN NEHİR" olarak bilinir.',
+      'Yurtdışından doğup Türkiye denizlerine dökülen iki akarsudan biridir (Asi ve Meriç).',
+      'Amik Ovası\'nı sular ve Samandağ sahilinde Akdeniz\'e dökülür.'
+    ],
+    details: {
+      lengthKm: 380,
+      originMouth: 'Lübnan Bekaa -> Suriye -> Hatay Samandağ (Akdeniz)'
+    },
+    mnemonic: 'ASİ = Lübnan/Suriye\'den Gelen Ters Akan Akarsu'
+  },
+
+  // --- BASRA KÖRFEZİ'NE DÖKÜLEN AKARSULAR (SINIR AŞAN NEHİRLER) ---
+  {
+    id: 'r-firat',
+    name: 'Fırat Nehri',
+    type: 'river',
+    category: 'Sınır Aşan / En Yüksek Enerji Potansiyeli',
+    coordinates: [38.800, 37.150],
+    region: 'Güneydoğu Anadolu',
+    description: 'Türkiye\'nin debisi, uzunluğu ve hidroelektrik enerji potansiyeli EN YÜKSEK nehridir (Karasu ve Murat kollarının birleşimi).',
+    kpssTips: [
+      'Karasu ve Murat kollarının Keban Baraj Gölü\'nde birleşmesiyle Fırat adını alır.',
+      'Türkiye\'nin en büyük barajları Fırat üzerindedir: ATATÜRK BARAJI (Türkiye\'nin en büyüğü), Keban, Karakaya, Birecik, Karkamış.',
+      'GAP (Güneydoğu Anadolu Projesi)\'nin temel omurgasıdır; Şanlıurfa Sulama Tünelleri ile Harran Ovası\'nı sular.',
+      'Suriye ve Irak\'a geçerek Dicle ile birleşir (Şattülarap) ve Basra Körfezi\'ne dökülür.'
+    ],
+    details: {
+      lengthKm: 2800,
+      originMouth: 'Doğu Anadolu -> Suriye/Irak -> Basra Körfezi',
+      dams: ['Atatürk Barajı (En Büyük Gövde/Rezerv)', 'Keban Barajı', 'Karakaya Barajı', 'Birecik Barajı', 'Karkamış Barajı']
+    },
+    mnemonic: 'FIRAT = GAP\'ın Kalbi + Atatürk & Keban & Karakaya Dev Barajları'
+  },
+  {
+    id: 'r-karasu',
+    name: 'Karasu Nehri (Fırat Kolu)',
+    type: 'river',
+    category: 'Doğu Anadolu / Fırat Ana Kolu',
+    coordinates: [39.500, 39.750],
+    region: 'Doğu Anadolu',
+    description: 'Erzurum Dumlu Dağı\'ndan doğup Aşkale, Erzincan Ovası ve Kemah Boğazı\'ndan geçerek Keban\'a ulaşan Fırat\'ın kuzey ana kolu.',
+    kpssTips: [
+      'Karasu, Fırat Nehri\'ni oluşturan iki ana nehirden biridir.',
+      'Erzincan ve Kemah kanyonlarından geçer.'
+    ],
+    details: {
+      lengthKm: 460
+    }
+  },
+  {
+    id: 'r-murat',
+    name: 'Murat Nehri (Fırat Kolu)',
+    type: 'river',
+    category: 'Doğu Anadolu / Fırat En Uzun Kolu',
+    coordinates: [40.800, 38.750],
+    region: 'Doğu Anadolu',
+    description: 'Van Gölü kuzeyindeki Aladağlar\'dan doğup Ağrı, Muş, Bingöl ve Elazığ ovalarından geçerek Fırat\'ı oluşturan en uzun kol.',
+    kpssTips: [
+      'Fırat\'ın en uzun koludur (722 km).',
+      'Üzerinde Yukarı Kaleköy, Aşağı Kaleköy, Beyhan ve Alpaslan barajları kurulmuştur.'
+    ],
+    details: {
+      lengthKm: 722,
+      dams: ['Alpaslan I', 'Alpaslan II', 'Kale Barajları', 'Beyhan']
+    }
+  },
+  {
+    id: 'r-munzur',
+    name: 'Munzur Çayı & Gözeleri',
+    type: 'river',
+    category: 'Milli Park / Karstik Gözeler',
+    coordinates: [39.550, 39.100],
+    region: 'Doğu Anadolu',
+    description: 'Tunceli Munzur Dağları eteklerindeki karstik gözelerden doğup Keban Baraj Gölü\'ne karışan vadi nehri.',
+    kpssTips: [
+      'Munzur Vadisi Milli Parkı alanı içerisindedir.',
+      'Buzul ve karstik kaynakların birleştiği zengin debili berrak akarsudur.'
+    ],
+    details: {
+      lengthKm: 144
+    }
+  },
+  {
+    id: 'r-dicle',
+    name: 'Dicle Nehri',
+    type: 'river',
+    category: 'Sınır Aşan / Mezopotamya Nehri',
+    coordinates: [41.250, 37.100],
+    region: 'Güneydoğu Anadolu',
+    description: 'Elazığ Hazar Gölü güneyinden doğup Diyarbakır, Batman, Mardin ve Şırnak\'tan geçerek Irak\'ta Fırat ile birleşen akarsu.',
+    kpssTips: [
+      'Türkiye - Suriye ve Türkiye - Irak arasında yer yer doğal sınır çizer.',
+      'Ilısu Barajı (Prof. Dr. Veysel Eroğlu Barajı - Türkiye\'nin gövde hacmi 2. büyük barajı) Dicle üzerindedir ve Hasankeyf sular altında kalmıştır.',
+      'Önemli kolları: Batman Çayı, Garzan Çayı, Botan Çayı ve Zap Suyu\'dur.'
+    ],
+    details: {
+      lengthKm: 1900,
+      originMouth: 'Hazar Gölü Güneyi -> Irak (Şattülarap) -> Basra Körfezi',
+      dams: ['Ilısu (Veysel Eroğlu)', 'Kralkızı Barajı', 'Dicle Barajı', 'Batman Barajı', 'Silvan Barajı']
+    },
+    mnemonic: 'DİCLE = Ilısu Barajı (Veysel Eroğlu) + Hasankeyf + Kralkızı & Batman Barajları'
+  },
+  {
+    id: 'r-zap',
+    name: 'Zap Suyu (Dicle Kolu)',
+    type: 'river',
+    category: 'En Hızlı & En Engebeli Akarsu',
+    coordinates: [43.750, 37.500],
+    region: 'Doğu Anadolu',
+    description: 'Hakkari dağlarından ve Cilo kütlesinden doğup Irak topraklarına geçerek Dicle\'ye karışan Türkiye\'nin en derin vadili akarsuyu.',
+    kpssTips: [
+      'Hakkari Cilo-Sat dağları kanyonlarından çok hızlı akar.',
+      'Sınır aşan Dicle koludur.'
+    ],
+    details: {
+      lengthKm: 426
+    }
+  },
+  {
+    id: 'r-botan',
+    name: 'Botan (Uluçay) Çayı',
+    type: 'river',
+    category: 'Kanyon / Dicle Kolu',
+    coordinates: [41.900, 37.800],
+    region: 'Güneydoğu Anadolu',
+    description: 'Van ve Siirt dağlarından doğup ünlü Botan Kanyonu boyunca akarak Çetin Barajı ve Ilısu Gölü\'ne dökülen çay.',
+    kpssTips: [
+      'Botan Kanyonu (Siirt) Türkiye\'nin en derin kanyon vadilerindendir.',
+      'Üzerinde Çetin Barajı (Avrupa\'nın en büyük RCC silindirle sıkıştırılmış beton barajı) yer alır.'
+    ],
+    details: {
+      lengthKm: 268,
+      dams: ['Çetin Barajı', 'Alkumru Barajı']
+    }
+  },
+
+  // --- HAZAR DENİZİ'NE DÖKÜLEN AKARSULAR (KAPALI HAVZA) ---
+  {
+    id: 'r-aras',
+    name: 'Aras Nehri',
+    type: 'river',
+    category: 'Kapalı Havza (Hazar Denizi) / Sınır Çizen Nehir',
+    coordinates: [44.000, 40.000],
+    region: 'Doğu Anadolu',
+    description: 'Erzurum Bingöl Dağları\'ndan doğup Iğdır Ovası\'nı sulayan, Türkiye-Ermenistan sınırını çizerek Azerbaycan\'da Kura ile birleşip Hazar Denizi\'ne dökülen nehir.',
+    kpssTips: [
+      'Okyanuslara veya açık denizlere dökülmediği için HAZAR DENİZİ KAPALI HAVZASI\'na aittir!',
+      'Türkiye ile Ermenistan ve Nahçıvan arasındaki uluslararası sınırı oluşturur.',
+      'Iğdır Ovası\'nda pamuk ve mikroklimal tarımın yapılmasını sağlar.'
+    ],
+    details: {
+      lengthKm: 1072,
+      originMouth: 'Erzurum -> Iğdır Sınırı -> Hazar Denizi'
+    },
+    mnemonic: 'ARAS & KURA = Hazar Kapalı Havzası + Sınır Çizen Doğu Nehirleri'
+  },
+  {
+    id: 'r-kura',
+    name: 'Kura Nehri',
+    type: 'river',
+    category: 'Kapalı Havza (Hazar Denizi)',
+    coordinates: [42.700, 41.100],
+    region: 'Doğu Anadolu',
+    description: 'Ardahan Allahuekber Dağları\'ndan doğup Gürcistan ve Azerbaycan\'a geçerek Aras ile birleşen ve Hazar Denizi\'ne dökülen nehir.',
+    kpssTips: [
+      'Ardahan platosunu sular ve Gürcistan/Tiflis üzerinden Hazar Denizi kapalı havzasına akar.',
+      'Çıldır Gölü yanından geçer.'
+    ],
+    details: {
+      lengthKm: 1515
+    }
+  },
+
+  // --- İÇ KAPALI HAVZA AKARSU ÖRNEKLERİ ---
+  {
+    id: 'r-carsamba-ic',
+    name: 'Çarşamba Çayı (Konya Kapalı Havzası)',
+    type: 'river',
+    category: 'İç Kapalı Havza Akarsuyu',
+    coordinates: [32.350, 37.400],
+    region: 'İç Anadolu',
+    description: 'Beyşehir Gölü\'nün gideğeni (göl ayağı) olarak doğup Konya Ovası\'nda kaybolan iç kapalı havza akarsuyu.',
+    kpssTips: [
+      'Beyşehir Gölü\'nün sularını Konya Ovası\'nın sulamasına taşıyan tarihi kanaldır.',
+      'Apa Barajı bu akarsu üzerindedir.'
+    ],
+    details: {
+      lengthKm: 105,
+      dams: ['Apa Barajı']
+    }
+  },
+  {
+    id: 'r-bendimahi',
+    name: 'Bendimahi Çayı (Van Kapalı Havzası)',
+    type: 'river',
+    category: 'Van Gölü Kapalı Havzası',
+    coordinates: [43.700, 38.950],
+    region: 'Doğu Anadolu',
+    description: 'Tendürek ve Çaldıran dağlarından doğup Muradiye Şelalesi\'ni oluşturarak Van Gölü\'ne dökülen akarsu.',
+    kpssTips: [
+      'Ünlü Muradiye Şelalesi bu akarsu üzerindedir.',
+      'Van Gölü\'nün endemik İnci Kefali balıklarının üremek için tersine yüzdüğü akarsudur.'
     ]
   }
 ];
 
 export const LAKES_DATA: GeoFeature[] = [
+  // ==========================================
+  // 1. TEKTONİK GÖLLER (ÇÖKÜNTÜ OLUĞU GÖLLERİ)
+  // ==========================================
   {
     id: 'l-van',
     name: 'Van Gölü',
     type: 'lake',
+    subCategory: 'tectonic',
     category: 'Karma Oluşumlu Göl (Tektonik + Volkanik Set)',
     coordinates: [42.900, 38.630],
     region: 'Doğu Anadolu',
-    description: 'Türkiye\'nin EN BÜYÜK gölüdür (3.713 km²). Sodalı ve tuzlu suları vardır.',
+    description: 'Türkiye\'nin EN BÜYÜK GÖLÜDÜR (3.713 km²). Sodalı ve tuzlu suları vardır. Nemrut volkanının lav setiyle büyümüştür.',
     kpssTips: [
-      'Türkiye\'nin en büyük gölüdür.',
-      'Suları sodalıdır; dünyada sadece bu gölde yaşayan endemik İnci Kefali (Van Balığı) çıkar.',
-      'Nemrut volkanından çıkan lavların önünü kesmesiyle Nemrut Volkanik Seti oluşmuştur.',
-      'Üzerinde feribot taşımacılığı yapılır (Tatvan - Van tren feribotu).'
+      'Türkiye\'nin en büyük gölüdür ve dünyanın en büyük sodalı gölüdür.',
+      'Suları sodalı ve tuzlu olduğu için donmaz; endemik İNCİ KEFALİ (Van Balığı) yaşar.',
+      'Nemrut volkanından çıkan lavların havzanın önünü kapatmasıyla volkanik set niteliği de kazanmıştır (Karma oluşumlu).',
+      'Üzerinde feribotla demiryolu taşımacılığı (Tatvan - Van tren feribotu) yapılır.',
+      'Akdamar Adası ve tarihi kilisesi turistik cazibe merkezidir.'
     ],
-    mnemonic: 'Van = En Büyük Sodalı Göl + İnci Kefali + Feribot'
+    mnemonic: 'VAN GÖLÜ = En Büyük Sodalı Göl + İnci Kefali + Feribot Demiryolu + Nemrut Volkanik Seti'
   },
   {
     id: 'l-tuz',
     name: 'Tuz Gölü',
     type: 'lake',
-    category: 'Tektonik Göl',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Sığ Kapalı Havza)',
     coordinates: [33.300, 38.750],
+    elevation: 905,
     region: 'İç Anadolu',
-    description: 'Türkiye\'nin yüzölçümü bakımından 2. büyük gölü fakat derinliği en az (1-2 m) olan sığ tektonik göl.',
+    description: 'Türkiye\'nin yüzölçümü bakımından 2. büyük gölü fakat derinliği en az (1-2 m) olan sığ tektonik gölü.',
     kpssTips: [
-      'Türkiye tuz ihtiyacının %60-70\'ini karşılar.',
-      'Yazın buharlaşma ile yüzölçümü en çok küçülen göldür.',
-      'Flamingo (Allıturna) kuşlarının Türkiye\'deki en büyük üreme alanıdır.'
-    ]
+      'Türkiye\'nin sofra tuzu ihtiyacının %60-70\'ini karşılar.',
+      'Yaz aylarında şiddetli buharlaşma nedeniyle yüzölçümü en çok küçülen/alan değiştiren göldür.',
+      'Suları aşırı tuzlu olduğu için dışarıya akışı (gideğeni) yoktur, kapalı havzadır.',
+      'Allı Turna (Flamingo) kuşlarının Akdeniz havzasındaki en büyük doğal kuluçka alanıdır.',
+      'Altında Türkiye\'nin en büyük Doğalgaz Yeraltı Depolama Tesisi yer alır.'
+    ],
+    mnemonic: 'TUZ GÖLÜ = Sofra Tuzu Kaynağı + Flamingo Cenneti + Doğalgaz Deposu'
   },
   {
     id: 'l-beysehir',
     name: 'Beyşehir Gölü',
     type: 'lake',
+    subCategory: 'tectonic',
     category: 'Tektonik - Karstik Tatlısu Gölü',
     coordinates: [31.500, 37.750],
+    elevation: 1123,
     region: 'İç Anadolu',
-    description: 'Türkiye\'nin EN BÜYÜK TATLISU GÖLÜDÜR.',
+    description: 'Türkiye\'nin EN BÜYÜK TATLISU GÖLÜDÜR (656 km²). Konya ve Isparta sınırlarında milli parktır.',
     kpssTips: [
-      'Türkiye\'nin 3. büyük gölü ve 1. büyük tatlısu gölüdür.',
-      'Göl ayağı (düden/gideğeni) olduğu için suları tatlıdır ve içme suyu kaynağıdır.'
+      'Türkiye\'nin 3. büyük gölü ve 1. EN BÜYÜK TATLISU GÖLÜDÜR.',
+      'Göl ayağı (Çarşamba Çayı gideğeni) bulunduğu için suları tatlıdır ve tarımsal sulamada kullanılır.',
+      'Milli Park statüsündedir, tatlı su balıkçılığı yapılır.'
     ],
-    mnemonic: 'BEYŞEHİR = Türkiye\'nin En Büyük TATLI Su Gölü!'
+    mnemonic: 'BEYŞEHİR = Türkiye\'nin En Büyük TATLISU Gölü! (Gideğeni: Çarşamba Çayı)'
   },
   {
     id: 'l-egirdir',
     name: 'Eğirdir Gölü',
     type: 'lake',
-    category: 'Karstik - Tektonik Göl',
+    subCategory: 'tectonic',
+    category: 'Tektonik - Karstik Tatlısu Gölü',
     coordinates: [30.880, 37.950],
+    elevation: 917,
     region: 'Akdeniz',
-    description: 'Isparta ilinde yer alan Türkiye\'nin 2. büyük tatlısu gölü.',
+    description: 'Isparta ilinde yer alan Türkiye\'nin EN BÜYÜK 2. TATLISU GÖLÜ (Kovada Kanalı ile Kovada Gölü\'ne bağlanır).',
     kpssTips: [
-      'Suları tatlıdır. Göller Yöresi\'nin önemli doğal mirasıdır.'
-    ]
+      'Türkiye\'nin 2. büyük tatlı su gölüdür.',
+      'Gideğeni Kovada Gölü\'ne ve Kovada Hidroelektrik Santrali\'ne su sağlar; elektrik üretilir!',
+      'İçme suyu, elma bahçeleri sulaması ve kerevit avcılığı yaygındır.'
+    ],
+    mnemonic: 'Eğirdir = 2. Büyük Tatlı Su Gölü + Kovada Kanalı + Enerji Üretimi'
   },
   {
-    id: 'l-salda',
-    name: 'Salda Gölü',
+    id: 'l-burdur',
+    name: 'Burdur Gölü',
     type: 'lake',
-    category: 'Karstik - Tektonik Göl / Mars Benzeri',
-    coordinates: [29.680, 37.550],
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Acı Sular)',
+    coordinates: [30.180, 37.750],
+    elevation: 857,
     region: 'Akdeniz',
-    description: 'Burdur Yeşilova\'da yer alan beyaz kumsalları ve turkuaz tonlarıyla "Türkiye\'nin Maldivleri" denilen göl.',
+    description: 'Göller Yöresi\'nde tektonik çöküntü oluğunda yer alan, gideğeni olmadığı için suları acı ve tuzlu olan derin göl.',
     kpssTips: [
-      'Magnezyum minerali zenginliği nedeniyle Mars\'ın Jezero kraterine benzerlik gösterir.',
-      'Türkiye\'nin en derin 2. gölüdür (184 m).'
-    ],
-    mnemonic: 'Salda = Maldivler + Mars Jezero Krateri İkizi'
+      'Gideğeni (boşalımı) olmadığı için suları acı-tuzludur.',
+      'Dikkuyruk ördeklerinin dünya popülasyonunun büyük kısmını barındıran Ramsar alanıdır.',
+      'Son yıllarda aşırı kuyu açımı ve kuraklık nedeniyle su seviyesi hızla çekilmektedir.'
+    ]
   },
   {
     id: 'l-iznik',
     name: 'İznik Gölü',
     type: 'lake',
-    category: 'Tektonik Göl',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Marmara)',
     coordinates: [29.500, 40.430],
+    elevation: 85,
     region: 'Marmara',
-    description: 'Marmara Bölgesi\'nin en büyük tatlısu gölüdür.',
+    description: 'Marmara Bölgesi\'nin EN BÜYÜK GÖLÜDÜR. Kuzey Anadolu Fay Hattı güney kolu çöküntüsünde yer alır.',
     kpssTips: [
-      'Marmara Tektonik çöküntü oluğunda yer alır (İznik, Sapanca, Uluabat, Manyas sıralaması).'
+      'Marmara Bölgesi\'nin en büyük tatlı su gölüdür.',
+      'Karasu Deresi gideğeni ile Gemlik Körfezi\'ne akar, bu yüzden suları tatlıdır.',
+      'Göl altında keşfedilen 1500 yıllık Bazilika kalıntısıyla ünlüdür.',
+      'Marmara Tektonik Gölleri şifresi: İ-S-U-M (İznik, Sapanca, Uluabat, Manyas).'
     ],
-    mnemonic: 'Marmara Tektonik Göller: İ-S-U-M (İznik, Sapanca, Uluabat, Manyas)'
+    mnemonic: 'İ-S-U-M = İznik, Sapanca, Uluabat, Manyas (Marmara Tektonik Gölleri)'
   },
+  {
+    id: 'l-sapanca',
+    name: 'Sapanca Gölü',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Marmara)',
+    coordinates: [30.250, 40.710],
+    elevation: 33,
+    region: 'Marmara',
+    description: 'Kocaeli ve Sakarya arasında yer alan içme suyu kaynağı tektonik göl.',
+    kpssTips: [
+      'Kuzey Anadolu Fayı tektonik oluğundadır.',
+      'Kocaeli ve Sakarya illerinin ana içme ve kullanma suyu kaynağıdır.',
+      'Çark Deresi ile fazla sularını Sakarya Nehri\'ne boşaltır.'
+    ]
+  },
+  {
+    id: 'l-uluabat',
+    name: 'Uluabat (Apolyont) Gölü',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Ramsar Alanı)',
+    coordinates: [28.600, 40.170],
+    elevation: 9,
+    region: 'Marmara',
+    description: 'Bursa ilinde yer alan, leylek köyleri (Eskikaraağaç) ve nilüfer çiçekleriyle ünlü sığ tektonik göl.',
+    kpssTips: [
+      'Uluslararası Yaşayan Göller ve Ramsar koruma ağına dahildir.',
+      'Suyu tatlıdır, Susurluk akarsu sistemine bağlanır.'
+    ]
+  },
+  {
+    id: 'l-manyas',
+    name: 'Manyas (Kuş) Gölü',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl / Kuş Cenneti Milli Parkı',
+    coordinates: [27.950, 40.180],
+    elevation: 18,
+    region: 'Marmara',
+    description: 'Balıkesir Bandırma yakınında Türkiye\'nin ilk milli parklarından olan Kuşcenneti Milli Parkı\'na ev sahipliği yapan göl.',
+    kpssTips: [
+      'Türkiye\'nin ilk A sınıfı Avrupa Diploması alan Kuş Cenneti Milli Parkı buradadır.',
+      'Göçmen kuşların ana konaklama merkezidir, tektonik oluşumludur.'
+    ]
+  },
+  {
+    id: 'l-aksehir-eber',
+    name: 'Akşehir ve Eber Gölleri',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (İç Anadolu)',
+    coordinates: [31.420, 38.600],
+    elevation: 958,
+    region: 'İç Anadolu',
+    description: 'Afyon ve Konya sınırında Sultan Dağları çöküntü oluğunda yer alan ikiz tektonik göller.',
+    kpssTips: [
+      'Nasreddin Hoca\'nın "Ya tutarsa" diyerek maya çaldığı tarihi göldür (Akşehir).',
+      'Kamış/hasır üretimi yapılır; kuraklık nedeniyle alanı daralmaktadır.'
+    ]
+  },
+  {
+    id: 'l-hazar',
+    name: 'Hazar Gölü (Elazığ)',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Doğu Anadolu Fay Oluğu)',
+    coordinates: [39.420, 38.480],
+    elevation: 1250,
+    region: 'Doğu Anadolu',
+    description: 'Elazığ Sivrice\'de Doğu Anadolu Fay Hattı (DAF) üzerinde yer alan derin tektonik göl (Batık Şehir barındırır).',
+    kpssTips: [
+      'Doğu Anadolu Fayı (DAF) çöküntü çanağında oluşmuştur.',
+      'Dicle Nehri\'nin kaynaklarından birini oluşturur.',
+      'Göl içinde tarihi "Batık Şehir" kalıntıları bulunur.'
+    ]
+  },
+  {
+    id: 'l-seyfe',
+    name: 'Seyfe Gölü',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Kırşehir Ramsar Alanı)',
+    coordinates: [34.330, 39.200],
+    elevation: 1080,
+    region: 'İç Anadolu',
+    description: 'Kırşehir Mucur ilçesinde yer alan önemli kuş göç yolu durağı tektonik göl.',
+    kpssTips: [
+      'Ramsar alanı tescillidir.',
+      'Flamingo ve yüzlerce su kuşu türünün üreme sahasıdır.'
+    ]
+  },
+  {
+    id: 'l-ladik',
+    name: 'Ladik Gölü (Samsun)',
+    type: 'lake',
+    subCategory: 'tectonic',
+    category: 'Tektonik Göl (Yüzen Adalar)',
+    coordinates: [35.950, 40.910],
+    elevation: 867,
+    region: 'Karadeniz',
+    description: 'Samsun Ladik ilçesinde Kuzey Anadolu Fayı üzerindeki tektonik göl (üzerinde yüzen torf adaları bulunur).',
+    kpssTips: [
+      'Torf madeni ve üzerinde hareket eden "Yüzen Adacıklar" ile tanınır.'
+    ]
+  },
+
+  // ==========================================
+  // 2. KARSTİK GÖLLER (ERİME ÇUKURU GÖLLERİ)
+  // ==========================================
+  {
+    id: 'l-salda',
+    name: 'Salda Gölü',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Göl (Türkiye\'nin Maldivleri & Mars İkizi)',
+    coordinates: [29.680, 37.550],
+    elevation: 1163,
+    region: 'Akdeniz',
+    description: 'Burdur Yeşilova\'da beyaz magnezyumlu hidromanyezit kumsalları ve turkuaz sularıyla tanınan karstik göl.',
+    kpssTips: [
+      'Türkiye\'nin en derin 2. gölüdür (184 metre).',
+      'Beyaz kumsalları magnezyum minerali içerir ve NASA araştırmalarında Mars Jezero Krateri ile aynı mineral yapısına sahip olduğu saptanmıştır!',
+      'Karstik çanaktır, Özel Çevre Koruma Bölgesi\'dir.'
+    ],
+    mnemonic: 'SALDA = Mars Jezero İkizi + Beyaz Hidromanyezit Kumsal + Karstik Derin Göl'
+  },
+  {
+    id: 'l-avlan',
+    name: 'Avlan ve Elmalı Gölleri',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Polye Gölü',
+    coordinates: [29.930, 36.580],
+    elevation: 1030,
+    region: 'Akdeniz',
+    description: 'Antalya Elmalı Polyesi\'nde kireçtaşlarının erimesiyle oluşan karstik göller.',
+    kpssTips: [
+      'Döneminde kurutulup ekolojik dengenin bozulması üzerine yeniden su tutulmaya başlanan karstik göldür.',
+      'Karstik polyelerin tabanında yer alır.'
+    ]
+  },
+  {
+    id: 'l-sugla',
+    name: 'Suğla Gölü',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Göl (Konya Seydişehir)',
+    coordinates: [31.950, 37.330],
+    elevation: 1040,
+    region: 'İç Anadolu',
+    description: 'Konya Seydişehir ve Yalıhüyük arasında yer alan karstik erimelerle şekillenmiş göl.',
+    kpssTips: [
+      'Suları düdenlerle yeraltına sızdığı için dönem dönem alanı değişir.',
+      'Konya Ovası Projesi (KOP) kapsamında depolama alanı olarak kullanılır.'
+    ]
+  },
+  {
+    id: 'l-kizoren-obruk',
+    name: 'Kızören ve Çıralı Obruk Gölleri',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Obruk Gölü',
+    coordinates: [33.180, 38.170],
+    elevation: 990,
+    region: 'İç Anadolu',
+    description: 'Konya Karapınar ve Obruk Platosu\'nda yeraltı kireçtaşı mağara tavanlarının çökmesiyle oluşan karstik obruk gölleri.',
+    kpssTips: [
+      'Kızören Obruğu 145 metre derinliği ile Türkiye\'nin en tipik obruk gölüdür ve Ramsar alanıdır.',
+      'İç Anadolu Obruk Platosu\'nun karstik çöküntüleridir.'
+    ],
+    mnemonic: 'Kızören & Çıralı = Obruk Platosu Karstik Çökme Gölleri'
+  },
+  {
+    id: 'l-kovada',
+    name: 'Kovada Gölü',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Göl / Milli Park',
+    coordinates: [30.870, 37.620],
+    elevation: 900,
+    region: 'Akdeniz',
+    description: 'Isparta Eğirdir Gölü\'nün fazla sularının aktığı doğal kanal ile beslenen karstik milli park gölü.',
+    kpssTips: [
+      'Kovada Gölü Milli Parkı flora ve fauna çeşitliliğiyle koruma altındadır.',
+      'Üzerinde Kovada 1 ve Kovada 2 hidroelektrik santralleri çalışır.'
+    ]
+  },
+
+  // ==========================================
+  // 3. VOLKANİK GÖLLER (KRATER / KALDERA / MAĞAR)
+  // ==========================================
+  {
+    id: 'l-meke',
+    name: 'Meke Gölü Mağarı',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Mağar Gölü (Dünyanın Nazar Boncuğu)',
+    coordinates: [33.633, 37.683],
+    elevation: 980,
+    region: 'İç Anadolu',
+    description: 'Konya Karapınar\'da gaz patlaması sonucu oluşan ve ortasındaki kül konisiyle "DÜNYANIN NAZAR BONCUĞU" olarak adlandırılan çift patlamalı volkanik mağar.',
+    kpssTips: [
+      'Türkiye\'nin ve dünyanın en belirgin Mağar (gaz patlama çukuru) örneğidir.',
+      'Ramsar alanı tescillidir; yeraltı sularının aşırı çekilmesiyle kuruma tehlikesi yaşamaktadır.',
+      'ÖSYM KPSS KİLİT SORUSU: "Dünyanın Nazar Boncuğu" olarak tanımlanır.'
+    ],
+    mnemonic: 'MEKE GÖLÜ = Dünyanın Nazar Boncuğu Volkanik Mağarı (Konya Karapınar)'
+  },
+  {
+    id: 'l-nemrut-kaldera',
+    name: 'Nemrut Kalderası ve Krater Gölü (Bitlis)',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Kaldera Gölü',
+    coordinates: [42.235, 38.625],
+    elevation: 2247,
+    region: 'Doğu Anadolu',
+    description: 'Bitlis Tatvan\'da Nemrut Volkanı zirvesinde yer alan, Türkiye\'nin EN BÜYÜK, dünyanın 2. büyük kaldera gölü.',
+    kpssTips: [
+      'Türkiye\'nin en büyük Kaldera gölüdür.',
+      'Avrupa Seçkin Destinasyonları (EDEN) ödüllüdür.',
+      'İçerisinde biri Soğuk Göl, diğeri jeotermal kaynaklı Sıcak Göl olmak üzere göller barındırır.',
+      'Nemrut Dağı 1441-1443 patlamalarıyla Türkiye\'de en son aktif olan sönmüş volkandır.'
+    ],
+    mnemonic: 'NEMRUT KALDERASI = Türkiye\'nin En Büyük Kaldera Krater Gölü (Bitlis)'
+  },
+  {
+    id: 'l-golcuk-isparta',
+    name: 'Gölcük Krater Gölü (Isparta)',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Krater Gölü',
+    coordinates: [30.490, 37.730],
+    elevation: 1380,
+    region: 'Akdeniz',
+    description: 'Isparta merkez yakınında sönmüş volkan bacası patlamasıyla oluşan krater gölü ve tabiat parkı.',
+    kpssTips: [
+      'Akdeniz Bölgesi\'ndeki nadir volkanik krater göllerindendir.'
+    ]
+  },
+  {
+    id: 'l-acigol-nevsehir',
+    name: 'Acıgöl Mağarı (Nevşehir)',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Mağar Çukuru',
+    coordinates: [34.520, 38.550],
+    elevation: 1260,
+    region: 'İç Anadolu',
+    description: 'Kapadokya volkanik arazisinde gaz patlaması sonucu oluşan mağar gölü.',
+    kpssTips: [
+      'Volkanik gaz patlama çukuru (Mağar) örneğidir.'
+    ]
+  },
+
+  // ==========================================
+  // 4. VOLKANİK SET GÖLLERİ
+  // ŞİFRE: ERÇEK'li NAZİK BALIK ÇILDIRINCA HAÇLI VAN'A KAÇTI
+  // ==========================================
   {
     id: 'l-cildir',
     name: 'Çıldır Gölü',
     type: 'lake',
-    category: 'Volkanik Set Gölü',
+    subCategory: 'volcanic',
+    category: 'Volkanik Set Gölü (Kışın Tamamen Donan)',
     coordinates: [43.250, 41.050],
+    elevation: 1959,
     region: 'Doğu Anadolu',
-    description: 'Kars ve Ardahan arasında yer alan, kışın tamamen donan volkanik set gölü.',
+    description: 'Kars ve Ardahan arasında yer alan, kışın yüzeyi tamamen 1 metre buz tutan volkanik set gölü.',
     kpssTips: [
-      'Kışın yüzeyi tamamen buz tutar ve atlı kızak / Eskimo usulü balıkçılık yapılır.',
-      'Doğu Anadolu\'nun 2. büyük gölüdür.'
+      'Doğu Anadolu\'nun Van Gölü\'nden sonra 2. büyük gölüdür.',
+      'Kışın yüzeyi kalın buz tutar; üzerinde atlı kızak ve Eskimo usulü sarıbalık avcılığı yapılır.',
+      'Oluşumu Volkanik Set gölüdür.'
+    ],
+    mnemonic: 'Çıldır = Kışın Donan Buz Üstü Atlı Kızak + Volkanik Set'
+  },
+  {
+    id: 'l-ercek',
+    name: 'Erçek Gölü',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Set Gölü (Van Yanı)',
+    coordinates: [43.580, 38.650],
+    elevation: 1803,
+    region: 'Doğu Anadolu',
+    description: 'Van Gölü\'nün hemen doğusunda yer alan sodalı-tuzlu volkanik set gölü.',
+    kpssTips: [
+      'Flamingoların Doğu Anadolu\'daki en önemli mola yeridir.',
+      'Volkanik lav settiyle oluşmuştur.'
     ]
   },
   {
-    id: 'l-tortum-abant',
-    name: 'Heyelan Set Gölleri (Tortum, Sera, Abant, Yedigöller, Borabay)',
+    id: 'l-nazik',
+    name: 'Nazik Gölü',
     type: 'lake',
-    category: 'Heyelan Set Gölü',
-    coordinates: [41.650, 40.640],
-    region: 'Karadeniz',
-    description: 'Karadeniz heyelanlarının dik vadileri kapatmasıyla oluşan göller grubu.',
+    subCategory: 'volcanic',
+    category: 'Volkanik Set Gölü (Bitlis)',
+    coordinates: [42.270, 38.850],
+    elevation: 1816,
+    region: 'Doğu Anadolu',
+    description: 'Bitlis Ahlat yakınında lavların vadiyi kapatmasıyla oluşan volkanik set tatlısu gölü.',
     kpssTips: [
-      'Karadeniz Bölgesi heyelan riski en yüksek bölgedir.',
-      'Heyelan set gölleri kodlaması: T-O-R-T-U-M, A-B-A-N-T, S-E-R-A, Y-E-D-İ-G-Ö-L-L-E-R, Z-İ-N-A-V, B-O-R-A-B-A-Y.'
+      'Kışın donan volkanik set göllerimizdendir.'
+    ]
+  },
+  {
+    id: 'l-balik',
+    name: 'Balık Gölü (Ağrı - Taşlıçay)',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Set Gölü (Türkiye\'nin En Yüksek Göllerinden)',
+    coordinates: [43.560, 39.750],
+    elevation: 2250,
+    region: 'Doğu Anadolu',
+    description: 'Ağrı Taşlıçay ve Doğubayazıt arasında 2.250 m rakımda Türkiye\'nin en yüksek rakımlı volkanik set göllerinden biri.',
+    kpssTips: [
+      'Üzerinde alabalık yaşar ve içme suyu kalitesindedir.'
+    ]
+  },
+  {
+    id: 'l-hacli',
+    name: 'Haçlı (Bulanık) Gölü',
+    type: 'lake',
+    subCategory: 'volcanic',
+    category: 'Volkanik Set Gölü (Muş)',
+    coordinates: [42.180, 39.020],
+    elevation: 1583,
+    region: 'Doğu Anadolu',
+    description: 'Muş Bulanık ilçesinde Şerafettin volkanik lavlarının vadiyi tıkamasıyla oluşan set gölü.',
+    kpssTips: [
+      'Volkanik Set Gölleri Şifresi: V-E-B-A-N-Ç (Van, Erçek, Balık, Aygır, Nazik, Çıldır, Haçlı).'
     ],
-    mnemonic: 'Heyelan Gölleri = S-A-T-O-B-Y (Sera, Abant, Tortum, Özenç, Borabay, Yedigöller)'
+    mnemonic: 'Volkanik Set Şifresi: ERÇEK\'Lİ NAZİK BALIK ÇILDIRINCA HAÇLI VAN\'A KAÇTI'
+  },
+
+  // ==========================================
+  // 5. HEYELAN SET GÖLLERİ
+  // ŞİFRE: S-A-T-O-B-Y (Sera, Abant, Tortum, Özenç, Borabay, Yedigöller)
+  // ==========================================
+  {
+    id: 'l-tortum',
+    name: 'Tortum Gölü ve Şelalesi',
+    type: 'lake',
+    subCategory: 'landslide',
+    category: 'Heyelan Set Gölü (Erzurum)',
+    coordinates: [41.650, 40.640],
+    elevation: 1000,
+    region: 'Doğu Anadolu',
+    description: 'Erzurum Uzundere\'de Kemerlidağ\'dan kopan dev kütlenin Tortum Çayı vadisini tıkamasıyla oluşan heyelan set gölü ve 48 m\'lik şelalesi.',
+    kpssTips: [
+      'Türkiye\'nin en ünlü Heyelan Set göllerindendir.',
+      'Gölün gideğeninden Tortum Şelalesi (Türkiye\'nin en görkemli şelalelerinden) dökülür ve elektrik üretilir.'
+    ],
+    mnemonic: 'Tortum = Heyelan Seti + 48m Dev Şelale'
+  },
+  {
+    id: 'l-abant',
+    name: 'Abant Gölü (Bolu)',
+    type: 'lake',
+    subCategory: 'landslide',
+    category: 'Heyelan Set Gölü / Tabiat Parkı',
+    coordinates: [31.280, 40.600],
+    elevation: 1328,
+    region: 'Karadeniz',
+    description: 'Bolu\'da heyelan sonucu vadi önünün kapanmasıyla oluşan ünlü turistik heyelan set gölü.',
+    kpssTips: [
+      'Bolu Abant Alabalığı (Salmo trutta abanticus) endemik türüne ev sahipliği yapar.',
+      'Karadeniz Bölgesi heyelan set oluşumunun en tipik simgesidir.'
+    ]
+  },
+  {
+    id: 'l-yedigoller',
+    name: 'Yedigöller (Bolu)',
+    type: 'lake',
+    subCategory: 'landslide',
+    category: 'Heyelan Set Gölleri Milli Parkı',
+    coordinates: [31.750, 40.940],
+    elevation: 780,
+    region: 'Karadeniz',
+    description: 'Bolu\'da birbirini izleyen heyelanların oluşturduğu 7 adet göl (Büyükgöl, Seringöl, Deringöl, Nazlıgöl, Küçükgöl, İncegöl, Sazlıgöl).',
+    kpssTips: [
+      'Birbiri ardına dizilmiş 7 heyelan set gölünden oluşan Milli Parktır.',
+      'Sonbahar doğa ve fotoğraf turizminin merkezidir.'
+    ],
+    mnemonic: 'Yedigöller = 7 Kademeli Heyelan Seti (Bolu)'
+  },
+  {
+    id: 'l-sera',
+    name: 'Sera Gölü (Trabzon)',
+    type: 'lake',
+    subCategory: 'landslide',
+    category: 'Heyelan Set Gölü (1950 Tarihli)',
+    coordinates: [39.620, 40.970],
+    elevation: 120,
+    region: 'Karadeniz',
+    description: 'Trabzon Akçaabat Derecik Vadisi\'nde 1950 yılında gözler önünde gerçekleşen dev heyelanla oluşan genç set gölü.',
+    kpssTips: [
+      'Oluşumu bizzat insanlık tarihinde kaydedilmiş genç heyelan set gölüdür.'
+    ]
+  },
+  {
+    id: 'l-borabay',
+    name: 'Borabay Gölü (Amasya)',
+    type: 'lake',
+    subCategory: 'landslide',
+    category: 'Heyelan Set Gölü (Tabiat Parkı)',
+    coordinates: [36.150, 40.860],
+    elevation: 1050,
+    region: 'Karadeniz',
+    description: 'Amasya Taşova ilçesinde heyelan sonucu oluşan zümrüt yeşili krater görünümlü set gölü.',
+    kpssTips: [
+      'Karadeniz Heyelan Set Gölleri şifresi: S-A-T-O-B-Y (Sera, Abant, Tortum, Zinav, Borabay, Yedigöller).'
+    ],
+    mnemonic: 'Heyelan Gölleri Şifresi: S-A-T-O-B-Y (Sera, Abant, Tortum, Zinav, Borabay, Yedigöller)'
+  },
+  {
+    id: 'l-zinav',
+    name: 'Zinav Gölü (Tokat Reşadiye)',
+    type: 'lake',
+    subCategory: 'landslide',
+    category: 'Heyelan Set Gölü',
+    coordinates: [37.280, 40.420],
+    elevation: 900,
+    region: 'Karadeniz',
+    description: 'Tokat Reşadiye ilçesinde heyelan birikintisinin dereyi kapatmasıyla oluşan göl.',
+    kpssTips: [
+      'Karadeniz heyelan set gölleri grubundadır.'
+    ]
+  },
+
+  // ==========================================
+  // 6. ALÜVYAL SET GÖLLERİ
+  // ŞİFRE: B-A-M-K-E + Mogan & Eymir
+  // ==========================================
+  {
+    id: 'l-bafa',
+    name: 'Bafa (Çamiçi) Gölü',
+    type: 'lake',
+    subCategory: 'alluvial',
+    category: 'Alüvyal Set Gölü (Ege)',
+    coordinates: [27.420, 37.500],
+    elevation: 10,
+    region: 'Ege',
+    description: 'Aydın ve Muğla sınırında Büyük Menderes Nehri\'nin taşıdığı alüvyonların eski Latmos Körfezi\'nin önünü kapatmasıyla oluşan göl.',
+    kpssTips: [
+      'Büyük Menderes\'in alüvyon setiyle denizden kopardığı eski deniz koyudur (Alüvyal Set).',
+      'Yılan balıkları ve antik Herakleia kenti kalıntılarıyla ünlüdür.'
+    ],
+    mnemonic: 'BAFA (ÇAMİÇİ) = Büyük Menderes Alüvyon Setiyle Kapanan Deniz Koyu'
+  },
+  {
+    id: 'l-koycegiz',
+    name: 'Köyceğiz Gölü',
+    type: 'lake',
+    subCategory: 'alluvial',
+    category: 'Alüvyal Set Gölü / Dalyan Labirenti',
+    coordinates: [28.650, 36.950],
+    elevation: 8,
+    region: 'Ege',
+    description: 'Muğla Köyceğiz\'de Namnam Çayı alüvyonlarıyla oluşan ve Dalyan Boğazı kanal labirentiyle İztuzu Plajı\'ndan denize bağlanan göl.',
+    kpssTips: [
+      'Dalyan kanalı ile Akdeniz\'e bağlanır (ayaklı göl / deniz kulağı).',
+      'Caretta Caretta deniz kaplumbağaları ve Kaunos Kral Mezarları buradadır.'
+    ],
+    mnemonic: 'Köyceğiz = Alüvyal Set + Dalyan Boğazı + İztuzu Carettaları'
+  },
+  {
+    id: 'l-marmara-gol',
+    name: 'Marmara Gölü (Manisa Gölmarmara)',
+    type: 'lake',
+    subCategory: 'alluvial',
+    category: 'Alüvyal Set Gölü (Gediz Havzası)',
+    coordinates: [28.020, 38.620],
+    elevation: 75,
+    region: 'Ege',
+    description: 'Manisa Salihli ve Gölmarmara arasında Gediz Nehri alüvyonlarının önünü tıkamasıyla oluşan doğal set gölü.',
+    kpssTips: [
+      'Gediz alüvyon setiyle oluşmuştur.',
+      'Tepeli Pelikan kuşlarının önemli üreme merkezidir.'
+    ]
+  },
+  {
+    id: 'l-eymir-mogan',
+    name: 'Mogan ve Eymir Gölleri (Ankara Gölbaşı)',
+    type: 'lake',
+    subCategory: 'alluvial',
+    category: 'Alüvyal Set Gölleri (İç Anadolu)',
+    coordinates: [32.780, 39.770],
+    elevation: 970,
+    region: 'İç Anadolu',
+    description: 'Ankara Gölbaşı\'nda yan derelerin getirdiği alüvyonların vadiyi kapatmasıyla oluşan ikiz alüvyal set gölleri.',
+    kpssTips: [
+      'İncesu Deresi vadisinin alüvyonlarla tıkanması sonucu oluşmuş Alüvyal Set gölleridir.',
+      'Mogan Gölü suları fazla olduğunda regülatörle Eymir Gölü\'ne akar.'
+    ],
+    mnemonic: 'Mogan & Eymir = Ankara\'nın Alüvyal Set Gölleri'
+  },
+  {
+    id: 'l-uzungol',
+    name: 'Uzungöl (Trabzon Çaykara)',
+    type: 'lake',
+    subCategory: 'alluvial',
+    category: 'Alüvyal Set / Heyelan Karışımı Göl',
+    coordinates: [40.290, 40.620],
+    elevation: 1090,
+    region: 'Karadeniz',
+    description: 'Trabzon Çaykara ilçesinde Haldizen Deresi vadisinin heyelan ve yamaç döküntüsü alüvyonlarıyla kapanması sonucu oluşan ünlü yayla gölü.',
+    kpssTips: [
+      'KPSS kaynaklarında Alüvyal Set / Heyelan Seti karma örneği olarak geçer.',
+      'Doğu Karadeniz yayla turizminin simgesidir.'
+    ]
+  },
+
+  // ==========================================
+  // 7. KIYI SET GÖLLERİ (LAGÜN / DENİZ KULAĞI)
+  // ==========================================
+  {
+    id: 'l-terkos',
+    name: 'Terkos (Durusu) Gölü',
+    type: 'lake',
+    subCategory: 'coastal',
+    category: 'Kıyı Set Gölü (Lagün - İstanbul)',
+    coordinates: [28.580, 41.330],
+    elevation: 5,
+    region: 'Marmara',
+    description: 'İstanbul Çatalca Yarımadası Karadeniz kıyısında dalgaların oluşturduğu kıyı kordonunun eski koyu kapatmasıyla oluşan dev lagün.',
+    kpssTips: [
+      'İstanbul\'un en önemli içme suyu baraj göllerindendir.',
+      'Tipik Kıyı Set Gölü (Lagün / Deniz Kulağı) örneğidir.'
+    ],
+    mnemonic: 'Terkos, Büyükçekmece, Küçükçekmece = İstanbul\'un 3 Büyük Kıyı Set Lagünü'
+  },
+  {
+    id: 'l-buyukcekmece',
+    name: 'Büyükçekmece Gölü',
+    type: 'lake',
+    subCategory: 'coastal',
+    category: 'Kıyı Set Gölü (Lagün / Marmara Denizi)',
+    coordinates: [28.550, 41.060],
+    elevation: 3,
+    region: 'Marmara',
+    description: 'Marmara Denizi kıyısında koyun önünün kıyı oku ile kapatılmasıyla lagüne dönüşen göl.',
+    kpssTips: [
+      'Tarihi Mimar Sinan Köprüsü gölün denizle birleştiği kıyı kordonu üzerindedir.',
+      'İçme suyu barajı olarak kullanılır.'
+    ]
+  },
+  {
+    id: 'l-kucukcekmece',
+    name: 'Küçükçekmece Gölü',
+    type: 'lake',
+    subCategory: 'coastal',
+    category: 'Kıyı Set Gölü (Lagün / Marmara Denizi)',
+    coordinates: [28.760, 41.000],
+    elevation: 2,
+    region: 'Marmara',
+    description: 'İstanbul Avrupa yakasında Marmara Denizi ile kıyı kordonuyla ayrılan lagün gölü.',
+    kpssTips: [
+      'Kıyı Set Gölü (Lagün) türünün en belirgin örneklerindendir.',
+      'Yarımburgaz Mağarası (Türkiye\'nin en eski insan yerleşimlerinden) gölün kuzey yamacındadır.'
+    ]
+  },
+  {
+    id: 'l-akyatan',
+    name: 'Akyatan Lagünü (Adana Çukurova)',
+    type: 'lake',
+    subCategory: 'coastal',
+    category: 'Kıyı Set Lagünü (Türkiye\'nin En Büyük Lagünü)',
+    coordinates: [35.250, 36.620],
+    elevation: 1,
+    region: 'Akdeniz',
+    description: 'Çukurova Deltası kıyısında Seyhan ve Ceyhan nehirlerinin dalgalarla biriktirdiği kum kordonunun arkasında oluşan TÜRKİYE\'NİN EN BÜYÜK LAGÜNÜ.',
+    kpssTips: [
+      'Türkiye\'nin yüzölçümü olarak EN BÜYÜK KIYI SET GÖLÜ (Lagünü)\'dür.',
+      'Yeşil Deniz Kaplumbağası (Chelonia mydas) ve kuş göç yollarının en büyük Akdeniz sığınağıdır (Ramsar Alanı).'
+    ],
+    mnemonic: 'AKYATAN = Türkiye\'nin En Büyük Lagünü (Çukurova Kıyı Seti)'
+  },
+
+  // ==========================================
+  // 8. BUZUL (SİRK) GÖLLERİ
+  // ==========================================
+  {
+    id: 'l-kackar-sirk',
+    name: 'Kaçkar Buzul Sirk Gölleri (Deniz Gölü & Karagöl)',
+    type: 'lake',
+    subCategory: 'glacial',
+    category: 'Buzul (Sirk) Gölü (3.000m+)',
+    coordinates: [41.160, 40.840],
+    elevation: 3370,
+    region: 'Karadeniz',
+    description: 'Rize ve Artvin Kaçkar Dağları zirve kuşağında buzul aşındırmasıyla oluşan derin ve buz gibi turkuaz sirk gölleri.',
+    kpssTips: [
+      'Türkiye\'de buzul göllerinin en yoğun olduğu yer Doğu Karadeniz (Kaçkarlar) ve Hakkari (Cilo-Sat)\'dir.',
+      'Deniz Gölü 3.370 m rakımı ile Kaçkarlar\'ın en derin buzul gölüdür.'
+    ],
+    mnemonic: 'Kaçkar Deniz Gölü = Zirvedeki Buzul Sirk Gölü'
+  },
+  {
+    id: 'l-uludag-sirk',
+    name: 'Uludağ Buzul Sirk Gölleri (Aynalı, Kilimli, Karagöl)',
+    type: 'lake',
+    subCategory: 'glacial',
+    category: 'Buzul (Sirk) Gölü (Marmara\'da Tek)',
+    coordinates: [29.130, 40.070],
+    elevation: 2400,
+    region: 'Marmara',
+    description: 'Marmara Bölgesi\'nde üzerinde buzul aşınım çukurları ve sirk gölleri bulunan TEK YER olan Uludağ zirve gölleri.',
+    kpssTips: [
+      'Marmara Bölgesi\'nde buzul şekillerine ve sirk göllerine rastlanan TEK DAĞ Uludağ\'dır!',
+      'Göller: Aynalı Göl, Kilimli Göl, Karagöl, Buzlu Göl.'
+    ],
+    mnemonic: 'Uludağ Aynalı/Kilimli = Marmara\'nın Tek Buzul Sirk Gölleri'
+  },
+  {
+    id: 'l-cilo-sat-sirk',
+    name: 'Cilo - Sat Buzul Gölleri (Hakkari)',
+    type: 'lake',
+    subCategory: 'glacial',
+    category: 'Buzul (Sirk) Gölü (En Yüksek Kıvrım Kuşağı)',
+    coordinates: [44.000, 37.500],
+    elevation: 3400,
+    region: 'Doğu Anadolu',
+    description: 'Hakkari Yüksekova ve Cilo-Sat Dağları Milli Parkı\'nda Türkiye\'nin en büyük güncel vadi buzulları eteklerindeki sirk gölleri.',
+    kpssTips: [
+      'Türkiye\'nin en büyük güncel takke ve vadi buzulları (Uludoruk) altındaki sirk gölleridir.',
+      'Milli Park ilan edilerek koruma altına alınmıştır.'
+    ]
   }
 ];
 
@@ -1616,67 +2791,600 @@ export const KARSTIC_COASTAL_DATA: GeoFeature[] = [
 ];
 
 export const MINES_DATA: GeoFeature[] = [
+  // ==========================================
+  // 1. DEMİR MADENİ
+  // ==========================================
   {
     id: 'mn-demir-divrigi',
-    name: 'Sivas Divriği & Malatya Hekimhan Demir Yatakları',
+    name: 'Sivas Divriği Demir Yatakları',
     type: 'mine',
-    category: 'Demir Madeni',
+    category: 'Demir Madeni (Türkiye\'nin En Büyük Rezervi)',
     coordinates: [38.120, 39.370],
-    region: 'Doğu Anadolu',
-    description: 'Türkiye demir rezervinin %80\'ini karşılayan dev maden alanı.',
+    region: 'İç Anadolu',
+    description: 'Türkiye demir rezervinin ve üretiminin yaklaşık %60-70\'ini tek başına karşılayan en büyük demir madeni sahası.',
     kpssTips: [
-      'İşlendiği yerler: Karabük ve Ereğli Demir-Çelik fabrikaları (Kömüre/Enerjiye yakınlık) ile İskenderun (Ulaşım/Liman).'
+      'Türkiye\'nin en zengin demir yatağıdır.',
+      'Buradan çıkarılan demir, demiryolu ile Karabük ve Ereğli Demir-Çelik fabrikalarına (Taşkömürüne yakınlık) ile İskenderun Demir-Çelik tesislerine (Liman/Ulaşım) taşınır.',
+      'Sivas Kangal ve Divriği demir cevheri rezerv merkezidir.'
+    ],
+    mnemonic: 'Sivas Divriği = Türkiye\'nin Demir Kalbi -> Karabük & İskenderun\'a Taşınır'
+  },
+  {
+    id: 'mn-demir-hekimhan',
+    name: 'Malatya Hekimhan & Hasançelebi Demir Yatakları',
+    type: 'mine',
+    category: 'Demir Madeni (Peletleme Tesisi)',
+    coordinates: [38.030, 38.830],
+    region: 'Doğu Anadolu',
+    description: 'Malatya\'nın Hekimhan ve Hasançelebi havzasında yer alan, Türkiye\'nin en büyük demir peletleme tesisine sahip maden alanı.',
+    kpssTips: [
+      'Hasançelebi\'de zenginleştirme ve pelet tesisleri kuruludur.',
+      'İskenderun Demir-Çelik Fabrikası\'nın temel hammadde kaynağıdır.'
     ]
   },
+  {
+    id: 'mn-demir-eymir',
+    name: 'Balıkesir Eymir & Şamlı Demir Yatakları',
+    type: 'mine',
+    category: 'Demir Madeni (Marmara)',
+    coordinates: [27.900, 39.550],
+    region: 'Marmara',
+    description: 'Balıkesir Havran ve Eymir çevresindeki demir cevheri yatakları.',
+    kpssTips: [
+      'Batı Anadolu\'nun en eski işletilen demir madenlerindendir.'
+    ]
+  },
+
+  // ==========================================
+  // 2. BAKIR MADENİ (ŞİFRE: KADER)
+  // Küre, Artvin, Diyarbakır, Elazığ, Rize
+  // ==========================================
   {
     id: 'mn-bakir-murgul',
-    name: 'Artvin Murgul, Kastamonu Küre & Elazığ Maden Bakır Tesisleri',
+    name: 'Artvin Murgul Bakır Madeni & İşletmesi',
     type: 'mine',
-    category: 'Bakır Madeni',
+    category: 'Bakır Madeni (Doğu Karadeniz)',
     coordinates: [41.570, 41.280],
     region: 'Karadeniz',
-    description: 'Türkiye\'nin en önemli bakır çıkarım ve işleme sahaları.',
+    description: 'Türkiye\'nin en eski ve en büyük bakır madeni ocaklarından biri (Karadeniz Bakır İşletmeleri).',
     kpssTips: [
-      'Samsun Bakır İşletmesi hammadde çıkarılmadığı halde LİMAN/ULAŞIM avantajı ile kurulmuştur!'
+      'Artvin Murgul ve Cerattepe bakır/altın sahalarıdır.',
+      'Samsun Bakır Fabrikası\'na hammadde gönderilir (Samsun\'da maden çıkmaz, LİMAN ve ULAŞIMDAN dolayı fabrika oradadır!).',
+      'Bakır şifresi: K-A-D-E-R (Küre, Artvin, Diyarbakır, Elazığ, Rize).'
     ],
-    mnemonic: 'Bakır Çıkarılan Yerler KADER (Küre, Artvin, Diyarbakır, Elazığ, Rize)'
+    mnemonic: 'Bakır Çıkarılan İller = K-A-D-E-R (Kastamonu Küre, Artvin Murgul, Diyarbakır Ergani, Elazığ Maden, Rize Çayeli)'
   },
+  {
+    id: 'mn-bakir-kure',
+    name: 'Kastamonu Küre Bakır Madeni',
+    type: 'mine',
+    category: 'Bakır & Pirit Yatakları',
+    coordinates: [33.720, 41.800],
+    region: 'Karadeniz',
+    description: 'Kastamonu Küre Dağları\'nda yer alan, yeraltı ve açık ocak bakır ve pirit işletmesi.',
+    kpssTips: [
+      'Buradan çıkarılan bakır cevheri İnebolu Limanı\'ndan deniz yoluyla Samsun Bakır İzabe Tesisleri\'ne sevk edilir.',
+      'Pirit madeni gübre sanayinde sülfürik asit üretiminde kullanılır.'
+    ]
+  },
+  {
+    id: 'mn-bakir-elazig',
+    name: 'Elazığ Maden Bakır İşletmesi',
+    type: 'mine',
+    category: 'Bakır Madeni (Tarihi İşletme)',
+    coordinates: [39.670, 38.390],
+    region: 'Doğu Anadolu',
+    description: 'Elazığ\'ın Maden ilçesinde binlerce yıldır işletilen tarihi bakır cevheri yatağı ve izabe tesisi.',
+    kpssTips: [
+      'Ergani ve Elazığ Maden ilçesi bakır havzasıdır.'
+    ]
+  },
+  {
+    id: 'mn-bakir-cayeli',
+    name: 'Rize Çayeli Bakır ve Çinko Yatakları',
+    type: 'mine',
+    category: 'Bakır & Çinko (Modern Yeraltı)',
+    coordinates: [40.730, 41.080],
+    region: 'Karadeniz',
+    description: 'Rize Çayeli Madenli beldesinde Türkiye\'nin en modern derin yeraltı bakır ve çinko flotasyon tesisi.',
+    kpssTips: [
+      'Yüksek tenörlü bakır ve çinko konsantresi ihraç edilir.'
+    ]
+  },
+
+  // ==========================================
+  // 3. BOR MİNERALLERİ (DÜNYA REZERVİNİN %73'Ü)
+  // ==========================================
   {
     id: 'mn-bor-balikesir',
-    name: 'Balıkesir Bigadiç, Eskişehir Seyitgazi, Kütahya Emet Bor Yatakları',
+    name: 'Balıkesir Bigadiç & Bandırma Bor Tesisleri',
     type: 'mine',
-    category: 'Bor Mineralleri',
+    category: 'Bor Mineralleri (Kolemanit & Üretim)',
     coordinates: [28.120, 39.400],
     region: 'Marmara',
-    description: 'Dünya bor rezervinin yaklaşık %73\'üne sahip olan stratejik madenimiz.',
+    description: 'Dünya bor rezervinin yaklaşık %73\'üne sahip olan Türkiye\'nin en zengin bor cevheri ocakları ve Bandırma Borik Asit Fabrikası.',
     kpssTips: [
-      'Bandırma ve Kırka\'da işleme tesisleri bulunur.',
-      'Jet/roket yakıtı, cam, seramik, deterjan sanayiinde kullanılır.'
+      'Türkiye dünyada 1. sıradadır (%73 rezerv payı).',
+      'İşlendiği fabrikalar: Balıkesir Bandırma Borik Asit Fabrikası (Liman avantajı) ve Eskişehir Kırka Bor Türevleri Tesisi.',
+      'Çıkarıldığı yerler: Balıkesir (Bigadiç, Susurluk), Kütahya (Emet), Eskişehir (Seyitgazi-Kırka), Bursa (Mustafakemalpaşa).',
+      'Kullanım: Roket/füze yakıtı, nükleer reaktörler, zırh kaplama, cam-seramik, temizlik ürünleri (BORON).'
+    ],
+    mnemonic: 'BOR Çıkarılan Yerler: Balıkesir (Bigadiç), Kütahya (Emet), Eskişehir (Kırka), Bursa (Kestelek)'
+  },
+  {
+    id: 'mn-bor-kirka',
+    name: 'Eskişehir Seyitgazi (Kırka) Tinkal Bor Yatakları',
+    type: 'mine',
+    category: 'Bor Mineralleri (Dünyanın En Büyük Tinkal Rezervi)',
+    coordinates: [30.530, 39.280],
+    region: 'İç Anadolu',
+    description: 'Dünyanın bilinen en büyük sodyum bazlı tinkal bor rezervine sahip devasa açık ocak işletmesi.',
+    kpssTips: [
+      'Kırka Bor İşletme Müdürlüğü tesislerinde rafine bor ürünleri üretilir.'
     ]
   },
   {
-    id: 'mn-kron-fethiye',
-    name: 'Muğla Fethiye-Dalaman & Elazığ Guleman Krom Yatakları',
+    id: 'mn-bor-emet',
+    name: 'Kütahya Emet Kolemanit Bor Madeni',
     type: 'mine',
-    category: 'Krom Madeni',
-    coordinates: [29.110, 36.620],
+    category: 'Bor Mineralleri (Kolemanit)',
+    coordinates: [29.260, 39.340],
     region: 'Ege',
-    description: 'Paslanmaz çelik yapımında kullanılan ve ihracatta önemli payı olan maden.',
+    description: 'Kütahya Emet ve Hisarcık ilçelerinde yer alan yüksek tenörlü kolemanit bor madenleri ve borik asit fabrikası.',
     kpssTips: [
-      'Elazığ Ferrokrom ve Antalya Ferrokrom tesislerinde işlenir.'
+      'Eti Maden Genel Müdürlüğü bünyesinde işlenir.'
     ]
   },
+
+  // ==========================================
+  // 4. KROM MADENİ (PASLANMAZ ÇELİK)
+  // ==========================================
+  {
+    id: 'mn-krom-fethiye',
+    name: 'Muğla Fethiye - Köyceğiz - Dalaman Krom Havzası',
+    type: 'mine',
+    category: 'Krom Madeni (Ege - Akdeniz)',
+    coordinates: [28.900, 36.850],
+    region: 'Ege',
+    description: 'Türkiye\'nin en kaliteli krom yataklarına sahip Güney Ege havzası.',
+    kpssTips: [
+      'Paslanmaz çelik, kaplama, silah ve otomotiv sanayiinde kullanılır.',
+      'İşlendiği yer: Antalya Ferrokrom Fabrikası (Liman ve elektrik avantajı).',
+      'Türkiye krom ihracatında dünyada ilk sıralarda yer alır.'
+    ],
+    mnemonic: 'Krom İşleme Tesisleri (Ferrokrom): 1. Elazığ Ferrokrom (Hammaddeye yakın), 2. Antalya Ferrokrom (Liman/Ulaşım)'
+  },
+  {
+    id: 'mn-krom-guleman',
+    name: 'Elazığ Guleman (Alacakaya) Krom Yatakları',
+    type: 'mine',
+    category: 'Krom Madeni (Doğu Anadolu)',
+    coordinates: [39.870, 38.450],
+    region: 'Doğu Anadolu',
+    description: 'Türkiye\'nin ilk keşfedilen ve en zengin krom yataklarına sahip tarihi Guleman havzası.',
+    kpssTips: [
+      'Elazığ Ferrokrom Fabrikası hammaddeye yakınlık ilkesiyle burada kurulmuştur.'
+    ]
+  },
+
+  // ==========================================
+  // 5. BOKSİT (ALÜMİNYUM HAMMADDESİ)
+  // ==========================================
+  {
+    id: 'mn-boksit-seydisehir',
+    name: 'Konya Seydişehir & Antalya Akseki Boksit Yatakları',
+    type: 'mine',
+    category: 'Boksit / Alüminyum Tesisleri',
+    coordinates: [31.850, 37.420],
+    region: 'İç Anadolu',
+    description: 'Türkiye\'nin TEK ENTEGRE ALÜMİNYUM TESİSİ olan Seydişehir Alüminyum Fabrikası ve boksit madenleri.',
+    kpssTips: [
+      'Alüminyumun hammaddesi BOKSİT madenidir.',
+      'Seydişehir Entegre Alüminyum Fabrikası Türkiye\'deki tek tesistir.',
+      'Fabrikanın elektrik enerjisi Manavgat üzerindeki Oymapınar Barajı\'ndan karşılanır!',
+      'Çıkarıldığı diğer yerler: Antalya (Akseki), Muğla (Milas), Gaziantep (İslahiye), Hatay (Payas).'
+    ],
+    mnemonic: 'Boksit = Alüminyum -> Konya Seydişehir Entegre Tesisi + Oymapınar Barajı Elektriği'
+  },
+
+  // ==========================================
+  // 6. TAŞKÖMÜRÜ & LİNYİT (KÖMÜR HAVZALARI)
+  // ==========================================
+  {
+    id: 'mn-taskomuru-zonguldak',
+    name: 'Zonguldak & Karadeniz Ereğli Taşkömürü Havzası',
+    type: 'mine',
+    category: 'Taşkömürü (1. Jeolojik Zaman / Paleozoik)',
+    coordinates: [31.790, 41.450],
+    region: 'Karadeniz',
+    description: 'Türkiye\'de I. Jeolojik Zaman\'da (Paleozoik/Karbonifer) oluşmuş TEK TAŞKÖMÜRÜ HAVZASI.',
+    kpssTips: [
+      'Türkiye\'de taşkömürü SADECE Batı Karadeniz\'de (Zonguldak, Ereğli, Amasra) bulunur.',
+      'I. Jeolojik Zaman arazisi (Masif/Paleozoik) olduğunun en kesin kanıtıdır!',
+      'Kalorisi ve ısı değeri çok yüksek olduğu için Karabük ve Ereğli Demir-Çelik fabrikalarında demiri eritmek için (KOK KÖMÜRÜ) kullanılır.',
+      'Çatalağzı Termik Santrali (Zonguldak) taşkömürü ile çalışan ilk santralimizdir.'
+    ],
+    mnemonic: 'Taşkömürü = 1. Jeolojik Zaman + Zonguldak + Demir Çelik Yakıtı + Çatalağzı Termik Santrali'
+  },
+  {
+    id: 'mn-linyit-soma',
+    name: 'Manisa Soma Linyit Havzası',
+    type: 'mine',
+    category: 'Linyit (3. Jeolojik Zaman / Tersiyer)',
+    coordinates: [27.610, 39.180],
+    region: 'Ege',
+    description: 'Ege Bölgesi\'nin en büyük linyit havzası ve dev Soma Termik Santrali.',
+    kpssTips: [
+      'Linyit III. Jeolojik Zaman\'da (Tersiyer) oluştuğu için Türkiye\'nin her bölgesinde yaygın bulunur.',
+      'Manisa Soma, Kütahya Tunçbilek/Seyitömer/Tavşanlı, Muğla Yatağan/Yeniköy/Kemerköy linyitle çalışan Ege santralleridir.'
+    ],
+    mnemonic: 'Linyit = 3. Zaman (Tersiyer) + Türkiye\'nin Hemen Her Yerinde Yaygın'
+  },
+  {
+    id: 'mn-linyit-elbistan',
+    name: 'Kahramanmaraş Afşin - Elbistan Linyit Havzası',
+    type: 'mine',
+    category: 'Linyit (Türkiye\'nin En Büyük Rezervi)',
+    coordinates: [36.910, 38.250],
+    region: 'Akdeniz',
+    description: 'Türkiye\'nin açık ocak linyit rezervi EN BÜYÜK olan sahası ve Afşin-Elbistan Termik Santralleri (A ve B).',
+    kpssTips: [
+      'Türkiye\'nin en büyük linyit rezervi buradadır (Düşük kalorili fakat devasa miktar).',
+      'Elektrik enerjisi üretiminde payı çok büyüktür.'
+    ]
+  },
+  {
+    id: 'mn-linyit-kutahya',
+    name: 'Kütahya Tunçbilek, Seyitömer & Tavşanlı Linyitleri',
+    type: 'mine',
+    category: 'Linyit & Termik Santraller',
+    coordinates: [29.470, 39.630],
+    region: 'Ege',
+    description: 'Kütahya il sınırları içerisindeki yüksek kalorili linyit madenleri ve termik santralleri.',
+    kpssTips: [
+      'Tunçbilek ve Seyitömer santralleri hammaddeye yakın kurulmuştur.'
+    ]
+  },
+  {
+    id: 'mn-asfaltit-sirnak',
+    name: 'Şırnak Silopi Asfaltit Yatakları',
+    type: 'mine',
+    category: 'Asfaltit (Katı Petrol Türevi Maden)',
+    coordinates: [42.480, 37.170],
+    region: 'Güneydoğu Anadolu',
+    description: 'Petrol kökenli katı yakıt olan asfaltitin Türkiye\'deki tek büyük yatağı ve Silopi Asfaltit Termik Santrali.',
+    kpssTips: [
+      'ÖSYM KPSS KİLİT SORU: Türkiye\'de ASFALTİT madeni Şırnak Silopi\'dedir!',
+      'Silopi Asfaltit Termik Santrali Türkiye\'de asfaltitle çalışan tek santraldir.'
+    ],
+    mnemonic: 'ASFALTİT = Şırnak Silopi (Türkiye\'de Tek Asfaltit Termik Santrali)'
+  },
+
+  // ==========================================
+  // 7. PETROL & DOĞALGAZ (FOSİL YAKITLAR)
+  // ==========================================
   {
     id: 'mn-petrol-batman',
     name: 'Batman Raman & Garzan Petrol Sahası',
     type: 'mine',
-    category: 'Petrol & Enerji',
+    category: 'Petrol & Rafineri',
     coordinates: [41.130, 37.880],
     region: 'Güneydoğu Anadolu',
-    description: 'Türkiye\'de ilk petrolün çıkarıldığı (1940 Raman Dağı) bölge.',
+    description: 'Türkiye\'de ilk petrolün çıkarıldığı (1940 Raman Dağı) tarihi petrol havzası ve Batman Rafinerisi.',
     kpssTips: [
-      'Yerli üretim tüketimimizin yaklaşık %10-12\'sini karşılar.',
-      'Batman Rafinerisi hammaddeye yakın kurulmuştur.'
+      'Türkiye\'nin ilk petrol kuyusu Raman-8\'dir.',
+      'Batman Rafinerisi hammaddeye yakın kurulmuştur.',
+      'Türkiye petrol rafinerileri: Batman (Hammaddeye yakın), İzmir Aliağa, Kocaeli İpraş (Tüpraş), Kırıkkale Orta Anadolu (Ordu/Ankara tüketim merkezine yakın).'
+    ],
+    mnemonic: 'Türkiye Rafinerileri: Batman (Tek Hammaddeye Yakın), Aliağa, İpraş, Kırıkkale'
+  },
+  {
+    id: 'mn-petrol-gabar',
+    name: 'Şırnak Gabar Dağı & Cudi Şehit Esma Çevik Petrol Sahası',
+    type: 'mine',
+    category: 'Yüksek Graviteli Yeni Petrol Sahası',
+    coordinates: [42.180, 37.450],
+    region: 'Güneydoğu Anadolu',
+    description: 'Türkiye\'nin son yıllarda keşfettiği en yüksek kaliteli (41 API gravite) ve en yüksek üretim hacmine ulaşan Gabar Dağı petrol rezervi.',
+    kpssTips: [
+      'Türkiye\'nin günlük petrol üretimini rekor seviyelere çıkaran sahadır.'
+    ]
+  },
+  {
+    id: 'mn-dogalgaz-hamitabat',
+    name: 'Kırklareli Hamitabat Doğalgaz Sahası',
+    type: 'mine',
+    category: 'Doğalgaz & Termik Santral (Trakya)',
+    coordinates: [27.350, 41.450],
+    region: 'Marmara',
+    description: 'Türkiye\'de ilk doğalgaz çıkarılan saha ve Hamitabat Doğalgaz Kombine Çevrim Santrali.',
+    kpssTips: [
+      'Kırklareli Hamitabat ve Tekirdağ Hayrabolu Trakya doğalgaz havzasıdır.',
+      'Hamitabat Çevrim Santrali hammaddeye yakın kurulmuştur.'
+    ],
+    mnemonic: 'Doğalgaz Çıkarılan Yerler: Kırklareli Hamitabat, Tekirdağ Hayrabolu, Düzce Akçakoca, Karadeniz Sakarya Sahası'
+  },
+  {
+    id: 'mn-dogalgaz-sakarya-sahasi',
+    name: 'Karadeniz Sakarya Gaz Sahası (Filyos)',
+    type: 'mine',
+    category: 'Açık Deniz Derin Doğalgaz Rezervi',
+    coordinates: [31.500, 42.800],
+    region: 'Karadeniz',
+    description: 'Fatih sondaj gemisinin keşfettiği 710 milyar metreküplük Türkiye\'nin en büyük açık deniz doğalgaz rezervi (Filyos Gaz İşleme Tesisi).',
+    kpssTips: [
+      'Cumhuriyet tarihinin en büyük enerji keşfidir.',
+      'Karadeniz derin deniz kuyularından çıkan gaz Filyos Limanı\'nda karaya bağlanmıştır.'
+    ]
+  },
+
+  // ==========================================
+  // 8. YENİLENEBİLİR & ALTERNATİF ENERJİ KAYNAKLARI
+  // ==========================================
+  {
+    id: 'mn-jeotermal-denizli',
+    name: 'Denizli Sarayköy (Kızıldere) Jeotermal Santrali',
+    type: 'mine',
+    category: 'Jeotermal Enerji (Yerin Sıcak Suyu)',
+    coordinates: [28.920, 37.920],
+    region: 'Ege',
+    description: 'Türkiye\'nin İLK JEOTERMAL ELEKTRİK SANTRALİ (Kızıldere). Fay hatları boyunca yükselen buhar enerjisi.',
+    kpssTips: [
+      'Türkiye jeotermal potansiyelde Avrupa\'da 1., dünyada 4. sıradadır!',
+      'İlk santral: Denizli Sarayköy Kızıldere.',
+      'Diğer santraller: Aydın Germencik, Buharkent, Manisa Alaşehir, Çanakkale Tuzla.',
+      'Jeotermal enerji elektrik üretimi dışında sera ısıtmasında ve kaplıca sağlık turizminde kullanılır.'
+    ],
+    mnemonic: 'JEOTERMAL = Fay Hatları -> Denizli Sarayköy (İlk Santral) & Aydın Germencik'
+  },
+  {
+    id: 'mn-res-cesme',
+    name: 'İzmir Çeşme / Alaçatı Rüzgar Enerji Santrali (RES)',
+    type: 'mine',
+    category: 'Rüzgar Enerjisi (Türkiye\'nin İlk RES\'i)',
+    coordinates: [26.370, 38.310],
+    region: 'Ege',
+    description: 'Türkiye\'nin 1998 yılında kurulan İLK RÜZGAR ENERJİ SANTRALİ (Alaçatı Germiyan).',
+    kpssTips: [
+      'Türkiye\'nin ilk RES\'i İzmir Çeşme Alaçatı\'da kurulmuştur.',
+      'Rüzgar potansiyelinin en yüksek olduğu bölgeler: Ege ve Marmara (İzmir, Balıkesir, Çanakkale, Manisa, Hatay Belen Geçidi).'
+    ],
+    mnemonic: 'RES = Rüzgarın Başkenti Ege ve Marmara (İlk RES: Alaçatı)'
+  },
+  {
+    id: 'mn-ges-karapinar',
+    name: 'Konya Karapınar Güneş Enerji Santrali (Kalyon GES)',
+    type: 'mine',
+    category: 'Güneş Enerjisi (Avrupa\'nın En Büyük GES\'i)',
+    coordinates: [33.550, 37.710],
+    region: 'İç Anadolu',
+    description: 'Konya Karapınar Çölleşme sahasında 20 milyon metrekare alana kurulu, Avrupa\'nın en büyük tek parça Güneş Enerji Santrali (1.350 MW).',
+    kpssTips: [
+      'Güneşlenme süresi en fazla olan bölgelerimiz: Güneydoğu Anadolu ve Akdeniz\'dir.',
+      'Güneşlenme süresi en az olan bölge: Karadeniz\'dir (Bulutluluk ve yağış fazla olduğu için).',
+      'Karapınar GES Türkiye\'nin ve Avrupa\'nın tek alandaki en büyük fotovoltaik güneş santralidir.'
+    ],
+    mnemonic: 'GES = En Fazla Güneydoğu & Akdeniz, En Az Karadeniz -> Dev Santral: Konya Karapınar'
+  },
+
+  // ==========================================
+  // 9. NÜKLEER MADENLER (STRATEJİK CEVHERLER)
+  // ==========================================
+  {
+    id: 'mn-toryum-eskisehir',
+    name: 'Eskişehir Sivrihisar (Beylikova) Toryum Yatakları',
+    type: 'mine',
+    category: 'Toryum (Geleceğin Nükleer Yakıtı - Dünya 2.si)',
+    coordinates: [31.530, 39.450],
+    region: 'İç Anadolu',
+    description: 'Türkiye\'yi dünyada 2. sıraya taşıyan devasa Toryum ve Nadir Toprak Elementleri (NTE) kompleksi.',
+    kpssTips: [
+      'ÖSYM KPSS KİLİT SORU: Toryum rezervinde Türkiye dünyada 2. sıradadır!',
+      'Yeri: Eskişehir Sivrihisar Beylikova sahası.',
+      'Geleceğin temiz nükleer enerji hammaddesi ve yüksek teknoloji mıknatıs/çip bileşenidir.'
+    ],
+    mnemonic: 'TORYUM = Eskişehir Sivrihisar Beylikova (Dünyada 2. Büyük Rezerv)'
+  },
+  {
+    id: 'mn-uranyum-yozgat',
+    name: 'Yozgat Sorgun & Manisa Köprübaşı Uranyum Yatakları',
+    type: 'mine',
+    category: 'Uranyum (Nükleer Enerji Hammaddesi)',
+    coordinates: [35.180, 39.810],
+    region: 'İç Anadolu',
+    description: 'Nükleer reaktörlerin yakıtı olan uranyumun Türkiye\'deki en büyük rezerv alanı (Yozgat Sorgun ve Manisa Köprübaşı).',
+    kpssTips: [
+      'Uranyum nükleer enerji ve sarı pasta (yellowcake) hammaddesidir.',
+      'Yozgat Sorgun, Manisa Köprübaşı, Uşak Eşme ve Aydın Koçarlı\'da yatakları bulunur.'
+    ]
+  },
+
+  // ==========================================
+  // 10. DİĞER STRATEJİK & DEĞERLİ MADENLER
+  // ==========================================
+  {
+    id: 'mn-mermer-afyon',
+    name: 'Afyonkarahisar İscehisar & Marmara Adası Mermer Ocakları',
+    type: 'mine',
+    category: 'Mermer (Doğaltaş İhracat Lideri)',
+    coordinates: [30.750, 38.870],
+    region: 'Ege',
+    description: 'Türkiye\'nin maden ihracat gelirinde 1. SIRADA yer alan doğaltaş ve mermer ocakları.',
+    kpssTips: [
+      'ÖSYM KPSS KİLİT SORU: Türkiye\'nin maden ihracatında en çok gelir getiren madeni MERMERDİR (%50\'den fazla pay)!',
+      'Kalkerlerin (kireçtaşı) başkalaşıma (metamorfizma) uğramasıyla oluşur.',
+      'Başlıca yerler: Afyon (İscehisar), Balıkesir (Marmara Adası), Bursa, Bilecik, Muğla, Denizli travertenleri, Elazığ (Vişne mermeri).'
+    ],
+    mnemonic: 'MERMER = İhracatta 1. Sırada En Çok Gelir Getiren Madenimiz!'
+  },
+  {
+    id: 'mn-altin-usak',
+    name: 'Uşak Kışladağ Altın Madeni',
+    type: 'mine',
+    category: 'Altın (Türkiye ve Avrupa\'nın En Büyük Açık Ocak Altın Madeni)',
+    coordinates: [29.180, 38.520],
+    region: 'Ege',
+    description: 'Türkiye\'nin ve Avrupa\'nın en büyük altın üretim kapasitesine sahip açık ocak altın madeni.',
+    kpssTips: [
+      'Türkiye\'nin yıllık altın üretiminde 1. sıradadır.',
+      'Diğer altın sahaları: İzmir (Bergama Ovacık, Efemçukuru), Balıkesir (Havran), Artvin (Cerattepe), Erzincan (İliç), Gümüşhane (Mastra).'
+    ]
+  },
+  {
+    id: 'mn-kursun-cinko-keban',
+    name: 'Elazığ Keban & Kayseri Yahyalı Kurşun-Çinko Yatakları',
+    type: 'mine',
+    category: 'Kurşun ve Çinko (Akü & Radyasyon Kalkanı)',
+    coordinates: [38.740, 38.790],
+    region: 'Doğu Anadolu',
+    description: 'Akü imalatı, kablo kaplama ve radyasyon kalkanı üretiminde kullanılan kurşun ve galvaniz kaplama çinko madenleri.',
+    kpssTips: [
+      'Elazığ Keban, Kayseri Yahyalı, Balıkesir Balya, Çanakkale Yenice ve Niğde Çamardı\'da çıkarılır.'
+    ]
+  },
+  {
+    id: 'mn-fosfat-mazidagi',
+    name: 'Mardin Mazıdağı Fosfat Tesisleri',
+    type: 'mine',
+    category: 'Fosfat (Suni Gübre Hammaddesi)',
+    coordinates: [40.480, 37.520],
+    region: 'Güneydoğu Anadolu',
+    description: 'Tarımsal suni gübre üretiminin ana hammaddesi olan fosfatın Türkiye\'deki en büyük entegre tesisi.',
+    kpssTips: [
+      'ÖSYM KPSS KİLİT SORU: Türkiye\'de FOSFAT denince akla Mardin Mazıdağı gelir!',
+      'Yurtiçi üretim yetmediği için Kuzey Afrika ülkelerinden (Fas, Tunus) ithal edilir.'
+    ],
+    mnemonic: 'FOSFAT = Mardin Mazıdağı (Suni Gübre Hammaddesi)'
+  },
+  {
+    id: 'mn-barit-antalya',
+    name: 'Antalya Alanya & Gazipaşa Barit Yatakları',
+    type: 'mine',
+    category: 'Barit (Petrol Sondaj Çamuru Ağırlaştırıcı)',
+    coordinates: [32.310, 36.270],
+    region: 'Akdeniz',
+    description: 'Yüksek yoğunluğu ve suda erimemesi sebebiyle petrol ve doğalgaz derin sondaj kuyularında kullanılan ağır mineral.',
+    kpssTips: [
+      'Petrol sondaj çamurunun basıncını dengelemek ve röntgen odalarında radyasyonu yutmak için kullanılır.',
+      'Antalya (Alanya, Gazipaşa), Kahramanmaraş (Elbistan), Muş ve Eskişehir\'de çıkarılır.'
+    ]
+  },
+  {
+    id: 'mn-volfram-uludag',
+    name: 'Bursa Uludağ Volfram (Tungsten) Yatakları',
+    type: 'mine',
+    category: 'Volfram / Tungsten (Çok Yüksek Isıya Dayanıklı)',
+    coordinates: [29.130, 40.090],
+    region: 'Marmara',
+    description: 'Erime sıcaklığı en yüksek metallerden olan volframın (tungsten) Bursa Uludağ eteklerindeki yatakları.',
+    kpssTips: [
+      'Ampul filamanı, uzay araçları gövdesi ve zırh delici mermilerde kullanılır.',
+      'Bursa Uludağ, Kırıkkale Keskin ve Elazığ Keban\'da bulunur.'
+    ]
+  },
+  {
+    id: 'mn-zimpara-tasi-aydin',
+    name: 'Muğla Yatağan & Aydın Söke Zımpara Taşı',
+    type: 'mine',
+    category: 'Zımpara Taşı (Aşındırıcı Doğal Mineral)',
+    coordinates: [27.700, 37.600],
+    region: 'Ege',
+    description: 'Elmas ve korunddan sonra en sert minerallerden olan zımpara taşının Ege Menteşe yöresindeki zengin yatakları.',
+    kpssTips: [
+      'Türkiye dünyada zımpara taşı ihracatında önde gelen ülkelerdendir.',
+      'Muğla (Milas, Yatağan), Aydın (Söke, Çine) ve İzmir (Tire, Ödemiş)\'de çıkarılır.'
+    ]
+  },
+  {
+    id: 'mn-civa-izmir',
+    name: 'İzmir Ödemiş & Konya Sarayönü Cıva Yatakları',
+    type: 'mine',
+    category: 'Cıva (Oda Sıcaklığında Sıvı Tek Metal)',
+    coordinates: [27.970, 38.230],
+    region: 'Ege',
+    description: 'Doğada oda sıcaklığında sıvı halde bulunan TEK METAL olan cıvanın tarihi yatakları.',
+    kpssTips: [
+      'Zehirli etkisi ve çevre standartları nedeniyle günümüzde ocakların çoğu kapatılmıştır.',
+      'İzmir (Ödemiş, Karaburun), Konya (Sarayönü), Niğde ve Uşak\'ta bulunur.'
+    ]
+  },
+  {
+    id: 'mn-tuz-camalti',
+    name: 'İzmir Çamaltı Tuzlası (Deniz Tuzu)',
+    type: 'mine',
+    category: 'Deniz Tuzu (Türkiye\'nin En Büyük Deniz Tuzlası)',
+    coordinates: [26.920, 38.550],
+    region: 'Ege',
+    description: 'Gediz Deltası sahilinde deniz suyunun buharlaştırılmasıyla sofra ve sanayi tuzu üretilen devasa tuzla.',
+    kpssTips: [
+      'Türkiye tuz üretim kaynakları: 1. Göl Tuzu (Tuz Gölü %60), 2. Deniz Tuzu (İzmir Çamaltı Tuzlası %30), 3. Kaya Tuzu (Çankırı, Yozgat Yerköy, Iğdır Tuzluca, Kars Kağızman %10).'
+    ],
+    mnemonic: 'Tuz Kaynakları: 1. Tuz Gölü (%60), 2. Çamaltı Tuzlası (%30), 3. Çankırı Kaya Tuzu (%10)'
+  },
+  {
+    id: 'mn-kaya-tuzu-cankiri',
+    name: 'Çankırı Kaya Tuzu Mağarası',
+    type: 'mine',
+    category: 'Kaya Tuzu (5000 Yıllık Hitit Mirası)',
+    coordinates: [33.780, 40.550],
+    region: 'İç Anadolu',
+    description: 'Hititler döneminden beri 5.000 yıldır işletilen, içinde tuzdan heykeller ve ambulans bulunan dev yer altı tuz şehri.',
+    kpssTips: [
+      'Türkiye\'nin en büyük kaya tuzu rezervidir.',
+      'Astım ve bronşit tedavisi (Speleoterapi/tuz terapisi) için sağlık turizminde kullanılır.'
+    ]
+  },
+  {
+    id: 'mn-luletasi-eskisehir',
+    name: 'Eskişehir Lületaşı (Beyaz Altın / Sepiyolit)',
+    type: 'mine',
+    category: 'Süs Taşı (Dünyada Sadece Eskişehir)',
+    coordinates: [30.520, 39.780],
+    region: 'İç Anadolu',
+    description: 'Hafif, gözenekli ve kolay işlenebilen, dünyada en kaliteli rezervi SADECE ESKİŞEHİR\'de bulunan süs taşı.',
+    kpssTips: [
+      'ÖSYM KPSS KİLİT SORU: Lületaşı = SADECE ESKİŞEHİR (Pipo, biblo, süs eşyası).',
+      'Yeraltından çıkarıldığında yumuşaktır, kurudukça sertleşir ve beyazlaşır.'
+    ],
+    mnemonic: 'LÜLETAŞI = ESKİŞEHİR (Beyaz Süs Taşı)'
+  },
+  {
+    id: 'mn-oltutasi-erzurum',
+    name: 'Erzurum Oltu Taşı (Siyah Kehribar)',
+    type: 'mine',
+    category: 'Süs Taşı (Siyah Kehribar)',
+    coordinates: [41.990, 40.550],
+    region: 'Doğu Anadolu',
+    description: 'Erzurum Oltu ilçesinde çıkarılan, sürtünmeyle elektriklenen ve tespih/takı yapımında kullanılan siyah renkli organik taş.',
+    kpssTips: [
+      'ÖSYM KPSS KİLİT SORU: Oltu Taşı = ERZURUM OLTU (Tespih, takı, siyah süs taşı).',
+      'Linyit kömürünün özel bir türüdür, sürtünmeyle hafif cisimleri çeker.'
+    ],
+    mnemonic: 'OLTU TAŞI = ERZURUM OLTU (Siyah Tespih Taşı)'
+  },
+  {
+    id: 'mn-feldispat-aydin',
+    name: 'Aydın Çine & Muğla Milas Feldispat Yatakları',
+    type: 'mine',
+    category: 'Feldispat (Seramik & Cam Sanayi İhracatçısı)',
+    coordinates: [28.060, 37.610],
+    region: 'Ege',
+    description: 'Seramik, porselen, cam ve kaynak elektrodu sanayiinde kullanılan ve Türkiye\'nin dünya ihracatında 1. olduğu mineral.',
+    kpssTips: [
+      'Türkiye dünyada feldispat ihracatında lider ülkelerdendir (İtalya ve İspanya seramik fabrikalarına ihraç edilir).'
+    ]
+  },
+  {
+    id: 'mn-pomza-bitlis',
+    name: 'Bitlis Tatvan & Nevşehir Pomza (Sünger Taşı / Bims)',
+    type: 'mine',
+    category: 'Pomza / Bims (Hafif Volkanik Yapı Malzemesi)',
+    coordinates: [42.280, 38.500],
+    region: 'Doğu Anadolu',
+    description: 'Nemrut ve Erciyes gibi volkanik dağların patlamasıyla oluşan, gözenekli, hafif, ısı ve ses yalıtımında kullanılan volkanik sünger taşı.',
+    kpssTips: [
+      'İnşaat sektöründe bimsblok (hafif yalıtımlı tuğla) ve tekstilde kot taşlamada kullanılır.',
+      'Bitlis, Van, Nevşehir ve Kayseri volkanik sahalarında çok yaygındır.'
     ]
   }
 ];

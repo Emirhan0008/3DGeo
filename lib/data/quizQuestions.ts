@@ -1225,12 +1225,100 @@ export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
     id: 'mc-40',
     category: 'Madenler',
     region: 'Ege',
-    questionText: 'Dünya rezervinin yaklaşık %72\'sine Türkiye\'nin sahip olduğu; Balıkesir Susurluk, Kütahya Emet, Eskişehir Kırka ve Bursa Mustafa Kemal Paşa\'da çıkarılan stratejik madenimiz hangisidir?',
+    questionText: 'Dünya rezervinin yaklaşık %73\'üne Türkiye\'nin sahip olduğu; Balıkesir Bigadiç, Kütahya Emet ve Eskişehir Kırka\'da çıkarılan stratejik madenimiz hangisidir?',
     options: ['Bor Mineralleri', 'Krom', 'Boksit', 'Bakır', 'Fosfat'],
     correctIndex: 0,
     targetCoords: [28.150, 39.910],
     explanation: 'Türkiye Bor mineralleri rezervinde dünyada 1. sıradadır.',
     osymTip: 'Susurluk, Emet, Kırka, Bigadiç = Bor.'
+  },
+  {
+    id: 'mc-41',
+    category: 'Madenler',
+    region: 'İç Anadolu',
+    questionText: 'Türkiye\'nin tek entegre alüminyum tesisi bulunan ve elektriğini Oymapınar Barajı\'ndan alan Seydişehir Alüminyum Fabrikası hangi madeni işler?',
+    options: ['Boksit', 'Demir', 'Krom', 'Bakır', 'Manganez'],
+    correctIndex: 0,
+    targetCoords: [31.850, 37.420],
+    explanation: 'Alüminyumun hammaddesi Boksit madenidir. Konya Seydişehir tesislerinde işlenir.',
+    osymTip: 'Seydişehir Alüminyum = Boksit madeni + Oymapınar Barajı elektriği.'
+  },
+  {
+    id: 'mc-42',
+    category: 'Madenler',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Suni gübre sanayisinin temel hammaddesi olan ve Türkiye\'de Mardin Mazıdağı tesislerinde çıkarılıp işlenen maden hangisidir?',
+    options: ['Fosfat', 'Kükürt', 'Barit', 'Asfaltit', 'Volfram'],
+    correctIndex: 0,
+    targetCoords: [40.480, 37.520],
+    explanation: 'Fosfat gübre sanayisinde kullanılır. Türkiye\'de Mardin Mazıdağı en önemli havzadır.',
+    osymTip: 'Fosfat = Gübre hammaddesi = Mardin Mazıdağı.'
+  },
+  {
+    id: 'mc-43',
+    category: 'Madenler',
+    region: 'Ege',
+    questionText: 'Türkiye\'nin maden ihracat gelirinde yaklaşık %50 ile EN YÜKSEK GELİRİ SAĞLAYAN maden grubu hangisidir?',
+    options: ['Mermer ve Doğaltaşlar', 'Bor Mineralleri', 'Krom', 'Bakır', 'Altın'],
+    correctIndex: 0,
+    targetCoords: [30.750, 38.870],
+    explanation: 'Türkiye maden ihracat gelirinin lideri Mermerdir (Afyon, Marmara Adası, Bilecik, Muğla).',
+    osymTip: 'İhracatta 1. sırada yer alan madenimiz Mermerdir.'
+  },
+  {
+    id: 'mc-44',
+    category: 'Madenler',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Türkiye\'de asfaltit adı verilen katı petrol türevi yakıtın çıkarıldığı ve asfaltitle çalışan tek termik santralin bulunduğu yer neresidir?',
+    options: ['Şırnak Silopi', 'Batman Raman', 'Adıyaman Kahta', 'Mardin Nusaybin', 'Siirt Kurtalan'],
+    correctIndex: 0,
+    targetCoords: [42.480, 37.170],
+    explanation: 'Şırnak Silopi Türkiye\'deki tek büyük asfaltit yatağı ve asfaltit termik santraline ev sahipliği yapar.',
+    osymTip: 'Asfaltit = Şırnak Silopi Termik Santrali.'
+  },
+  {
+    id: 'mc-45',
+    category: 'Akarsular',
+    region: 'Karadeniz',
+    questionText: 'Türkiye sınırları içerisinde doğup yine Türkiye sınırları içerisinde Karadeniz\'e dökülen EN UZUN NEHRİMİZ hangisidir?',
+    options: ['Kızılırmak (1.355 km)', 'Fırat Nehri', 'Yeşilırmak', 'Sakarya Nehri', 'Dicle Nehri'],
+    correctIndex: 0,
+    targetCoords: [35.950, 41.720],
+    explanation: 'Kızılırmak (1.355 km) Türkiye sınırları içerisinde doğup denize dökülen en uzun nehirdir. (Fırat havza olarak daha uzundur ancak denize Basra Körfezi\'nde dökülür).',
+    osymTip: 'Sınırlarımız içinde doğup dökülen en uzun nehir: Kızılırmak.'
+  },
+  {
+    id: 'mc-46',
+    category: 'Göller',
+    region: 'Akdeniz',
+    questionText: 'Gideğeni (Çarşamba Çayı) vasıtasıyla Konya Ovası Sulama Projesi\'ne (KOP - Mavi Tünel) can suyu sağlayan Türkiye\'nin en büyük tatlı su gölü hangisidir?',
+    options: ['Beyşehir Gölü', 'Eğirdir Gölü', 'Tuz Gölü', 'Kovada Gölü', 'Çıldır Gölü'],
+    correctIndex: 0,
+    targetCoords: [31.500, 37.750],
+    explanation: 'Beyşehir Gölü Türkiye\'nin en büyük tatlı su gölüdür. Gideğeni olan Çarşamba Çayı Konya Ovası\'nı sular.',
+    osymTip: 'En büyük tatlı su gölü: Beyşehir Gölü (Gideğeni: Çarşamba Çayı).'
+  },
+  {
+    id: 'mc-47',
+    category: 'Göller',
+    region: 'Doğu Anadolu',
+    questionText: 'Kış aylarında yüzeyi tamamen donarak üzerinde atlı kızaklarla gezinti ve Eskimo usulü balıkçılık yapılan volkanik set gölü hangisidir?',
+    options: ['Çıldır Gölü (Ardahan-Kars)', 'Van Gölü', 'Nemrut Kalderası', 'Nazik Gölü', 'Hazar Gölü'],
+    correctIndex: 0,
+    targetCoords: [43.250, 41.050],
+    explanation: 'Çıldır Gölü kışın donmasıyla ünlü volkanik set gölüdür.',
+    osymTip: 'Çıldır Gölü = Volkanik Set + Donan Göl + Atlı Kızak Turizmi.'
+  },
+  {
+    id: 'mc-48',
+    category: 'Madenler',
+    region: 'İç Anadolu',
+    questionText: 'Eskişehir Sivrihisar (Beylikova) sahasında bulunan ve Türkiye\'yi dünya rezervinde 2. sıraya taşıyan nükleer enerji hammaddesi hangisidir?',
+    options: ['Toryum', 'Uranyum', 'Bor', 'Radyum', 'Plütonyum'],
+    correctIndex: 0,
+    targetCoords: [31.530, 39.450],
+    explanation: 'Toryum rezervinde Türkiye dünyada 2. sıradadır. Başlıca rezerv Eskişehir Beylikova\'dadır.',
+    osymTip: 'Toryum = Eskişehir Sivrihisar Beylikova (Dünyada 2.yiz).'
   }
 ];
 

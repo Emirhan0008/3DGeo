@@ -27,7 +27,9 @@ const MapContainer = dynamic(() => import('@/components/map/MapContainer'), {
 });
 
 export default function HomePageClient() {
-  const { activeTab } = useAppStore();
+  const { activeTab, isSidebarOpen, isAiDrawerOpen, closeAllSidebars } = useAppStore();
+
+  const isAnySidebarOpen = isSidebarOpen || isAiDrawerOpen;
 
   return (
     <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-950 font-sans select-none">
@@ -38,6 +40,24 @@ export default function HomePageClient() {
       <main className="relative flex-1 w-full h-full overflow-hidden">
         {/* 3D Map canvas */}
         <MapContainer />
+
+        {/* Global Sidebar Dismiss Backdrop: Closes sidebars when tapping on map area without clicking map features or making accidental guesses */}
+        {isAnySidebarOpen && (
+          <div
+            id="sidebar-backdrop-dismiss"
+            className="absolute inset-0 z-35 bg-black/20 backdrop-blur-[0.5px] transition-all duration-200 cursor-pointer pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              closeAllSidebars();
+            }}
+            onTouchEnd={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              closeAllSidebars();
+            }}
+          />
+        )}
 
         {/* Floating Controls & Modals */}
         <LayerSidebar />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAppStore, MapStyleType } from '@/lib/store/useStore';
 import { useAppFullscreen } from '@/lib/utils';
 import { 
@@ -35,6 +35,7 @@ export default function LayerSidebar() {
   const { isFullscreen } = useAppFullscreen();
   const {
     isSidebarOpen,
+    setSidebarOpen,
     toggleSidebar,
     layers,
     toggleLayer,
@@ -56,6 +57,14 @@ export default function LayerSidebar() {
   const [isPinned, setIsPinned] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync state when store closes sidebar
+  useEffect(() => {
+    if (!isSidebarOpen) {
+      setIsHovered(false);
+      setIsPinned(false);
+    }
+  }, [isSidebarOpen]);
 
   const toggleGroup = (groupId: string) => {
     setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -98,8 +107,19 @@ export default function LayerSidebar() {
     >
       {/* Collapsed Bar State */}
       {!isExpanded ? (
-        <div className="w-full h-full flex flex-col items-center justify-between py-2 sm:py-4 cursor-pointer hover:bg-white/5 transition-all overflow-hidden select-none">
-          <div className="flex flex-col items-center gap-1.5 sm:gap-3">
+        <div 
+          onClick={() => {
+            setSidebarOpen(true);
+            setIsPinned(true);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            setSidebarOpen(true);
+            setIsPinned(true);
+          }}
+          className="w-full h-full flex flex-col items-center justify-between py-2 sm:py-4 cursor-pointer hover:bg-white/5 active:bg-white/10 transition-all overflow-hidden select-none touch-manipulation"
+        >
+          <div className="flex flex-col items-center gap-1.5 sm:gap-3 pointer-events-none">
             <div className="relative p-1.5 sm:p-2 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-indigo-400 animate-pulse">
               <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
               {activeLayersCount > 0 && (
@@ -108,29 +128,30 @@ export default function LayerSidebar() {
                 </span>
               )}
             </div>
-            <div className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-200">
+            <div className="p-1 sm:p-1.5 rounded-lg text-slate-400">
               <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <div className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-200">
+            <div className="p-1 sm:p-1.5 rounded-lg text-slate-400">
               <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-1 sm:my-2 overflow-hidden">
+          <div className="flex-1 flex items-center justify-center my-1 sm:my-2 overflow-hidden pointer-events-none">
             <span className="[writing-mode:vertical-rl] rotate-180 text-[9px] sm:text-[10px] font-extrabold tracking-widest uppercase text-slate-400 hover:text-indigo-300 transition-colors whitespace-nowrap max-h-20 sm:max-h-36 overflow-hidden">
               KATMANLAR
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-1 sm:gap-2">
+          <div className="flex flex-col items-center gap-1 sm:gap-2 pointer-events-none">
             <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 animate-bounce" />
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                setSidebarOpen(true);
                 setIsPinned(true);
               }}
               title="Menüyü Ekrana Sabitle"
-              className="p-1 sm:p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all border border-transparent hover:border-white/20"
+              className="p-1 sm:p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all border border-transparent hover:border-white/20 pointer-events-auto"
             >
               <Pin className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </button>
@@ -167,7 +188,7 @@ export default function LayerSidebar() {
                 onClick={() => {
                   setIsPinned(false);
                   setIsHovered(false);
-                  if (isSidebarOpen) toggleSidebar();
+                  setSidebarOpen(false);
                 }}
                 className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-transparent hover:border-white/20"
               >

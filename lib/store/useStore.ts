@@ -40,9 +40,11 @@ export interface AppState {
   activeTab: ActiveTabType;
   setActiveTab: (tab: ActiveTabType) => void;
   isSidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   isAiDrawerOpen: boolean;
   setAiDrawerOpen: (open: boolean) => void;
+  closeAllSidebars: () => void;
 
   // Map Controls
   mapStyle: MapStyleType;
@@ -203,9 +205,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeTab: 'map',
   setActiveTab: (tab) => set({ activeTab: tab }),
   isSidebarOpen: false,
+  setSidebarOpen: (open) => set({ isSidebarOpen: open }),
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   isAiDrawerOpen: false,
   setAiDrawerOpen: (open) => set({ isAiDrawerOpen: open }),
+  closeAllSidebars: () => set({ isSidebarOpen: false, isAiDrawerOpen: false }),
 
   gameCategoryFilter: 'Genel',
   setGameCategoryFilter: (category) =>
