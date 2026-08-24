@@ -43,11 +43,14 @@ export default function Navbar() {
     setSelectedFeature,
     flyToCoords,
     toggleSidebar,
+    layers,
     setAiDrawerOpen,
     isAiDrawerOpen,
     gameCategoryFilter,
     setGameCategoryFilter
   } = useAppStore();
+
+  const activeLayersCount = Object.values(layers).filter(Boolean).length;
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -81,9 +84,23 @@ export default function Navbar() {
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <button
             onClick={toggleSidebar}
-            className="p-1 sm:p-1.5 bg-indigo-500/20 hover:bg-indigo-500/35 border border-indigo-400/60 rounded-xl text-indigo-200 transition-all flex items-center gap-1 text-xs font-bold active:scale-95 shrink-0"
-            title="Katmanları Aç/Kapat"
+            className={`p-1 sm:p-1.5 border rounded-xl text-indigo-200 transition-all flex items-center gap-1.5 text-xs font-bold active:scale-95 shrink-0 shadow-sm ${
+              activeLayersCount > 0
+                ? 'bg-indigo-600/30 hover:bg-indigo-600/45 border-indigo-400/80 text-white shadow-indigo-500/20'
+                : 'bg-indigo-500/20 hover:bg-indigo-500/35 border-indigo-400/60'
+            }`}
+            title="Katmanları Aç/Kapat (Yer Şekilleri, Madenler, Sınırlar)"
           >
+            {activeLayersCount === 0 ? (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400"></span>
+              </span>
+            ) : (
+              <span className="px-1 py-0.2 text-[10px] font-black bg-indigo-500 text-white rounded-md">
+                {activeLayersCount}
+              </span>
+            )}
             <Sliders className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-300" />
             <span className="text-xs">Katmanlar</span>
           </button>

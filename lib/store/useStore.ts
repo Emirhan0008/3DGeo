@@ -242,22 +242,22 @@ export const useAppStore = create<AppState>((set, get) => ({
   setTerrainExaggeration: (factor) => set({ terrainExaggeration: factor }),
 
   layers: {
-    mountainsVolcanic: true,
-    mountainsFold: true,
-    mountainsFault: true,
-    mountainsGlacial: true,
-    rivers: true,
-    lakes: true,
-    plainsDelta: true,
-    plainsTectonic: true,
-    plainsKarstic: true,
-    plateaus: true,
-    karstics: true,
-    coastal: true,
-    passes: true,
-    borderGates: true,
-    mines: true,
-    provinces: true,
+    mountainsVolcanic: false,
+    mountainsFold: false,
+    mountainsFault: false,
+    mountainsGlacial: false,
+    rivers: false,
+    lakes: false,
+    plainsDelta: false,
+    plainsTectonic: false,
+    plainsKarstic: false,
+    plateaus: false,
+    karstics: false,
+    coastal: false,
+    passes: false,
+    borderGates: false,
+    mines: false,
+    provinces: false,
   },
   toggleLayer: (layerKey) =>
     set((state) => ({
@@ -388,7 +388,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   clearLatestUnlockedBadge: () => set({ latestUnlockedBadge: null }),
 
   // Dilsiz Harita (Blind Outline Map) State
-  isBlindMapMode: false,
+  isBlindMapMode: true,
   hideLandformsInBlindMode: true,
   toggleBlindMapMode: () => set((s) => ({ 
     isBlindMapMode: !s.isBlindMapMode,

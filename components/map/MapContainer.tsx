@@ -463,16 +463,17 @@ export default function MapContainer() {
     };
   }, []);
 
-  // 2. Handle Style & Blind Map Mode Changes
+  // 2. Handle Style & Blind Map Mode Changes (1v1 Duel automatically enforces full blind mode)
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     const map = mapRef.current;
+    const effectiveBlind = isBlindMapMode || activeTab === 'duel';
     const styleFn = MAP_STYLE_CONFIGS[mapStyle] || MAP_STYLE_CONFIGS.topographic;
 
-    map.setStyle(styleFn(isBlindMapMode));
+    map.setStyle(styleFn(effectiveBlind));
 
     const handleStyleLoad = () => {
-      setupTurkeyNationalBordersAndMask(map, isBlindMapMode);
+      setupTurkeyNationalBordersAndMask(map, effectiveBlind);
     };
 
     map.once('style.load', handleStyleLoad);
@@ -480,7 +481,7 @@ export default function MapContainer() {
     return () => {
       map.off('style.load', handleStyleLoad);
     };
-  }, [mapStyle, isBlindMapMode, mapLoaded]);
+  }, [mapStyle, isBlindMapMode, activeTab, mapLoaded]);
 
   // 3. Handle Camera FlyTo Signal
   useEffect(() => {
@@ -522,9 +523,9 @@ export default function MapContainer() {
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    // Hide all standard map markers during game modes (Pin Game or Quiz Test)
-    // so that ONLY the target answer pin and user location stand out cleanly!
-    if (activeTab === 'pin_game' || activeTab === 'quiz_test') {
+    // Hide all standard map markers during game & duel modes (Pin Game, Quiz Test, 1v1 Duel)
+    // so that the map is 100% clean and dilsiz without visual hints
+    if (activeTab === 'pin_game' || activeTab === 'quiz_test' || activeTab === 'duel') {
       return;
     }
 
