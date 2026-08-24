@@ -14,7 +14,6 @@ import {
   Mountain,
   Sliders,
   ChevronDown,
-  ChevronUp,
   Maximize2,
   Minimize2
 } from 'lucide-react';
@@ -341,22 +340,17 @@ export default function Navbar() {
     </>
   );
 
-  // In Fullscreen Mode
+  // In Fullscreen Mode: Dedicated floating minimize button on top-right outside of cards
   if (isFullscreen) {
-    // When in Pin Game or Quiz Test, the exit arrow is placed directly on the right side of the question card
-    if (activeTab === 'pin_game' || activeTab === 'quiz_test') {
-      return null;
-    }
-
-    // In other modes (e.g. Map Explore, Flashcards), show clean pulsing arrow at top right without outer circle ring
     return (
-      <div className="fixed top-2.5 right-3.5 z-50 pointer-events-auto select-none">
+      <div className="fixed top-2 right-2 sm:top-3 sm:right-3.5 z-50 pointer-events-auto select-none">
         <button
           onClick={toggleFullscreen}
-          title="Tam Ekrandan Çık"
-          className="p-1.5 text-amber-400 hover:text-amber-300 hover:bg-white/10 rounded-xl transition-all cursor-pointer active:scale-95 flex items-center justify-center bg-[#09090b]/80 backdrop-blur-md border border-amber-400/50 shadow-lg"
+          title="Ekranı Küçült (Tam Ekrandan Çık)"
+          className="group relative flex items-center gap-1 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-[#09090b]/90 backdrop-blur-xl border border-amber-400/80 text-amber-300 hover:text-slate-950 hover:bg-amber-400 rounded-xl shadow-2xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all cursor-pointer font-black text-xs"
         >
-          <ChevronUp className="w-5 h-5 text-amber-300 animate-bounce stroke-[2.5]" />
+          <Minimize2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:scale-110 transition-transform stroke-[2.5]" />
+          <span className="text-[10px] sm:text-xs font-black">Küçült</span>
         </button>
       </div>
     );

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { MULTIPLE_CHOICE_QUESTIONS, getCurrentQuizQuestion, getFilteredQuizQuestions, sanitizeQuestionText } from '@/lib/data/quizQuestions';
 import { getFeatureImageUrl } from '@/lib/data/turkeyData';
-import { useAppFullscreen } from '@/lib/utils';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   CheckCircle2, 
@@ -17,8 +16,7 @@ import {
   Check,
   X,
   ChevronDown,
-  ChevronUp,
-  HelpCircle
+  ChevronUp
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -48,7 +46,6 @@ export default function QuizTestGame() {
     gameCategoryFilter,
     setGameCategoryFilter
   } = useAppStore();
-  const { isFullscreen, toggleFullscreen } = useAppFullscreen();
 
   const isMobile = () => {
     if (typeof window === 'undefined') return false;
@@ -119,76 +116,73 @@ export default function QuizTestGame() {
       <div 
         onDoubleClick={() => setIsCollapsed(false)}
         title="Çift Tıklayarak Detayları Açabilirsiniz"
-        className="absolute top-2 left-20 sm:left-1/2 sm:-translate-x-1/2 right-2 sm:right-auto z-30 w-auto max-w-[calc(100vw-88px)] sm:max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2 py-1 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
+        className="absolute top-11 sm:top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-auto max-w-lg sm:max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
       >
-        <div className="flex items-center gap-1 min-w-0 flex-1">
-          <span className="px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 font-black text-[9px] shrink-0">
-            TEST:
-          </span>
-          <span className="font-extrabold text-xs sm:text-sm text-emerald-300 truncate max-w-[140px] sm:max-w-[220px]">
-            {currentQ.category}
-          </span>
-          <span className="text-[9px] text-slate-300 font-bold border-l border-white/20 pl-1 shrink-0">
+        {/* Row 1 on mobile portrait / Left section on landscape */}
+        <div className="flex items-center justify-between gap-2 min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <span className="px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 font-black text-[9px] sm:text-[10px] shrink-0 flex items-center gap-0.5 shadow-sm">
+              TEST:
+            </span>
+            <span className="font-black text-xs sm:text-sm text-emerald-300 leading-snug break-words line-clamp-2 sm:line-clamp-1">
+              {currentQ.category}
+            </span>
+          </div>
+          <span className="text-[9px] sm:text-[10px] text-slate-300 font-extrabold bg-white/10 px-1.5 py-0.5 rounded border border-white/10 shrink-0">
             {safeIndex + 1}/{filteredQuestions.length}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleNext();
-            }}
-            title="Sonraki Soruya Geç"
-            className="px-2 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg flex items-center gap-0.5 shadow-md transition-all active:scale-95 shrink-0"
-          >
-            <span>Sonraki</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
+        {/* Row 2 on mobile portrait / Right section on landscape */}
+        <div className="flex items-center justify-between sm:justify-end gap-1 shrink-0 border-t sm:border-t-0 border-white/10 pt-1 sm:pt-0">
+          <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-500/20 border border-emerald-400/40 rounded text-[9px] font-black text-emerald-300 sm:hidden">
+            <Trophy className="w-2.5 h-2.5 text-emerald-400" />
+            <span>{quizScore} P</span>
+          </div>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsCollapsed(false);
-            }}
-            title="Detaylı Soru Kartını Aç"
-            className="px-1.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] rounded-lg flex items-center gap-0.5 border border-emerald-400 transition-all active:scale-95 shrink-0"
-          >
-            <ChevronDown className="w-3.5 h-3.5" />
-            <span>Detay</span>
-          </button>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setActiveTab('map');
-            }}
-            className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all shrink-0"
-            title="Kapat"
-          >
-            <X className="w-3 h-3" />
-          </button>
-
-          {/* Fullscreen Exit Pulsing Arrow */}
-          {isFullscreen && (
+          <div className="flex items-center gap-1 shrink-0 ml-auto sm:ml-0">
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                toggleFullscreen();
+                handleNext();
               }}
-              title="Tam Ekrandan Çık"
-              className="p-1 rounded hover:bg-white/10 text-amber-300 hover:text-amber-200 transition-all shrink-0 active:scale-95 flex items-center justify-center cursor-pointer ml-0.5"
+              title="Sonraki Soruya Geç"
+              className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] sm:text-xs rounded-lg flex items-center gap-0.5 shadow-md transition-all active:scale-95 shrink-0 cursor-pointer"
             >
-              <ChevronUp className="w-4 h-4 text-amber-300 animate-bounce stroke-[3]" />
+              <span>Sonraki</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
-          )}
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCollapsed(false);
+              }}
+              title="Detaylı Soru Kartını Aç"
+              className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] sm:text-xs rounded-lg flex items-center gap-0.5 border border-emerald-400 transition-all active:scale-95 shrink-0 cursor-pointer"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+              <span>Detay</span>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTab('map');
+              }}
+              className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all shrink-0 cursor-pointer"
+              title="Kapat"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   // Card classes (compact floating card over map)
-  const containerClasses = "absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all";
+  const containerClasses = "absolute top-11 sm:top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all";
 
   return (
     <DraggableCard
@@ -257,20 +251,6 @@ export default function QuizTestGame() {
           >
             <X className="w-3 h-3" />
           </button>
-
-          {/* Fullscreen Exit Pulsing Arrow */}
-          {isFullscreen && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFullscreen();
-              }}
-              title="Tam Ekrandan Çık"
-              className="p-0.5 sm:p-1 rounded hover:bg-white/10 text-amber-300 hover:text-amber-200 transition-all cursor-pointer ml-0.5"
-            >
-              <ChevronUp className="w-3.5 h-3.5 text-amber-300 animate-bounce stroke-[3]" />
-            </button>
-          )}
         </div>
       </div>
 
