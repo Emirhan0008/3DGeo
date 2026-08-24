@@ -5,7 +5,6 @@ import { useAppStore } from '@/lib/store/useStore';
 import { MULTIPLE_CHOICE_QUESTIONS, getCurrentQuizQuestion, getFilteredQuizQuestions, sanitizeQuestionText } from '@/lib/data/quizQuestions';
 import { getFeatureImageUrl } from '@/lib/data/turkeyData';
 import DraggableCard from '@/components/ui/DraggableCard';
-import { useAppFullscreen } from '@/lib/utils';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -16,8 +15,8 @@ import {
   Sparkles,
   Check,
   X,
-  Maximize2,
-  Minimize2,
+  ChevronDown,
+  ChevronUp,
   HelpCircle
 } from 'lucide-react';
 
@@ -49,15 +48,40 @@ export default function QuizTestGame() {
     setGameCategoryFilter
   } = useAppStore();
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const { isFullscreen, toggleFullscreen } = useAppFullscreen();
+  const isMobile = () => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768 || window.innerHeight < 550 || ('ontouchstart' in window && window.innerWidth < 1024);
+  };
 
-  // Default to collapsed mode on mobile screens for unobstructed map view
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768 || window.innerHeight < 550 || ('ontouchstart' in window && window.innerWidth < 1024);
+    }
+    return false;
+  });
+
+  // Default to collapsed mode on mobile/landscape screens for unobstructed map view
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    const handleResize = () => {
+      if (isMobile()) {
+        setIsCollapsed(true);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
+
+  // Force collapsed mode on mobile/landscape whenever question or category changes
+  useEffect(() => {
+    if (isMobile()) {
       setIsCollapsed(true);
     }
-  }, []);
+  }, [quizTestIndex, gameCategoryFilter]);
 
   useEffect(() => {
     if (shuffledQuizQuestions.length === 0) {
@@ -74,6 +98,9 @@ export default function QuizTestGame() {
   if (!currentQ) return null;
 
   const handleNext = () => {
+    if (isMobile()) {
+      setIsCollapsed(true);
+    }
     nextQuizQuestion();
   };
 
@@ -84,19 +111,19 @@ export default function QuizTestGame() {
     }
   };
 
-  // Collapsed State
+  // Collapsed State (Default on Mobile)
   if (isCollapsed) {
     return (
       <div 
         onDoubleClick={() => setIsCollapsed(false)}
-        title="Çift Tıklayarak Kartı Açabilirsiniz"
-        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2 py-1.5 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
+        title="Çift Tıklayarak Detayları Açabilirsiniz"
+        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-emerald-400/80 rounded-xl shadow-2xl px-2 py-1 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
       >
         <div className="flex items-center gap-1 min-w-0 flex-1">
           <span className="px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 font-black text-[9px] shrink-0">
             TEST:
           </span>
-          <span className="font-extrabold text-xs text-emerald-300 truncate max-w-[120px] sm:max-w-[200px]">
+          <span className="font-extrabold text-xs sm:text-sm text-emerald-300 truncate max-w-[140px] sm:max-w-[220px]">
             {currentQ.category}
           </span>
           <span className="text-[9px] text-slate-300 font-bold border-l border-white/20 pl-1 shrink-0">
@@ -122,10 +149,11 @@ export default function QuizTestGame() {
               e.stopPropagation();
               setIsCollapsed(false);
             }}
+            title="Detaylı Soru Kartını Aç"
             className="px-1.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] rounded-lg flex items-center gap-0.5 border border-emerald-400 transition-all active:scale-95 shrink-0"
           >
-            <Maximize2 className="w-3 h-3" />
-            <span>Aç</span>
+            <ChevronDown className="w-3.5 h-3.5" />
+            <span>Detay</span>
           </button>
 
           <button
@@ -197,26 +225,12 @@ export default function QuizTestGame() {
             <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </button>
 
-          {/* App Fullscreen Toggle Button */}
-          <button
-            onClick={toggleFullscreen}
-            title={isFullscreen ? "Tam Ekrandan Çık" : "Uygulamayı Tam Ekran Yap (Haritayı Büyüt)"}
-            className={`px-1.5 py-0.5 rounded text-[9px] sm:text-xs font-black flex items-center gap-0.5 border transition-all ${
-              isFullscreen 
-                ? 'bg-emerald-500 text-slate-950 border-emerald-300' 
-                : 'bg-emerald-600/40 hover:bg-emerald-600/60 border-emerald-400/60 text-emerald-200'
-            }`}
-          >
-            {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
-            <span className="hidden sm:inline">{isFullscreen ? 'Normal' : 'Tam Ekran'}</span>
-          </button>
-
           <button
             onClick={() => setIsCollapsed(true)}
-            title="Sadece Başlığı Göster (Çift Tık)"
+            title="Kartı Küçült (Sadece İsim Modu)"
             className="p-0.5 sm:p-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400/50 text-emerald-200 rounded text-[9px] font-black"
           >
-            <Minimize2 className="w-3 h-3" />
+            <ChevronUp className="w-3.5 h-3.5" />
           </button>
 
           <button

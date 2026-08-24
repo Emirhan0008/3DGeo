@@ -79,59 +79,59 @@ export default function LayerSidebar() {
     <aside
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute left-2 top-16 bottom-6 z-20 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out ${
+      className={`absolute left-1.5 sm:left-2 top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 z-20 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.75rem)] sm:h-[calc(100%-1rem)] max-h-full ${
         isExpanded
           ? isHovered || isPinned
-            ? 'w-80 bg-[#09090b]/95 opacity-100'
-            : 'w-80 bg-[#09090b]/75 opacity-75 hover:opacity-100'
+            ? 'w-72 sm:w-80 bg-[#09090b]/95 opacity-100'
+            : 'w-72 sm:w-80 bg-[#09090b]/75 opacity-75 hover:opacity-100'
           : isHovered
-          ? 'w-12 bg-[#09090b]/95 opacity-100'
-          : 'w-12 bg-[#09090b]/60 opacity-60 hover:opacity-100'
+          ? 'w-10 sm:w-12 bg-[#09090b]/95 opacity-100'
+          : 'w-10 sm:w-12 bg-[#09090b]/60 opacity-60 hover:opacity-100'
       }`}
     >
       {/* Collapsed Bar State */}
       {!isExpanded ? (
-        <div className="w-full h-full flex flex-col items-center justify-between py-4 cursor-pointer hover:bg-white/5 transition-all overflow-hidden select-none">
-          <div className="flex flex-col items-center gap-3">
-            <div className="relative p-2 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-indigo-400 animate-pulse">
-              <Layers className="w-5 h-5" />
+        <div className="w-full h-full flex flex-col items-center justify-between py-2 sm:py-4 cursor-pointer hover:bg-white/5 transition-all overflow-hidden select-none">
+          <div className="flex flex-col items-center gap-1.5 sm:gap-3">
+            <div className="relative p-1.5 sm:p-2 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-indigo-400 animate-pulse">
+              <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
               {activeLayersCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-500 text-white font-extrabold text-[9px] rounded-full flex items-center justify-center border border-[#09090b]">
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-indigo-500 text-white font-extrabold text-[8px] sm:text-[9px] rounded-full flex items-center justify-center border border-[#09090b]">
                   {activeLayersCount}
                 </span>
               )}
             </div>
-            <div className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200">
-              <Compass className="w-4 h-4" />
+            <div className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-200">
+              <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <div className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200">
-              <Globe className="w-4 h-4" />
+            <div className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-200">
+              <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-2 overflow-hidden">
-            <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-extrabold tracking-widest uppercase text-slate-400 hover:text-indigo-300 transition-colors whitespace-nowrap max-h-36 overflow-hidden">
+          <div className="flex-1 flex items-center justify-center my-1 sm:my-2 overflow-hidden">
+            <span className="[writing-mode:vertical-rl] rotate-180 text-[9px] sm:text-[10px] font-extrabold tracking-widest uppercase text-slate-400 hover:text-indigo-300 transition-colors whitespace-nowrap max-h-20 sm:max-h-36 overflow-hidden">
               KATMANLAR
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <ChevronRight className="w-4 h-4 text-indigo-400 animate-bounce" />
+          <div className="flex flex-col items-center gap-1 sm:gap-2">
+            <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 animate-bounce" />
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsPinned(true);
               }}
               title="Menüyü Ekrana Sabitle"
-              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all border border-transparent hover:border-white/20"
+              className="p-1 sm:p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all border border-transparent hover:border-white/20"
             >
-              <Pin className="w-3.5 h-3.5" />
+              <Pin className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </button>
           </div>
         </div>
       ) : (
         /* Expanded Full Content State */
-        <div className="w-80 h-full flex flex-col animate-in fade-in duration-200">
+        <div className="w-72 sm:w-80 h-full flex flex-col animate-in fade-in duration-200">
           {/* Header */}
           <div className="p-3.5 border-b border-white/15 flex items-center justify-between bg-white/5">
             <div className="flex items-center gap-2">

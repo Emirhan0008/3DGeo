@@ -6,10 +6,28 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+interface FsDocument extends Document {
+  webkitFullscreenElement?: Element;
+  mozFullScreenElement?: Element;
+  msFullscreenElement?: Element;
+  webkitExitFullscreen?: () => Promise<void> | void;
+  mozCancelFullScreen?: () => Promise<void> | void;
+  msExitFullscreen?: () => Promise<void> | void;
+}
+
+interface FsElement extends HTMLElement {
+  webkitRequestFullscreen?: () => Promise<void> | void;
+  mozRequestFullScreen?: () => Promise<void> | void;
+  msRequestFullscreen?: () => Promise<void> | void;
+}
+
 export function toggleAppFullscreen() {
   if (typeof document === 'undefined') return;
-  if (!document.fullscreenElement) {
-    const elem = document.documentElement as any;
+  const fsDoc = document as FsDocument;
+  const isFs = !!(fsDoc.fullscreenElement || fsDoc.webkitFullscreenElement || fsDoc.mozFullScreenElement || fsDoc.msFullscreenElement);
+
+  if (!isFs) {
+    const elem = document.documentElement as FsElement;
     if (elem.requestFullscreen) {
       elem.requestFullscreen().catch(() => {});
     } else if (elem.webkitRequestFullscreen) {
@@ -20,10 +38,10 @@ export function toggleAppFullscreen() {
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen().catch(() => {});
-    } else if ((document as any).webkitExitFullscreen) {
-      (document as any).webkitExitFullscreen();
-    } else if ((document as any).msExitFullscreen) {
-      (document as any).msExitFullscreen();
+    } else if (fsDoc.webkitExitFullscreen) {
+      fsDoc.webkitExitFullscreen();
+    } else if (fsDoc.msExitFullscreen) {
+      fsDoc.msExitFullscreen();
     }
   }
 }

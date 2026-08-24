@@ -8,14 +8,21 @@ export default function RotateScreenBanner() {
   const [timeLeft, setTimeLeft] = useState(10);
 
   useEffect(() => {
-    // Only trigger on mobile screens (portrait or width < 768)
-    const checkMobile = () => {
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        setIsVisible(true);
+    // Only trigger on mobile screens in portrait mode (height > width and width < 768)
+    const checkOrientation = () => {
+      if (typeof window !== 'undefined') {
+        const isPortraitMobile = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+        if (isPortraitMobile) {
+          setIsVisible(true);
+        } else {
+          setIsVisible(false);
+        }
       }
     };
 
-    checkMobile();
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
 
     // 10 second countdown timer
     const interval = setInterval(() => {
@@ -29,7 +36,11 @@ export default function RotateScreenBanner() {
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
   }, []);
 
   if (!isVisible) return null;

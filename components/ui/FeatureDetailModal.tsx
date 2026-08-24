@@ -28,10 +28,10 @@ export default function FeatureDetailModal() {
 
   return (
     <DraggableCard
-      className="absolute left-2 sm:left-20 bottom-6 z-30 w-[92vw] sm:w-96 max-w-sm bg-[#09090b]/90 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
+      className="absolute left-2 sm:left-20 top-2 sm:top-auto bottom-2 sm:bottom-6 z-30 w-[92vw] sm:w-96 max-w-sm max-h-[calc(100vh-1rem)] flex flex-col bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
     >
       {/* Top Banner */}
-      <div className="p-3.5 bg-gradient-to-r from-indigo-950/80 via-[#09090b] to-slate-900 border-b border-white/10 flex items-start justify-between">
+      <div className="p-3.5 bg-gradient-to-r from-indigo-950/80 via-[#09090b] to-slate-900 border-b border-white/10 flex items-start justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="p-2 bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-indigo-300">
             {selectedFeature.type === 'mountain' && <Mountain className="w-4 h-4 text-indigo-400" />}
@@ -66,7 +66,7 @@ export default function FeatureDetailModal() {
       </div>
 
       {/* Content */}
-      <div className="p-3.5 space-y-2.5 max-h-[50vh] overflow-y-auto text-xs">
+      <div className="p-3.5 space-y-2.5 flex-1 overflow-y-auto text-xs">
         {/* Feature Photograph Image Banner */}
         <div className="relative w-full h-36 rounded-xl overflow-hidden border border-white/10 shadow-lg group">
           {/* eslint-disable-next-line @next/next/no-img-element */}

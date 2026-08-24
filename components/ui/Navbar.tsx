@@ -69,22 +69,22 @@ export default function Navbar() {
   };
 
   return (
-    <header className="relative z-30 w-full bg-[#09090b]/90 backdrop-blur-xl border-b border-white/10 text-slate-100 px-2.5 sm:px-4 py-1.5 shadow-xl">
-      {/* Top Main Bar */}
-      <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+    <header className="relative z-30 w-full bg-[#09090b]/95 backdrop-blur-xl border-b border-white/10 text-slate-100 px-2 sm:px-4 py-1 sm:py-1.5 shadow-xl select-none">
+      {/* Main Bar */}
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2 w-full">
         {/* Left: Brand & Sidebar Toggle */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <button
             onClick={toggleSidebar}
-            className="p-1.5 bg-indigo-500/20 hover:bg-indigo-500/35 border border-indigo-400/60 rounded-xl text-indigo-200 transition-all flex items-center gap-1 text-xs font-bold active:scale-95"
+            className="p-1 sm:p-1.5 bg-indigo-500/20 hover:bg-indigo-500/35 border border-indigo-400/60 rounded-xl text-indigo-200 transition-all flex items-center gap-1 text-xs font-bold active:scale-95 shrink-0"
             title="Katmanları Aç/Kapat"
           >
             <Sliders className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-300" />
             <span className="hidden sm:inline text-xs">Katmanlar</span>
           </button>
 
-          <div className="flex items-center gap-1 cursor-pointer" onClick={() => setActiveTab('map')}>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-500 rounded-xl flex items-center justify-center shadow-md border border-white/20 shrink-0">
+          <div className="flex items-center gap-1 cursor-pointer shrink-0" onClick={() => setActiveTab('map')}>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md border border-white/20 shrink-0">
               <Mountain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
             <span className="text-xs sm:text-sm font-black tracking-tight text-white hidden xs:inline">
@@ -93,77 +93,77 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Center: Desktop Navigation Tabs (Hidden on mobile) */}
-        <nav className="hidden md:flex items-center gap-1 bg-[#09090b]/80 p-1 rounded-xl border border-white/15 shadow-inner">
+        {/* Center: Navigation Tabs (Visible in single row for Desktop AND Mobile Landscape) */}
+        <nav className="hidden lg:flex max-h-[550px]:flex items-center gap-1 bg-[#09090b]/80 p-0.5 sm:p-1 rounded-xl border border-white/15 shadow-inner overflow-x-auto scrollbar-none shrink">
           <button
             onClick={() => setActiveTab('map')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border shrink-0 ${
               activeTab === 'map'
                 ? 'bg-indigo-600 text-white border-indigo-300 shadow-md shadow-indigo-500/30 ring-1 ring-indigo-300'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-indigo-400/60 hover:text-white'
             }`}
           >
-            <Map className="w-3.5 h-3.5 text-indigo-400" />
+            <Map className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-400" />
             <span>Keşif</span>
           </button>
 
           <button
             onClick={() => setActiveTab('pin_game')}
-            className={`relative px-2.5 py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1.5 whitespace-nowrap border-2 ${
+            className={`relative px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border-2 shrink-0 ${
               activeTab === 'pin_game'
                 ? 'bg-amber-500 text-slate-950 border-amber-200 shadow-md shadow-amber-500/40 ring-2 ring-amber-300'
                 : 'bg-amber-500/15 text-amber-300 border-amber-400/60 hover:bg-amber-500/25 hover:border-amber-300 shadow-sm shadow-amber-500/20'
             }`}
           >
-            <span className="relative flex h-2 w-2">
+            <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-amber-400"></span>
             </span>
-            <MapPin className="w-3.5 h-3.5 text-amber-300" />
+            <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300" />
             <span>Harita Testi</span>
           </button>
 
           <button
             onClick={() => setActiveTab('quiz_test')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border shrink-0 ${
               activeTab === 'quiz_test'
                 ? 'bg-emerald-600 text-white border-emerald-300 shadow-md shadow-emerald-500/30 ring-1 ring-emerald-300'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-emerald-400/60 hover:text-white'
             }`}
           >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <HelpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" />
             <span>KPSS Testi</span>
           </button>
 
           <button
             onClick={() => setActiveTab('flashcards')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border shrink-0 ${
               activeTab === 'flashcards'
                 ? 'bg-purple-600 text-white border-purple-300 shadow-md shadow-purple-500/30 ring-1 ring-purple-300'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-purple-400/60 hover:text-white'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+            <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-400" />
             <span>Ezber</span>
           </button>
 
           <button
             onClick={() => setActiveTab('stats')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border shrink-0 ${
               activeTab === 'stats'
                 ? 'bg-cyan-600 text-white border-cyan-300 shadow-md shadow-cyan-500/30 ring-1 ring-cyan-300'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10 hover:border-cyan-400/60 hover:text-white'
             }`}
           >
-            <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
+            <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-400" />
             <span>Analiz</span>
           </button>
         </nav>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Category Selector (Desktop) */}
-          <div className="relative hidden lg:block">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {/* Category Selector (Desktop only) */}
+          <div className="relative hidden xl:block">
             <select
               value={gameCategoryFilter}
               onChange={(e) => setGameCategoryFilter(e.target.value)}
@@ -179,9 +179,9 @@ export default function Navbar() {
           </div>
 
           {/* Search Bar */}
-          <div className="relative w-20 xs:w-28 sm:w-36 md:w-40">
+          <div className="relative w-16 xs:w-24 sm:w-32 md:w-36">
             <div className="relative flex items-center">
-              <Search className="absolute left-2 w-3 h-3 text-slate-400" />
+              <Search className="absolute left-1.5 sm:left-2 w-3 h-3 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
@@ -191,7 +191,7 @@ export default function Navbar() {
                 }}
                 onFocus={() => setShowSearchResults(true)}
                 placeholder="Ara..."
-                className="w-full pl-6 pr-1.5 py-1 bg-white/5 border border-white/10 rounded-xl text-[10px] sm:text-[11px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+                className="w-full pl-5 sm:pl-6 pr-1 py-0.5 sm:py-1 bg-white/5 border border-white/10 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
               />
             </div>
 
@@ -215,7 +215,7 @@ export default function Navbar() {
           </div>
 
           {/* Compact Score / Streak Pill (Hidden on extra small screens) */}
-          <div className="hidden sm:flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl px-2 py-1 text-[10px] font-bold">
+          <div className="hidden sm:flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] font-bold shrink-0">
             <span className="text-emerald-400">{score}p</span>
             <span className="text-slate-600">|</span>
             <span className="text-orange-400">{streak}🔥</span>
@@ -224,19 +224,19 @@ export default function Navbar() {
           {/* Highly Visible Mobile & Desktop Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-xl border transition-all text-[10px] sm:text-xs font-black flex items-center gap-1 active:scale-95 shadow-md shrink-0 ${
+            className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl border transition-all text-[9px] sm:text-xs font-black flex items-center gap-1 active:scale-95 shadow-md shrink-0 ${
               isFullscreen
                 ? 'bg-slate-800 text-amber-300 border-amber-400/60 shadow-amber-500/20'
-                : 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 border-amber-200 ring-2 ring-amber-400/40 shadow-amber-500/30 hover:brightness-110 animate-pulse-slow'
+                : 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 border-amber-200 ring-1 ring-amber-400/40 shadow-amber-500/30 hover:brightness-110'
             }`}
             title={isFullscreen ? 'Tam Ekrandan Çık' : 'Uygulamayı Tam Ekran Yap (Haritayı Büyüt)'}
           >
             {isFullscreen ? (
-              <Minimize2 className="w-3.5 h-3.5 text-amber-300" />
+              <Minimize2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300" />
             ) : (
-              <Maximize2 className="w-3.5 h-3.5 text-slate-950 font-black" />
+              <Maximize2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-950 font-black" />
             )}
-            <span className="font-black uppercase tracking-tight">
+            <span className="font-black uppercase tracking-tight hidden xs:inline">
               {isFullscreen ? 'Çık' : 'Tam Ekran'}
             </span>
           </button>
@@ -247,7 +247,7 @@ export default function Navbar() {
           {/* AI Tutor Button */}
           <button
             onClick={() => setAiDrawerOpen(!isAiDrawerOpen)}
-            className={`p-1.5 rounded-xl border transition-all text-xs font-bold flex items-center gap-1 ${
+            className={`p-1 sm:p-1.5 rounded-lg sm:rounded-xl border transition-all text-xs font-bold flex items-center gap-1 shrink-0 ${
               isAiDrawerOpen
                 ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
                 : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
@@ -260,12 +260,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Bottom Mobile Scrollable Navigation Tabs (Hidden on md+) */}
-      <div className="flex md:hidden items-center justify-between gap-1 mt-1.5 pt-1.5 border-t border-white/10 overflow-x-auto">
+      {/* Bottom Mobile Scrollable Navigation Tabs (Only shown in Portrait Mobile when height > 550px) */}
+      <div className="flex lg:hidden max-h-[550px]:hidden items-center justify-between gap-1 mt-1 pt-1 border-t border-white/10 overflow-x-auto scrollbar-none">
         <nav className="flex items-center gap-1.5 w-full overflow-x-auto py-0.5 scrollbar-none">
           <button
             onClick={() => setActiveTab('map')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'map'
                 ? 'bg-indigo-600 text-white border-indigo-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
@@ -277,7 +277,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setActiveTab('pin_game')}
-            className={`relative px-2.5 py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
+            className={`relative px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
               activeTab === 'pin_game'
                 ? 'bg-amber-500 text-slate-950 border-amber-200 shadow-md'
                 : 'bg-amber-500/15 text-amber-300 border-amber-400/60 hover:bg-amber-500/25'
@@ -293,7 +293,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setActiveTab('quiz_test')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'quiz_test'
                 ? 'bg-emerald-600 text-white border-emerald-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
@@ -305,7 +305,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setActiveTab('flashcards')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'flashcards'
                 ? 'bg-purple-600 text-white border-purple-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
@@ -317,7 +317,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setActiveTab('stats')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'stats'
                 ? 'bg-cyan-600 text-white border-cyan-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
