@@ -854,21 +854,21 @@ export default function MapContainer() {
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Floating HUD Controls - Compact Hover-Expandable Pill Bar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 pointer-events-auto select-none">
-        <div className="flex items-center gap-1 p-1 bg-[#09090b]/85 backdrop-blur-xl border border-white/15 rounded-2xl shadow-2xl">
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20 flex items-center gap-1 sm:gap-2 pointer-events-auto select-none">
+        <div className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 bg-[#09090b]/85 backdrop-blur-xl border border-white/15 rounded-xl sm:rounded-2xl shadow-2xl">
           
           {/* Compass & Zoom Pill */}
           <div 
             onClick={resetCameraToTurkey}
             title="Kuzey yönüne dön ve yakınlaşmayı gör (Tıkla: Odaklan)"
-            className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/5 hover:border-emerald-500/40 text-slate-200 text-xs font-semibold cursor-pointer transition-all duration-300 active:scale-95"
+            className="group flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/5 hover:border-emerald-500/40 text-slate-200 text-xs font-semibold cursor-pointer transition-all duration-300 active:scale-95"
           >
-            <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all shrink-0">
-              <Compass className="w-3.5 h-3.5" />
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all shrink-0">
+              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
             
             {/* Always visible compact badge */}
-            <span className="text-[11px] font-extrabold text-slate-300 group-hover:text-emerald-300">
+            <span className="text-[10px] sm:text-[11px] font-extrabold text-slate-300 group-hover:text-emerald-300">
               {currentZoom}x
             </span>
 
@@ -881,16 +881,16 @@ export default function MapContainer() {
           </div>
 
           {/* Divider */}
-          <div className="w-px h-5 bg-white/10 mx-0.5" />
+          <div className="w-px h-4 sm:h-5 bg-white/10 mx-0.5" />
 
           {/* Türkiye'ye Odaklan Button */}
           <button
             onClick={resetCameraToTurkey}
             title="Türkiye Genel Görünümüne Odaklan (Kısayol: T)"
-            className="group relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/5 hover:border-sky-500/40 text-slate-200 text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm"
+            className="group relative flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/5 hover:border-sky-500/40 text-slate-200 text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm"
           >
-            <div className="w-6 h-6 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-slate-950 transition-all shrink-0">
-              <RotateCcw className="w-3.5 h-3.5" />
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-slate-950 transition-all shrink-0">
+              <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
 
             {/* Expandable Label on Hover */}
@@ -907,18 +907,18 @@ export default function MapContainer() {
             <button
               onClick={toggleBlindMapMode}
               title={isBlindMapMode ? "Dilsiz Harita Modunu Kapat (Kısayol: D)" : "Dilsiz Harita Modunu Aç - Şehir İsimleri & Sınırlar Gizlenir (Kısayol: D)"}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm ${
                 isBlindMapMode
                   ? 'bg-amber-500/25 border-amber-400/80 text-amber-200 ring-1 ring-amber-400/50 shadow-lg shadow-amber-500/10'
                   : 'bg-white/5 hover:bg-amber-500/15 border-white/5 hover:border-amber-500/30 text-slate-200'
               }`}
             >
-              <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all shrink-0 ${
+              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-all shrink-0 ${
                 isBlindMapMode 
                   ? 'bg-amber-400 text-slate-950 font-black scale-105' 
                   : 'bg-amber-500/20 text-amber-400 group-hover:bg-amber-500 group-hover:text-slate-950'
               }`}>
-                <EyeOff className="w-3.5 h-3.5" />
+                <EyeOff className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </div>
 
               {/* Status indicator dot when active */}
@@ -978,7 +978,7 @@ export default function MapContainer() {
               }
             }}
             title={isTourActive ? "Animasyon Turunu Durdur (Kısayol: P)" : "3D KPSS Animasyonlu Rehber Turunu Başlat (Kısayol: P)"}
-            className={`group flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm ${
+            className={`hidden sm:flex group items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm ${
               isTourActive
                 ? 'bg-gradient-to-r from-emerald-500/30 to-teal-500/30 border-emerald-400/80 text-emerald-200 ring-1 ring-emerald-400 shadow-lg shadow-emerald-500/10'
                 : 'bg-white/5 hover:bg-indigo-500/20 border-white/5 hover:border-indigo-500/40 text-indigo-300'

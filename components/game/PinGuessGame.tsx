@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { PIN_GAME_QUESTIONS, getCurrentPinQuestion, getFilteredPinQuestions, sanitizeQuestionText, cleanFeatureTitle } from '@/lib/data/quizQuestions';
 import { getFeatureImageUrl } from '@/lib/data/turkeyData';
+import { useAppFullscreen } from '@/lib/utils';
 import DraggableCard from '@/components/ui/DraggableCard';
 import { 
   HelpCircle, 
@@ -46,6 +47,7 @@ export default function PinGuessGame() {
     isBlindMapMode,
     toggleBlindMapMode
   } = useAppStore();
+  const { isFullscreen, toggleFullscreen } = useAppFullscreen();
 
   const isMobile = () => {
     if (typeof window === 'undefined') return false;
@@ -126,7 +128,7 @@ export default function PinGuessGame() {
       <div 
         onDoubleClick={() => setIsCollapsed(false)}
         title="Çift Tıklayarak Detayları Açabilirsiniz"
-        className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-xl shadow-2xl px-2 py-1 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
+        className="absolute top-2 left-20 sm:left-1/2 sm:-translate-x-1/2 right-2 sm:right-auto z-30 w-auto max-w-[calc(100vw-88px)] sm:max-w-[96vw] bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-xl shadow-2xl px-2 py-1 flex items-center justify-between gap-1.5 text-white animate-in fade-in duration-200 cursor-pointer"
       >
         <div className="flex items-center gap-1 min-w-0 flex-1">
           <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[9px] shrink-0 flex items-center gap-0.5">
@@ -172,9 +174,24 @@ export default function PinGuessGame() {
               setActiveTab('map');
             }}
             className="p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all shrink-0"
+            title="Kapat"
           >
             <X className="w-3 h-3" />
           </button>
+
+          {/* Fullscreen Exit Pulsing Arrow: Positioned on the right side of the card without circle */}
+          {isFullscreen && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFullscreen();
+              }}
+              title="Tam Ekrandan Çık"
+              className="p-1 rounded hover:bg-white/10 text-amber-300 hover:text-amber-200 transition-all shrink-0 active:scale-95 flex items-center justify-center cursor-pointer ml-0.5"
+            >
+              <ChevronUp className="w-4 h-4 text-amber-300 animate-bounce stroke-[3]" />
+            </button>
+          )}
         </div>
       </div>
     );
@@ -263,9 +280,24 @@ export default function PinGuessGame() {
           <button
             onClick={() => setActiveTab('map')}
             className="p-0.5 sm:p-1 rounded bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20"
+            title="Kapat"
           >
             <X className="w-3 h-3" />
           </button>
+
+          {/* Fullscreen Exit Pulsing Arrow */}
+          {isFullscreen && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFullscreen();
+              }}
+              title="Tam Ekrandan Çık"
+              className="p-0.5 sm:p-1 rounded hover:bg-white/10 text-amber-300 hover:text-amber-200 transition-all cursor-pointer ml-0.5"
+            >
+              <ChevronUp className="w-3.5 h-3.5 text-amber-300 animate-bounce stroke-[3]" />
+            </button>
+          )}
         </div>
       </div>
 

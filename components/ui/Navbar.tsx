@@ -341,22 +341,22 @@ export default function Navbar() {
     </>
   );
 
-  // In Fullscreen Mode: Only a pulsing arrow button that exits fullscreen on click
+  // In Fullscreen Mode
   if (isFullscreen) {
+    // When in Pin Game or Quiz Test, the exit arrow is placed directly on the right side of the question card
+    if (activeTab === 'pin_game' || activeTab === 'quiz_test') {
+      return null;
+    }
+
+    // In other modes (e.g. Map Explore, Flashcards), show clean pulsing arrow at top right without outer circle ring
     return (
-      <div className="fixed top-2.5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto select-none">
+      <div className="fixed top-2.5 right-3.5 z-50 pointer-events-auto select-none">
         <button
           onClick={toggleFullscreen}
           title="Tam Ekrandan Çık"
-          className="group relative flex items-center justify-center p-2 rounded-full bg-[#09090b]/90 backdrop-blur-2xl border-2 border-amber-400 text-amber-300 shadow-2xl shadow-amber-500/50 hover:scale-110 active:scale-95 transition-all cursor-pointer ring-4 ring-amber-400/30"
+          className="p-1.5 text-amber-400 hover:text-amber-300 hover:bg-white/10 rounded-xl transition-all cursor-pointer active:scale-95 flex items-center justify-center bg-[#09090b]/80 backdrop-blur-md border border-amber-400/50 shadow-lg"
         >
-          {/* Outer glowing pulsing ring */}
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-50 pointer-events-none" />
-
-          {/* Pulsing & Bouncing Arrow Icon */}
-          <div className="relative flex items-center justify-center w-7 h-7 bg-amber-500/20 rounded-full border border-amber-400/60">
-            <ChevronUp className="w-5 h-5 text-amber-300 animate-bounce stroke-[3]" />
-          </div>
+          <ChevronUp className="w-5 h-5 text-amber-300 animate-bounce stroke-[2.5]" />
         </button>
       </div>
     );
