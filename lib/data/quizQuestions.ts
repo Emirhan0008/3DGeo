@@ -5,7 +5,7 @@ export interface PinGameQuestion {
   title: string;
   questionText: string;
   category: 'Dağlar' | 'Akarsular' | 'Göller' | 'Sınır Kapıları' | 'Geçitler' | 'Platolar & Ovalar' | 'Madenler' | 'Karstik & Kıyı';
-  region?: 'Marmara' | 'Ege' | 'Akdeniz' | 'İç Anadolu' | 'Karadeniz' | 'Doğu Anadolu' | 'Güneydoğu Anadolu';
+  region?: 'Marmara' | 'Ege' | 'Akdeniz' | 'İç Anadolu' | 'Karadeniz' | 'Doğu Anadolu' | 'Güneydoğu Anadolu' | 'Genel' | string;
   targetFeatureId: string;
   targetCoords: [number, number]; // [lng, lat]
   hint: string;
@@ -16,7 +16,7 @@ export interface PinGameQuestion {
 export interface MultipleChoiceQuestion {
   id: string;
   category: string;
-  region?: 'Marmara' | 'Ege' | 'Akdeniz' | 'İç Anadolu' | 'Karadeniz' | 'Doğu Anadolu' | 'Güneydoğu Anadolu';
+  region?: 'Marmara' | 'Ege' | 'Akdeniz' | 'İç Anadolu' | 'Karadeniz' | 'Doğu Anadolu' | 'Güneydoğu Anadolu' | 'Genel' | string;
   questionText: string;
   options: string[];
   correctIndex: number;
@@ -1319,6 +1319,688 @@ export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
     targetCoords: [31.530, 39.450],
     explanation: 'Toryum rezervinde Türkiye dünyada 2. sıradadır. Başlıca rezerv Eskişehir Beylikova\'dadır.',
     osymTip: 'Toryum = Eskişehir Sivrihisar Beylikova (Dünyada 2.yiz).'
+  },
+  {
+    id: 'mc-49',
+    category: 'Platolar & Ovalar',
+    region: 'Akdeniz',
+    questionText: 'Karstik kalker yapısı sebebiyle yerleşim ve tarımın çok kısıtlı olduğu, kıl keçisi yetiştiriciliğinin yaygın yapıldığı Akdeniz platosu hangisidir?',
+    options: ['Teke ve Taşeli Platoları', 'Haymana Platosu', 'Bozok Platosu', 'Çatalca Platosu', 'Yazılıkaya Platosu'],
+    correctIndex: 0,
+    targetCoords: [32.900, 36.500],
+    explanation: 'Teke ve Taşeli Platoları karstik (kalkerli) yapılıdır, su tutma kapasitesi düşüktür ve kıl keçisi yetiştirilir.',
+    osymTip: 'Karstik Plato = Teke & Taşeli (Kıl keçisi ve seyrek nüfus).'
+  },
+  {
+    id: 'mc-50',
+    category: 'Platolar & Ovalar',
+    region: 'Doğu Anadolu',
+    questionText: 'Lav örtüsüyle kaplı olan, zengin çayır bitki örtüsü ve Çernezyom (Kara Toprak) varlığı sayesinde BÜYÜKBAŞ MERA HAYVANCILIĞININ merkezi olan plato hangisidir?',
+    options: ['Erzurum - Kars - Ardahan Platosu', 'Cihanbeyli Platosu', 'Şanlıurfa Platosu', 'Obruk Platosu', 'Gaziantep Platosu'],
+    correctIndex: 0,
+    targetCoords: [43.100, 40.600],
+    explanation: 'Erzurum-Kars Platosu volkanik lav platosudur. Yaz yağışları, Alpin çayırlar, Çernezyom toprak ve büyükbaş mera hayvancılığı karakteristiktir.',
+    osymTip: 'Volkanik Plato + Çernezyom + Yaz Yağışı + Büyükbaş = Erzurum-Kars.'
+  },
+  {
+    id: 'mc-51',
+    category: 'Platolar & Ovalar',
+    region: 'Marmara',
+    questionText: 'Aşınım (Peneplen) platosu özelliğinde olup Türkiye\'nin sanayi, nüfus, ticaret ve enerji tüketimi en yüksek platosu hangisidir?',
+    options: ['Çatalca - Kocaeli Platosu', 'Haymana Platosu', 'Uzunyayla Platosu', 'Bozok Platosu', 'Teke Platosu'],
+    correctIndex: 0,
+    targetCoords: [29.100, 41.000],
+    explanation: 'Çatalca-Kocaeli Platosu aşınım platosudur. Nüfus yoğunluğu ve sanayi faaliyetleri en yüksektir.',
+    osymTip: 'Aşınım Platosu = Çatalca-Kocaeli (En yoğun nüfus ve sanayi).'
+  },
+  {
+    id: 'mc-52',
+    category: 'Ovalar',
+    region: 'Akdeniz',
+    questionText: 'Türkiye\'nin Akdeniz Bölgesi\'ndeki karstik kökenli polye ovalarını kodlayan "TAKKEM" kısaltmasındaki ovalardan hangisi yer almaz?',
+    options: ['Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla', 'Çarşamba Ovası', 'Elmalı Ovası', 'Kestel Ovası', 'Acıpayam Ovası'],
+    correctIndex: 1,
+    targetCoords: [29.920, 36.730],
+    explanation: 'TAKKEM: Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla ovaları Karstik (Polye) ovalardır. Çarşamba ise Karadeniz\'de bir delta ovasıdır.',
+    osymTip: 'Karstik Polye Ovaları = TAKKEM (Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla).'
+  },
+  {
+    id: 'mc-53',
+    category: 'Geçitler',
+    region: 'Karadeniz',
+    questionText: 'Trabzon Limanı\'nı Gümüşhane - Bayburt üzerinden Erzurum ve İran Transit Ticaret Yolu\'na bağlayan tarihi ve stratejik geçit hangisidir?',
+    options: ['Zigana (Kalkanlı) ve Kop Geçitleri', 'Gülek Boğazı', 'Belen Geçidi', 'Sertavul Geçidi', 'Çubuk Boğazı'],
+    correctIndex: 0,
+    targetCoords: [39.420, 40.630],
+    explanation: 'Zigana ve Kop Geçitleri Doğu Karadeniz\'i (Trabzon) Doğu Anadolu\'ya ve İran transit yoluna bağlar.',
+    osymTip: 'Trabzon - Gümüşhane - Erzurum = Zigana ve Kop Geçitleri.'
+  },
+  {
+    id: 'mc-54',
+    category: 'Geçitler',
+    region: 'Akdeniz',
+    questionText: 'İç Anadolu\'yu (Konya/Niğde) Akdeniz\'e (Adana/Çukurova) bağlayan, Toroslar üzerindeki en önemli tarihi boğaz geçit hangisidir?',
+    options: ['Gülek Boğazı', 'Sertavul Geçidi', 'Belen Geçidi', 'Ilgaz Geçidi', 'Cankurtaran Geçidi'],
+    correctIndex: 0,
+    targetCoords: [34.780, 37.200],
+    explanation: 'Gülek Boğazı İç Anadolu ile Çukurova (Adana) arasındaki ana ulaşım arteri ve tarihi kapıdır.',
+    osymTip: 'İç Anadolu - Çukurova = Gülek Boğazı.'
+  },
+  {
+    id: 'mc-55',
+    category: 'Geçitler',
+    region: 'Akdeniz',
+    questionText: 'İç Anadolu\'yu (Karaman/Konya) Akdeniz\'de Mersin Silifke Limanı\'na bağlayan Toros geçidi hangisidir?',
+    options: ['Sertavul Geçidi', 'Gülek Boğazı', 'Çubuk Boğazı', 'Belen Geçidi', 'Zigana Geçidi'],
+    correctIndex: 0,
+    targetCoords: [33.250, 36.900],
+    explanation: 'Sertavul Geçidi Karaman ile Mersin/Silifke arasını birbirine bağlar.',
+    osymTip: 'Karaman - Silifke/Mersin = Sertavul Geçidi.'
+  },
+  {
+    id: 'mc-56',
+    category: 'Geçitler',
+    region: 'Akdeniz',
+    questionText: 'İskenderun Demir-Çelik Limanı ile Amik Ovası ve Hatay\'ı birbirine bağlayan Amanos (Nur) Dağları geçidi hangisidir?',
+    options: ['Belen Geçidi', 'Gülek Boğazı', 'Çubuk Boğazı', 'Ilgaz Geçidi', 'Ovit Tüneli'],
+    correctIndex: 0,
+    targetCoords: [36.200, 36.500],
+    explanation: 'Belen Geçidi Amanos Dağları üzerinde İskenderun ile Hatay/Amik arasını bağlar.',
+    osymTip: 'İskenderun - Antakya = Belen Geçidi.'
+  },
+  {
+    id: 'mc-57',
+    category: 'Geçitler',
+    region: 'Karadeniz',
+    questionText: 'Rize İkizdere ile Erzurum İspir arasında yer alan ve Türkiye\'nin en uzun çift tüplü karayolu tünellerinden biri olan tünel hangisidir?',
+    options: ['Ovit Tüneli', 'Ilgaz 15 Temmuz Tüneli', 'Avrasya Tüneli', 'Sabuncubeli Tüneli', 'Nefise Akçelik Tüneli'],
+    correctIndex: 0,
+    targetCoords: [40.780, 40.620],
+    explanation: 'Ovit Tüneli (14 km) Rize ile Erzurum arasındaki kış kapanmalarını önleyen devasa projedir.',
+    osymTip: 'Rize - Erzurum = Ovit Tüneli.'
+  },
+  {
+    id: 'mc-58',
+    category: 'Rüzgarlar & İklim',
+    region: 'Genel',
+    questionText: 'Türkiye\'yi etkileyen yerel rüzgarların saat yönündeki kodlaması olan "KAYIP SAKAL"da kuzeydoğudan esen soğuk rüzgar hangisidir?',
+    options: ['Poyraz', 'Karayel', 'Yıldız', 'Samyeli (Keşişleme)', 'Lodos'],
+    correctIndex: 0,
+    targetCoords: [29.000, 41.000],
+    explanation: 'KAYIP SAKAL: Karayel (KB), Yıldız (K), Poyraz (KD), Samyeli/Keşişleme (GD), Kıble (G), Lodos (GB).',
+    osymTip: 'KAYIP SAKAL = Karayel, Yıldız, Poyraz (Kuzeyden Soğuk) / Samyeli, Kıble, Lodos (Güneyden Sıcak).'
+  },
+  {
+    id: 'mc-59',
+    category: 'Rüzgarlar & İklim',
+    region: 'Karadeniz',
+    questionText: 'Dağ yamacından aşağıya doğru alçalırken her 100 metrede 1°C ısınan, Doğu Karadeniz Rize\'de turunçgil ve Artvin Yusufeli\'de zeytin yetişmesini sağlayan mikroklima rüzgarı hangisidir?',
+    options: ['Föhn (Fön) Rüzgarı', 'Lodos', 'Etezyen', 'Bora', 'Krivetz'],
+    correctIndex: 0,
+    targetCoords: [40.520, 41.020],
+    explanation: 'Fön rüzgarları alçalan havanın sürtünmeyle her 100 m\'de 1°C ısınması sonucu oluşur ve mikroklima cepleri yaratır.',
+    osymTip: 'Rize\'de turunçgil, Iğdır ve Yusufeli\'de zeytin = Fön Rüzgarı & Mikroklima.'
+  },
+  {
+    id: 'mc-60',
+    category: 'Topraklar',
+    region: 'Doğu Anadolu',
+    questionText: 'Organik madde (humus) bakımından en zengin olmasına ve "Kara Toprak" olarak bilinmesine rağmen, yaz kuraklığı ve iklim soğukluğu nedeniyle tarımda kısıtlı kullanılan zonal toprak türü hangisidir?',
+    options: ['Çernezyom Toprakları', 'Terra Rossa', 'Podzol', 'Kahverengi Bozkır', 'Laterit'],
+    correctIndex: 0,
+    targetCoords: [43.100, 40.600],
+    explanation: 'Çernezyom dünyanın en verimli toprağıdır ancak Erzurum-Kars\'ta iklim sertliğinden ötürü büyükbaş mera alanı olarak kullanılır.',
+    osymTip: 'En verimli Zonal Toprak = Çernezyom (Erzurum-Kars).'
+  },
+  {
+    id: 'mc-61',
+    category: 'Topraklar',
+    region: 'Akdeniz',
+    questionText: 'Kalkerli (kireçtaşı) araziler üzerinde kimyasal çözünmeyle oluşan ve bünyesindeki demir oksit nedeniyle kırmızı renkli olan Akdeniz iklim toprağı hangisidir?',
+    options: ['Terra Rossa (Kırmızı Akdeniz Toprağı)', 'Podzol', 'Çernezyom', 'Regosol', 'Rendzina'],
+    correctIndex: 0,
+    targetCoords: [30.700, 36.900],
+    explanation: 'Terra Rossa kalker arazideki demir oksit zenginliğiyle kırmızı renk alır. Akdeniz ikliminin karakteristik toprağıdır.',
+    osymTip: 'Kırmızı renk + Kalker + Akdeniz = Terra Rossa.'
+  },
+  {
+    id: 'mc-62',
+    category: 'Topraklar',
+    region: 'Karadeniz',
+    questionText: 'Batı Karadeniz\'de (Bolu, Kastamonu, Zonguldak çevresinde) soğuk ve nemli iğne yapraklı orman sahalarında yıkanmış, kül renkli olan toprak tipi hangisidir?',
+    options: ['Podzol Toprakları', 'Kahverengi Orman', 'Terra Rossa', 'Vertisol', 'Solonçak'],
+    correctIndex: 0,
+    targetCoords: [32.500, 41.400],
+    explanation: 'Podzol, soğuk nemli iğne yapraklı tayga/orman altı kül renkli, aşırı yıkanmış topraktır.',
+    osymTip: 'Batı Karadeniz + Soğuk Nemli İğne Yapraklı = Podzol.'
+  },
+  {
+    id: 'mc-63',
+    category: 'Topraklar',
+    region: 'Marmara',
+    questionText: 'Killi kireçli kireç taşlı ana materyal üzerinde oluşan, kurak dönemde çatlayıp taş doğuran / dönen toprak olarak bilinen ve Trakya Ergene ile Muş Ovası\'nda yaygın intrazonal toprak hangisidir?',
+    options: ['Vertisol (Dönen Toprak / Taş Doğuran)', 'Rendzina', 'Solonçak', 'Halomorfik', 'Hidromorfik'],
+    correctIndex: 0,
+    targetCoords: [27.500, 41.300],
+    explanation: 'Vertisoller killi yapıdadır, kuruyunca yarılır, ıslanınca şişer. Ayçiçeği tarımında (Ergene Havzası) yaygındır.',
+    osymTip: 'Dönen Toprak / Taş Doğuran / Kepir / Ayçiçeği Toprağı = Vertisol (Ergene).'
+  },
+  {
+    id: 'mc-64',
+    category: 'Nüfus & Yerleşme',
+    region: 'Ege',
+    questionText: 'Ege Bölgesi\'nde yer almasına ve kıyıda bulunmasına rağmen dağlık-engebeli arazi yapısı ve ana ulaşım hatlarına sapa kalması sebebiyle SEYREK NÜFUSLU olan yöre hangisidir?',
+    options: ['Menteşe Yöresi (Muğla)', 'Gediz Havzası', 'Büyük Menderes Ovası', 'İzmir Körfezi', 'Bakırçay Havzası'],
+    correctIndex: 0,
+    targetCoords: [28.360, 37.210],
+    explanation: 'Muğla Menteşe Yöresi bol yağış almasına rağmen aşırı engebeli olduğundan ve ana yollardan sapa kaldığından tenhadır.',
+    osymTip: 'Ege\'de tenhadır: Menteşe Yöresi (Engebe ve Ulaşım sapalığı).'
+  },
+  {
+    id: 'mc-65',
+    category: 'Nüfus & Yerleşme',
+    region: 'Karadeniz',
+    questionText: 'Karadeniz\'de doğal bir limana sahip olmasına rağmen, arkasındaki Küre Dağları\'nın ulaşımı engellemesi ve demiryolu bağlantısı olmaması (hinterlandı dar) nedeniyle gelişemeyen ilimiz hangisidir?',
+    options: ['Sinop', 'Samsun', 'Trabzon', 'Zonguldak', 'Ordu'],
+    correctIndex: 0,
+    targetCoords: [35.150, 42.020],
+    explanation: 'Sinop tek doğal limandır ancak hinterlandı (ard bölgesi) dağlar yüzünden dar olduğu için gelişememiştir.',
+    osymTip: 'Doğal liman ama dar hinterland = Sinop.'
+  },
+  {
+    id: 'mc-66',
+    category: 'Nüfus & Yerleşme',
+    region: 'Akdeniz',
+    questionText: 'Akdeniz\'de kalkerli karstik arazisi, su tutmayan zemini ve tarım arazilerinin darlığı sebebiyle Türkiye\'nin EN SEYREK NÜFUSLU kıyı platoları hangileridir?',
+    options: ['Teke ve Taşeli Platoları', 'Çukurova', 'Antalya Ovası', 'Asi Deltası', 'Bursa Ovası'],
+    correctIndex: 0,
+    targetCoords: [32.800, 36.600],
+    explanation: 'Teke ve Taşeli platoları karstik erimeler, engebe ve zemin geçirgenliği yüzünden çok seyrek nüfusludur.',
+    osymTip: 'Akdeniz\'in en tenha yerleri = Teke ve Taşeli Platoları.'
+  },
+  {
+    id: 'mc-67',
+    category: 'Tarım & Hayvancılık',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Güneydoğu Anadolu Projesi (GAP) ile sulamanın yaygınlaşması sonucu Türkiye PAMUK ÜRETİMİNİN yarıdan fazlasını tek başına karşılayan ilimiz hangisidir?',
+    options: ['Şanlıurfa', 'Adana', 'Aydın', 'Diyarbakır', 'Hatay'],
+    correctIndex: 0,
+    targetCoords: [38.790, 37.160],
+    explanation: 'GAP ile Şanlıurfa, Çukurova\'yı geçerek Türkiye pamuk üretiminde açık ara 1. sıraya yükselmiştir.',
+    osymTip: 'Pamuk üretiminde 1. il = Şanlıurfa (GAP sulamasıyla).'
+  },
+  {
+    id: 'mc-68',
+    category: 'Tarım & Hayvancılık',
+    region: 'İç Anadolu',
+    questionText: 'Türkiye\'de bozkır (step) bitki örtüsünün geniş yer kaplaması, düzlük araziler ve küçükbaş hayvancılık kültürünün sonucu olarak EN ÇOK YETİŞTİRİLEN KOYUN IRKI hangisidir?',
+    options: ['Karaman Koyunu', 'Merinos', 'Kıvırcık', 'Sakız', 'Dağlıç'],
+    correctIndex: 0,
+    targetCoords: [33.200, 38.000],
+    explanation: 'Karaman koyunu (Akkaraman ve Morkaraman) kurak iklime ve bozkır otlaklarına en dayanıklı ırk olup Türkiye genelinde 1. sıradadır.',
+    osymTip: 'En yaygın koyun ırkı: Karaman Koyunu (Bozkır uyumu).'
+  },
+  {
+    id: 'mc-69',
+    category: 'Tarım & Hayvancılık',
+    region: 'İç Anadolu',
+    questionText: 'Tiftik (Angora) Keçisi yetiştiriciliğinde tescilli ve tarihi olarak en önemli merkezimiz olan ilimiz hangisidir?',
+    options: ['Ankara', 'Mersin', 'Antalya', 'Siirt', 'Hakkari'],
+    correctIndex: 0,
+    targetCoords: [32.850, 39.930],
+    explanation: 'Ankara Keçisi (Tiftik Keçisi) yünü için yetiştirilir ve başkenti Ankara\'dır.',
+    osymTip: 'Tiftik Keçisi = Ankara / Kıl Keçisi = Akdeniz Torosları.'
+  },
+  {
+    id: 'mc-70',
+    category: 'Tarım & Hayvancılık',
+    region: 'Ege',
+    questionText: 'Dünya kuru incir ve kuru zeytin ihracatında öncü olan, jeotermal kaynakları ve Büyük Menderes grabenindeki verimli alüvyonlarıyla bilinen ilimiz hangisidir?',
+    options: ['Aydın', 'Manisa', 'İzmir', 'Denizli', 'Muğla'],
+    correctIndex: 0,
+    targetCoords: [27.840, 37.850],
+    explanation: 'Aydın, incir ve kestane üretiminde 1. sıradadır. Zeytinyağı ve jeotermalde de öncüdür.',
+    osymTip: 'İncir + Kestane + Jeotermal = Aydın.'
+  },
+  {
+    id: 'mc-71',
+    category: 'Madenler',
+    region: 'Ege',
+    questionText: 'Alüminyumun hammaddesi olan ve Antalya Akseki ile Konya Seydişehir tesislerinde işlenen maden hangisidir?',
+    options: ['Boksit (Alüminyum)', 'Bakır', 'Krom', 'Manganez', 'Kurşun'],
+    correctIndex: 0,
+    targetCoords: [31.850, 37.420],
+    explanation: 'Boksit alüminyum cevheridir. Seydişehir Alüminyum Tesisleri ve Akseki yatakları en önemlisidir.',
+    osymTip: 'Boksit = Alüminyum = Konya Seydişehir & Antalya Akseki.'
+  },
+  {
+    id: 'mc-72',
+    category: 'Madenler',
+    region: 'Doğu Anadolu',
+    questionText: 'Elazığ Maden, Rize Çayeli, Artvin Murgul ve Kastamonu Küre\'de çıkarılan, iletkenliği yüksek stratejik maden hangisidir?',
+    options: ['Bakır', 'Demir', 'Krom', 'Çinko', 'Kükürt'],
+    correctIndex: 0,
+    targetCoords: [39.220, 38.670],
+    explanation: 'KADER kodlaması: Kastamonu Küre, Artvin Murgul, Diyarbakır Ergani, Elazığ Maden, Rize Çayeli başlıca Bakır yataklarıdır.',
+    osymTip: 'Bakır = KADER (Küre, Artvin, Diyarbakır, Elazığ, Rize).'
+  },
+  {
+    id: 'mc-73',
+    category: 'Madenler',
+    region: 'Doğu Anadolu',
+    questionText: 'Paslanmaz çelik sanayisinde kullanılan, Elazığ Guleman ve Muğla Fethiye-Köyceğiz\'de çıkarılıp Antalya ve Elazığ Ferrokrom tesislerinde işlenen maden hangisidir?',
+    options: ['Krom', 'Manganez', 'Volfram', 'Nikel', 'Titanyum'],
+    correctIndex: 0,
+    targetCoords: [39.900, 38.500],
+    explanation: 'Krom sert ve paslanmaz çelik yapımında kullanılır. Elazığ Guleman ve Fethiye en büyük çıkarım alanlarıdır.',
+    osymTip: 'Krom = Paslanmaz Çelik = Elazığ Guleman & Ferrokrom Tesisleri.'
+  },
+  {
+    id: 'mc-74',
+    category: 'Madenler',
+    region: 'Marmara',
+    questionText: 'Dünya rezervlerinin yaklaşık %73\'üne sahip olduğumuz, Balıkesir (Bigadiç, Susurluk), Bursa (Mustafakemalpaşa), Kütahya (Emet) ve Eskişehir (Kırka)\'da çıkarılan stratejik mineral hangisidir?',
+    options: ['Bor Mineralleri', 'Toryum', 'Mermer', 'Asbest', 'Fosfat'],
+    correctIndex: 0,
+    targetCoords: [28.150, 39.400],
+    explanation: 'Bor rezervlerinde Türkiye dünya 1.sidir. Bandırma ve Kırka\'da borik asit tesisleri bulunur.',
+    osymTip: 'Dünya 1.si olduğumuz maden = BOR (Balıkesir, Kütahya, Bursa, Eskişehir).'
+  },
+  {
+    id: 'mc-75',
+    category: 'Madenler',
+    region: 'İç Anadolu',
+    questionText: 'Pipo, ağızlık ve süs eşyası yapımında kullanılan ve yalnızca Eskişehir ilimizde çıkarılan "Beyaz Altın" lakaplı mineral hangisidir?',
+    options: ['Lületaşı', 'Oltu Taşı', 'Zultanit', 'Obsidyen', 'Ametist'],
+    correctIndex: 0,
+    targetCoords: [30.520, 39.770],
+    explanation: 'Lületaşı Eskişehir\'e özgü, hafif ve gözenekli beyaz süs taşıdır.',
+    osymTip: 'Lületaşı = Eskişehir / Oltu Taşı = Erzurum.'
+  },
+  {
+    id: 'mc-76',
+    category: 'Madenler',
+    region: 'Doğu Anadolu',
+    questionText: 'Siyah kehribar olarak bilinen, tespih ve takı üretiminde kullanılan ve Erzurum\'un aynı adlı ilçesinde çıkarılan süs taşı hangisidir?',
+    options: ['Oltu Taşı', 'Lületaşı', 'Kuvars', 'Akik', 'Kalsit'],
+    correctIndex: 0,
+    targetCoords: [41.990, 40.550],
+    explanation: 'Oltu Taşı Erzurum Oltu ilçesinde çıkarılan organik kökenli fosil linyit türevi taştır.',
+    osymTip: 'Oltu Taşı = Erzurum.'
+  },
+  {
+    id: 'mc-77',
+    category: 'Enerji Kaynakları',
+    region: 'Ege',
+    questionText: 'Türkiye\'nin İLK jeotermal elektrik santrali hangi sahada kurulmuştur?',
+    options: ['Denizli Sarayköy', 'Aydın Germencik', 'Çanakkale Tuzla', 'Manisa Alaşehir', 'Afyon Sandıklı'],
+    correctIndex: 0,
+    targetCoords: [28.920, 37.920],
+    explanation: 'Denizli Sarayköy Jeotermal Santrali Türkiye\'nin ilk jeotermal elektrik üretim tesisidir.',
+    osymTip: 'İlk Jeotermal Santral = Denizli Sarayköy.'
+  },
+  {
+    id: 'mc-78',
+    category: 'Enerji Kaynakları',
+    region: 'Ege',
+    questionText: 'Türkiye\'nin İLK rüzgar enerjisi santrali (RES) 1998 yılında hangi merkezde işletmeye açılmıştır?',
+    options: ['İzmir Çeşme - Alaçatı', 'Çanakkale Bozcaada', 'Balıkesir Bandırma', 'Manisa Soma', 'Hatay Belen'],
+    correctIndex: 0,
+    targetCoords: [26.370, 38.280],
+    explanation: 'İlk rüzgar santrali İzmir Çeşme Alaçatı beldesinde kurulmuştur.',
+    osymTip: 'İlk Rüzgar Santrali (RES) = İzmir Alaçatı.'
+  },
+  {
+    id: 'mc-79',
+    category: 'Enerji Kaynakları',
+    region: 'İç Anadolu',
+    questionText: 'Avrupa\'nın ve Türkiye\'nin en büyük tek parça Güneş Enerjisi Santrali (GES) sahası hangi ilçemizde kurulmuştur?',
+    options: ['Konya Karapınar', 'Şanlıurfa Viranşehir', 'Mersin Mut', 'Ankara Polatlı', 'Kayseri İncesu'],
+    correctIndex: 0,
+    targetCoords: [33.550, 37.710],
+    explanation: 'Konya Karapınar Güneş Enerjisi İhtisas Endüstri Bölgesi Türkiye\'nin en devasa GES projesidir.',
+    osymTip: 'En büyük Güneş Santrali = Konya Karapınar GES.'
+  },
+  {
+    id: 'mc-80',
+    category: 'Enerji Kaynakları',
+    region: 'Karadeniz',
+    questionText: 'Fatih Sondaj Gemisi tarafından Karadeniz\'de keşfedilen ve Türkiye\'nin en büyük doğalgaz rezervi olan gaz sahası hangisidir?',
+    options: ['Sakarya Gaz Sahası (Tuna-1)', 'Hamitabat', 'Çamurlu', 'Akçakoca', 'Batı Raman'],
+    correctIndex: 0,
+    targetCoords: [31.200, 42.800],
+    explanation: 'Sakarya Gaz Sahası Karadeniz açıklarında Türkiye tarihinin en büyük hidrokarbon keşfidir.',
+    osymTip: 'Karadeniz Doğalgaz Keşfi = Sakarya Gaz Sahası (Filyos Limanı üzerinden sisteme bağlanmıştır).'
+  },
+  {
+    id: 'mc-81',
+    category: 'Enerji Kaynakları',
+    region: 'Güneydoğu Anadolu',
+    questionText: '1940 yılında Türkiye\'de İLK petrolün bulunduğu ve ilk petrol rafinerisinin açıldığı tarihi dağ ve merkez hangisidir?',
+    options: ['Batman Raman Dağı', 'Adıyaman Kahta', 'Şırnak Gabar Dağı', 'Siirt Kurtalan', 'Mardin Nusaybin'],
+    correctIndex: 0,
+    targetCoords: [41.250, 37.800],
+    explanation: 'Türkiye\'de ilk petrol Batman Raman Dağı\'nda bulunmuş ve Batman Rafinerisi kurulmuştur.',
+    osymTip: 'İlk Petrol = Batman Raman Dağı.'
+  },
+  {
+    id: 'mc-82',
+    category: 'Sanayi',
+    region: 'Karadeniz',
+    questionText: 'Karabük ve İskenderun Demir-Çelik Fabrikaları kurulurken sırasıyla hangi temel faktörler belirleyici olmuştur?',
+    options: ['Karabük: Enerji Kaynağına Yakınlık (Taşkömürü) / İskenderun: Ulaşım ve Liman Kolaylığı', 'Hammaddeye Yakınlık / Pazar', 'Pazar / Sermaye', 'İklim / Su', 'İşgücü / Maden Yatağı'],
+    correctIndex: 0,
+    targetCoords: [32.620, 41.200],
+    explanation: 'Karabük ve Ereğli taşkömürüne (enerji kaynağına) yakınlık; İskenderun ise liman ve deniz ulaşımı sebebiyle seçilmiştir.',
+    osymTip: 'Karabük = Taşkömürüne Yakınlık / İskenderun = Ulaşım ve Liman.'
+  },
+  {
+    id: 'mc-83',
+    category: 'Sanayi',
+    region: 'Karadeniz',
+    questionText: 'Türkiye\'de Kağıt Sanayisi tesislerinin (Giresun Aksu, Zonguldak Çaycuma, Kastamonu Taşköprü, Muğla Dalaman) genelde kıyı kesimlerde toplanmasının temel nedeni nedir?',
+    options: ['Hammaddeye (Orman Varlığına) Yakınlık', 'Pazar Kolaylığı', 'Nitelikli İş Gücü', 'Demiryolu Ağı', 'Düşük Elektrik Maliyeti'],
+    correctIndex: 0,
+    targetCoords: [38.450, 40.900],
+    explanation: 'Kağıt fabrikaları Türkiye ormanlarının %27\'sini barındıran Karadeniz ve Akdeniz ormanlarına (hammaddeye) yakın kurulmuştur.',
+    osymTip: 'Kağıt Fabrikaları = Hammaddeye (Ormana) Yakınlık.'
+  },
+  {
+    id: 'mc-84',
+    category: 'Turizm & UNESCO',
+    region: 'Doğu Anadolu',
+    questionText: 'Ani Tarihi Arkeolojik Alanı (1001 Kiliseli Şehir) hangi serhat şehrimiz sınırları içinde yer almaktadır?',
+    options: ['Kars', 'Ardahan', 'Iğdır', 'Erzurum', 'Ağrı'],
+    correctIndex: 0,
+    targetCoords: [43.570, 40.510],
+    explanation: 'Ani Harabeleri Kars ili Arpaçay boyunda yer alan UNESCO Dünya Mirası arkeolojik kentidir.',
+    osymTip: 'Ani Harabeleri = Kars.'
+  },
+  {
+    id: 'mc-85',
+    category: 'Turizm & UNESCO',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Tarihin sıfır noktası olarak adlandırılan, yaklaşık 12.000 yıllık T biçimli dikilitaşlarıyla bilinen UNESCO Dünya Mirası arkeolojik alan hangisidir?',
+    options: ['Göbeklitepe (Şanlıurfa)', 'Çatalhöyük (Konya)', 'Alacahöyük (Çorum)', 'Karain (Antalya)', 'Yassıhöyük (Ankara)'],
+    correctIndex: 0,
+    targetCoords: [38.920, 37.220],
+    explanation: 'Göbeklitepe Şanlıurfa\'da insanlık tarihinin bilinen en eski anıtsal kült merkezidir.',
+    osymTip: 'Tarihin sıfır noktası = Şanlıurfa Göbeklitepe.'
+  },
+  {
+    id: 'mc-86',
+    category: 'Bölgesel Kalkınma Projeleri',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Fırat ve Dicle nehirleri üzerinde barajlar, hidroelektrik santralleri ve Şanlıurfa Sulama Tünelleri inşa ederek bölgeyi tarım ve sanayi merkezine dönüştüren en kapsamlı bölgesel kalkınma projemiz hangisidir?',
+    options: ['GAP (Güneydoğu Anadolu Projesi)', 'DAP (Doğu Anadolu Projesi)', 'DOKAP (Doğu Karadeniz Projesi)', 'KOP (Konya Ovası Projesi)', 'ZBK (Zonguldak Bartın Karabük)'],
+    correctIndex: 0,
+    targetCoords: [38.500, 37.500],
+    explanation: 'GAP Türkiye\'nin en büyük entegre bölgesel kalkınma projesidir. Atatürk Barajı ve sulama kanalları çekirdeğidir.',
+    osymTip: 'En büyük kalkınma projesi: GAP (Güneydoğu Anadolu Projesi).'
+  },
+  {
+    id: 'mc-87',
+    category: 'Bölgesel Kalkınma Projeleri',
+    region: 'İç Anadolu',
+    questionText: 'Göksu Nehri\'nin sularını Bağbaşı Barajı ve Mavi Tünel vasıtasıyla Konya Kapalı Havzası\'na aktararak yeraltı suyunun çekilmesini ve obruk oluşumunu azaltmayı hedefleyen proje hangisidir?',
+    options: ['KOP (Konya Ovası Projesi)', 'GAP', 'DAP', 'YHGP (Yeşilırmak Havzası Gelişim Projesi)', 'DOKAP'],
+    correctIndex: 0,
+    targetCoords: [32.500, 37.870],
+    explanation: 'KOP kapsamında Mavi Tünel ile Akdeniz\'e dökülen Göksu Nehri suları Konya Ovası\'na taşınmıştır.',
+    osymTip: 'Mavi Tünel + Göksu Nehri + Konya Havzası = KOP.'
+  },
+  {
+    id: 'mc-88',
+    category: 'Sınır Kapıları',
+    region: 'Doğu Anadolu',
+    questionText: 'Türkiye ile İran arasındaki EN İŞLEK ve en eski gümrük kapısı olup demiryolu hattı barındırmayan karayolu kapısı hangisidir?',
+    options: ['Gürbulak Sınır Kapısı (Ağrı Doğubayazıt)', 'Kapıköy Sınır Kapısı (Van)', 'Esendere Sınır Kapısı (Hakkari)', 'Dilucu Sınır Kapısı (Iğdır)', 'Sarp Sınır Kapısı (Artvin)'],
+    correctIndex: 0,
+    targetCoords: [44.400, 39.420],
+    explanation: 'Ağrı Gürbulak Türkiye-İran arasındaki en işlek ana transit sınır kapısıdır.',
+    osymTip: 'Türkiye - İran En İşlek Kapı: Gürbulak (Ağrı Doğubayazıt).'
+  },
+  {
+    id: 'mc-89',
+    category: 'Sınır Kapıları',
+    region: 'Doğu Anadolu',
+    questionText: 'Van Gölü üzerinden feribotla gelen vagonların İran demiryolu ağına bağlandığı DEMİRYOLU SINIR KAPIMIZ hangisidir?',
+    options: ['Kapıköy Sınır Kapısı (Van)', 'Gürbulak', 'Esendere', 'Nusbin', 'İslahiye'],
+    correctIndex: 0,
+    targetCoords: [44.380, 38.550],
+    explanation: 'Van Kapıköy Sınır Kapısı İran\'a demiryolu bağlantısı sağlayan kapımızdır.',
+    osymTip: 'İran ile Demiryolu Sınır Kapısı: Van Kapıköy.'
+  },
+  {
+    id: 'mc-90',
+    category: 'Sınır Kapıları',
+    region: 'Marmara',
+    questionText: 'Türkiye\'nin Avrupa\'ya (Bulgaristan) açılan ve yolcu ile TIR hacmi bakımından DÜNYANIN EN İŞLEK ikinci sınır kapısı olan kapımız hangisidir?',
+    options: ['Kapıkule Sınır Kapısı (Edirne)', 'Hamzabeyli Sınır Kapısı', 'İpsala Sınır Kapısı', 'Dereköy Sınır Kapısı', 'Pazarkule'],
+    correctIndex: 0,
+    targetCoords: [26.350, 41.710],
+    explanation: 'Kapıkule Sınır Kapısı Bulgaristan\'a açılan en yoğun gümrük kapımızdır (hem karayolu hem demiryolu vardır).',
+    osymTip: 'En işlek Avrupa kapımız: Kapıkule (Edirne).'
+  },
+  {
+    id: 'mc-91',
+    category: 'Sınır Kapıları',
+    region: 'Marmara',
+    questionText: 'Türkiye ile Yunanistan arasındaki İpsala Sınır Kapısı hangi akarsuyun deltasının ve köprüsünün yakınında yer alır?',
+    options: ['Meriç Nehri', 'Tunca Nehri', 'Arda Nehri', 'Ergene Nehri', 'Sakarya Nehri'],
+    correctIndex: 0,
+    targetCoords: [26.380, 40.920],
+    explanation: 'İpsala Sınır Kapısı Meriç Nehri üzerinden Yunanistan\'a açılan ana kapımızdır.',
+    osymTip: 'Yunanistan Sınır Kapısı = İpsala (Meriç Nehri).'
+  },
+  {
+    id: 'mc-92',
+    category: 'Akarsular',
+    region: 'Doğu Anadolu',
+    questionText: 'Erzurum Dumludağ\'dan doğan Karasu ile Bingöl\'den doğan Murat nehirlerinin birleşmesiyle oluşan ve Keban, Karakaya, Atatürk Barajları\'nı besleyen dev akarsu hangisidir?',
+    options: ['Fırat Nehri', 'Dicle Nehri', 'Aras Nehri', 'Kura Nehri', 'Çoruh Nehri'],
+    correctIndex: 0,
+    targetCoords: [38.500, 38.800],
+    explanation: 'Fırat Nehri Karasu ve Murat kollarının birleşmesiyle oluşur. Türkiye\'nin en yüksek hidroelektrik potansiyeline sahip nehridir.',
+    osymTip: 'Karasu + Murat = Fırat Nehri (Keban, Karakaya, Atatürk Barajları).'
+  },
+  {
+    id: 'mc-93',
+    category: 'Akarsular',
+    region: 'Doğu Anadolu',
+    questionText: 'Türkiye sınırlarından doğarak Hazar Denizi\'ne (kapalı havza) dökülen ve sınır çizen akarsularımız hangi seçenekte doğru verilmiştir?',
+    options: ['Aras ve Kura Nehirleri', 'Fırat ve Dicle', 'Çoruh ve Kelkit', 'Asi ve Seyhan', 'Meriç ve Tunca'],
+    correctIndex: 0,
+    targetCoords: [44.000, 40.000],
+    explanation: 'Aras ve Kura nehirleri Hazar Denizi kapalı havzasına dökülürler. Ermenistan ve Azerbaycan sınırlarını oluştururlar.',
+    osymTip: 'Hazar Denizi Kapalı Havzasına Dökülenler = Aras ve Kura.'
+  },
+  {
+    id: 'mc-94',
+    category: 'Göller',
+    region: 'Akdeniz',
+    questionText: 'Burdur Salda Gölü, beyaz magnezyum-hidromanyezit tortulları ve Mars yüzeyine benzer jeokimyasal yapısıyla bilinen hangi kökenli bir göldür?',
+    options: ['Tektonik ve Karstik Göl', 'Volkanik Krater Gölü', 'Buzul Sirk Gölü', 'Lagün (Kıyı Set)', 'Alüvyal Set'],
+    correctIndex: 0,
+    targetCoords: [29.680, 37.550],
+    explanation: 'Salda Gölü tektonik-karstik çanakta yer alan, hidromanyezit stromatolit yapılarıyla "Türkiye\'nin Maldivleri" sayılan derin bir göldür.',
+    osymTip: 'Salda Gölü = Tektonik-Karstik + Magnezit Beyaz Tortu (Burdur).'
+  },
+  {
+    id: 'mc-95',
+    category: 'Göller',
+    region: 'Karadeniz',
+    questionText: 'Tortum (Erzurum), Abant ve Yedigöller (Bolu), Sera (Trabzon), Zinav (Tokat) ve Boraboy (Amasya) gölleri hangi ortak oluşum tipine sahiptir?',
+    options: ['Heyelan Set Gölleri', 'Volkanik Set Gölleri', 'Alüvyal Set Gölleri', 'Karstik Göller', 'Kıyı Set Gölleri'],
+    correctIndex: 0,
+    targetCoords: [31.620, 40.600],
+    explanation: 'Karadeniz Bölgesi\'ndeki eğimli yamaçlar ve aşırı yağışlar heyelanları tetiklemiş, vadilerin önünün tıkanmasıyla Heyelan Set Gölleri oluşmuştur.',
+    osymTip: 'Heyelan Set Gölleri: Abant, Yedigöller, Tortum, Sera, Boraboy, Zinav.'
+  },
+  {
+    id: 'mc-96',
+    category: 'Göller',
+    region: 'Ege',
+    questionText: 'Muğla Köyceğiz Gölü, Aydın Bafa (Çamiçi) Gölü, Ankara Mogan ve Eymir Gölleri hangi oluşum türüne örnektir?',
+    options: ['Alüvyal Set Gölleri', 'Heyelan Set Gölleri', 'Kıyı Set Gölleri', 'Buzul Gölleri', 'Krater Gölleri'],
+    correctIndex: 0,
+    targetCoords: [28.680, 36.950],
+    explanation: 'Akarsuların taşıdığı alüvyonların vadi veya koy önünü kapatmasıyla Alüvyal Set Gölleri (Bafa, Köyceğiz, Mogan, Eymir, Marmara) oluşur.',
+    osymTip: 'Alüvyal Set Gölleri = Bafa (Çamiçi), Köyceğiz, Mogan, Eymir, Gölmarmara.'
+  },
+  {
+    id: 'mc-97',
+    category: 'Göller',
+    region: 'Marmara',
+    questionText: 'Büyükçekmece, Küçükçekmece, Terkos (Durusu) ve Akyayan gölleri hangi göl oluşum tipine örnektir?',
+    options: ['Kıyı Set Gölleri (Lagün / Denizkulağı)', 'Sirk Gölleri', 'Volkanik Kaldera', 'Polye Gölleri', 'Tektonik Göller'],
+    correctIndex: 0,
+    targetCoords: [28.580, 41.050],
+    explanation: 'Kıyı kordonlarının bir koyun önünü kapatmasıyla Lagün (Kıyı Set Gölü) oluşur. En tipikleri Terkos ve Çekmece gölleridir.',
+    osymTip: 'Kıyı Set Gölü (Lagün) = Terkos (Durusu), Büyükçekmece, Küçükçekmece.'
+  },
+  {
+    id: 'mc-98',
+    category: 'Göller',
+    region: 'Doğu Anadolu',
+    questionText: 'Van Gölü, Erçek, Nazik, Balık, Çıldır ve Haçlı gölleri hangi oluşum tipine örnektir?',
+    options: ['Volkanik Set Gölleri', 'Karstik Göller', 'Buzul Sirk Gölleri', 'Kıyı Set Gölleri', 'Heyelan Set Gölleri'],
+    correctIndex: 0,
+    targetCoords: [43.000, 38.600],
+    explanation: 'Nemrut Dağı ve çevresindeki volkanlardan çıkan lavların vadileri tıkamasıyla Doğu Anadolu\'da Volkanik Set Gölleri oluşmuştur.',
+    osymTip: 'Volkanik Set Gölleri = Van, Erçek, Nazik, Balık, Çıldır, Haçlı.'
+  },
+  {
+    id: 'mc-99',
+    category: 'Dağlar',
+    region: 'Ege',
+    questionText: 'Ege Bölgesi\'nde orojenez (dağ oluşumu) sırasında kırılma ile yükselen "HORST" dağları kuzeyden güneye doğru hangi sırada dizilir?',
+    options: ['Kaz Dağı, Madra Dağı, Yunt Dağları, Bozdağlar, Aydın Dağları, Menteşe Dağları', 'Aydın, Bozdağ, Yunt, Madra, Kaz', 'Bozdağ, Menteşe, Kaz, Madra, Yunt', 'Kaz, Bozdağ, Madra, Aydın, Yunt', 'Yunt, Kaz, Madra, Menteşe, Aydın'],
+    correctIndex: 0,
+    targetCoords: [27.000, 38.500],
+    explanation: 'Ege Horstları (Kazma Yutmuş Boz Ayı Menteşe): Kaz, Madra, Yunt, Bozdağlar, Aydın, Menteşe.',
+    osymTip: 'Ege Kırık Horst Dağları: Kaz -> Madra -> Yunt -> Bozdağlar -> Aydın -> Menteşe.'
+  },
+  {
+    id: 'mc-100',
+    category: 'Dağlar',
+    region: 'İç Anadolu',
+    questionText: 'İç Anadolu Bölgesi\'ndeki volkanik dağlar güneybatı-kuzeydoğu yönünde hangi hat üzerinde sıralanır?',
+    options: ['Karadağ, Karacadağ, Hasandağı, Melendiz Dağı, Erciyes Dağı', 'Erciyes, Tendürek, Süphan, Ağrı, Nemrut', 'Hasandağı, Kazdağı, Erciyes, Nemrut, Spil', 'Karadağ, Cilo, Süphan, Nemrut, Tendürek', 'Melendiz, Ilgaz, Canik, Köroğlu, Erciyes'],
+    correctIndex: 0,
+    targetCoords: [34.500, 38.300],
+    explanation: 'İç Anadolu Volkanları: Karadağ (Karaman), Karacadağ (Konya), Hasandağı (Aksaray), Melendiz (Niğde), Erciyes (Kayseri).',
+    osymTip: 'İç Anadolu Volkanları: Karadağ -> Karacadağ -> Hasandağı -> Melendiz -> Erciyes.'
+  },
+  {
+    id: 'mc-101',
+    category: 'Madenler',
+    region: 'Ege',
+    questionText: 'Türkiye\'nin bor mineralleri yatakları hangi merkezlerde yoğunlaşmıştır?',
+    options: ['Balıkesir (Bigadiç, Susurluk), Kütahya (Emet), Bursa (Mustafakemalpaşa), Eskişehir (Seyitgazi/Kırka)', 'Artvin (Murgul), Kastamonu (Küre), Elazığ (Maden)', 'Konya (Seydişehir), Antalya (Akseki)', 'Sivas (Divriği), Malatya (Hekimhan)', 'Batman (Raman), Adıyaman (Kahta)'],
+    correctIndex: 0,
+    targetCoords: [28.120, 39.400],
+    explanation: 'Türkiye dünya bor rezervlerinin %73\'üne sahiptir. Yataklar Bigadiç, Susurluk, Emet, Mustafakemalpaşa ve Kırka\'dadır.',
+    osymTip: 'Bor Yatakları = Bigadiç, Susurluk, Emet, Mustafakemalpaşa, Kırka (Seyitgazi).'
+  },
+  {
+    id: 'mc-102',
+    category: 'Madenler',
+    region: 'Akdeniz',
+    questionText: 'Alüminyumun hammaddesi olan boksit madeni ve bu madeni işleyen Türkiye\'nin tek alüminyum tesisi nerededir?',
+    options: ['Konya (Seydişehir) ve Antalya (Akseki)', 'Balıkesir (Bandırma)', 'Elazığ (Keban)', 'Muğla (Yatağan)', 'Zonguldak (Ereğli)'],
+    correctIndex: 0,
+    targetCoords: [31.880, 37.420],
+    explanation: 'Boksit yatakları Seydişehir (Konya) ve Akseki\'de (Antalya) bulunur; Seydişehir Entegre Alüminyum Tesisleri\'nde işlenir.',
+    osymTip: 'Boksit = Alüminyum Hammaddesi = Seydişehir & Akseki.'
+  },
+  {
+    id: 'mc-103',
+    category: 'Madenler',
+    region: 'Doğu Anadolu',
+    questionText: 'Paslanmaz çelik sanayisinin temel girdisi olan FERROKROM tesisleri hangi iki ilimizde bulunmaktadır?',
+    options: ['Elazığ ve Antalya', 'İzmir ve Mersin', 'Zonguldak ve Karabük', 'Sivas ve Malatya', 'Bursa ve Kocaeli'],
+    correctIndex: 0,
+    targetCoords: [39.220, 38.680],
+    explanation: 'Krom yatakları Elazığ (Guleman), Fethiye-Köyceğiz ve Kop Dağı\'nda bulunur. Ferrokrom tesisleri Elazığ ve Antalya\'dadır.',
+    osymTip: 'Ferrokrom Tesisleri = Elazığ (Hammaddeye yakınlık) ve Antalya (Liman/Ulaşım).'
+  },
+  {
+    id: 'mc-104',
+    category: 'Geçitler',
+    region: 'Akdeniz',
+    questionText: 'Akdeniz Bölgesi\'ni İç Anadolu\'ya bağlayan tarihi ve stratejik geçitler batıdan doğuya sırasıyla hangileridir?',
+    options: ['Çubuk, Sertavul, Gülek, Belen', 'Zigana, Kop, Ovit, Ilgaz', 'Geyve, Bolu, Cankurtaran, Canik', 'Belen, Gülek, Sertavul, Çubuk', 'Gülek, Çubuk, Sertavul, Belen'],
+    correctIndex: 0,
+    targetCoords: [34.800, 37.200],
+    explanation: 'Akdeniz Geçitleri (Çok Sayıda Gül Bulunur): Çubuk (Antalya-Göller), Sertavul (Silifke-Karaman), Gülek (Çukurova-İç Anadolu), Belen (İskenderun-Hatay).',
+    osymTip: 'Akdeniz Geçitleri = Çubuk -> Sertavul -> Gülek -> Belen.'
+  },
+  {
+    id: 'mc-105',
+    category: 'Geçitler',
+    region: 'Karadeniz',
+    questionText: 'Doğu Karadeniz kıyısını Erzurum ve Doğu Anadolu\'ya bağlayan; üzerinde yeni Zigana ve Ovit tünellerinin bulunduğu geçitler hangileridir?',
+    options: ['Zigana (Kalkanlı) ve Ovit Geçitleri', 'Çubuk ve Sertavul', 'Ilgaz ve Ecevit', 'Gülek ve Belen', 'Cankurtaran ve Sakar'],
+    correctIndex: 0,
+    targetCoords: [39.400, 40.600],
+    explanation: 'Zigana Geçidi (Trabzon-Gümüşhane) ve Ovit Tüneli (Rize-İspir-Erzurum) Karadeniz\'i Doğu Anadolu\'ya bağlar.',
+    osymTip: 'Zigana = Trabzon-Gümüşhane, Kop = Bayburt-Erzurum, Ovit = Rize-Erzurum.'
+  },
+  {
+    id: 'mc-106',
+    category: 'Fiziki',
+    region: 'Ege',
+    questionText: 'Dalga ve akıntıların taşıdığı kumların bir adayı karaya bağlamasıyla oluşan "SAPLI ADA / TOMBOLO" oluşumunun Türkiye\'deki en tipik iki örneği hangileridir?',
+    options: ['Balıkesir Kapıdağ Yarımadası ve Sinop İnceburun Yarımadası', 'Çeşme ve Bodrum Yarımadaları', 'Datça ve Bozburun Yarımadaları', 'Gelibolu ve Biga Yarımadaları', 'Kocaeli ve Armutlu Yarımadaları'],
+    correctIndex: 0,
+    targetCoords: [27.850, 40.450],
+    explanation: 'Tombolo (Saplı Ada): Dalga biriktirmesiyle bir ada karaya bağlanır. En belirgin örnekleri Kapıdağ Yarımadası (Marmara) ve Sinop Yarımadası\'dır.',
+    osymTip: 'Tombolo (Saplı Ada) = Kapıdağ Yarımadası (Balıkesir) & Sinop Şehir Merkezi.'
+  },
+  {
+    id: 'mc-107',
+    category: 'Fiziki',
+    region: 'Akdeniz',
+    questionText: 'Türkiye\'de "DALMAÇYA KIYI TİPİ" ve "KALANKLI KIYI TİPİ" nerede görülür?',
+    options: ['Dalmaçya: Antalya Kaş-Finike kıyıları; Kalanklı: Mersin-Silifke kıyıları', 'Dalmaçya: Rize-Hopa kıyıları; Kalanklı: İzmir-Çeşme', 'Dalmaçya: İstanbul Boğazı; Kalanklı: Sinop', 'Dalmaçya: Fethiye Körfezi; Kalanklı: İzmit Körfezi', 'Dalmaçya: Çanakkale; Kalanklı: Samsun'],
+    correctIndex: 0,
+    targetCoords: [29.640, 36.200],
+    explanation: 'Dalmaçya Kıyı Tipi: Dağların kıyıya paralel olduğu yerlerde deniz basmasıyla adacıklar dizilmesi (Antalya Kaş-Finike). Kalanklı Kıyı: Kanyon vadilerin deniz suyuyla dolması (Mersin).',
+    osymTip: 'Dalmaçya Kıyı Tipi = Antalya Kaş - Finike kıyıları.'
+  },
+  {
+    id: 'mc-108',
+    category: 'Fiziki',
+    region: 'Marmara',
+    questionText: 'İstanbul Boğazı, Çanakkale Boğazı ve Haliç hangi kıyı tipine örnektir?',
+    options: ['Ria Tipi Kıyı', 'Dalmaçya Tipi Kıyı', 'Boyuna Kıyı Tipi', 'Enine Kıyı Tipi', 'Fiyort Tipi Kıyı'],
+    correctIndex: 0,
+    targetCoords: [29.050, 41.100],
+    explanation: 'Eski akarsu vadilerinin deniz altında kalmasıyla oluşan kıyılara Ria Tipi Kıyı denir. İstanbul & Çanakkale Boğazları, Haliç ve GB Ege kıyıları örnektir.',
+    osymTip: 'Ria Kıyı Tipi = İstanbul Boğazı, Çanakkale Boğazı, Haliç, Gökova.'
+  },
+  {
+    id: 'mc-109',
+    category: 'İklim',
+    region: 'Karadeniz',
+    questionText: 'Rize ve çevresinde mikroklima sayesinde mandalina, turunçgil ve çay tarımı yapılabilmesini; Artvin Çoruh Vadisi\'nde zeytin yetişmesini sağlayan temel klimatolojik etken nedir?',
+    options: ['Kafkas ve Kaçkar Dağları\'ndan aşağı doğru esen FÖHN Rüzgarları', 'Muson Rüzgarları', 'Kutup kökenli Karayel', 'Lodos rüzgarının nemi', 'Samyeli rüzgarı'],
+    correctIndex: 0,
+    targetCoords: [40.520, 41.020],
+    explanation: 'Dağlardan kıyıya inen havanın sürtünmeyle her 100 metrede 1°C ısınmasıyla Föhn rüzgarı oluşur ve Rize mikroklimasını meydana getirir.',
+    osymTip: 'Rize Turunçgil / Artvin Zeytin Mikrokliması = Föhn Rüzgarları.'
+  },
+  {
+    id: 'mc-110',
+    category: 'Ekonomik',
+    region: 'İç Anadolu',
+    questionText: 'Türkiye\'de "Şeker Fabrikaları"nın ülkenin hemen her bölgesinde yaygın olmasının temel sebebi nedir?',
+    options: ['Şeker pancarının hasattan sonra bekletilmeden hızla işlenmesi zorunluluğu (Çabuk bozulabilirlik)', 'Şekerin taşıma maliyetinin çok pahalı olması', 'Her bölgede pancar tüketiminin çok yüksek olması', 'Şeker fabrikalarının sadece küçük sermaye gerektirmesi', 'İklim şartlarının her yerde tropikal olması'],
+    correctIndex: 0,
+    targetCoords: [32.850, 39.920],
+    explanation: 'Şeker pancarı hasat edildikten hemen sonra işlenmezse şeker oranını hızla kaybeder ve çürür. Bu yüzden fabrikalar tarım alanlarına çok yakın kurulur.',
+    osymTip: 'Şeker Fabrikaları = Hammaddeye Yakınlık Zorunluluğu (Çabuk Bozulma).'
   }
 ];
 

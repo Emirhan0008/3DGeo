@@ -12,12 +12,21 @@ import {
   limit, 
   deleteDoc
 } from 'firebase/firestore';
-import { PIN_GAME_QUESTIONS, PinGameQuestion, getFilteredPinQuestions } from '@/lib/data/quizQuestions';
+import { 
+  PIN_GAME_QUESTIONS, 
+  PinGameQuestion, 
+  getFilteredPinQuestions,
+  MULTIPLE_CHOICE_QUESTIONS,
+  MultipleChoiceQuestion,
+  getFilteredQuizQuestions
+} from '@/lib/data/quizQuestions';
 
 export interface DuelGuess {
   lat: number;
   lng: number;
   distanceKm: number;
+  selectedOption?: number;
+  isCorrect?: boolean;
   timeTakenSec: number;
   pointsEarned: number;
   submittedAt: number;
@@ -26,15 +35,20 @@ export interface DuelGuess {
 export interface DuelRoundHistory {
   roundIndex: number;
   questionId: string;
+  gameType?: 'pin' | 'quiz';
   targetTitle: string;
   targetCoords: [number, number];
   targetCategory?: string;
+  options?: string[];
+  correctIndex?: number;
   player1Guess: DuelGuess | null;
   player2Guess: DuelGuess | null;
   player1Points: number;
   player2Points: number;
   player1DistanceKm: number;
   player2DistanceKm: number;
+  player1SelectedOption?: number;
+  player2SelectedOption?: number;
 }
 
 export interface DuelPlayer {
@@ -56,6 +70,7 @@ export interface DuelSession {
   roomCode: string;
   roomPin?: string;
   mode: 'quick' | 'private';
+  gameType?: 'pin' | 'quiz';
   status: 'waiting' | 'starting' | 'in_progress' | 'round_reveal' | 'finished' | 'abandoned';
   questionCount: 10 | 20 | 30;
   categoryFilter: string;
@@ -160,18 +175,33 @@ export function generateRoomCode(): string {
 }
 
 /**
- * Builds question IDs list based on category filter and question count.
+ * Builds question IDs list based on category filter, question count, and game type.
  */
-export function prepareDuelQuestions(categoryFilter: string, questionCount: number): string[] {
+export function prepareDuelQuestions(categoryFilter: string, questionCount: number, gameType: 'pin' | 'quiz' = 'pin'): string[] {
+  if (gameType === 'quiz') {
+    const pool = getFilteredQuizQuestions(categoryFilter, true);
+    const selected = pool.slice(0, questionCount);
+    return selected.map(q => q.id);
+  }
   const pool = getFilteredPinQuestions(categoryFilter, true);
   const selected = pool.slice(0, questionCount);
   return selected.map(q => q.id);
 }
 
 /**
- * Retrieves question objects by list of IDs.
+ * Retrieves question objects by list of IDs for both Pin game and Quiz modes.
  */
-export function getQuestionsByIds(questionIds: string[]): PinGameQuestion[] {
+export function getQuestionsByIds(questionIds: string[], gameType: 'pin' | 'quiz' = 'pin'): (PinGameQuestion | MultipleChoiceQuestion)[] {
+  if (gameType === 'quiz') {
+    const map = new Map(MULTIPLE_CHOICE_QUESTIONS.map(q => [q.id, q]));
+    const result: MultipleChoiceQuestion[] = [];
+    for (const id of questionIds) {
+      const q = map.get(id);
+      if (q) result.push(q);
+    }
+    return result.length > 0 ? result : MULTIPLE_CHOICE_QUESTIONS.slice(0, 10);
+  }
+
   const map = new Map(PIN_GAME_QUESTIONS.map(q => [q.id, q]));
   const result: PinGameQuestion[] = [];
   for (const id of questionIds) {
@@ -188,6 +218,7 @@ export async function createDuelRoom(
   player: { id: string; rumuz: string; rumuzKey: string },
   options: {
     mode: 'quick' | 'private';
+    gameType?: 'pin' | 'quiz';
     questionCount: 10 | 20 | 30;
     categoryFilter: string;
     roomPin?: string;
@@ -195,7 +226,8 @@ export async function createDuelRoom(
 ): Promise<DuelSession> {
   const duelId = `duel_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const roomCode = generateRoomCode();
-  const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount);
+  const gameType = options.gameType || 'pin';
+  const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount, gameType);
 
   const initialPlayer: DuelPlayer = {
     id: player.id,
@@ -214,6 +246,7 @@ export async function createDuelRoom(
     roomCode,
     roomPin: options.roomPin?.trim() || '',
     mode: options.mode,
+    gameType,
     status: 'waiting',
     questionCount: options.questionCount,
     categoryFilter: options.categoryFilter,
@@ -245,14 +278,17 @@ export async function createDuelRoom(
 export async function findOrCreateQuickMatch(
   player: { id: string; rumuz: string; rumuzKey: string },
   options: {
+    gameType?: 'pin' | 'quiz';
     questionCount: 10 | 20 | 30;
     categoryFilter: string;
   }
 ): Promise<{ duel: DuelSession; isNew: boolean }> {
+  const gameType = options.gameType || 'pin';
   try {
     const q = query(
       collection(db, 'duels'),
       where('mode', '==', 'quick'),
+      where('gameType', '==', gameType),
       where('status', '==', 'waiting'),
       where('questionCount', '==', options.questionCount),
       where('categoryFilter', '==', options.categoryFilter),
@@ -282,7 +318,7 @@ export async function findOrCreateQuickMatch(
         const updatedFields = {
           player2: joiningPlayer,
           status: 'starting',
-          roundStartTime: now + 3500, // 3.5s countdown before 1st question starts
+          roundStartTime: now + 10500, // 10s countdown before 1st question starts
           updatedAt: new Date().toISOString()
         };
 
@@ -297,6 +333,7 @@ export async function findOrCreateQuickMatch(
     // No available room found, create new quick match lobby
     const newDuel = await createDuelRoom(player, {
       mode: 'quick',
+      gameType,
       questionCount: options.questionCount,
       categoryFilter: options.categoryFilter
     });
@@ -360,7 +397,7 @@ export async function joinPrivateDuelRoom(
     const updatedFields = {
       player2: joiningPlayer,
       status: 'starting',
-      roundStartTime: now + 3500,
+      roundStartTime: now + 10500, // 10s countdown
       updatedAt: new Date().toISOString()
     };
 
@@ -382,13 +419,15 @@ export async function joinPrivateDuelRoom(
 export async function startBotDuel(
   player: { id: string; rumuz: string; rumuzKey: string },
   options: {
+    gameType?: 'pin' | 'quiz';
     questionCount: 10 | 20 | 30;
     categoryFilter: string;
   }
 ): Promise<DuelSession> {
   const duelId = `duel_bot_${Date.now()}`;
   const roomCode = 'BOT-3D';
-  const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount);
+  const gameType = options.gameType || 'pin';
+  const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount, gameType);
 
   const initialPlayer: DuelPlayer = {
     id: player.id,
@@ -420,6 +459,7 @@ export async function startBotDuel(
     id: duelId,
     roomCode,
     mode: 'quick',
+    gameType,
     status: 'starting',
     questionCount: options.questionCount,
     categoryFilter: options.categoryFilter,
@@ -427,7 +467,7 @@ export async function startBotDuel(
     player1: initialPlayer,
     player2: botPlayer,
     currentRound: 0,
-    roundStartTime: now + 2500,
+    roundStartTime: now + 10500, // 10s countdown
     roundTimeLimit: 15,
     bothAnsweredAt: null,
     winnerId: null,
@@ -446,7 +486,7 @@ export async function startBotDuel(
 }
 
 /**
- * Submits a player's guess for current round and checks if both answered
+ * Submits a player's guess for current round (Pin Mode) and checks if both answered
  */
 export async function submitPlayerGuess(
   duel: DuelSession,
@@ -515,9 +555,68 @@ export async function submitPlayerGuess(
 }
 
 /**
+ * Submits a player's choice in KPSS Multiple Choice Test Duel Mode
+ */
+export async function submitPlayerQuizAnswer(
+  duel: DuelSession,
+  playerId: string,
+  selectedOptionIndex: number,
+  correctOptionIndex: number,
+  timeTakenSec: number
+): Promise<void> {
+  const isPlayer1 = duel.player1.id === playerId;
+  const isPlayer2 = duel.player2?.id === playerId;
+
+  if (!isPlayer1 && !isPlayer2) return;
+
+  const isCorrect = selectedOptionIndex === correctOptionIndex;
+  // If correct: 800 base + up to 200 time bonus
+  const timeBonus = Math.max(0, Math.round(((15 - Math.min(15, timeTakenSec)) / 15) * 200));
+  const pointsEarned = isCorrect ? (800 + timeBonus) : 0;
+
+  const guess: DuelGuess = {
+    lat: 0,
+    lng: 0,
+    distanceKm: 0,
+    selectedOption: selectedOptionIndex,
+    isCorrect,
+    timeTakenSec: Math.round(timeTakenSec * 10) / 10,
+    pointsEarned,
+    submittedAt: Date.now()
+  };
+
+  const otherPlayer = isPlayer1 ? duel.player2 : duel.player1;
+  const otherHasGuessed = !!otherPlayer?.currentGuess;
+
+  const playerKey = isPlayer1 ? 'player1' : 'player2';
+  const currentPlayer = isPlayer1 ? duel.player1 : duel.player2!;
+
+  const newScore = currentPlayer.score + pointsEarned;
+
+  const updates: Record<string, unknown> = {
+    [`${playerKey}.currentGuess`]: guess,
+    [`${playerKey}.score`]: newScore,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (otherHasGuessed) {
+    updates['status'] = 'round_reveal';
+    updates['bothAnsweredAt'] = Date.now();
+  }
+
+  try {
+    await updateDoc(doc(db, 'duels', duel.id), updates);
+  } catch (error) {
+    console.error('Submit quiz answer error:', error);
+    handleFirestoreError(error, OperationType.WRITE, `duels/${duel.id}`);
+  }
+}
+
+/**
  * Handles round timeout if a player hasn't clicked within 15 seconds
  */
 export async function handleRoundTimeout(duel: DuelSession, _targetCoords?: [number, number]): Promise<void> {
+  const isQuiz = duel.gameType === 'quiz';
   const updates: Record<string, unknown> = {
     status: 'round_reveal',
     bothAnsweredAt: Date.now(),
@@ -529,13 +628,17 @@ export async function handleRoundTimeout(duel: DuelSession, _targetCoords?: [num
     const missGuess: DuelGuess = {
       lat: 0,
       lng: 0,
-      distanceKm: 850,
+      distanceKm: isQuiz ? 0 : 850,
+      selectedOption: -1,
+      isCorrect: false,
       timeTakenSec: 15,
       pointsEarned: 0,
       submittedAt: Date.now()
     };
     updates['player1.currentGuess'] = missGuess;
-    updates['player1.totalDistanceKm'] = duel.player1.totalDistanceKm + 850;
+    if (!isQuiz) {
+      updates['player1.totalDistanceKm'] = duel.player1.totalDistanceKm + 850;
+    }
   }
 
   // If Player 2 didn't answer
@@ -543,13 +646,17 @@ export async function handleRoundTimeout(duel: DuelSession, _targetCoords?: [num
     const missGuess: DuelGuess = {
       lat: 0,
       lng: 0,
-      distanceKm: 850,
+      distanceKm: isQuiz ? 0 : 850,
+      selectedOption: -1,
+      isCorrect: false,
       timeTakenSec: 15,
       pointsEarned: 0,
       submittedAt: Date.now()
     };
     updates['player2.currentGuess'] = missGuess;
-    updates['player2.totalDistanceKm'] = duel.player2.totalDistanceKm + 850;
+    if (!isQuiz) {
+      updates['player2.totalDistanceKm'] = duel.player2.totalDistanceKm + 850;
+    }
   }
 
   try {
@@ -565,20 +672,49 @@ export async function handleRoundTimeout(duel: DuelSession, _targetCoords?: [num
  */
 function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
   const currentQId = duel.questionIds[duel.currentRound];
-  const questionObj = PIN_GAME_QUESTIONS.find((q) => q.id === currentQId);
+  const isQuiz = duel.gameType === 'quiz';
+  
+  let targetTitle = `Soru #${duel.currentRound + 1}`;
+  let targetCoords: [number, number] = [35.0, 39.0];
+  let targetCategory = duel.categoryFilter;
+  let options: string[] | undefined = undefined;
+  let correctIndex: number | undefined = undefined;
+
+  if (isQuiz) {
+    const qObj = MULTIPLE_CHOICE_QUESTIONS.find(q => q.id === currentQId);
+    if (qObj) {
+      targetTitle = qObj.questionText;
+      targetCoords = qObj.targetCoords || [35.0, 39.0];
+      targetCategory = qObj.category || duel.categoryFilter;
+      options = qObj.options;
+      correctIndex = qObj.correctIndex;
+    }
+  } else {
+    const qObj = PIN_GAME_QUESTIONS.find(q => q.id === currentQId);
+    if (qObj) {
+      targetTitle = qObj.title;
+      targetCoords = qObj.targetCoords || [35.0, 39.0];
+      targetCategory = qObj.category || duel.categoryFilter;
+    }
+  }
   
   const historyEntry: DuelRoundHistory = {
     roundIndex: duel.currentRound,
     questionId: currentQId || `q_${duel.currentRound}`,
-    targetTitle: questionObj?.title || `Soru #${duel.currentRound + 1}`,
-    targetCoords: questionObj?.targetCoords || [35.0, 39.0],
-    targetCategory: questionObj?.category || duel.categoryFilter,
+    gameType: duel.gameType || 'pin',
+    targetTitle,
+    targetCoords,
+    targetCategory,
+    options,
+    correctIndex,
     player1Guess: duel.player1.currentGuess || null,
     player2Guess: duel.player2?.currentGuess || null,
     player1Points: duel.player1.currentGuess?.pointsEarned || 0,
     player2Points: duel.player2?.currentGuess?.pointsEarned || 0,
-    player1DistanceKm: duel.player1.currentGuess ? Math.round(duel.player1.currentGuess.distanceKm * 10) / 10 : 850,
-    player2DistanceKm: duel.player2?.currentGuess ? Math.round(duel.player2.currentGuess.distanceKm * 10) / 10 : 850
+    player1DistanceKm: duel.player1.currentGuess ? Math.round(duel.player1.currentGuess.distanceKm * 10) / 10 : (isQuiz ? 0 : 850),
+    player2DistanceKm: duel.player2?.currentGuess ? Math.round(duel.player2.currentGuess.distanceKm * 10) / 10 : (isQuiz ? 0 : 850),
+    player1SelectedOption: duel.player1.currentGuess?.selectedOption,
+    player2SelectedOption: duel.player2?.currentGuess?.selectedOption
   };
 
   const existingHistory = duel.roundHistory || [];

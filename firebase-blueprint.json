@@ -78,6 +78,7 @@
         "roomCode": { "type": "string", "maxLength": 16 },
         "roomPin": { "type": "string", "maxLength": 32 },
         "mode": { "type": "string" },
+        "gameType": { "type": "string" },
         "status": { "type": "string" },
         "questionCount": { "type": "number" },
         "categoryFilter": { "type": "string" },
