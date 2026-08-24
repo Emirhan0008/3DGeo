@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useAppStore, MapStyleType } from '@/lib/store/useStore';
+import { useAppFullscreen } from '@/lib/utils';
 import { 
   Mountain, 
   Waves, 
@@ -31,6 +32,7 @@ const MAP_STYLES: { id: MapStyleType; label: string; desc: string; icon: string 
 ];
 
 export default function LayerSidebar() {
+  const { isFullscreen } = useAppFullscreen();
   const {
     isSidebarOpen,
     toggleSidebar,
@@ -75,11 +77,16 @@ export default function LayerSidebar() {
   // Count active layers
   const activeLayersCount = Object.values(layers).filter(Boolean).length;
 
+  // In fullscreen mode, if not expanded, do not render a translucent column
+  if (isFullscreen && !isExpanded) {
+    return null;
+  }
+
   return (
     <aside
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute left-1.5 sm:left-2 top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 z-20 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.75rem)] sm:h-[calc(100%-1rem)] max-h-full ${
+      className={`absolute left-1.5 sm:left-2 top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 z-40 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.75rem)] sm:h-[calc(100%-1rem)] max-h-full ${
         isExpanded
           ? isHovered || isPinned
             ? 'w-72 sm:w-80 bg-[#09090b]/95 opacity-100'

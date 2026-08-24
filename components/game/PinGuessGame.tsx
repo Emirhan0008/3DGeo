@@ -9,8 +9,6 @@ import {
   HelpCircle, 
   ArrowRight, 
   RotateCcw, 
-  CheckCircle2, 
-  AlertCircle, 
   Sparkles,
   MapPin,
   Shuffle,

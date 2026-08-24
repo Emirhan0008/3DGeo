@@ -2,19 +2,18 @@
 
 import React, { useState, useRef } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
+import { useAppFullscreen } from '@/lib/utils';
 import { 
   Bot, 
   Send, 
   X, 
   Sparkles, 
-  BookMarked, 
-  RotateCcw,
-  User,
-  Loader2,
-  Lightbulb,
-  Pin,
-  PinOff,
-  ChevronLeft
+  User, 
+  Loader2, 
+  Lightbulb, 
+  Pin, 
+  PinOff, 
+  ChevronLeft 
 } from 'lucide-react';
 
 const QUICK_QUESTIONS = [
@@ -26,6 +25,7 @@ const QUICK_QUESTIONS = [
 ];
 
 export default function AITutorDrawer() {
+  const { isFullscreen } = useAppFullscreen();
   const { isAiDrawerOpen, setAiDrawerOpen, selectedFeature } = useAppStore();
 
   const [inputPrompt, setInputPrompt] = useState('');
@@ -85,7 +85,7 @@ export default function AITutorDrawer() {
           { sender: 'ai', text: 'Üzgünüm, yanıt oluşturulurken bir aksaklık oldu.' }
         ]);
       }
-    } catch (err) {
+    } catch {
       setChatMessages((prev) => [
         ...prev,
         { sender: 'ai', text: 'Bağlantı hatası yaşandı. Lütfen tekrar deneyin.' }
@@ -95,11 +95,16 @@ export default function AITutorDrawer() {
     }
   };
 
+  // In fullscreen mode, if not expanded, do not render a translucent column
+  if (isFullscreen && !isExpanded) {
+    return null;
+  }
+
   return (
     <aside
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute right-1.5 sm:right-3 top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 z-30 backdrop-blur-2xl border-2 border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.75rem)] sm:h-[calc(100%-1rem)] max-h-full ${
+      className={`absolute right-1.5 sm:right-3 top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 z-40 backdrop-blur-2xl border-2 border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.75rem)] sm:h-[calc(100%-1rem)] max-h-full ${
         isExpanded
           ? isHovered || isPinned
             ? 'w-72 sm:w-96 bg-[#09090b]/95 opacity-100'
@@ -143,7 +148,7 @@ export default function AITutorDrawer() {
         </div>
       ) : (
         /* Expanded Content State */
-        <div className="w-80 sm:w-96 h-full flex flex-col animate-in fade-in duration-200">
+        <div className="w-72 sm:w-96 h-full flex flex-col animate-in fade-in duration-200">
           {/* Header */}
           <div className="p-3.5 bg-gradient-to-r from-indigo-950 via-[#09090b] to-purple-950 border-b border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
