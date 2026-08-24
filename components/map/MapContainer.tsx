@@ -8,7 +8,6 @@ import turkeyProvincesGeoJSON from '@/public/data/turkey-provinces.json';
 import { 
   PIN_GAME_QUESTIONS, 
   MULTIPLE_CHOICE_QUESTIONS,
-  PinGameQuestion,
   getCurrentPinQuestion,
   getCurrentQuizQuestion
 } from '@/lib/data/quizQuestions';
@@ -439,17 +438,16 @@ export default function MapContainer() {
         storeState.submitPinGuess(e.lngLat.lng, e.lngLat.lat);
       }
 
-      // 2. 1v1 Real-time Map Duel Guess (Only active in 'pin' gameType)
+      // 2. 1v1 Real-time Map Duel Guess
       if (storeState.activeTab === 'duel') {
         const session = storeState.activeDuelSession;
         const playerKey = storeState.activeDuelPlayerKey;
-        const isPinDuel = (session?.gameType || 'pin') === 'pin';
-        if (session && session.status === 'in_progress' && isPinDuel && playerKey) {
+        if (session && session.status === 'in_progress' && playerKey) {
           const currentPlayer = playerKey === 'player1' ? session.player1 : session.player2;
           if (currentPlayer && !currentPlayer.currentGuess) {
-            const questions = getQuestionsByIds(session.questionIds, 'pin');
+            const questions = getQuestionsByIds(session.questionIds);
             const currentQ = questions[session.currentRound];
-            if (currentQ && 'targetCoords' in currentQ && currentQ.targetCoords) {
+            if (currentQ) {
               const startMs = session.roundStartTime || Date.now();
               const timeTakenSec = Math.max(0.5, Math.round(((Date.now() - startMs) / 1000) * 10) / 10);
               submitPlayerGuess(session, currentPlayer.id, [e.lngLat.lng, e.lngLat.lat], currentQ.targetCoords, timeTakenSec);
@@ -850,14 +848,13 @@ export default function MapContainer() {
     // 2. 1v1 Real-time Duel Mode
     else if (activeTab === 'duel' && activeDuelSession) {
       const session = activeDuelSession;
-      const isPin = (session.gameType || 'pin') === 'pin';
-      const questions = getQuestionsByIds(session.questionIds, session.gameType || 'pin');
-      const currentQ = questions[session.currentRound] as (PinGameQuestion | undefined);
+      const questions = getQuestionsByIds(session.questionIds);
+      const currentQ = questions[session.currentRound];
 
-      // If player placed guess during in_progress (show only own guess for pin game)
-      if (session.status === 'in_progress' && isPin) {
+      // If player placed guess during in_progress (show only own guess)
+      if (session.status === 'in_progress') {
         const myPlayer = activeDuelPlayerKey === 'player1' ? session.player1 : session.player2;
-        if (myPlayer?.currentGuess && myPlayer.currentGuess.lng && myPlayer.currentGuess.lat) {
+        if (myPlayer?.currentGuess) {
           const el = document.createElement('div');
           el.className = 'relative flex items-center justify-center';
           el.innerHTML = `
@@ -871,8 +868,8 @@ export default function MapContainer() {
             .addTo(map);
         }
       }
-      // If round is in reveal or finished phase (show both guesses, target, and comparison lines for pin game)
-      else if ((session.status === 'round_reveal' || session.status === 'finished') && currentQ && isPin && currentQ.targetCoords) {
+      // If round is in reveal or finished phase (show both guesses, target, and comparison lines)
+      else if ((session.status === 'round_reveal' || session.status === 'finished') && currentQ) {
         // Gold Target Marker
         const targetEl = document.createElement('div');
         targetEl.className = 'relative flex items-center justify-center';
@@ -887,7 +884,7 @@ export default function MapContainer() {
           .addTo(map);
 
         // Player 1 Guess Marker & Line
-        if (session.player1.currentGuess && session.player1.currentGuess.lng && session.player1.currentGuess.lat) {
+        if (session.player1.currentGuess) {
           const p1Coords: [number, number] = [session.player1.currentGuess.lng, session.player1.currentGuess.lat];
           const p1El = document.createElement('div');
           p1El.className = 'relative flex items-center justify-center';
@@ -922,7 +919,7 @@ export default function MapContainer() {
         }
 
         // Player 2 Guess Marker & Line
-        if (session.player2?.currentGuess && session.player2.currentGuess.lng && session.player2.currentGuess.lat) {
+        if (session.player2?.currentGuess) {
           const p2Coords: [number, number] = [session.player2.currentGuess.lng, session.player2.currentGuess.lat];
           const p2El = document.createElement('div');
           p2El.className = 'relative flex items-center justify-center';
