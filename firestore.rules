@@ -54,5 +54,11 @@ service cloud.firestore {
       allow create, update: if isValidId(rumuzId);
       allow delete: if false;
     }
+
+    match /duels/{duelId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(duelId);
+      allow delete: if isValidId(duelId);
+    }
   }
 }

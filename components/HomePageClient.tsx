@@ -6,6 +6,7 @@ import LayerSidebar from '@/components/ui/LayerSidebar';
 import FeatureDetailModal from '@/components/ui/FeatureDetailModal';
 import PinGuessGame from '@/components/game/PinGuessGame';
 import QuizTestGame from '@/components/game/QuizTestGame';
+import DuelMode from '@/components/game/DuelMode';
 import FlashcardMode from '@/components/game/FlashcardMode';
 import StatsModal from '@/components/ui/StatsModal';
 import AITutorDrawer from '@/components/ai/AITutorDrawer';
@@ -68,6 +69,7 @@ export default function HomePageClient() {
 
         {/* Tab Specific Gamification Overlays */}
         {activeTab === 'pin_game' && <PinGuessGame />}
+        {activeTab === 'duel' && <DuelMode />}
         {activeTab === 'quiz_test' && <QuizTestGame />}
         {activeTab === 'flashcards' && <FlashcardMode />}
         {activeTab === 'stats' && <StatsModal />}

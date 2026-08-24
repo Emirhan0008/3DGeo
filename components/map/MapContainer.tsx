@@ -11,6 +11,7 @@ import {
   getCurrentPinQuestion,
   getCurrentQuizQuestion
 } from '@/lib/data/quizQuestions';
+import { getQuestionsByIds, submitPlayerGuess } from '@/lib/duelService';
 import { 
   Play, 
   Pause, 
@@ -339,6 +340,10 @@ export default function MapContainer() {
   const guessMarkerRef = useRef<maplibregl.Marker | null>(null);
   const targetMarkerRef = useRef<maplibregl.Marker | null>(null);
   const distanceMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const duelP1MarkerRef = useRef<maplibregl.Marker | null>(null);
+  const duelP2MarkerRef = useRef<maplibregl.Marker | null>(null);
+  const duelDist1MarkerRef = useRef<maplibregl.Marker | null>(null);
+  const duelDist2MarkerRef = useRef<maplibregl.Marker | null>(null);
 
   const {
     mapStyle,
@@ -361,7 +366,9 @@ export default function MapContainer() {
     hideLandformsInBlindMode,
     toggleBlindMapMode,
     toggleHideLandformsInBlindMode,
-    gameCategoryFilter
+    gameCategoryFilter,
+    activeDuelSession,
+    activeDuelPlayerKey
   } = useAppStore();
 
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -417,7 +424,7 @@ export default function MapContainer() {
     map.on('pitch', () => setCurrentPitch(Math.round(map.getPitch())));
     map.on('zoom', () => setCurrentZoom(parseFloat(map.getZoom().toFixed(1))));
 
-    // Click handler for Pin Guess Game & Map Dismiss
+    // Click handler for Pin Guess Game, 1v1 Duel & Map Dismiss
     map.on('click', (e) => {
       const storeState = useAppStore.getState();
       // If any sidebar is open, treat this click exclusively as sidebar dismissal
@@ -425,8 +432,28 @@ export default function MapContainer() {
         storeState.closeAllSidebars();
         return;
       }
+
+      // 1. Single Player Pin Guess Game
       if (storeState.activeTab === 'pin_game' && !storeState.isPinGuessed) {
         storeState.submitPinGuess(e.lngLat.lng, e.lngLat.lat);
+      }
+
+      // 2. 1v1 Real-time Map Duel Guess
+      if (storeState.activeTab === 'duel') {
+        const session = storeState.activeDuelSession;
+        const playerKey = storeState.activeDuelPlayerKey;
+        if (session && session.status === 'in_progress' && playerKey) {
+          const currentPlayer = playerKey === 'player1' ? session.player1 : session.player2;
+          if (currentPlayer && !currentPlayer.currentGuess) {
+            const questions = getQuestionsByIds(session.questionIds);
+            const currentQ = questions[session.currentRound];
+            if (currentQ) {
+              const startMs = session.roundStartTime || Date.now();
+              const timeTakenSec = Math.max(0.5, Math.round(((Date.now() - startMs) / 1000) * 10) / 10);
+              submitPlayerGuess(session, currentPlayer.id, [e.lngLat.lng, e.lngLat.lat], currentQ.targetCoords, timeTakenSec);
+            }
+          }
+        }
       }
     });
 
@@ -699,12 +726,16 @@ export default function MapContainer() {
     return () => clearInterval(interval);
   }, [isTourActive, tourSpeedMs, advanceTourStep]);
 
-  // 7. Handle Pin Guess Game Markers and GeoGuessr Line
+  // 7. Handle Pin Guess Game & 1v1 Duel Markers and GeoGuessr Lines
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     const map = mapRef.current;
     const lineSourceId = 'pin-guess-line-src';
     const lineLayerId = 'pin-guess-line-lyr';
+    const duelLine1Src = 'duel-line1-src';
+    const duelLine1Lyr = 'duel-line1-lyr';
+    const duelLine2Src = 'duel-line2-src';
+    const duelLine2Lyr = 'duel-line2-lyr';
 
     if (guessMarkerRef.current) {
       guessMarkerRef.current.remove();
@@ -718,11 +749,32 @@ export default function MapContainer() {
       distanceMarkerRef.current.remove();
       distanceMarkerRef.current = null;
     }
+    if (duelP1MarkerRef.current) {
+      duelP1MarkerRef.current.remove();
+      duelP1MarkerRef.current = null;
+    }
+    if (duelP2MarkerRef.current) {
+      duelP2MarkerRef.current.remove();
+      duelP2MarkerRef.current = null;
+    }
+    if (duelDist1MarkerRef.current) {
+      duelDist1MarkerRef.current.remove();
+      duelDist1MarkerRef.current = null;
+    }
+    if (duelDist2MarkerRef.current) {
+      duelDist2MarkerRef.current.remove();
+      duelDist2MarkerRef.current = null;
+    }
 
-    // Clean previous line layer if exists
+    // Clean previous line layers if exist
     if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
     if (map.getSource(lineSourceId)) map.removeSource(lineSourceId);
+    if (map.getLayer(duelLine1Lyr)) map.removeLayer(duelLine1Lyr);
+    if (map.getSource(duelLine1Src)) map.removeSource(duelLine1Src);
+    if (map.getLayer(duelLine2Lyr)) map.removeLayer(duelLine2Lyr);
+    if (map.getSource(duelLine2Src)) map.removeSource(duelLine2Src);
 
+    // 1. Single Player Pin Guess Mode
     if (activeTab === 'pin_game' && isPinGuessed && pinGuessCoords) {
       const currentQ = getCurrentPinQuestion(pinGameIndex, gameCategoryFilter, shuffledPinQuestions);
 
@@ -791,7 +843,118 @@ export default function MapContainer() {
             .addTo(map);
         }
       }
-    } else if (activeTab === 'quiz_test' && isQuizAnswered) {
+    } 
+    // 2. 1v1 Real-time Duel Mode
+    else if (activeTab === 'duel' && activeDuelSession) {
+      const session = activeDuelSession;
+      const questions = getQuestionsByIds(session.questionIds);
+      const currentQ = questions[session.currentRound];
+
+      // If player placed guess during in_progress (show only own guess)
+      if (session.status === 'in_progress') {
+        const myPlayer = activeDuelPlayerKey === 'player1' ? session.player1 : session.player2;
+        if (myPlayer?.currentGuess) {
+          const el = document.createElement('div');
+          el.className = 'relative flex items-center justify-center';
+          el.innerHTML = `
+            <div class="absolute w-8 h-8 bg-indigo-500/40 rounded-full animate-ping"></div>
+            <div class="px-2.5 py-0.5 bg-indigo-600 border-2 border-white text-white font-black text-xs rounded-full shadow-2xl flex items-center gap-1">
+              📍 ${myPlayer.rumuz}
+            </div>
+          `;
+          duelP1MarkerRef.current = new maplibregl.Marker({ element: el })
+            .setLngLat([myPlayer.currentGuess.lng, myPlayer.currentGuess.lat])
+            .addTo(map);
+        }
+      }
+      // If round is in reveal or finished phase (show both guesses, target, and comparison lines)
+      else if ((session.status === 'round_reveal' || session.status === 'finished') && currentQ) {
+        // Gold Target Marker
+        const targetEl = document.createElement('div');
+        targetEl.className = 'relative flex items-center justify-center';
+        targetEl.innerHTML = `
+          <div class="absolute w-12 h-12 bg-amber-400/60 rounded-full animate-pulse"></div>
+          <div class="px-3.5 py-1.5 bg-amber-500 border-2 border-white text-slate-950 font-black text-xs sm:text-sm rounded-full shadow-2xl flex items-center gap-1.5 ring-2 ring-amber-300">
+            ⭐ DOĞRU YER: ${currentQ.title}
+          </div>
+        `;
+        targetMarkerRef.current = new maplibregl.Marker({ element: targetEl })
+          .setLngLat(currentQ.targetCoords)
+          .addTo(map);
+
+        // Player 1 Guess Marker & Line
+        if (session.player1.currentGuess) {
+          const p1Coords: [number, number] = [session.player1.currentGuess.lng, session.player1.currentGuess.lat];
+          const p1El = document.createElement('div');
+          p1El.className = 'relative flex items-center justify-center';
+          p1El.innerHTML = `
+            <div class="px-2.5 py-1 bg-indigo-600 border-2 border-white text-white font-extrabold text-[11px] rounded-full shadow-2xl flex items-center gap-1">
+              🔵 ${session.player1.rumuz} (${session.player1.currentGuess.distanceKm} km)
+            </div>
+          `;
+          duelP1MarkerRef.current = new maplibregl.Marker({ element: p1El })
+            .setLngLat(p1Coords)
+            .addTo(map);
+
+          // P1 Line
+          map.addSource(duelLine1Src, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: [p1Coords, currentQ.targetCoords]
+              }
+            }
+          });
+          map.addLayer({
+            id: duelLine1Lyr,
+            type: 'line',
+            source: duelLine1Src,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': '#6366f1', 'line-width': 3, 'line-dasharray': [2, 2] }
+          });
+        }
+
+        // Player 2 Guess Marker & Line
+        if (session.player2?.currentGuess) {
+          const p2Coords: [number, number] = [session.player2.currentGuess.lng, session.player2.currentGuess.lat];
+          const p2El = document.createElement('div');
+          p2El.className = 'relative flex items-center justify-center';
+          p2El.innerHTML = `
+            <div class="px-2.5 py-1 bg-rose-600 border-2 border-white text-white font-extrabold text-[11px] rounded-full shadow-2xl flex items-center gap-1">
+              🔴 ${session.player2.rumuz} (${session.player2.currentGuess.distanceKm} km)
+            </div>
+          `;
+          duelP2MarkerRef.current = new maplibregl.Marker({ element: p2El })
+            .setLngLat(p2Coords)
+            .addTo(map);
+
+          // P2 Line
+          map.addSource(duelLine2Src, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: [p2Coords, currentQ.targetCoords]
+              }
+            }
+          });
+          map.addLayer({
+            id: duelLine2Lyr,
+            type: 'line',
+            source: duelLine2Src,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': '#f43f5e', 'line-width': 3, 'line-dasharray': [2, 2] }
+          });
+        }
+      }
+    } 
+    // 3. Quiz Mode
+    else if (activeTab === 'quiz_test' && isQuizAnswered) {
       const currentQ = getCurrentQuizQuestion(quizTestIndex, gameCategoryFilter, shuffledQuizQuestions);
       if (currentQ && currentQ.targetCoords) {
         const targetEl = document.createElement('div');
@@ -807,7 +970,21 @@ export default function MapContainer() {
           .addTo(map);
       }
     }
-  }, [activeTab, isPinGuessed, pinGuessCoords, lastGuessDistanceKm, pinGameIndex, shuffledPinQuestions, isQuizAnswered, quizTestIndex, shuffledQuizQuestions, gameCategoryFilter, mapLoaded]);
+  }, [
+    activeTab, 
+    isPinGuessed, 
+    pinGuessCoords, 
+    lastGuessDistanceKm, 
+    pinGameIndex, 
+    shuffledPinQuestions, 
+    isQuizAnswered, 
+    quizTestIndex, 
+    shuffledQuizQuestions, 
+    gameCategoryFilter, 
+    mapLoaded,
+    activeDuelSession,
+    activeDuelPlayerKey
+  ]);
 
   const resetCameraToTurkey = () => {
     if (mapRef.current) {

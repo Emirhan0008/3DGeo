@@ -12,9 +12,10 @@ import {
   MultipleChoiceQuestion
 } from '../data/quizQuestions';
 import { ALL_BADGES } from '../data/badgesData';
+import type { DuelSession } from '../duelService';
 
 export type MapStyleType = 'topographic' | 'hybrid' | 'dark' | 'satellite';
-export type ActiveTabType = 'map' | 'pin_game' | 'quiz_test' | 'flashcards' | 'stats' | 'ai_tutor';
+export type ActiveTabType = 'map' | 'pin_game' | 'duel' | 'quiz_test' | 'flashcards' | 'stats' | 'ai_tutor';
 
 export interface LayerState {
   mountainsVolcanic: boolean;
@@ -97,6 +98,14 @@ export interface AppState {
   nextQuizQuestion: () => void;
   resetQuizTest: () => void;
   shuffleQuizQuestions: () => void;
+
+  // Real-time 1v1 Duel State
+  activeDuelSession: DuelSession | null;
+  setActiveDuelSession: (session: DuelSession | null) => void;
+  activeDuelPlayerKey: 'player1' | 'player2' | null;
+  setActiveDuelPlayerKey: (key: 'player1' | 'player2' | null) => void;
+  duelPinCoords: [number, number] | null;
+  setDuelPinCoords: (coords: [number, number] | null) => void;
 
   // Gamification, Category Mastery & Badges
   unlockedBadges: string[];
@@ -678,6 +687,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Lock zoom to 5.5x at every question start
     get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
   },
+
+  // Real-time 1v1 Duel State
+  activeDuelSession: null,
+  setActiveDuelSession: (session) => set({ activeDuelSession: session }),
+  activeDuelPlayerKey: null,
+  setActiveDuelPlayerKey: (key) => set({ activeDuelPlayerKey: key }),
+  duelPinCoords: null,
+  setDuelPinCoords: (coords) => set({ duelPinCoords: coords }),
 
   unlockedBadges: ['3D Coğrafyacı Çırağı'],
   totalQuestionsAnswered: 0,

@@ -15,7 +15,8 @@ import {
   Sliders,
   ChevronDown,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Swords
 } from 'lucide-react';
 import { useAppFullscreen } from '@/lib/utils';
 
@@ -128,6 +129,22 @@ export default function Navbar() {
             </span>
             <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300" />
             <span>Harita Testi</span>
+          </button>
+
+          <button
+            onClick={() => handleTabChange('duel')}
+            className={`relative px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border-2 shrink-0 ${
+              activeTab === 'duel'
+                ? 'bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 text-slate-950 border-amber-300 shadow-md shadow-red-500/40 ring-2 ring-amber-300'
+                : 'bg-red-500/20 text-amber-300 border-red-400/60 hover:bg-red-500/30 hover:border-amber-300 shadow-sm shadow-red-500/20'
+            }`}
+          >
+            <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-amber-400"></span>
+            </span>
+            <Swords className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 stroke-[2.5]" />
+            <span>1v1 Düello</span>
           </button>
 
           <button
@@ -298,6 +315,22 @@ export default function Navbar() {
             </span>
             <MapPin className="w-3 h-3 text-amber-300" />
             <span>Harita Testi</span>
+          </button>
+
+          <button
+            onClick={() => handleTabChange('duel')}
+            className={`relative px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
+              activeTab === 'duel'
+                ? 'bg-gradient-to-r from-red-600 to-amber-500 text-slate-950 border-amber-300 shadow-md'
+                : 'bg-red-500/20 text-amber-300 border-red-400/60 hover:bg-red-500/30'
+            }`}
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400"></span>
+            </span>
+            <Swords className="w-3 h-3 text-amber-300 stroke-[2.5]" />
+            <span>1v1 Düello</span>
           </button>
 
           <button

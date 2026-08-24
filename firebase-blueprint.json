@@ -69,6 +69,30 @@
         "createdAt": { "type": "string" }
       },
       "required": ["userId", "type", "createdAt"]
+    },
+    "DuelSession": {
+      "title": "DuelSession",
+      "description": "Gerçek zamanlı 1v1 harita düello oturumu",
+      "type": "object",
+      "properties": {
+        "roomCode": { "type": "string", "maxLength": 16 },
+        "roomPin": { "type": "string", "maxLength": 32 },
+        "mode": { "type": "string" },
+        "status": { "type": "string" },
+        "questionCount": { "type": "number" },
+        "categoryFilter": { "type": "string" },
+        "questionIds": { "type": "array" },
+        "player1": { "type": "object" },
+        "player2": { "type": "object" },
+        "currentRound": { "type": "number" },
+        "roundStartTime": { "type": "number" },
+        "roundTimeLimit": { "type": "number" },
+        "bothAnsweredAt": { "type": "number" },
+        "winnerId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["mode", "status", "questionCount", "player1"]
     }
   },
   "firestore": {
@@ -87,6 +111,10 @@
     "/rumuzes/{rumuzId}": {
       "schema": { "$ref": "#/entities/RumuzProfile" },
       "description": "Rumuz anahtarlı benzersiz çapraz domain istatistik kaydı"
+    },
+    "/duels/{duelId}": {
+      "schema": { "$ref": "#/entities/DuelSession" },
+      "description": "Gerçek zamanlı harita düello oturumları"
     }
   }
 }
