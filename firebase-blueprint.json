@@ -89,6 +89,7 @@
         "roundTimeLimit": { "type": "number" },
         "bothAnsweredAt": { "type": "number" },
         "winnerId": { "type": "string" },
+        "roundHistory": { "type": "array" },
         "createdAt": { "type": "string" },
         "updatedAt": { "type": "string" }
       },

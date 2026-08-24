@@ -9,6 +9,7 @@ import {
   startBotDuel,
   submitPlayerGuess, 
   advanceDuelRound, 
+  voteToAdvanceDuelRound,
   leaveOrCancelDuel, 
   subscribeToDuel,
   getQuestionsByIds,
@@ -34,7 +35,8 @@ import {
   Zap, 
   Crosshair, 
   ChevronRight,
-  RefreshCw
+  RefreshCw,
+  MapPin
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -81,6 +83,7 @@ export default function DuelMode() {
   const [timeLeftSec, setTimeLeftSec] = useState<number>(15);
   const [roundQuestions, setRoundQuestions] = useState<PinGameQuestion[]>([]);
   const [countdownNum, setCountdownNum] = useState<number | null>(null);
+  const [revealCountdown, setRevealCountdown] = useState<number>(7);
   const [lastRoundScore, setLastRoundScore] = useState<DistanceScoreBreakdown | null>(null);
   const [opponentRoundScore, setOpponentRoundScore] = useState<DistanceScoreBreakdown | null>(null);
 
@@ -261,7 +264,7 @@ export default function DuelMode() {
       };
     }
 
-    // 3. Round reveal phase
+    // 3. Round reveal phase (7 seconds display, auto advance, or advance if both press İlerle)
     if (activeDuelSession.status === 'round_reveal') {
       const myPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1 : activeDuelSession.player2;
       const otherPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player2 : activeDuelSession.player1;
@@ -281,16 +284,30 @@ export default function DuelMode() {
         flyToCoords(currentQ.targetCoords, 0, 0, 6.8);
       }
 
-      // Auto-advance to next round after 4.5 seconds
-      let revealTimer: NodeJS.Timeout | null = null;
-      if (activeDuelPlayerKey === 'player1' || activeDuelSession.player2?.isBot) {
-        revealTimer = setTimeout(() => {
-          advanceDuelRound(activeDuelSession);
-        }, 4500);
-      }
+      const revealStart = activeDuelSession.bothAnsweredAt || Date.now();
+      const REVEAL_DURATION_SEC = 7;
+
+      const updateTicker = () => {
+        const elapsed = (Date.now() - revealStart) / 1000;
+        const remain = Math.max(0, Math.ceil(REVEAL_DURATION_SEC - elapsed));
+        setRevealCountdown(remain);
+        return remain;
+      };
+
+      updateTicker();
+
+      const revealTicker = setInterval(() => {
+        const remain = updateTicker();
+        if (remain <= 0) {
+          clearInterval(revealTicker);
+          if (activeDuelPlayerKey === 'player1' || activeDuelSession.player2?.isBot) {
+            advanceDuelRound(activeDuelSession);
+          }
+        }
+      }, 300);
 
       return () => {
-        if (revealTimer) clearTimeout(revealTimer);
+        clearInterval(revealTicker);
       };
     }
   }, [
@@ -883,66 +900,167 @@ export default function DuelMode() {
   }
 
   // -------------------------------------------------------------
-  // 5. MAÇ SONUÇ EKRANI (Kazanan, Kaybeden, Skorlar)
+  // 5. MAÇ SONUÇ EKRANI (Kazanan, Kaybeden, Skorlar & Detaylı Karşılaştırma Tablosu)
   // -------------------------------------------------------------
   if (activeDuelSession.status === 'finished') {
     const isWinner = activeDuelSession.winnerId === activeDuelPlayerKey;
     const isDraw = activeDuelSession.winnerId === 'draw';
+    const historyList = activeDuelSession.roundHistory || [];
 
     return (
-      <div className="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div className="w-full max-w-lg bg-[#09090b]/95 border-2 border-amber-500/50 rounded-2xl shadow-2xl p-6 text-white text-center animate-in zoom-in-95 duration-200">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center mx-auto mb-3 shadow-xl shadow-amber-500/40">
-            <Trophy className="w-8 h-8 text-slate-950" />
+      <div className="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div className="w-full max-w-2xl max-h-[92dvh] bg-[#09090b]/95 border-2 border-amber-500/50 rounded-2xl shadow-2xl p-4 sm:p-6 text-white text-center animate-in zoom-in-95 duration-200 flex flex-col my-auto">
+          {/* Header Summary */}
+          <div className="shrink-0 mb-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center mx-auto mb-2 shadow-xl shadow-amber-500/40">
+              <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-slate-950" />
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-amber-400 mb-0.5">
+              {isDraw ? '🤝 BERABERE!' : isWinner ? '🏆 TEBRİKLER! DÜELLOYU KAZANDINIZ!' : '⚔️ DÜELLO TAMAMLANDI!'}
+            </h2>
+            <p className="text-[11px] sm:text-xs text-slate-400">
+              {activeDuelSession.questionCount} Soru • {activeDuelSession.categoryFilter}
+            </p>
           </div>
 
-          <h2 className="text-2xl font-black text-amber-400 mb-1">
-            {isDraw ? '🤝 BERABERE!' : isWinner ? '🏆 TEBRİKLER! DÜELLOYU KAZANDINIZ!' : '⚔️ DÜELLO TAMAMLANDI!'}
-          </h2>
-          <p className="text-xs text-slate-400 mb-6">
-            {activeDuelSession.questionCount} Soru • {activeDuelSession.categoryFilter}
-          </p>
-
-          {/* Karşılaştırma Kartları */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          {/* Karşılaştırma Kartları (Overview) */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 shrink-0">
             {/* Player 1 */}
-            <div className={`p-4 rounded-xl border ${activeDuelSession.player1.id === activeDuelSession.winnerId ? 'bg-amber-500/20 border-amber-400' : 'bg-white/5 border-white/10'}`}>
-              <span className="text-xs font-bold text-slate-300 block truncate">
-                {activeDuelSession.player1.rumuz}
-              </span>
-              <span className="text-2xl font-black text-indigo-400 block my-1">
+            <div className={`p-3 sm:p-4 rounded-xl border ${activeDuelSession.player1.id === activeDuelSession.winnerId ? 'bg-amber-500/20 border-amber-400' : 'bg-white/5 border-white/10'}`}>
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <span className="w-5 h-5 rounded-md bg-indigo-600 border border-indigo-400/50 flex items-center justify-center text-[10px] font-black text-white shrink-0">
+                  {activeDuelSession.player1.rumuz.charAt(0).toUpperCase()}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-slate-200 truncate">
+                  {activeDuelSession.player1.rumuz} {activeDuelPlayerKey === 'player1' ? '(Sen)' : ''}
+                </span>
+              </div>
+              <span className="text-xl sm:text-2xl font-black text-indigo-400 block my-0.5">
                 {activeDuelSession.player1.score} P
               </span>
-              <span className="text-[10px] text-slate-400">
-                Toplam Hata: {Math.round(activeDuelSession.player1.totalDistanceKm)} km
+              <span className="text-[10px] sm:text-xs text-slate-400 block">
+                Toplam Hata: <strong className="text-amber-300">{Math.round(activeDuelSession.player1.totalDistanceKm)} km</strong>
               </span>
             </div>
 
             {/* Player 2 */}
-            <div className={`p-4 rounded-xl border ${activeDuelSession.player2?.id === activeDuelSession.winnerId ? 'bg-amber-500/20 border-amber-400' : 'bg-white/5 border-white/10'}`}>
-              <span className="text-xs font-bold text-slate-300 block truncate">
-                {activeDuelSession.player2?.rumuz || 'Rakip'}
-              </span>
-              <span className="text-2xl font-black text-rose-400 block my-1">
+            <div className={`p-3 sm:p-4 rounded-xl border ${activeDuelSession.player2?.id === activeDuelSession.winnerId ? 'bg-amber-500/20 border-amber-400' : 'bg-white/5 border-white/10'}`}>
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <span className="w-5 h-5 rounded-md bg-rose-600 border border-rose-400/50 flex items-center justify-center text-[10px] font-black text-white shrink-0">
+                  {activeDuelSession.player2?.rumuz.charAt(0).toUpperCase() || 'R'}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-slate-200 truncate">
+                  {activeDuelSession.player2?.rumuz || 'Rakip'} {activeDuelPlayerKey === 'player2' ? '(Sen)' : ''}
+                </span>
+              </div>
+              <span className="text-xl sm:text-2xl font-black text-rose-400 block my-0.5">
                 {activeDuelSession.player2?.score || 0} P
               </span>
-              <span className="text-[10px] text-slate-400">
-                Toplam Hata: {Math.round(activeDuelSession.player2?.totalDistanceKm || 0)} km
+              <span className="text-[10px] sm:text-xs text-slate-400 block">
+                Toplam Hata: <strong className="text-amber-300">{Math.round(activeDuelSession.player2?.totalDistanceKm || 0)} km</strong>
               </span>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          {/* Soru Soru Lokasyon ve Uzaklık Karşılaştırma Tablosu (Aşağı Kaydırmalı & Responsive) */}
+          <div className="flex-1 min-h-0 bg-black/40 border border-white/10 rounded-xl p-2.5 sm:p-3 mb-4 flex flex-col text-left">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 shrink-0">
+              <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                Lokasyon & Uzaklık Karşılaştırması
+              </span>
+              <span className="text-[10px] text-slate-400">
+                {historyList.length} / {activeDuelSession.questionCount} Kayıt
+              </span>
+            </div>
+
+            {/* Scrollable list of question comparisons */}
+            <div className="overflow-y-auto pr-1 space-y-2 max-h-[35vh] sm:max-h-[40vh]">
+              {historyList.length === 0 ? (
+                <div className="text-center py-6 text-xs text-slate-400">
+                  Karşılaştırma detayları yükleniyor...
+                </div>
+              ) : (
+                historyList.map((item, idx) => {
+                  const p1Dist = item.player1DistanceKm;
+                  const p2Dist = item.player2DistanceKm;
+                  const p1Closer = p1Dist < p2Dist;
+                  const p2Closer = p2Dist < p1Dist;
+
+                  return (
+                    <div 
+                      key={item.questionId || idx}
+                      className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-2 sm:p-2.5 transition-all"
+                    >
+                      {/* Top: Round number & Target title */}
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-[9px] font-black bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded shrink-0">
+                            #{idx + 1}
+                          </span>
+                          <span className="text-xs font-bold text-white truncate">
+                            {cleanFeatureTitle(item.targetTitle)}
+                          </span>
+                        </div>
+                        {item.targetCategory && (
+                          <span className="text-[9px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 shrink-0 hidden xs:inline">
+                            {item.targetCategory}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Bottom: Player 1 vs Player 2 comparative distances */}
+                      <div className="grid grid-cols-2 gap-2 text-[11px] sm:text-xs">
+                        {/* Player 1 Stats */}
+                        <div className={`p-1.5 rounded flex items-center justify-between gap-1 ${p1Closer ? 'bg-indigo-950/60 border border-indigo-500/40 text-indigo-200' : 'bg-black/30 text-slate-300'}`}>
+                          <div className="truncate">
+                            <span className="font-semibold text-[10px] text-indigo-300 block truncate">
+                              {activeDuelSession.player1.rumuz}
+                            </span>
+                            <span className="font-mono font-bold">
+                              {item.player1Guess ? `${Math.round(p1Dist)} km` : 'Cevapsız'}
+                            </span>
+                          </div>
+                          <span className="font-black text-[10px] sm:text-xs text-emerald-400 shrink-0">
+                            +{item.player1Points}P
+                          </span>
+                        </div>
+
+                        {/* Player 2 Stats */}
+                        <div className={`p-1.5 rounded flex items-center justify-between gap-1 ${p2Closer ? 'bg-rose-950/60 border border-rose-500/40 text-rose-200' : 'bg-black/30 text-slate-300'}`}>
+                          <div className="truncate">
+                            <span className="font-semibold text-[10px] text-rose-300 block truncate">
+                              {activeDuelSession.player2?.rumuz || 'Rakip'}
+                            </span>
+                            <span className="font-mono font-bold">
+                              {item.player2Guess ? `${Math.round(p2Dist)} km` : 'Cevapsız'}
+                            </span>
+                          </div>
+                          <span className="font-black text-[10px] sm:text-xs text-emerald-400 shrink-0">
+                            +{item.player2Points}P
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 sm:gap-3 shrink-0">
             <button
               onClick={handleLeaveDuel}
-              className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all"
+              className="flex-1 py-2.5 sm:py-3 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
             >
               Lobiye Dön
             </button>
 
             <button
               onClick={handleStartQuickMatch}
-              className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-1.5"
+              className="flex-1 py-2.5 sm:py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Yeni Düello Başlat</span>
@@ -1078,7 +1196,7 @@ export default function DuelMode() {
       {isReveal && (
         <div
           id="duel-round-reveal-banner"
-          className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-30 w-[96vw] max-w-lg bg-[#09090b]/95 backdrop-blur-2xl border border-amber-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 text-white animate-in slide-in-from-bottom-2 duration-150 flex items-center justify-between gap-1.5"
+          className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-30 w-[96vw] max-w-xl bg-[#09090b]/95 backdrop-blur-2xl border border-amber-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 text-white animate-in slide-in-from-bottom-2 duration-150 flex items-center justify-between gap-1.5"
         >
           {/* Left: Sen (Your Stats) */}
           <div className="flex items-center gap-1.5 min-w-0">
@@ -1107,10 +1225,13 @@ export default function DuelMode() {
             </div>
           </div>
 
-          {/* Center: Target Location Badge */}
-          <div className="hidden xs:flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[10px] font-black max-w-[130px] sm:max-w-[170px] truncate shrink">
+          {/* Center: Target Location Badge & 7s Countdown */}
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[10px] font-black max-w-[130px] sm:max-w-[180px] truncate shrink">
             <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
-            <span className="truncate">{sanitizedTitle}</span>
+            <span className="truncate hidden xs:inline">{sanitizedTitle}</span>
+            <span className="text-amber-300 font-mono font-bold ml-auto px-1 py-0.2 bg-amber-500/20 rounded">
+              {revealCountdown}s
+            </span>
           </div>
 
           {/* Right: Opponent Stats */}
@@ -1140,14 +1261,29 @@ export default function DuelMode() {
             </span>
           </div>
 
-          {/* Advance / Next Round Button */}
+          {/* Advance / Next Round Button (Votes to advance immediately if both click) */}
           <button
-            onClick={() => advanceDuelRound(activeDuelSession)}
-            className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950 font-black text-[10px] sm:text-xs rounded-lg shadow-md transition-all flex items-center gap-0.5 shrink-0 cursor-pointer ml-1"
-            title="Sonraki Soruya Geç"
+            onClick={() => {
+              if (activeDuelPlayerKey) {
+                const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
+                if (myId) voteToAdvanceDuelRound(activeDuelSession, myId);
+              }
+            }}
+            className={`px-2.5 py-1 font-black text-[10px] sm:text-xs rounded-lg shadow-md transition-all flex items-center gap-0.5 shrink-0 cursor-pointer ml-1 ${
+              myPlayer?.readyToAdvance
+                ? 'bg-emerald-500/30 border border-emerald-400/60 text-emerald-300'
+                : 'bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950'
+            }`}
+            title={myPlayer?.readyToAdvance ? 'Rakip bekleniyor...' : 'Sonraki soruya geç'}
           >
-            <span>İlerle</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-950 font-black" />
+            {myPlayer?.readyToAdvance ? (
+              <span>Bekleniyor...</span>
+            ) : (
+              <>
+                <span>İlerle</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </>
+            )}
           </button>
         </div>
       )}

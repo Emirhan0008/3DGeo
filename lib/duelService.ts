@@ -23,6 +23,20 @@ export interface DuelGuess {
   submittedAt: number;
 }
 
+export interface DuelRoundHistory {
+  roundIndex: number;
+  questionId: string;
+  targetTitle: string;
+  targetCoords: [number, number];
+  targetCategory?: string;
+  player1Guess: DuelGuess | null;
+  player2Guess: DuelGuess | null;
+  player1Points: number;
+  player2Points: number;
+  player1DistanceKm: number;
+  player2DistanceKm: number;
+}
+
 export interface DuelPlayer {
   id: string;
   rumuz: string;
@@ -32,6 +46,7 @@ export interface DuelPlayer {
   totalDistanceKm: number;
   currentGuess?: DuelGuess | null;
   isReady: boolean;
+  readyToAdvance?: boolean;
   pingMs?: number;
   isBot?: boolean;
 }
@@ -52,6 +67,7 @@ export interface DuelSession {
   roundTimeLimit: number; // usually 15
   bothAnsweredAt?: number | null;
   winnerId?: string | 'draw' | null;
+  roundHistory?: DuelRoundHistory[];
   createdAt: string;
   updatedAt: string;
 }
@@ -545,11 +561,39 @@ export async function handleRoundTimeout(duel: DuelSession, _targetCoords?: [num
 }
 
 /**
+ * Builds history snapshot for the concluded round
+ */
+function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
+  const currentQId = duel.questionIds[duel.currentRound];
+  const questionObj = PIN_GAME_QUESTIONS.find((q) => q.id === currentQId);
+  
+  const historyEntry: DuelRoundHistory = {
+    roundIndex: duel.currentRound,
+    questionId: currentQId || `q_${duel.currentRound}`,
+    targetTitle: questionObj?.title || `Soru #${duel.currentRound + 1}`,
+    targetCoords: questionObj?.targetCoords || [35.0, 39.0],
+    targetCategory: questionObj?.category || duel.categoryFilter,
+    player1Guess: duel.player1.currentGuess || null,
+    player2Guess: duel.player2?.currentGuess || null,
+    player1Points: duel.player1.currentGuess?.pointsEarned || 0,
+    player2Points: duel.player2?.currentGuess?.pointsEarned || 0,
+    player1DistanceKm: duel.player1.currentGuess ? Math.round(duel.player1.currentGuess.distanceKm * 10) / 10 : 850,
+    player2DistanceKm: duel.player2?.currentGuess ? Math.round(duel.player2.currentGuess.distanceKm * 10) / 10 : 850
+  };
+
+  const existingHistory = duel.roundHistory || [];
+  // Avoid duplicate entry for same roundIndex
+  const filtered = existingHistory.filter(h => h.roundIndex !== duel.currentRound);
+  return [...filtered, historyEntry];
+}
+
+/**
  * Advances to the next round or finishes the duel
  */
 export async function advanceDuelRound(duel: DuelSession): Promise<void> {
   const nextRound = duel.currentRound + 1;
   const isFinished = nextRound >= duel.questionCount;
+  const updatedHistory = recordCurrentRoundHistory(duel);
 
   if (isFinished) {
     let winnerId: string | 'draw' = 'draw';
@@ -563,6 +607,9 @@ export async function advanceDuelRound(duel: DuelSession): Promise<void> {
       await updateDoc(doc(db, 'duels', duel.id), {
         status: 'finished',
         winnerId,
+        roundHistory: updatedHistory,
+        'player1.readyToAdvance': false,
+        'player2.readyToAdvance': false,
         updatedAt: new Date().toISOString()
       });
     } catch (error) {
@@ -579,12 +626,49 @@ export async function advanceDuelRound(duel: DuelSession): Promise<void> {
       status: 'in_progress',
       roundStartTime: now,
       bothAnsweredAt: null,
+      roundHistory: updatedHistory,
       'player1.currentGuess': null,
       'player2.currentGuess': null,
+      'player1.readyToAdvance': false,
+      'player2.readyToAdvance': false,
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
     console.error('Advance round error:', error);
+    handleFirestoreError(error, OperationType.WRITE, `duels/${duel.id}`);
+  }
+}
+
+/**
+ * Handles a player clicking "İlerle" (Vote to advance) during round_reveal.
+ * If both players voted to advance (or if playing against Bot), advances immediately.
+ */
+export async function voteToAdvanceDuelRound(duel: DuelSession, playerId: string): Promise<void> {
+  if (duel.status !== 'round_reveal') return;
+
+  const isPlayer1 = duel.player1.id === playerId;
+  const isPlayer2 = duel.player2?.id === playerId;
+  if (!isPlayer1 && !isPlayer2) return;
+
+  const playerKey = isPlayer1 ? 'player1' : 'player2';
+  const otherPlayer = isPlayer1 ? duel.player2 : duel.player1;
+  const isBotMatch = !!otherPlayer?.isBot;
+  const otherIsReady = isBotMatch || !!otherPlayer?.readyToAdvance;
+
+  // If other player is already ready (or bot), advance to next round immediately!
+  if (otherIsReady) {
+    await advanceDuelRound(duel);
+    return;
+  }
+
+  // Otherwise, mark this player as ready to advance and wait for other player or 7s timer
+  try {
+    await updateDoc(doc(db, 'duels', duel.id), {
+      [`${playerKey}.readyToAdvance`]: true,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Vote to advance error:', error);
     handleFirestoreError(error, OperationType.WRITE, `duels/${duel.id}`);
   }
 }
