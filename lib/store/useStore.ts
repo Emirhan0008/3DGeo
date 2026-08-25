@@ -831,9 +831,5 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeDuelPlayerKey: null,
   setActiveDuelPlayerKey: (key) => set({ activeDuelPlayerKey: key }),
   duelPinCoords: null,
-  setDuelPinCoords: (coords) => set({ duelPinCoords: coords }),
-
-  unlockedBadges: ['3D Coğrafyacı Çırağı'],
-  totalQuestionsAnswered: 0,
-  correctAnswersCount: 0
+  setDuelPinCoords: (coords) => set({ duelPinCoords: coords })
 }));

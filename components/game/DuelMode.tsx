@@ -1380,7 +1380,7 @@ export default function DuelMode() {
         {/* Center / Bottom: KPSS Question & Choice Options Card */}
         <div className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/60 rounded-2xl shadow-2xl p-3 sm:p-4 text-white my-auto animate-in slide-in-from-bottom-3 duration-200">
           <div className="font-extrabold text-xs sm:text-sm text-slate-100 leading-relaxed mb-3">
-            {currentTestQ.question}
+            {currentTestQ.questionText}
           </div>
 
           {/* Options A, B, C, D, E */}
