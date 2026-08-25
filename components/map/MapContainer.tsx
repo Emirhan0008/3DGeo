@@ -6,8 +6,6 @@ import { useAppStore, MapStyleType } from '@/lib/store/useStore';
 import { ALL_GEO_FEATURES, GeoFeature } from '@/lib/data/turkeyData';
 import turkeyProvincesGeoJSON from '@/public/data/turkey-provinces.json';
 import { 
-  PIN_GAME_QUESTIONS, 
-  MULTIPLE_CHOICE_QUESTIONS,
   getCurrentPinQuestion,
   getCurrentQuizQuestion
 } from '@/lib/data/quizQuestions';
@@ -165,46 +163,6 @@ const CATEGORY_STYLES: Record<GeoFeature['type'], { bg: string; ring: string; pu
   coastal: { bg: 'bg-teal-500', ring: 'ring-teal-400', pulse: 'bg-teal-400', badgeBg: 'bg-teal-950/90', text: 'text-teal-200', border: 'border-teal-400/60' }
 };
 
-// Detailed high-resolution Turkey national border ring coordinates (110+ precise waypoints)
-const DETAILED_TURKEY_BORDER_RING: [number, number][] = [
-  // --- Thrace / Bulgaria & Greece Borders ---
-  [26.04, 41.72], [26.35, 41.71], [26.70, 41.85], [27.05, 41.98], [27.50, 42.01], [28.02, 41.87],
-  [28.10, 41.50], [28.60, 41.35], [29.10, 41.25], [29.50, 41.18], [29.90, 41.15],
-  
-  // --- Black Sea Coastline (West to East) ---
-  [30.30, 41.15], [30.70, 41.20], [31.20, 41.30], [31.80, 41.50], [32.10, 41.70], [32.50, 41.90],
-  [33.10, 41.95], [34.00, 42.00], [34.50, 42.05], [35.00, 42.10], [35.50, 41.95], [36.00, 41.80],
-  [36.50, 41.40], [37.00, 41.10], [37.70, 41.00], [38.30, 41.00], [39.00, 41.02], [39.70, 41.05],
-  [40.20, 41.08], [40.50, 41.10], [40.80, 41.20], [41.20, 41.35], [41.55, 41.55],
-  
-  // --- Georgia / Armenia / Nakhchivan Land Borders ---
-  [41.80, 41.50], [42.20, 41.50], [42.50, 41.35], [42.80, 41.20], [43.10, 41.15], [43.50, 41.10],
-  [43.70, 40.80], [43.90, 40.65], [44.00, 40.50], [44.20, 40.25], [44.50, 40.00], [44.80, 39.70],
-  [44.82, 39.60], [44.60, 39.45],
-  
-  // --- Iran Land Border ---
-  [44.40, 39.30], [44.30, 39.00], [44.30, 38.80], [44.32, 38.50], [44.35, 38.20], [44.45, 37.90],
-  [44.50, 37.60], [44.70, 37.40], [44.80, 37.20], [44.55, 37.15], [44.30, 37.10],
-  
-  // --- Iraq & Syria Land Borders ---
-  [44.00, 37.12], [43.80, 37.15], [43.40, 37.18], [43.00, 37.20], [42.60, 37.15], [42.30, 37.10],
-  [41.80, 37.12], [41.20, 37.30], [40.60, 37.10], [40.00, 37.00], [39.40, 36.85], [38.80, 36.70],
-  [38.30, 36.70], [37.80, 36.70], [37.20, 36.68], [36.80, 36.70], [36.60, 36.60], [36.20, 36.30],
-  [35.90, 35.85], [35.95, 36.30], [36.20, 36.80],
-  
-  // --- Mediterranean Coastline ---
-  [35.80, 36.70], [35.50, 36.75], [35.20, 36.60], [34.70, 36.55], [34.30, 36.50], [33.90, 36.30],
-  [33.50, 36.15], [33.10, 36.12], [32.80, 36.10], [32.30, 36.20], [32.00, 36.30], [31.50, 36.80],
-  [31.00, 36.85], [30.60, 36.30], [30.10, 36.25], [29.80, 36.20], [29.40, 36.22], [29.10, 36.20],
-  [28.70, 36.40], [28.30, 36.70], [27.80, 36.70], [27.30, 36.70],
-  
-  // --- Aegean Coastline ---
-  [27.20, 37.00], [27.20, 37.30], [27.30, 37.60], [27.40, 37.80], [27.10, 37.95], [26.80, 38.00],
-  [26.50, 38.15], [26.30, 38.30], [26.50, 38.55], [26.80, 38.80], [26.90, 39.10], [26.90, 39.30],
-  [26.50, 39.40], [26.00, 39.50], [26.00, 39.80], [26.00, 40.00], [26.30, 40.20], [26.50, 40.40],
-  [26.35, 40.60], [26.20, 40.80], [26.10, 41.20], [26.04, 41.72]
-];
-
 // Interior Regional Boundary Division Lines (7 Geographical Regions)
 const TURKEY_REGION_DIVISIONS: [number, number][][] = [
   // Marmara - Ege / İç Anadolu Border
@@ -237,14 +195,14 @@ function setupTurkeyNationalBordersAndMask(map: maplibregl.Map, isBlind: boolean
     ];
     layersToRemove.forEach((id) => {
       if (map.getLayer(id)) {
-        try { map.removeLayer(id); } catch (_) {}
+        try { map.removeLayer(id); } catch { /* noop */ }
       }
     });
 
     const sourcesToRemove = ['turkey-border-src', 'turkey-mask-src', 'turkey-regions-src', 'turkey-provinces-src'];
     sourcesToRemove.forEach((id) => {
       if (map.getSource(id)) {
-        try { map.removeSource(id); } catch (_) {}
+        try { map.removeSource(id); } catch { /* noop */ }
       }
     });
 
@@ -372,7 +330,6 @@ export default function MapContainer() {
   } = useAppStore();
 
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [currentPitch, setCurrentPitch] = useState(50);
   const [currentZoom, setCurrentZoom] = useState(6.2);
 
   // Animated Tour Mode state
@@ -421,7 +378,6 @@ export default function MapContainer() {
       }
     });
 
-    map.on('pitch', () => setCurrentPitch(Math.round(map.getPitch())));
     map.on('zoom', () => setCurrentZoom(parseFloat(map.getZoom().toFixed(1))));
 
     // Click handler for Pin Guess Game, 1v1 Duel & Map Dismiss

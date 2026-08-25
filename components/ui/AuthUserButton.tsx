@@ -88,18 +88,19 @@ export default function AuthUserButton() {
           if (savedPin) {
             const result = await verifyAndLoadRumuzProfile(savedRumuz, savedPin);
             if (result.success && result.profile) {
+              const st = useAppStore.getState();
               hydrateUserData({
-                score: result.profile.score ?? score,
-                streak: result.profile.streak ?? streak,
-                totalQuestionsAnswered: result.profile.totalQuestionsAnswered ?? totalQuestionsAnswered,
-                correctAnswersCount: result.profile.correctAnswersCount ?? correctAnswersCount,
-                totalDistanceErrorKm: result.profile.totalDistanceErrorKm ?? totalDistanceErrorKm,
-                pinGuessCount: result.profile.pinGuessCount ?? pinGuessCount,
-                unlockedBadges: result.profile.unlockedBadges ?? unlockedBadges,
-                isBlindMapMode: result.profile.isBlindMapMode ?? isBlindMapMode,
-                regionalStats: result.profile.regionalStats ?? regionalStats,
-                categoryStats: result.profile.categoryStats ?? categoryStats,
-                missedItems: result.profile.missedItems ?? missedItems
+                score: result.profile.score ?? st.score,
+                streak: result.profile.streak ?? st.streak,
+                totalQuestionsAnswered: result.profile.totalQuestionsAnswered ?? st.totalQuestionsAnswered,
+                correctAnswersCount: result.profile.correctAnswersCount ?? st.correctAnswersCount,
+                totalDistanceErrorKm: result.profile.totalDistanceErrorKm ?? st.totalDistanceErrorKm,
+                pinGuessCount: result.profile.pinGuessCount ?? st.pinGuessCount,
+                unlockedBadges: result.profile.unlockedBadges ?? st.unlockedBadges,
+                isBlindMapMode: result.profile.isBlindMapMode ?? st.isBlindMapMode,
+                regionalStats: result.profile.regionalStats ?? st.regionalStats,
+                categoryStats: result.profile.categoryStats ?? st.categoryStats,
+                missedItems: result.profile.missedItems ?? st.missedItems
               });
               setLoading(false);
               return;
@@ -132,6 +133,7 @@ export default function AuthUserButton() {
 
       if (currentUser) {
         try {
+          const currentState = useAppStore.getState();
           const userRef = doc(db, 'users', currentUser.uid);
           const progressRef = doc(db, 'users', currentUser.uid, 'progress', 'current');
           const userSnap = await getDoc(userRef);
@@ -142,39 +144,39 @@ export default function AuthUserButton() {
             const progData = progressSnap.exists() ? progressSnap.data() : {};
 
             hydrateUserData({
-              score: data.score ?? score,
-              streak: data.streak ?? streak,
-              totalQuestionsAnswered: data.totalQuestionsAnswered ?? totalQuestionsAnswered,
-              correctAnswersCount: data.correctAnswersCount ?? correctAnswersCount,
-              totalDistanceErrorKm: data.totalDistanceErrorKm ?? totalDistanceErrorKm,
-              pinGuessCount: data.pinGuessCount ?? pinGuessCount,
-              unlockedBadges: data.unlockedBadges ?? unlockedBadges,
-              isBlindMapMode: data.isBlindMapMode ?? isBlindMapMode,
-              regionalStats: progData.regionalStats ?? regionalStats,
-              categoryStats: progData.categoryStats ?? categoryStats,
-              missedItems: progData.missedItems ?? missedItems
+              score: data.score ?? currentState.score,
+              streak: data.streak ?? currentState.streak,
+              totalQuestionsAnswered: data.totalQuestionsAnswered ?? currentState.totalQuestionsAnswered,
+              correctAnswersCount: data.correctAnswersCount ?? currentState.correctAnswersCount,
+              totalDistanceErrorKm: data.totalDistanceErrorKm ?? currentState.totalDistanceErrorKm,
+              pinGuessCount: data.pinGuessCount ?? currentState.pinGuessCount,
+              unlockedBadges: data.unlockedBadges ?? currentState.unlockedBadges,
+              isBlindMapMode: data.isBlindMapMode ?? currentState.isBlindMapMode,
+              regionalStats: progData.regionalStats ?? currentState.regionalStats,
+              categoryStats: progData.categoryStats ?? currentState.categoryStats,
+              missedItems: progData.missedItems ?? currentState.missedItems
             });
           } else {
             await setDoc(userRef, {
               uid: currentUser.uid,
               displayName: currentUser.displayName || localRumuz || 'KPSS Öğrencisi',
               email: currentUser.email || '',
-              score,
-              streak,
-              totalQuestionsAnswered,
-              correctAnswersCount,
-              totalDistanceErrorKm,
-              pinGuessCount,
-              unlockedBadges,
-              isBlindMapMode,
+              score: currentState.score,
+              streak: currentState.streak,
+              totalQuestionsAnswered: currentState.totalQuestionsAnswered,
+              correctAnswersCount: currentState.correctAnswersCount,
+              totalDistanceErrorKm: currentState.totalDistanceErrorKm,
+              pinGuessCount: currentState.pinGuessCount,
+              unlockedBadges: currentState.unlockedBadges,
+              isBlindMapMode: currentState.isBlindMapMode,
               updatedAt: new Date().toISOString()
             }, { merge: true });
 
             await setDoc(progressRef, {
               userId: currentUser.uid,
-              regionalStats,
-              categoryStats,
-              missedItems,
+              regionalStats: currentState.regionalStats,
+              categoryStats: currentState.categoryStats,
+              missedItems: currentState.missedItems,
               updatedAt: new Date().toISOString()
             }, { merge: true });
           }
@@ -185,8 +187,7 @@ export default function AuthUserButton() {
     });
 
     return () => unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hydrateUserData, localRumuz]);
 
   // Sync state to localStorage & Cloud Firestore continuously whenever stats change
   useEffect(() => {

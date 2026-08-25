@@ -1,8 +1,6 @@
 import { create } from 'zustand';
-import { GeoFeature, ALL_GEO_FEATURES } from '../data/turkeyData';
+import { GeoFeature } from '../data/turkeyData';
 import { 
-  PIN_GAME_QUESTIONS, 
-  MULTIPLE_CHOICE_QUESTIONS,
   getCurrentPinQuestion,
   getCurrentQuizQuestion,
   getFilteredPinQuestions,
@@ -34,6 +32,16 @@ export interface LayerState {
   borderGates: boolean;
   mines: boolean;
   provinces: boolean;
+}
+
+export interface DuelStats {
+  duelWins: number;
+  duelLosses: number;
+  duelDraws: number;
+  totalDuelsPlayed: number;
+  duelScore: number;
+  duelStreak: number;
+  bestDuelStreak: number;
 }
 
 export interface AppState {
@@ -106,6 +114,8 @@ export interface AppState {
   setActiveDuelPlayerKey: (key: 'player1' | 'player2' | null) => void;
   duelPinCoords: [number, number] | null;
   setDuelPinCoords: (coords: [number, number] | null) => void;
+  duelStats: DuelStats;
+  recordDuelFinish: (winnerId: string | 'draw', myPlayerId: string, myScore: number) => void;
 
   // Gamification, Category Mastery & Badges
   unlockedBadges: string[];
@@ -132,6 +142,42 @@ export interface AppState {
   missedItems: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
   resetStats: () => void;
   hydrateUserData: (data: Partial<AppState>) => void;
+}
+
+function saveStatsToLocalStorage(state: AppState) {
+  if (typeof window === 'undefined') return;
+  try {
+    const payload = {
+      score: state.score,
+      quizScore: state.quizScore,
+      totalQuestionsAnswered: state.totalQuestionsAnswered,
+      correctAnswersCount: state.correctAnswersCount,
+      regionalStats: state.regionalStats,
+      categoryStats: state.categoryStats,
+      totalDistanceErrorKm: state.totalDistanceErrorKm,
+      pinGuessCount: state.pinGuessCount,
+      unlockedBadges: state.unlockedBadges,
+      categoryMasteryProgress: state.categoryMasteryProgress,
+      missedItems: state.missedItems,
+      duelStats: state.duelStats
+    };
+    localStorage.setItem('kpss3d_user_stats', JSON.stringify(payload));
+  } catch (e) {
+    console.warn('LocalStorage save error:', e);
+  }
+}
+
+function getStoredStatsFromLocalStorage(): Partial<AppState> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem('kpss3d_user_stats');
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    console.warn('LocalStorage parse error:', e);
+  }
+  return {};
 }
 
 // Haversine formula to calculate distance in km between two lat/lng points
@@ -317,7 +363,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   cameraFlyTarget: null,
   flyToCoords: (coords, pitch = 0, bearing = 0, zoom = 7.5) =>
-    set({ cameraFlyTarget: { coords, pitch: 0, bearing: 0, zoom: Math.min(zoom, 8.2) } }),
+    set({ cameraFlyTarget: { coords, pitch, bearing, zoom: Math.min(zoom, 8.2) } }),
   clearFlyTarget: () => set({ cameraFlyTarget: null }),
 
   // Pin Guessing Game Logic
@@ -360,7 +406,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Analytics & Statistics Tracking State
-  regionalStats: {
+  regionalStats: getStoredStatsFromLocalStorage().regionalStats || {
     'Marmara': { correct: 0, wrong: 0 },
     'Ege': { correct: 0, wrong: 0 },
     'Akdeniz': { correct: 0, wrong: 0 },
@@ -369,7 +415,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     'Doğu Anadolu': { correct: 0, wrong: 0 },
     'Güneydoğu Anadolu': { correct: 0, wrong: 0 }
   },
-  categoryStats: {
+  categoryStats: getStoredStatsFromLocalStorage().categoryStats || {
     'Dağlar': { correct: 0, wrong: 0 },
     'Akarsular': { correct: 0, wrong: 0 },
     'Göller': { correct: 0, wrong: 0 },
@@ -379,11 +425,25 @@ export const useAppStore = create<AppState>((set, get) => ({
     'Madenler': { correct: 0, wrong: 0 },
     'Karstik & Kıyı': { correct: 0, wrong: 0 }
   },
-  totalDistanceErrorKm: 0,
-  pinGuessCount: 0,
+  totalDistanceErrorKm: getStoredStatsFromLocalStorage().totalDistanceErrorKm || 0,
+  pinGuessCount: getStoredStatsFromLocalStorage().pinGuessCount || 0,
+  totalQuestionsAnswered: getStoredStatsFromLocalStorage().totalQuestionsAnswered || 0,
+  correctAnswersCount: getStoredStatsFromLocalStorage().correctAnswersCount || 0,
+  unlockedBadges: getStoredStatsFromLocalStorage().unlockedBadges || ['3D Coğrafyacı Çırağı'],
+  categoryMasteryProgress: getStoredStatsFromLocalStorage().categoryMasteryProgress || {},
+
+  // Duel Stats
+  duelStats: getStoredStatsFromLocalStorage().duelStats || {
+    duelWins: 0,
+    duelLosses: 0,
+    duelDraws: 0,
+    totalDuelsPlayed: 0,
+    duelScore: 0,
+    duelStreak: 0,
+    bestDuelStreak: 0
+  },
 
   // Gamification, Category Mastery & Badge State
-  categoryMasteryProgress: {},
   latestUnlockedBadge: null,
   clearLatestUnlockedBadge: () => set({ latestUnlockedBadge: null }),
 
@@ -401,36 +461,109 @@ export const useAppStore = create<AppState>((set, get) => ({
   })),
 
   // Tracked Weak Spots / Misplaced Geography Items
-  missedItems: {},
+  missedItems: getStoredStatsFromLocalStorage().missedItems || {},
 
-  resetStats: () => set({
-    regionalStats: {
-      'Marmara': { correct: 0, wrong: 0 },
-      'Ege': { correct: 0, wrong: 0 },
-      'Akdeniz': { correct: 0, wrong: 0 },
-      'İç Anadolu': { correct: 0, wrong: 0 },
-      'Karadeniz': { correct: 0, wrong: 0 },
-      'Doğu Anadolu': { correct: 0, wrong: 0 },
-      'Güneydoğu Anadolu': { correct: 0, wrong: 0 }
-    },
-    categoryStats: {
-      'Dağlar': { correct: 0, wrong: 0 },
-      'Akarsular': { correct: 0, wrong: 0 },
-      'Göller': { correct: 0, wrong: 0 },
-      'Sınır Kapıları': { correct: 0, wrong: 0 },
-      'Geçitler': { correct: 0, wrong: 0 },
-      'Platolar & Ovalar': { correct: 0, wrong: 0 },
-      'Madenler': { correct: 0, wrong: 0 },
-      'Karstik & Kıyı': { correct: 0, wrong: 0 }
-    },
-    totalQuestionsAnswered: 0,
-    correctAnswersCount: 0,
-    totalDistanceErrorKm: 0,
-    pinGuessCount: 0,
-    missedItems: {}
-  }),
+  resetStats: () => {
+    set({
+      regionalStats: {
+        'Marmara': { correct: 0, wrong: 0 },
+        'Ege': { correct: 0, wrong: 0 },
+        'Akdeniz': { correct: 0, wrong: 0 },
+        'İç Anadolu': { correct: 0, wrong: 0 },
+        'Karadeniz': { correct: 0, wrong: 0 },
+        'Doğu Anadolu': { correct: 0, wrong: 0 },
+        'Güneydoğu Anadolu': { correct: 0, wrong: 0 }
+      },
+      categoryStats: {
+        'Dağlar': { correct: 0, wrong: 0 },
+        'Akarsular': { correct: 0, wrong: 0 },
+        'Göller': { correct: 0, wrong: 0 },
+        'Sınır Kapıları': { correct: 0, wrong: 0 },
+        'Geçitler': { correct: 0, wrong: 0 },
+        'Platolar & Ovalar': { correct: 0, wrong: 0 },
+        'Madenler': { correct: 0, wrong: 0 },
+        'Karstik & Kıyı': { correct: 0, wrong: 0 }
+      },
+      totalQuestionsAnswered: 0,
+      correctAnswersCount: 0,
+      totalDistanceErrorKm: 0,
+      pinGuessCount: 0,
+      missedItems: {},
+      duelStats: {
+        duelWins: 0,
+        duelLosses: 0,
+        duelDraws: 0,
+        totalDuelsPlayed: 0,
+        duelScore: 0,
+        duelStreak: 0,
+        bestDuelStreak: 0
+      }
+    });
+    saveStatsToLocalStorage(get());
+  },
 
-  hydrateUserData: (data) => set((s) => ({ ...s, ...data })),
+  hydrateUserData: (data) => {
+    set((s) => ({ ...s, ...data }));
+    saveStatsToLocalStorage(get());
+  },
+
+  recordDuelFinish: (winnerId, myPlayerId, myScore) => {
+    const state = get();
+    const isWin = winnerId === myPlayerId;
+    const isDraw = winnerId === 'draw';
+    const isLoss = !isWin && !isDraw;
+
+    const newWins = state.duelStats.duelWins + (isWin ? 1 : 0);
+    const newLosses = state.duelStats.duelLosses + (isLoss ? 1 : 0);
+    const newDraws = state.duelStats.duelDraws + (isDraw ? 1 : 0);
+    const newTotal = state.duelStats.totalDuelsPlayed + 1;
+    const newScore = state.duelStats.duelScore + myScore;
+    const newStreak = isWin ? state.duelStats.duelStreak + 1 : 0;
+    const newBestStreak = Math.max(state.duelStats.bestDuelStreak, newStreak);
+
+    const updatedDuelStats: DuelStats = {
+      duelWins: newWins,
+      duelLosses: newLosses,
+      duelDraws: newDraws,
+      totalDuelsPlayed: newTotal,
+      duelScore: newScore,
+      duelStreak: newStreak,
+      bestDuelStreak: newBestStreak
+    };
+
+    // Check duel badges
+    const newBadges = [...state.unlockedBadges];
+    let newlyUnlockedBadge = state.latestUnlockedBadge;
+
+    if (!newBadges.includes('Arena Çaylağı') && newTotal >= 1) {
+      newBadges.push('Arena Çaylağı');
+      newlyUnlockedBadge = { name: 'Arena Çaylağı', icon: '⚔️', desc: 'İlk canlı 1v1 düellonu tamamladın!' };
+    }
+    if (!newBadges.includes('1v1 Gladyatör') && newWins >= 3) {
+      newBadges.push('1v1 Gladyatör');
+      newlyUnlockedBadge = { name: '1v1 Gladyatör', icon: '🛡️', desc: 'Düellolarda 3 zafer kazandın!' };
+    }
+    if (!newBadges.includes('Düello Şampiyonu') && newWins >= 10) {
+      newBadges.push('Düello Şampiyonu');
+      newlyUnlockedBadge = { name: 'Düello Şampiyonu', icon: '👑', desc: '10 düello zaferiyle KPSS zirvesine oturdun!' };
+    }
+    if (!newBadges.includes('Yenilmez Fatih') && newStreak >= 3) {
+      newBadges.push('Yenilmez Fatih');
+      newlyUnlockedBadge = { name: 'Yenilmez Fatih', icon: '🏆', desc: 'Üst üste 3 düello maçı kazandın!' };
+    }
+    if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 8) {
+      newBadges.push('Efsanevi Coğrafyacı');
+      newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '8 rozetle efsanevi prestij seviyesine ulaştın!' };
+    }
+
+    set({
+      duelStats: updatedDuelStats,
+      unlockedBadges: newBadges,
+      latestUnlockedBadge: newlyUnlockedBadge
+    });
+
+    saveStatsToLocalStorage(get());
+  },
 
   submitPinGuess: (userLng, userLat) => {
     const state = get();
@@ -536,6 +669,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       pinGuessCount: state.pinGuessCount + 1,
       missedItems: updatedMissed
     });
+
+    saveStatsToLocalStorage(get());
 
     // Smoothly fly and zoom to 7.0x at the target location when answer/guess is revealed
     get().flyToCoords(currentQ.targetCoords, 0, 0, 7.0);
@@ -643,6 +778,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       regionalStats: updatedRegStats,
       categoryStats: updatedCatStats
     });
+
+    saveStatsToLocalStorage(get());
 
     if (currentQ.targetCoords) {
       get().flyToCoords(currentQ.targetCoords, 0, 0, 7.0);

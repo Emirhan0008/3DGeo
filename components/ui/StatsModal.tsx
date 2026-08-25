@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { ALL_BADGES } from '@/lib/data/badgesData';
+import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
 import { 
   Trophy, 
   Flame, 
@@ -22,7 +23,9 @@ import {
   RotateCcw,
   Navigation,
   CheckCircle2,
-  Layers
+  Layers,
+  Swords,
+  Crown
 } from 'lucide-react';
 
 export default function StatsModal() {
@@ -38,6 +41,7 @@ export default function StatsModal() {
     totalDistanceErrorKm,
     pinGuessCount,
     missedItems,
+    duelStats,
     flyToCoords,
     setActiveTab,
     isBlindMapMode,
@@ -47,7 +51,7 @@ export default function StatsModal() {
 
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
-  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'regions' | 'weakspots' | 'ai_report'>('overview');
+  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'regions' | 'weakspots' | 'duel_stats' | 'ai_report'>('overview');
 
   const accuracyPct = totalQuestionsAnswered > 0
     ? Math.round((correctAnswersCount / totalQuestionsAnswered) * 100)
@@ -55,6 +59,10 @@ export default function StatsModal() {
 
   const avgDistanceKm = pinGuessCount > 0
     ? Math.round(totalDistanceErrorKm / pinGuessCount)
+    : 0;
+
+  const duelWinRate = duelStats.totalDuelsPlayed > 0
+    ? Math.round((duelStats.duelWins / duelStats.totalDuelsPlayed) * 100)
     : 0;
 
   // Determine user competence rank
@@ -114,6 +122,8 @@ export default function StatsModal() {
             avgDistanceKm,
             maxWrongReg,
             maxWrongCat,
+            duelWins: duelStats.duelWins,
+            totalDuelsPlayed: duelStats.totalDuelsPlayed,
             missedItemsList: missedList.map((m) => `${m.name} (${m.region})`).join(', ')
           }
         })
@@ -136,16 +146,19 @@ export default function StatsModal() {
     <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 w-[95%] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-4 transition-all max-h-[88vh] overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-indigo-500/20 border border-indigo-500/40 rounded-xl text-indigo-400">
-            <BarChart3 className="w-5 h-5" />
-          </div>
+        <div className="flex items-center gap-3">
+          <AvatarWithBadgeFrame 
+            rumuz="Sen"
+            unlockedBadges={unlockedBadges}
+            duelWins={duelStats.duelWins}
+            size="md"
+          />
           <div>
             <h2 className="font-black text-sm sm:text-base text-white tracking-wide">
               AKILLI KPSS COĞRAFYA TEŞHİS &amp; ANALİZ PANOSU
             </h2>
             <p className="text-[10px] text-slate-400 font-medium">
-              Soru ve harita testlerinizden elde edilen kişisel gelişim verileri
+              Soru, harita ve 1v1 canlı düello testlerinizden elde edilen kişisel gelişim verileri
             </p>
           </div>
         </div>
@@ -173,7 +186,7 @@ export default function StatsModal() {
       <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 mb-3 overflow-x-auto text-xs">
         <button
           onClick={() => setActiveSubTab('overview')}
-          className={`flex-1 py-1.5 px-3 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
             activeSubTab === 'overview'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
@@ -184,27 +197,39 @@ export default function StatsModal() {
         </button>
 
         <button
+          onClick={() => setActiveSubTab('duel_stats')}
+          className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+            activeSubTab === 'duel_stats'
+              ? 'bg-rose-600 text-white shadow-md'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+          }`}
+        >
+          <Swords className="w-3.5 h-3.5 text-rose-300" />
+          <span>1v1 Düello Karnesi</span>
+        </button>
+
+        <button
           onClick={() => setActiveSubTab('regions')}
-          className={`flex-1 py-1.5 px-3 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
             activeSubTab === 'regions'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
-          <span>Bölge &amp; Konu Karnesi</span>
+          <span>Bölge &amp; Konu</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('weakspots')}
-          className={`flex-1 py-1.5 px-3 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
             activeSubTab === 'weakspots'
-              ? 'bg-rose-600 text-white shadow-md'
+              ? 'bg-amber-600 text-white shadow-md'
               : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
           }`}
         >
           <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
-          <span>Sık Karıştırılanlar ({missedList.length})</span>
+          <span>Hatalar ({missedList.length})</span>
         </button>
 
         <button
@@ -215,14 +240,14 @@ export default function StatsModal() {
               setActiveSubTab('ai_report');
             }
           }}
-          className={`flex-1 py-1.5 px-3 rounded-lg font-black transition-all whitespace-nowrap flex items-center justify-center gap-1.5 border ${
+          className={`flex-1 py-1.5 px-2.5 rounded-lg font-black transition-all whitespace-nowrap flex items-center justify-center gap-1.5 border ${
             activeSubTab === 'ai_report'
               ? 'bg-amber-500 text-slate-950 border-amber-300 font-extrabold shadow-md'
               : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
-          <span>AI Teşhis Raporu</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>AI Teşhis</span>
         </button>
       </div>
 
@@ -248,25 +273,25 @@ export default function StatsModal() {
             <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
               <Trophy className="w-4 h-4 text-amber-400 mx-auto mb-1" />
               <span className="text-[9px] uppercase font-bold text-slate-400">Toplam Puan</span>
-              <div className="font-black text-base text-amber-300">{score}</div>
+              <div className="font-black text-lg text-white">{score}</div>
             </div>
 
             <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
-              <Flame className="w-4 h-4 text-orange-500 fill-orange-500 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">Üst Üste Seri</span>
-              <div className="font-black text-base text-orange-400">{streak}</div>
+              <Flame className="w-4 h-4 text-orange-400 mx-auto mb-1" />
+              <span className="text-[9px] uppercase font-bold text-slate-400">Mevcut Seri</span>
+              <div className="font-black text-lg text-orange-400">{streak} 🔥</div>
             </div>
 
             <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
               <Target className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">Doğru Cevap</span>
-              <div className="font-black text-base text-emerald-300">{correctAnswersCount}/{totalQuestionsAnswered}</div>
+              <span className="text-[9px] uppercase font-bold text-slate-400">Çözülen Soru</span>
+              <div className="font-black text-lg text-emerald-400">{correctAnswersCount}/{totalQuestionsAnswered}</div>
             </div>
 
             <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
-              <Compass className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">Harita Ort. Sapma</span>
-              <div className="font-black text-base text-cyan-300">{avgDistanceKm} km</div>
+              <Compass className="w-4 h-4 text-indigo-400 mx-auto mb-1" />
+              <span className="text-[9px] uppercase font-bold text-slate-400">Ort. Mesafe Sapması</span>
+              <div className="font-black text-lg text-indigo-300">{avgDistanceKm} km</div>
             </div>
           </div>
 
@@ -274,7 +299,7 @@ export default function StatsModal() {
           <div className="p-3 bg-gradient-to-r from-rose-950/40 via-[#09090b] to-amber-950/30 border border-rose-500/30 rounded-xl space-y-2">
             <div className="flex items-center gap-2 text-xs font-black text-amber-300">
               <AlertTriangle className="w-4 h-4 text-amber-400" />
-              <span>SPESİFİK KPSS ZAYIF HAKAM VE HATA TESPİTİ</span>
+              <span>SPESİFİK KPSS ZAYIF ALAN VE HATA TESPİTİ</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -324,11 +349,68 @@ export default function StatsModal() {
           <button
             onClick={handleGenerateAiReport}
             disabled={loadingAi}
-            className="w-full py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold rounded-xl text-xs shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+            className="w-full py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold rounded-xl text-xs shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-amber-300 animate-bounce" />
             <span>YAPAY ZEKA KPSS AKILLI TEŞHİS RAPORU ÜRET</span>
           </button>
+        </div>
+      )}
+
+      {/* SUB-TAB 2: 1v1 DUEL STATS */}
+      {activeSubTab === 'duel_stats' && (
+        <div className="space-y-3 animate-in fade-in duration-200">
+          <div className="p-3 bg-gradient-to-r from-rose-950/60 via-[#09090b] to-indigo-950/60 border border-rose-500/30 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <AvatarWithBadgeFrame 
+                rumuz="Sen"
+                unlockedBadges={unlockedBadges}
+                duelWins={duelStats.duelWins}
+                size="lg"
+              />
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300">1v1 Canlı Düello Karnesi</span>
+                <div className="font-extrabold text-sm sm:text-base text-white mt-0.5 flex items-center gap-2">
+                  <span>{duelStats.duelWins} Galibiyet</span>
+                  <span className="text-slate-400 text-xs">/ {duelStats.duelLosses} Mağlubiyet</span>
+                  {duelStats.duelDraws > 0 && <span className="text-amber-400 text-xs">/ {duelStats.duelDraws} Berabere</span>}
+                </div>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <div className="text-xs font-black text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                %{duelWinRate} Kazanma
+              </div>
+            </div>
+          </div>
+
+          {/* Duel Details Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
+              <Swords className="w-4 h-4 text-rose-400 mx-auto mb-1" />
+              <span className="text-[9px] uppercase font-bold text-slate-400">Toplam Düello</span>
+              <div className="font-black text-lg text-white">{duelStats.totalDuelsPlayed}</div>
+            </div>
+
+            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
+              <Trophy className="w-4 h-4 text-amber-400 mx-auto mb-1" />
+              <span className="text-[9px] uppercase font-bold text-slate-400">Düello Puanı</span>
+              <div className="font-black text-lg text-amber-300">{duelStats.duelScore}</div>
+            </div>
+
+            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
+              <Flame className="w-4 h-4 text-orange-400 mx-auto mb-1" />
+              <span className="text-[9px] uppercase font-bold text-slate-400">Galibiyet Serisi</span>
+              <div className="font-black text-lg text-orange-400">{duelStats.duelStreak} 🔥</div>
+            </div>
+
+            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
+              <Crown className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
+              <span className="text-[9px] uppercase font-bold text-slate-400">En İyi Seri</span>
+              <div className="font-black text-lg text-yellow-400">{duelStats.bestDuelStreak} 👑</div>
+            </div>
+          </div>
         </div>
       )}
 

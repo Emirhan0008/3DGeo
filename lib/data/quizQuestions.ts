@@ -1319,6 +1319,170 @@ export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
     targetCoords: [31.530, 39.450],
     explanation: 'Toryum rezervinde Türkiye dünyada 2. sıradadır. Başlıca rezerv Eskişehir Beylikova\'dadır.',
     osymTip: 'Toryum = Eskişehir Sivrihisar Beylikova (Dünyada 2.yiz).'
+  },
+  {
+    id: 'mc-49',
+    category: 'İklim & Bitki Örtüsü',
+    region: 'Karadeniz',
+    questionText: 'Doğu Karadeniz kıyılarında (Rize ve çevresi) kışların ılık geçmesi ve fön rüzgarlarının etkisiyle zeytin ve turunçgil yetiştirilmesi hangi coğrafi kavramla açıklanır?',
+    options: ['Mikroklima Alanı', 'Karasallık Şiddeti', 'Termik Yüksek Basınç', 'Fiziksel Ayrışma', 'Kütle Hareketi'],
+    correctIndex: 0,
+    targetCoords: [40.520, 41.025],
+    explanation: 'Rize ve Çoruh vadisinde çevreye göre farklı iklim koşulları görülmesi mikroklima özelliğiyle açıklanır.',
+    osymTip: 'Rize zeytin/turunçgil ve Iğdır pamuk = Mikroklima.'
+  },
+  {
+    id: 'mc-50',
+    category: 'Dağlar',
+    region: 'Ege',
+    questionText: 'Aşağıdaki dağlardan hangisi Ege Bölgesi\'nde yer alan faylanma (kırılma) sonucu oluşmuş bir "Horst" dağı DEĞİLDİR?',
+    options: ['Erciyes Dağı', 'Kaz Dağı', 'Madra Dağı', 'Yunt Dağı', 'Aydın Dağları'],
+    correctIndex: 0,
+    targetCoords: [35.450, 38.530],
+    explanation: 'Erciyes Dağı İç Anadolu\'da yer alan bir volkanik dağdır; Ege\'deki kırık (horst) dağlarından biri değildir.',
+    osymTip: 'Ege Kırık Dağları: Kaz, Madra, Yunt, Boz, Aydın, Menteşe Dağları.'
+  },
+  {
+    id: 'mc-51',
+    category: 'Platolar & Ovalar',
+    region: 'Akdeniz',
+    questionText: 'Kalkerli (kireçtaşı) arazinin yaygın olduğu ve karstik erime çukurluklarının birleşmesiyle oluşan Taşeli ve Teke platoları hangi coğrafi plato türüne örnektir?',
+    options: ['Karstik Platolar', 'Volkanik / Lav Platoları', 'Aşınım Düzlüğü Platoları', 'Tabaka Düzlüğü Platoları', 'Alüvyal Platolar'],
+    correctIndex: 0,
+    targetCoords: [32.850, 36.650],
+    explanation: 'Teke ve Taşeli platoları karstik erimelerle şekillenmiş Türkiye\'nin en tipik karstik platolarıdır.',
+    osymTip: 'Teke ve Taşeli = Karstik Plato + Kıl Keçisi Yetiştiriciliği.'
+  },
+  {
+    id: 'mc-52',
+    category: 'Akarsular',
+    region: 'Akdeniz',
+    questionText: 'Manavgat, Aksu ve Köprüçay nehirleri yaz mevsiminde kuraklığa rağmen debilerini önemli ölçüde korurlar. Bu durumun temel nedeni nedir?',
+    options: ['Karstik gür kaynaklarla (Voklüz) beslenmeleri', 'Buzul erimelerinin yazın artması', 'Yaz aylarında muson yağışları alması', 'Baraj kapaklarının sürekli açık tutulması', 'Karasal iklim kuşağında yer almaları'],
+    correctIndex: 0,
+    targetCoords: [31.450, 36.850],
+    explanation: 'Akdeniz akarsuları karstik yer altı kaynaklarıyla (voklüz) beslendikleri için yaz kuraklığında bile kurumazlar.',
+    osymTip: 'Manavgat/Köprüçay = Karstik kaynak (Voklüz) beslenmeli akarsulardır.'
+  },
+  {
+    id: 'mc-53',
+    category: 'Nüfus & Yerleşme',
+    region: 'Doğu Anadolu',
+    questionText: 'Türkiye\'de yükseltinin ve kış soğuklarının en fazla olduğu, buna bağlı olarak nüfus yoğunluğunun Türkiye ortalamasının çok altında kaldığı bölüm hangisidir?',
+    options: ['Erzurum-Kars Bölümü', 'Yukarı Sakarya Bölümü', 'Çatalca-Kocaeli Bölümü', 'Ege Kıyı Bölümü', 'Antalya Bölümü'],
+    correctIndex: 0,
+    targetCoords: [42.100, 40.200],
+    explanation: 'Erzurum-Kars Bölümü sert karasal iklim ve yüksek rakım sebebiyle tenhadır.',
+    osymTip: 'Erzurum-Kars: Yüksek rakım + Sert Karasal + Büyükbaş Mera Hayvancılığı.'
+  },
+  {
+    id: 'mc-54',
+    category: 'Tarım & Hayvancılık',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Güneydoğu Anadolu Projesi (GAP) ile sulamanın yaygınlaşması sonucunda üretiminde Türkiye birincisi haline gelinen ve "Beyaz Altın" olarak adlandırılan sanayi bitkisi hangisidir?',
+    options: ['Pamuk', 'Çay', 'Tütün', 'Şeker Pancarı', 'Haşhaş'],
+    correctIndex: 0,
+    targetCoords: [38.800, 37.150],
+    explanation: 'Şanlıurfa ve Harran Ovası\'nın sulanmasıyla Türkiye pamuk üretiminin yarıdan fazlası GAP bölgesinden karşılanır.',
+    osymTip: 'GAP sulamasıyla liderliğe yükselen ürün: Pamuk (Şanlıurfa).'
+  },
+  {
+    id: 'mc-55',
+    category: 'Sanayi & Enerji',
+    region: 'Ege',
+    questionText: 'Denizli Sarayköy ve Aydın Germencik sahalarında bulunan, yerin derinliklerindeki sıcak su buharından elektrik üreten ilk santrallerimiz hangi enerji türüyle çalışır?',
+    options: ['Jeotermal Enerji', 'Biyokütle Enerjisi', 'Rüzgar Enerjisi', 'Dalga Enerjisi', 'Nükleer Enerji'],
+    correctIndex: 0,
+    targetCoords: [28.920, 37.910],
+    explanation: 'Denizli Sarayköy ve Aydın Germencik Türkiye\'nin ilk ve en büyük jeotermal enerji santrallerine ev sahipliği yapar.',
+    osymTip: 'Sarayköy ve Germencik = Jeotermal Enerji.'
+  },
+  {
+    id: 'mc-56',
+    category: 'Geçitler',
+    region: 'Akdeniz',
+    questionText: 'Çukurova\'yı İç Anadolu\'ya (Niğde/Konya) bağlayan ve Toros Dağları üzerinde yer alan en tarihi ve stratejik geçit hangisidir?',
+    options: ['Gülek Boğazı / Geçidi', 'Sertavul Geçidi', 'Zigana Geçidi', 'Kop Geçidi', 'Belen Geçidi'],
+    correctIndex: 0,
+    targetCoords: [34.780, 37.200],
+    explanation: 'Gülek Geçidi, Adana Çukurova ile İç Anadolu arasındaki ana ulaşım arteri ve tarihi kapıdır.',
+    osymTip: 'Gülek = Adana / Çukurova - İç Anadolu bağlantısı.'
+  },
+  {
+    id: 'mc-57',
+    category: 'Sınır Kapıları',
+    region: 'Marmara',
+    questionText: 'Türkiye\'nin Avrupa\'ya açılan en işlek ve dünyada da araç trafiği bakımından en yoğun sınır kapılarından biri olan Bulgaristan sınır kapımız hangisidir?',
+    options: ['Kapıkule Sınır Kapısı (Edirne)', 'Sarp Sınır Kapısı (Artvin)', 'Habur Sınır Kapısı (Şırnak)', 'Gürbulak Sınır Kapısı (Ağrı)', 'İpsala Sınır Kapısı (Edirne)'],
+    correctIndex: 0,
+    targetCoords: [26.350, 41.710],
+    explanation: 'Kapıkule Sınır Kapısı Bulgaristan ile olan en yoğun gümrük kapımızdır. İpsala ise Yunanistan kapısıdır.',
+    osymTip: 'Kapıkule = Bulgaristan; İpsala = Yunanistan.'
+  },
+  {
+    id: 'mc-58',
+    category: 'Madenler',
+    region: 'Karadeniz',
+    questionText: 'Karadeniz Ereğli ve Zonguldak havzasında çıkarılan ve yüksek kalorisi nedeniyle demir-çelik sanayisinde demirin eritilmesinde kullanılan 1. Jeolojik Zaman (Paleozoik) kömürü hangisidir?',
+    options: ['Taş Kömürü', 'Linyit Kömürü', 'Asfaltit', 'Turba', 'Kok Kömürü'],
+    correctIndex: 0,
+    targetCoords: [31.800, 41.450],
+    explanation: 'Taş kömürü 1. Jeolojik Zaman (Paleozoik) arazilerinde oluşmuştur ve Türkiye\'de yalnızca Zonguldak-Karadeniz havzasında bulunur.',
+    osymTip: 'Taş Kömürü = 1. Zaman (Paleozoik) = Zonguldak & Demir-Çelik eritme enerjisi.'
+  },
+  {
+    id: 'mc-59',
+    category: 'Rüzgarlar & İklim',
+    region: 'İç Anadolu',
+    questionText: 'Türkiye\'de ilkbahar aylarında öğleden sonraları ısınan havanın yükselmesiyle oluşan ve halk arasında "Kırkikindi Yağışları" olarak bilinen yağış türü hangisidir?',
+    options: ['Konveksiyonel (Yükselim) Yağışları', 'Orografik (Yamaç) Yağışları', 'Cephesel (Frontal) Yağışları', 'Siklonik Yağışlar', 'Muson Yağışları'],
+    correctIndex: 0,
+    targetCoords: [32.850, 39.920],
+    explanation: 'İç Anadolu\'da ilkbaharda görülen Kırkikindi yağışları tipik konveksiyonel (yükselim) yağışıdır.',
+    osymTip: 'İç Anadolu İlkbahar Kırkikindi = Konveksiyonel Yağış.'
+  },
+  {
+    id: 'mc-60',
+    category: 'Turizm & Miras',
+    region: 'İç Anadolu',
+    questionText: 'Volkanik tüflerin sel ve rüzgar aşındırmasıyla oluştuğu, peri bacaları ve yeraltı şehirleriyle UNESCO Dünya Mirası Listesi\'nde yer alan karma miras alanımız neresidir?',
+    options: ['Kapadokya (Göreme Milli Parkı)', 'Pamukkale Travertenleri', 'Nemrut Dağı Heykelleri', 'Truva Antik Kenti', 'Safranbolu Evleri'],
+    correctIndex: 0,
+    targetCoords: [34.830, 38.640],
+    explanation: 'Kapadokya ve Pamukkale, Türkiye\'deki hem doğal hem kültürel (karma) UNESCO dünya miras alanlarıdır.',
+    osymTip: 'Kapadokya ve Pamukkale = Karma Miras (Doğal + Kültürel).'
+  },
+  {
+    id: 'mc-61',
+    category: 'Akarsular',
+    region: 'Güneydoğu Anadolu',
+    questionText: 'Türkiye\'de doğup Suriye ve Irak topraklarından geçerek Basra Körfezi\'ne dökülen ve üzerinde Atatürk Barajı bulunan nehir hangisidir?',
+    options: ['Fırat Nehri', 'Dicle Nehri', 'Aras Nehri', 'Kura Nehri', 'Asi Nehri'],
+    correctIndex: 0,
+    targetCoords: [38.500, 37.400],
+    explanation: 'Fırat Nehri Karasu ve Murat kollarının birleşmesiyle oluşur ve Atatürk Barajı bu nehir üzerindedir.',
+    osymTip: 'Atatürk, Keban ve Karakaya barajları = Fırat Nehri üzerindedir.'
+  },
+  {
+    id: 'mc-62',
+    category: 'Göller',
+    region: 'İç Anadolu',
+    questionText: 'Türkiye\'nin yüzölçümü bakımından 2. büyük gölü olan, yazın buharlaşmayla alanı daralan ve Türkiye tuz ihtiyacının büyük kısmını karşılayan göl hangisidir?',
+    options: ['Tuz Gölü', 'Van Gölü', 'Beyşehir Gölü', 'İznik Gölü', 'Uluabat Gölü'],
+    correctIndex: 0,
+    targetCoords: [33.350, 38.750],
+    explanation: 'Tuz Gölü sığ bir tektonik göldür ve kapalı havza özelliğindedir.',
+    osymTip: 'Tuz Gölü = Tektonik + Kapalı Havza + Tuz Üretimi.'
   }
 ];
+
+export function getQuizQuestionsByIds(questionIds: string[]): MultipleChoiceQuestion[] {
+  const map = new Map(MULTIPLE_CHOICE_QUESTIONS.map(q => [q.id, q]));
+  const result: MultipleChoiceQuestion[] = [];
+  for (const id of questionIds) {
+    const q = map.get(id);
+    if (q) result.push(q);
+  }
+  return result.length > 0 ? result : MULTIPLE_CHOICE_QUESTIONS.slice(0, 10);
+}
 

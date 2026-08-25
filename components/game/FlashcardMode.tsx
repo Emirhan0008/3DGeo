@@ -1,22 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ALL_GEO_FEATURES, GeoFeature, getFeatureImageUrl } from '@/lib/data/turkeyData';
 import { useAppStore } from '@/lib/store/useStore';
 import { shuffleArray } from '@/lib/data/quizQuestions';
 import { 
   RotateCw, 
   Check, 
-  RotateCcw, 
   Sparkles, 
   Compass, 
-  BookMarked, 
-  Mountain,
-  ChevronLeft,
-  ChevronRight,
-  Filter,
-  Shuffle,
-  X
+  ChevronLeft, 
+  ChevronRight, 
+  Shuffle, 
+  X 
 } from 'lucide-react';
 
 export default function FlashcardMode() {
@@ -26,7 +22,6 @@ export default function FlashcardMode() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
-  const [shuffledCards, setShuffledCards] = useState<GeoFeature[]>([]);
 
   // Filter and shuffle items whenever category changes or initially
   const baseList = useMemo(() => {

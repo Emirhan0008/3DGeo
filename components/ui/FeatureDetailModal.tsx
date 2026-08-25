@@ -17,8 +17,7 @@ import {
   Sparkles, 
   MapPin, 
   BookMarked, 
-  Compass,
-  ArrowUpRight
+  Compass
 } from 'lucide-react';
 
 export default function FeatureDetailModal() {
