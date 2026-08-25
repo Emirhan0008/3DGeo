@@ -490,14 +490,14 @@ export async function startBotDuel(
     roomCode,
     mode: 'quick',
     duelType,
-    status: 'starting',
+    status: 'in_progress', // Starts immediately for AI Practice!
     questionCount: options.questionCount,
     categoryFilter: options.categoryFilter,
     questionIds,
     player1: initialPlayer,
     player2: botPlayer,
     currentRound: 0,
-    roundStartTime: now + 10000, // 10s countdown
+    roundStartTime: now, // Zero delay, instant start
     roundTimeLimit: duelType === 'kpss_test' ? 40 : 15,
     bothAnsweredAt: null,
     winnerId: null,
@@ -556,8 +556,10 @@ export async function submitPlayerGuess(
 
   const otherPlayer = isPlayer1 ? duel.player2 : duel.player1;
   const otherHasGuessed = !!otherPlayer?.currentGuess;
+  const isBotOpponent = !!otherPlayer?.isBot;
 
   const playerKey = isPlayer1 ? 'player1' : 'player2';
+  const otherKey = isPlayer1 ? 'player2' : 'player1';
   const currentPlayer = isPlayer1 ? duel.player1 : duel.player2!;
 
   const newScore = currentPlayer.score + scoreResult.totalPoints;
@@ -570,8 +572,40 @@ export async function submitPlayerGuess(
     updatedAt: new Date().toISOString()
   };
 
-  // If both players have answered, switch to round_reveal immediately!
-  if (otherHasGuessed) {
+  // If playing against AI Bot and Bot hasn't answered yet, answer INSTANTLY together with user's click!
+  if (isBotOpponent && !otherHasGuessed && otherPlayer) {
+    const scatterLat = (Math.random() - 0.5) * 0.7;
+    const scatterLng = (Math.random() - 0.5) * 1.0;
+    const botLat = targetCoords[1] + scatterLat;
+    const botLng = targetCoords[0] + scatterLng;
+
+    const bLatDiff = (tLat - botLat) * (Math.PI / 180);
+    const bLonDiff = (tLng - botLng) * (Math.PI / 180);
+    const bA =
+      Math.sin(bLatDiff / 2) * Math.sin(bLatDiff / 2) +
+      Math.cos(botLat * (Math.PI / 180)) * Math.cos(tLat * (Math.PI / 180)) * Math.sin(bLonDiff / 2) * Math.sin(bLonDiff / 2);
+    const bC = 2 * Math.atan2(Math.sqrt(bA), Math.sqrt(1 - bA));
+    const botDistKm = R * bC;
+
+    const botTimeSec = Math.min(14.5, Math.max(1.0, timeTakenSec + (Math.random() * 1.2 - 0.6)));
+    const botScoreResult = calculateDuelScore(botDistKm, botTimeSec);
+
+    const botGuess: DuelGuess = {
+      lat: botLat,
+      lng: botLng,
+      distanceKm: botScoreResult.distanceKm,
+      timeTakenSec: Math.round(botTimeSec * 10) / 10,
+      pointsEarned: botScoreResult.totalPoints,
+      submittedAt: Date.now()
+    };
+
+    updates[`${otherKey}.currentGuess`] = botGuess;
+    updates[`${otherKey}.score`] = (otherPlayer.score || 0) + botScoreResult.totalPoints;
+    updates[`${otherKey}.totalDistanceKm`] = (otherPlayer.totalDistanceKm || 0) + botScoreResult.distanceKm;
+    updates['status'] = 'round_reveal';
+    updates['bothAnsweredAt'] = Date.now();
+  } else if (otherHasGuessed) {
+    // If both players have answered, switch to round_reveal immediately!
     updates['status'] = 'round_reveal';
     updates['bothAnsweredAt'] = Date.now();
   }
@@ -602,12 +636,14 @@ export async function submitPlayerTestAnswer(
   const isCorrect = selectedOptionIndex === correctOptionIndex;
   const scoreResult = calculateTestDuelScore(isCorrect, timeTakenSec, duel.roundTimeLimit || 40);
 
-  const playerKey = isPlayer1 ? 'player1' : 'player2';
-  const currentPlayer = isPlayer1 ? duel.player1 : duel.player2!;
-  const newScore = currentPlayer.score + scoreResult.pointsEarned;
-
   const otherPlayer = isPlayer1 ? duel.player2 : duel.player1;
   const otherHasAnswered = otherPlayer?.currentOptionAnswer !== null && otherPlayer?.currentOptionAnswer !== undefined;
+  const isBotOpponent = !!otherPlayer?.isBot;
+
+  const playerKey = isPlayer1 ? 'player1' : 'player2';
+  const otherKey = isPlayer1 ? 'player2' : 'player1';
+  const currentPlayer = isPlayer1 ? duel.player1 : duel.player2!;
+  const newScore = currentPlayer.score + scoreResult.pointsEarned;
 
   const updates: Record<string, unknown> = {
     [`${playerKey}.currentOptionAnswer`]: selectedOptionIndex,
@@ -615,8 +651,23 @@ export async function submitPlayerTestAnswer(
     updatedAt: new Date().toISOString()
   };
 
-  // If both players have answered, switch to round_reveal immediately!
-  if (otherHasAnswered) {
+  // If playing against AI Bot and Bot hasn't answered yet, answer INSTANTLY together with user's selection!
+  if (isBotOpponent && !otherHasAnswered && otherPlayer) {
+    const isBotCorrect = Math.random() < 0.75;
+    const optionsCount = 5;
+    const botPickedOption = isBotCorrect
+      ? correctOptionIndex
+      : (correctOptionIndex + 1 + Math.floor(Math.random() * (optionsCount - 1))) % optionsCount;
+
+    const botTimeSec = Math.min(38, Math.max(1.2, timeTakenSec + (Math.random() * 1.5 - 0.5)));
+    const botScoreResult = calculateTestDuelScore(isBotCorrect, botTimeSec, duel.roundTimeLimit || 40);
+
+    updates[`${otherKey}.currentOptionAnswer`] = botPickedOption;
+    updates[`${otherKey}.score`] = (otherPlayer.score || 0) + botScoreResult.pointsEarned;
+    updates['status'] = 'round_reveal';
+    updates['bothAnsweredAt'] = Date.now();
+  } else if (otherHasAnswered) {
+    // If both players have answered, switch to round_reveal immediately!
     updates['status'] = 'round_reveal';
     updates['bothAnsweredAt'] = Date.now();
   }

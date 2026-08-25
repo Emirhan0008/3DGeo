@@ -209,6 +209,14 @@ export default function DuelMode() {
 
     // 1. Starting phase: 10-second countdown (10.. 9.. 8.. 7.. 6.. 5.. 4.. 3.. 2.. 1..)
     if (activeDuelSession.status === 'starting') {
+      if (activeDuelSession.player2?.isBot) {
+        setCountdownNum(null);
+        if (activeDuelPlayerKey === 'player1') {
+          advanceDuelRound({ ...activeDuelSession, currentRound: -1 });
+        }
+        return;
+      }
+
       const diffMs = (activeDuelSession.roundStartTime || Date.now()) - Date.now();
       const secLeft = Math.max(1, Math.ceil(diffMs / 1000));
       setCountdownNum(secLeft);
@@ -1450,7 +1458,13 @@ export default function DuelMode() {
                 onClick={() => {
                   if (activeDuelPlayerKey) {
                     const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
-                    if (myId) voteToAdvanceDuelRound(activeDuelSession, myId);
+                    if (myId) {
+                      if (activeDuelSession.player2?.isBot) {
+                        advanceDuelRound(activeDuelSession);
+                      } else {
+                        voteToAdvanceDuelRound(activeDuelSession, myId);
+                      }
+                    }
                   }
                 }}
                 className={`px-3 py-1.5 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1 cursor-pointer ${
@@ -1643,7 +1657,14 @@ export default function DuelMode() {
             onClick={() => {
               if (activeDuelPlayerKey) {
                 const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
-                if (myId) voteToAdvanceDuelRound(activeDuelSession, myId);
+                if (myId) {
+                  if (activeDuelSession.player2?.isBot) {
+                    flyToCoords([35.243, 38.963], 0, 0, 5.5);
+                    advanceDuelRound(activeDuelSession);
+                  } else {
+                    voteToAdvanceDuelRound(activeDuelSession, myId);
+                  }
+                }
               }
             }}
             className={`px-2.5 py-1 font-black text-[10px] sm:text-xs rounded-lg shadow-md transition-all flex items-center gap-0.5 shrink-0 cursor-pointer ml-1 ${
