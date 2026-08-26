@@ -87,6 +87,7 @@ export interface DuelSession {
   bothAnsweredAt?: number | null;
   winnerId?: string | 'draw' | null;
   roundHistory?: DuelRoundHistory[];
+  lastHeartbeat?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -265,6 +266,7 @@ export async function createDuelRoom(
     pingMs: 0
   };
 
+  const now = Date.now();
   const payload: DuelSession = {
     id: duelId,
     roomCode,
@@ -282,8 +284,9 @@ export async function createDuelRoom(
     roundTimeLimit: duelType === 'kpss_test' ? 40 : 15,
     bothAnsweredAt: null,
     winnerId: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    lastHeartbeat: now,
+    createdAt: new Date(now).toISOString(),
+    updatedAt: new Date(now).toISOString()
   };
 
   try {
@@ -297,7 +300,24 @@ export async function createDuelRoom(
 }
 
 /**
+ * Sends a heartbeat to keep a waiting room alive
+ */
+export async function sendDuelHeartbeat(duelId: string): Promise<void> {
+  try {
+    const duelRef = doc(db, 'duels', duelId);
+    await updateDoc(duelRef, {
+      lastHeartbeat: Date.now(),
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    // Non-fatal error during heartbeat
+    console.warn('Heartbeat error:', error);
+  }
+}
+
+/**
  * Searches for an open Quick Match lobby matching filters, or creates one.
+ * Actively purges stale/dead rooms (> 25 seconds inactive) to prevent phantom matchups.
  */
 export async function findOrCreateQuickMatch(
   player: { id: string; rumuz: string; rumuzKey: string },
@@ -309,6 +329,23 @@ export async function findOrCreateQuickMatch(
 ): Promise<{ duel: DuelSession; isNew: boolean }> {
   const duelType = options.duelType || 'pin_map';
   try {
+    // 1. Clean up any prior waiting rooms created by the current player to avoid ghost lobbies
+    try {
+      const myOldRoomsQuery = query(
+        collection(db, 'duels'),
+        where('player1.id', '==', player.id),
+        where('status', '==', 'waiting'),
+        limit(5)
+      );
+      const myOldSnaps = await getDocs(myOldRoomsQuery);
+      for (const oldDoc of myOldSnaps.docs) {
+        deleteDoc(doc(db, 'duels', oldDoc.id)).catch(() => {});
+      }
+    } catch {
+      // ignore cleanup error
+    }
+
+    // 2. Query available open rooms matching exact duel parameters
     const q = query(
       collection(db, 'duels'),
       where('mode', '==', 'quick'),
@@ -316,16 +353,30 @@ export async function findOrCreateQuickMatch(
       where('duelType', '==', duelType),
       where('questionCount', '==', options.questionCount),
       where('categoryFilter', '==', options.categoryFilter),
-      limit(5)
+      limit(10)
     );
 
     const snap = await getDocs(q);
+    const now = Date.now();
     
-    // Find an open room where player is not already player1
+    // Find an active open room where player is not already player1
     for (const docSnap of snap.docs) {
       const duelData = docSnap.data() as DuelSession;
+      
+      // Calculate age of last activity (heartbeat or updatedAt or createdAt)
+      const lastActiveTime = duelData.lastHeartbeat || 
+        (duelData.updatedAt ? new Date(duelData.updatedAt).getTime() : 0) || 
+        (duelData.createdAt ? new Date(duelData.createdAt).getTime() : 0);
+      const ageSec = (now - lastActiveTime) / 1000;
+
+      // If room is older than 25 seconds without heartbeat, host is disconnected/left! Purge stale room.
+      if (ageSec > 25) {
+        deleteDoc(doc(db, 'duels', duelData.id)).catch(() => {});
+        continue;
+      }
+
       if (duelData.player1.id !== player.id && !duelData.player2) {
-        // Join this room
+        // Valid active room found! Join this room
         const joiningPlayer: DuelPlayer = {
           id: player.id,
           rumuz: player.rumuz,
@@ -339,13 +390,13 @@ export async function findOrCreateQuickMatch(
           pingMs: 0
         };
 
-        const now = Date.now();
         // 10-second countdown before 1st question starts
         const updatedFields = {
           player2: joiningPlayer,
           status: 'starting',
           roundStartTime: now + 10000,
-          updatedAt: new Date().toISOString()
+          lastHeartbeat: now,
+          updatedAt: new Date(now).toISOString()
         };
 
         await updateDoc(doc(db, 'duels', duelData.id), updatedFields);
@@ -356,7 +407,7 @@ export async function findOrCreateQuickMatch(
       }
     }
 
-    // No available room found, create new quick match lobby
+    // No active room found, create new quick match lobby
     const newDuel = await createDuelRoom(player, {
       mode: 'quick',
       duelType,
@@ -396,7 +447,15 @@ export async function joinPrivateDuelRoom(
     const duelData = docSnap.data() as DuelSession;
 
     if (duelData.status !== 'waiting') {
-      return { success: false, errorMsg: 'Bu oda şu anda müsait değil veya oyun zaten başladı.' };
+      return { success: false, errorMsg: 'Bu oda şu anda müsait değil veya oyun zaten başladı / kapandı.' };
+    }
+
+    // Check if private room is older than 15 minutes
+    const now = Date.now();
+    const createdTime = duelData.createdAt ? new Date(duelData.createdAt).getTime() : now;
+    if ((now - createdTime) > 15 * 60 * 1000) {
+      deleteDoc(doc(db, 'duels', duelData.id)).catch(() => {});
+      return { success: false, errorMsg: 'Bu özel odanın süresi dolmuş. Lütfen arkadaşınızdan yeni bir oda kurmasını isteyin.' };
     }
 
     if (duelData.roomPin && duelData.roomPin !== (roomPin?.trim() || '')) {
@@ -420,13 +479,13 @@ export async function joinPrivateDuelRoom(
       pingMs: 0
     };
 
-    const now = Date.now();
     // 10-second countdown before 1st question starts
     const updatedFields = {
       player2: joiningPlayer,
       status: 'starting',
       roundStartTime: now + 10000,
-      updatedAt: new Date().toISOString()
+      lastHeartbeat: now,
+      updatedAt: new Date(now).toISOString()
     };
 
     await updateDoc(doc(db, 'duels', duelData.id), updatedFields);

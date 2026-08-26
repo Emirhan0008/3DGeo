@@ -7,6 +7,7 @@ import {
   joinPrivateDuelRoom, 
   createDuelRoom, 
   startBotDuel,
+  sendDuelHeartbeat,
   submitPlayerGuess,
   submitPlayerTestAnswer,
   advanceDuelRound, 
@@ -102,6 +103,47 @@ export default function DuelMode() {
 
   // Bot auto-play ref
   const botTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const activeDuelRef = useRef(activeDuelSession);
+
+  useEffect(() => {
+    activeDuelRef.current = activeDuelSession;
+  }, [activeDuelSession]);
+
+  // Clean up waiting duel rooms on component unmount or browser tab close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (activeDuelRef.current && activeDuelRef.current.status === 'waiting') {
+        leaveOrCancelDuel(activeDuelRef.current.id).catch(() => {});
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleBeforeUnload);
+      if (activeDuelRef.current && activeDuelRef.current.status === 'waiting') {
+        leaveOrCancelDuel(activeDuelRef.current.id).catch(() => {});
+      }
+    };
+  }, []);
+
+  // Heartbeat to keep waiting room alive & detect alive players
+  useEffect(() => {
+    if (!activeDuelSession?.id || activeDuelSession.status !== 'waiting') return;
+
+    // Send immediate heartbeat
+    sendDuelHeartbeat(activeDuelSession.id);
+
+    const interval = setInterval(() => {
+      if (activeDuelRef.current?.id && activeDuelRef.current.status === 'waiting') {
+        sendDuelHeartbeat(activeDuelRef.current.id);
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [activeDuelSession?.id, activeDuelSession?.status]);
 
   // Check saved rumuz / PIN on mount
   useEffect(() => {
@@ -392,6 +434,10 @@ export default function DuelMode() {
 
   // Handle Quick Match Finding
   const handleStartQuickMatch = async () => {
+    if (activeDuelSession) {
+      await leaveOrCancelDuel(activeDuelSession.id);
+      setActiveDuelSession(null);
+    }
     setActionLoading(true);
     setLobbyError(null);
     try {
@@ -414,6 +460,10 @@ export default function DuelMode() {
 
   // Handle Private Room Creation
   const handleCreatePrivateRoom = async () => {
+    if (activeDuelSession) {
+      await leaveOrCancelDuel(activeDuelSession.id);
+      setActiveDuelSession(null);
+    }
     setActionLoading(true);
     setLobbyError(null);
     try {
@@ -442,6 +492,10 @@ export default function DuelMode() {
       setLobbyError('Lütfen 6 haneli oda kodunu girin (Örn: TR-4921)');
       return;
     }
+    if (activeDuelSession) {
+      await leaveOrCancelDuel(activeDuelSession.id);
+      setActiveDuelSession(null);
+    }
     setActionLoading(true);
     setLobbyError(null);
     try {
@@ -465,6 +519,10 @@ export default function DuelMode() {
 
   // Handle Bot Practice Game
   const handleStartBotDuel = async () => {
+    if (activeDuelSession) {
+      await leaveOrCancelDuel(activeDuelSession.id);
+      setActiveDuelSession(null);
+    }
     setActionLoading(true);
     setLobbyError(null);
     try {
@@ -492,6 +550,11 @@ export default function DuelMode() {
     }
     setActiveDuelSession(null);
     setActiveDuelPlayerKey(null);
+    setRoundQuestions([]);
+    setRoundTestQuestions([]);
+    setLastRoundScore(null);
+    setOpponentRoundScore(null);
+    setRecordedFinishedId(null);
     flyToCoords([35.243, 38.963], 0, 0, 5.5);
   };
 
@@ -975,6 +1038,48 @@ export default function DuelMode() {
             >
               <Bot className="w-4 h-4" />
               <span>Yapay Zekaya Geç</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // 3.5 DÜELLO İPTAL / RAKİP AYRILDI EKRANI
+  // -------------------------------------------------------------
+  if (activeDuelSession.status === 'abandoned') {
+    return (
+      <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#09090b]/95 border-2 border-rose-500/50 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150">
+          <div className="w-14 h-14 rounded-full bg-rose-500/20 border-2 border-rose-400/60 flex items-center justify-center mx-auto mb-3">
+            <X className="w-7 h-7 text-rose-400" />
+          </div>
+
+          <h2 className="text-lg font-black text-rose-400 mb-1">
+            Düello Sonlandırıldı
+          </h2>
+          <p className="text-xs text-slate-300 mb-4">
+            Rakip oyuncu düellodan ayrıldı veya bağlantısı kesildi.
+          </p>
+
+          <div className="flex gap-2">
+            <button
+              onClick={handleLeaveDuel}
+              className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+            >
+              Lobiye Dön
+            </button>
+
+            <button
+              onClick={async () => {
+                await handleLeaveDuel();
+                handleStartQuickMatch();
+              }}
+              className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Zap className="w-4 h-4" />
+              <span>Yeni Rakip Bul</span>
             </button>
           </div>
         </div>
