@@ -199,14 +199,30 @@ export function generateRoomCode(): string {
  */
 export function prepareDuelQuestions(categoryFilter: string, questionCount: number, duelType: DuelType = 'pin_map'): string[] {
   if (duelType === 'kpss_test') {
-    const pool = getFilteredQuizQuestions(categoryFilter);
-    const selected = pool.slice(0, questionCount);
-    return selected.map(q => q.id);
+    let pool = getFilteredQuizQuestions(categoryFilter, true);
+    if (!pool || pool.length === 0) {
+      pool = MULTIPLE_CHOICE_QUESTIONS;
+    }
+    const result: string[] = [];
+    let idx = 0;
+    while (result.length < questionCount) {
+      result.push(pool[idx % pool.length].id);
+      idx++;
+    }
+    return result;
   }
 
-  const pool = getFilteredPinQuestions(categoryFilter, true);
-  const selected = pool.slice(0, questionCount);
-  return selected.map(q => q.id);
+  let pool = getFilteredPinQuestions(categoryFilter, true);
+  if (!pool || pool.length === 0) {
+    pool = PIN_GAME_QUESTIONS;
+  }
+  const result: string[] = [];
+  let idx = 0;
+  while (result.length < questionCount) {
+    result.push(pool[idx % pool.length].id);
+    idx++;
+  }
+  return result;
 }
 
 /**
@@ -215,9 +231,14 @@ export function prepareDuelQuestions(categoryFilter: string, questionCount: numb
 export function getQuestionsByIds(questionIds: string[]): PinGameQuestion[] {
   const map = new Map(PIN_GAME_QUESTIONS.map(q => [q.id, q]));
   const result: PinGameQuestion[] = [];
-  for (const id of questionIds) {
+  for (let i = 0; i < questionIds.length; i++) {
+    const id = questionIds[i];
     const q = map.get(id);
-    if (q) result.push(q);
+    if (q) {
+      result.push(q);
+    } else {
+      result.push(PIN_GAME_QUESTIONS[i % PIN_GAME_QUESTIONS.length]);
+    }
   }
   return result.length > 0 ? result : PIN_GAME_QUESTIONS.slice(0, 10);
 }
@@ -228,9 +249,14 @@ export function getQuestionsByIds(questionIds: string[]): PinGameQuestion[] {
 export function getQuizQuestionsByIds(questionIds: string[]): MultipleChoiceQuestion[] {
   const map = new Map(MULTIPLE_CHOICE_QUESTIONS.map(q => [q.id, q]));
   const result: MultipleChoiceQuestion[] = [];
-  for (const id of questionIds) {
+  for (let i = 0; i < questionIds.length; i++) {
+    const id = questionIds[i];
     const q = map.get(id);
-    if (q) result.push(q);
+    if (q) {
+      result.push(q);
+    } else {
+      result.push(MULTIPLE_CHOICE_QUESTIONS[i % MULTIPLE_CHOICE_QUESTIONS.length]);
+    }
   }
   return result.length > 0 ? result : MULTIPLE_CHOICE_QUESTIONS.slice(0, 10);
 }
@@ -802,7 +828,7 @@ function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
   const isTest = duel.duelType === 'kpss_test';
 
   if (isTest) {
-    const questionObj = MULTIPLE_CHOICE_QUESTIONS.find((q) => q.id === currentQId);
+    const questionObj = MULTIPLE_CHOICE_QUESTIONS.find((q) => q.id === currentQId) || MULTIPLE_CHOICE_QUESTIONS[duel.currentRound % MULTIPLE_CHOICE_QUESTIONS.length];
     const correctIdx = questionObj?.correctIndex ?? 0;
     const p1Opt = duel.player1.currentOptionAnswer ?? -1;
     const p2Opt = duel.player2?.currentOptionAnswer ?? -1;
@@ -834,7 +860,7 @@ function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
     return [...filtered, historyEntry];
   }
 
-  const questionObj = PIN_GAME_QUESTIONS.find((q) => q.id === currentQId);
+  const questionObj = PIN_GAME_QUESTIONS.find((q) => q.id === currentQId) || PIN_GAME_QUESTIONS[duel.currentRound % PIN_GAME_QUESTIONS.length];
   const historyEntry: DuelRoundHistory = {
     roundIndex: duel.currentRound,
     questionId: currentQId || `q_${duel.currentRound}`,

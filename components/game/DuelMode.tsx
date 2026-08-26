@@ -22,7 +22,13 @@ import {
   DuelType
 } from '@/lib/duelService';
 import { checkRumuzExists, saveRumuzProfile, normalizeRumuzKey } from '@/lib/rumuzService';
-import { PinGameQuestion, MultipleChoiceQuestion, cleanFeatureTitle } from '@/lib/data/quizQuestions';
+import { 
+  PinGameQuestion, 
+  MultipleChoiceQuestion, 
+  PIN_GAME_QUESTIONS,
+  MULTIPLE_CHOICE_QUESTIONS,
+  cleanFeatureTitle 
+} from '@/lib/data/quizQuestions';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
 import { 
   Swords, 
@@ -1364,8 +1370,13 @@ export default function DuelMode() {
   // 6. CANLI OYUN HUD'I (HARİTA MODU VEYA KPSS TEST YARIŞMASI MODU)
   // -------------------------------------------------------------
   const isTestMode = activeDuelSession.duelType === 'kpss_test';
-  const currentMapQ = !isTestMode ? roundQuestions[activeDuelSession.currentRound] : null;
-  const currentTestQ = isTestMode ? roundTestQuestions[activeDuelSession.currentRound] : null;
+  const curRound = activeDuelSession.currentRound ?? 0;
+  const currentMapQ = !isTestMode 
+    ? (roundQuestions[curRound] || roundQuestions[curRound % Math.max(1, roundQuestions.length)] || PIN_GAME_QUESTIONS[curRound % PIN_GAME_QUESTIONS.length]) 
+    : null;
+  const currentTestQ = isTestMode 
+    ? (roundTestQuestions[curRound] || roundTestQuestions[curRound % Math.max(1, roundTestQuestions.length)] || MULTIPLE_CHOICE_QUESTIONS[curRound % MULTIPLE_CHOICE_QUESTIONS.length]) 
+    : null;
 
   if (!currentMapQ && !currentTestQ) return null;
 

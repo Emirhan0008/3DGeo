@@ -1,4 +1,4 @@
-import { ALL_GEO_FEATURES } from './turkeyData';
+import { ALL_GEO_FEATURES, GeoFeature } from './turkeyData';
 
 export interface PinGameQuestion {
   id: string;
@@ -26,6 +26,41 @@ export interface MultipleChoiceQuestion {
   osymTip: string;
 }
 
+export function matchesCategory(itemCategory: string, filterCategory: string): boolean {
+  if (!filterCategory || filterCategory === 'Genel' || filterCategory === 'Tümü') return true;
+  if (!itemCategory) return false;
+
+  const normItem = itemCategory.toLowerCase().trim();
+  const normFilter = filterCategory.toLowerCase().trim();
+
+  if (normItem === normFilter) return true;
+  if (normItem.includes(normFilter) || normFilter.includes(normItem)) return true;
+
+  // Split tokens like "Platolar & Ovalar", "Karstik & Kıyı", "Madenler / Enerji"
+  const filterParts = normFilter.split(/[&,/+]/).map(s => s.trim()).filter(Boolean);
+  const itemParts = normItem.split(/[&,/+]/).map(s => s.trim()).filter(Boolean);
+
+  for (const fp of filterParts) {
+    if (normItem.includes(fp)) return true;
+    for (const ip of itemParts) {
+      if (ip.includes(fp) || fp.includes(ip)) return true;
+    }
+  }
+
+  // Common aliases
+  if (normFilter.includes('plato') && (normItem.includes('plato') || normItem.includes('ova'))) return true;
+  if (normFilter.includes('ova') && (normItem.includes('ova') || normItem.includes('delta') || normItem.includes('polye'))) return true;
+  if (normFilter.includes('dağ') && (normItem.includes('dağ') || normItem.includes('volkan') || normItem.includes('zirve'))) return true;
+  if (normFilter.includes('göl') && normItem.includes('göl')) return true;
+  if (normFilter.includes('akarsu') && (normItem.includes('akarsu') || normItem.includes('nehir') || normItem.includes('çay'))) return true;
+  if (normFilter.includes('geçit') && (normItem.includes('geçit') || normItem.includes('tünel') || normItem.includes('boğaz'))) return true;
+  if (normFilter.includes('sınır') && (normItem.includes('sınır') || normItem.includes('kapı') || normItem.includes('gümrük'))) return true;
+  if (normFilter.includes('maden') && (normItem.includes('maden') || normItem.includes('enerji') || normItem.includes('petrol') || normItem.includes('santral'))) return true;
+  if (normFilter.includes('karst') && (normItem.includes('karst') || normItem.includes('kıyı') || normItem.includes('mağara') || normItem.includes('obruk') || normItem.includes('traverten') || normItem.includes('tombolo'))) return true;
+
+  return false;
+}
+
 export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -37,16 +72,16 @@ export function shuffleArray<T>(array: T[]): T[] {
 
 export function getFilteredPinQuestions(category: string, shuffle: boolean = false): PinGameQuestion[] {
   let list = PIN_GAME_QUESTIONS;
-  if (category && category !== 'Genel') {
-    list = PIN_GAME_QUESTIONS.filter((q) => q.category === category || q.category.includes(category));
+  if (category && category !== 'Genel' && category !== 'Tümü') {
+    list = PIN_GAME_QUESTIONS.filter((q) => matchesCategory(q.category, category));
   }
   return shuffle ? shuffleArray(list) : list;
 }
 
 export function getFilteredQuizQuestions(category: string, shuffle: boolean = false): MultipleChoiceQuestion[] {
   let list = MULTIPLE_CHOICE_QUESTIONS;
-  if (category && category !== 'Genel') {
-    list = MULTIPLE_CHOICE_QUESTIONS.filter((q) => q.category === category || q.category.includes(category));
+  if (category && category !== 'Genel' && category !== 'Tümü') {
+    list = MULTIPLE_CHOICE_QUESTIONS.filter((q) => matchesCategory(q.category, category));
   }
   return shuffle ? shuffleArray(list) : list;
 }
@@ -375,28 +410,100 @@ const HANDCRAFTED_PIN_QUESTIONS: PinGameQuestion[] = [
     kpssTip: 'KPSS Notu: Yılda birden fazla ürün alınan en büyük alüvyal delta ovasıdır.'
   },
   {
-    id: 'pin-22',
-    title: 'TAKKEM Karstik Ovaları (Polye)',
-    questionText: 'Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı ve Muğla ovalarından oluşan kireçtaşı erime polye sahası nerededir?',
+    id: 'pin-22-tefenni',
+    title: 'Tefenni Ovası (Karstik Polye)',
+    questionText: 'TAKKEM şifresinin "T" harfini oluşturan, Burdur ilindeki karstik polye ovası nerededir?',
     category: 'Platolar & Ovalar',
     region: 'Akdeniz',
-    targetFeatureId: 'pl-takkee',
-    targetCoords: [29.800, 37.100],
-    hint: 'Teke Yöresi ve Göller Yöresi çevresindedir.',
-    explanation: 'TAKKEM şifresiyle bilinen kireçtaşı erimesiyle oluşan karstik polye ovalarıdır.',
-    kpssTip: 'KPSS Notu: Şifre: TAKKEM (Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla).'
+    targetFeatureId: 'pl-tefenni',
+    targetCoords: [29.780, 37.310],
+    hint: 'Burdur ili sınırlarında yer alır.',
+    explanation: 'Tefenni Ovası kireçtaşlarının erimesiyle oluşan karstik polye ovasıdır.',
+    kpssTip: 'TAKKEM: T = Tefenni (Burdur)'
   },
   {
-    id: 'pin-23',
-    title: 'Bafra ve Çarşamba Deltaları',
-    questionText: 'Kızılırmak ve Yeşilırmak nehirlerinin Karadeniz kıyısında oluşturduğu verimli delta ovaları nerededir?',
+    id: 'pin-22-acipayam',
+    title: 'Acıpayam Ovası (Karstik Polye)',
+    questionText: 'TAKKEM şifresinin "A" harfini oluşturan, Denizli ilindeki karstik polye ovası nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Ege',
+    targetFeatureId: 'pl-acipayam',
+    targetCoords: [29.350, 37.430],
+    hint: 'Denizli ili sınırlarında yer alır.',
+    explanation: 'Acıpayam Ovası kireçtaşlarının erimesiyle oluşan geniş karstik polye sahasıdır.',
+    kpssTip: 'TAKKEM: A = Acıpayam (Denizli)'
+  },
+  {
+    id: 'pin-22-korkuteli',
+    title: 'Korkuteli Ovası (Karstik Polye)',
+    questionText: 'TAKKEM şifresinin "K" harfi olan ve kültür mantarcılığında lider Antalya polye ovası nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Akdeniz',
+    targetFeatureId: 'pl-korkuteli',
+    targetCoords: [30.200, 37.060],
+    hint: 'Antalya ili batısında yer alır.',
+    explanation: 'Korkuteli Ovası karstik polye tabanında yer alır ve mantarcılığıyla meşhurdur.',
+    kpssTip: 'TAKKEM: K = Korkuteli (Antalya)'
+  },
+  {
+    id: 'pin-22-kestel',
+    title: 'Kestel Ovası (Karstik Polye)',
+    questionText: 'TAKKEM şifresinin ikinci "K" harfi olan Burdur/Bucak karstik polye ovası nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Akdeniz',
+    targetFeatureId: 'pl-kestel',
+    targetCoords: [30.400, 37.380],
+    hint: 'Burdur Bucak sınırındadır.',
+    explanation: 'Kestel Ovası karstik düdenlerle yeraltına su boşalımı gerçekleşen polye sahasıdır.',
+    kpssTip: 'TAKKEM: K = Kestel (Burdur)'
+  },
+  {
+    id: 'pin-22-elmali',
+    title: 'Elmalı Ovası (Karstik Polye)',
+    questionText: 'TAKKEM şifresinin "E" harfi olan, Avlan ve Karagöl gibi karstik gölleri barındıran Antalya polyesi nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Akdeniz',
+    targetFeatureId: 'pl-elmali',
+    targetCoords: [29.920, 36.730],
+    hint: 'Antalya ili Elmalı ilçesindedir.',
+    explanation: 'Elmalı Ovası karstik polye havzasıdır ve elma bahçeleriyle tanınır.',
+    kpssTip: 'TAKKEM: E = Elmalı (Antalya)'
+  },
+  {
+    id: 'pin-22-mugla',
+    title: 'Muğla Ovası (Menteşe Polyesi)',
+    questionText: 'TAKKEM şifresinin son harfi "M"yi oluşturan Muğla il merkezinin kurulu olduğu polye ovası nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Ege',
+    targetFeatureId: 'pl-mugla',
+    targetCoords: [28.370, 37.210],
+    hint: 'Muğla il merkezinin kurulu olduğu çanaktır.',
+    explanation: 'Muğla Ovası Menteşe yöresindeki tipik karstik polye çöküntüsüdür.',
+    kpssTip: 'TAKKEM: M = Muğla Ovası'
+  },
+  {
+    id: 'pin-23-bafra',
+    title: 'Bafra Deltası',
+    questionText: 'Kızılırmak Nehri\'nin Karadeniz\'e döküldüğü yerde oluşturduğu Türkiye\'nin en büyük delta ovalarından biri nerededir?',
     category: 'Platolar & Ovalar',
     region: 'Karadeniz',
-    targetFeatureId: 'pl-bafra-carsamba',
-    targetCoords: [36.200, 41.450],
-    hint: 'Samsun ili sahillerindedir.',
-    explanation: 'Bafra (Kızılırmak) ve Çarşamba (Yeşilırmak) Karadeniz\'in iki dev delta ovasıdır.',
-    kpssTip: 'KPSS Notu: Karadeniz\'in en büyük iki alüvyal birikim deltasıdır.'
+    targetFeatureId: 'pl-bafra',
+    targetCoords: [35.950, 41.570],
+    hint: 'Samsun ili batı kıyısındadır.',
+    explanation: 'Bafra Ovası Kızılırmak\'ın taşıdığı alüvyonlarla oluşmuş zengin delta ovasıdır.',
+    kpssTip: 'Bafra Deltası = Kızılırmak (Samsun)'
+  },
+  {
+    id: 'pin-23-carsamba',
+    title: 'Çarşamba Deltası',
+    questionText: 'Yeşilırmak Nehri\'nin Karadeniz\'e ulaştığı sahada oluşturduğu devasa alüvyal delta ovası nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Karadeniz',
+    targetFeatureId: 'pl-carsamba',
+    targetCoords: [36.700, 41.350],
+    hint: 'Samsun ili doğu sahilindedir.',
+    explanation: 'Çarşamba Ovası Yeşilırmak\'ın alüvyonlarıyla oluşturduğu Karadeniz\'in en büyük deltalarındandır.',
+    kpssTip: 'Çarşamba Deltası = Yeşilırmak (Samsun)'
   },
   {
     id: 'pin-24',
@@ -411,16 +518,124 @@ const HANDCRAFTED_PIN_QUESTIONS: PinGameQuestion[] = [
     kpssTip: 'KPSS Notu: Volkanik plato, Çernozyom toprak ve büyükbaş mera hayvancılığı ilintilidir.'
   },
   {
-    id: 'pin-25',
-    title: 'Teke ve Taşeli Platoları',
-    questionText: 'Kireçtaşı (Kalker) yapılı, engebeli ve nüfus yoğunluğunun son derece az olduğu karstik platolar nerededir?',
+    id: 'pin-25-teke',
+    title: 'Teke Platosu',
+    questionText: 'Antalya ile Muğla arasında kireçtaşı (Kalker) yapılı, engebeli, kıl keçisi yetiştirilen karstik plato nerededir?',
     category: 'Platolar & Ovalar',
     region: 'Akdeniz',
-    targetFeatureId: 'pl-teke-taseli',
-    targetCoords: [32.300, 36.600],
-    hint: 'Antalya ve Mersin kıyı arkası platolarıdır.',
-    explanation: 'Teke ve Taşeli platoları karstik erimeli yapıları nedeniyle tarıma elverişsiz ve seyrek nüfusludur.',
-    kpssTip: 'KPSS Notu: Kıl keçisi yetiştiriciliği ve karstik yapısıyla tanınır.'
+    targetFeatureId: 'pl-teke',
+    targetCoords: [29.800, 36.600],
+    hint: 'Antalya batısı Teke Yarımadası\'ndadır.',
+    explanation: 'Teke Platosu karstik kalkerli yapısı sebebiyle su tutmaz ve nüfusu çok seyrektir.',
+    kpssTip: 'Teke = Karstik Kalker + Seyrek Nüfus + Kıl Keçisi'
+  },
+  {
+    id: 'pin-25-taseli',
+    title: 'Taşeli Platosu',
+    questionText: 'Mersin ve Karaman sınırında Göksu kanyonlarıyla parçalanmış, karstik kireçtaşı yapılı plato nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Akdeniz',
+    targetFeatureId: 'pl-taseli',
+    targetCoords: [32.800, 36.600],
+    hint: 'Mersin-Karaman-Antalya kesişimindedir.',
+    explanation: 'Taşeli Platosu Göksu kanyonları ile derin yarılmış karstik platodur.',
+    kpssTip: 'Taşeli = Göksu Kanyonları + Karstik Yapı + Kıl Keçisi'
+  },
+  {
+    id: 'pin-25-haymana',
+    title: 'Haymana Platosu',
+    questionText: 'Ankara güneyinde yer alan, tiftik (Ankara) keçisi yetiştiriciliğinin merkezi tabaka düzlüğü platosu nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'İç Anadolu',
+    targetFeatureId: 'pl-haymana',
+    targetCoords: [32.500, 39.430],
+    hint: 'Ankara ilindedir.',
+    explanation: 'Haymana Platosu tabaka düzlüğü platosudur ve tiftik keçisiyle ünlüdür.',
+    kpssTip: 'Haymana = Ankara Tiftik Keçisi + Tabaka Düzlüğü'
+  },
+  {
+    id: 'pin-25-cihanbeyli',
+    title: 'Cihanbeyli Platosu',
+    questionText: 'Tuz Gölü batısında Konya kuzeyinde yer alan Türkiye\'nin tahıl ambarı tabaka düzlüğü platosu nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'İç Anadolu',
+    targetFeatureId: 'pl-cihanbeyli',
+    targetCoords: [32.900, 38.650],
+    hint: 'Konya ilindedir.',
+    explanation: 'Cihanbeyli Platosu buğday ve arpa tarımının yoğun olduğu tabaka düzlüğü platosudur.',
+    kpssTip: 'Cihanbeyli = Konya Tahıl Ambarı Tabaka Düzlüğü'
+  },
+  {
+    id: 'pin-25-obruk',
+    title: 'Obruk Platosu',
+    questionText: 'Konya ile Karapınar arasında yer alan ve yeraltı çökmeleriyle çok sayıda karstik obruk barındıran plato nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'İç Anadolu',
+    targetFeatureId: 'pl-obruk',
+    targetCoords: [33.300, 38.000],
+    hint: 'Konya Karapınar hattındadır.',
+    explanation: 'Obruk Platosu üzerinde Kızören, Meyil, Çıralı gibi dev karstik çöküntü obrukları yer alır.',
+    kpssTip: 'Obruk Platosu = Yeraltı Çökmeleri + Kızören Obruğu'
+  },
+  {
+    id: 'pin-25-bozok',
+    title: 'Bozok Platosu',
+    questionText: 'Yozgat çevresinde Kızılırmak yayı içerisinde kalan İç Anadolu\'nun en geniş tabaka düzlüğü platosu nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'İç Anadolu',
+    targetFeatureId: 'pl-bozok',
+    targetCoords: [35.000, 39.800],
+    hint: 'Yozgat ilindedir.',
+    explanation: 'Bozok Platosu Kızılırmak yayı içinde kalan geniş tabaka düzlüğü platosudur.',
+    kpssTip: 'Bozok = Yozgat + Kızılırmak Yayı İçi + Koyun Yetiştiriciliği'
+  },
+  {
+    id: 'pin-25-uzunyayla',
+    title: 'Uzunyayla Platosu',
+    questionText: 'Sivas Kangal ile Kayseri Pınarbaşı arasında yer alan İç Anadolu\'nun en yüksek ve en soğuk platosu nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'İç Anadolu',
+    targetFeatureId: 'pl-uzunyayla',
+    targetCoords: [36.500, 39.200],
+    hint: 'Sivas-Kayseri sınırındadır.',
+    explanation: 'Uzunyayla Platosu 1600 metre rakımlı yüksek tabaka düzlüğü platosudur.',
+    kpssTip: 'Uzunyayla = Sivas-Kayseri Sınırı + Uzunyayla Atı + Yüksek Plato'
+  },
+  {
+    id: 'pin-25-konya-ovasi',
+    title: 'Konya Ovası',
+    questionText: 'Kuvaterner göl tabanı üzerinde oluşan Türkiye\'nin en büyük iç tektonik ovası nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'İç Anadolu',
+    targetFeatureId: 'pl-konya',
+    targetCoords: [32.500, 37.870],
+    hint: 'Konya merkez havzasındadır.',
+    explanation: 'Konya Ovası eski göl tabanı ve tektonik çöküntüyle oluşan Türkiye\'nin en geniş iç ovasıdır.',
+    kpssTip: 'Konya Ovası = En Büyük İç Ova + Mavi Tünel KOP Projesi'
+  },
+  {
+    id: 'pin-25-harran',
+    title: 'Harran (Altınbaşak) Ovası',
+    questionText: 'GAP sulamasıyla Türkiye pamuk üretiminin kalbi haline gelen kırmızı killi ova nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Güneydoğu Anadolu',
+    targetFeatureId: 'pl-harran',
+    targetCoords: [39.020, 36.870],
+    hint: 'Şanlıurfa ilindedir.',
+    explanation: 'Harran Ovası Fırat Nehri sularıyla sulanarak pamuk üretiminde Türkiye birincisidir.',
+    kpssTip: 'Harran = GAP Sulaması + Türkiye Pamuk Şampiyonu + Tuzlanma Riski'
+  },
+  {
+    id: 'pin-25-igdir',
+    title: 'Iğdır (Sürmeli) Ovası',
+    questionText: 'Etrafı yüksek dağlarla çevrili çukurlukta fön rüzgarı etkisiyle pamuk ve kayısı yetiştirilen "Doğu\'nun Çukurovası" nerededir?',
+    category: 'Platolar & Ovalar',
+    region: 'Doğu Anadolu',
+    targetFeatureId: 'pl-igdir',
+    targetCoords: [44.050, 39.920],
+    hint: 'Iğdır ilindedir.',
+    explanation: 'Iğdır Ovası çukurda kaldığı için fön rüzgarlarıyla mikroklima özelliği kazanmıştır.',
+    kpssTip: 'Iğdır Ovası = Doğu\'nun Çukurova\'sı + Fön Rüzgarı + Mikroklima Pamuk'
   },
   {
     id: 'pin-26',
@@ -801,7 +1016,7 @@ export const PIN_GAME_QUESTIONS: PinGameQuestion[] = [
   ...DYNAMIC_PIN_QUESTIONS
 ];
 
-export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
+const HANDCRAFTED_MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
   {
     id: 'mc-1',
     category: 'Dağlar',
@@ -1476,12 +1691,76 @@ export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
   }
 ];
 
+function getCategoryDistractors(target: GeoFeature, all: GeoFeature[]): string[] {
+  const sameGroup = all.filter(f => f.id !== target.id && f.name !== target.name && (f.type === target.type || f.category === target.category));
+  const pool = sameGroup.length >= 4 ? sameGroup : all.filter(f => f.id !== target.id && f.name !== target.name);
+  const shuffled = shuffleArray(pool);
+  const distractors: string[] = [];
+  const nameSet = new Set<string>([target.name]);
+
+  for (const item of shuffled) {
+    if (!nameSet.has(item.name)) {
+      nameSet.add(item.name);
+      distractors.push(item.name);
+      if (distractors.length === 4) break;
+    }
+  }
+  return distractors;
+}
+
+const DYNAMIC_QUIZ_QUESTIONS: MultipleChoiceQuestion[] = ALL_GEO_FEATURES.flatMap((f, idx) => {
+  const questions: MultipleChoiceQuestion[] = [];
+  const distractors = getCategoryDistractors(f, ALL_GEO_FEATURES);
+  if (distractors.length < 4) return questions;
+
+  const rawOptions = [f.name, ...distractors];
+  const shuffledOptions = shuffleArray(rawOptions);
+  const correctIndex = shuffledOptions.indexOf(f.name);
+  const cat = mapTypeToPinCategory(f.type, f.category);
+
+  // Question 1: Feature Characteristics / Genesis
+  const cleanDesc = f.description ? sanitizeQuestionText(f.description) : '';
+  let qText1 = '';
+  if (cleanDesc && cleanDesc.length > 15) {
+    qText1 = `"${cleanDesc}"\nYukarıda özellikleri ve konumu açıklanan coğrafi unsur / yer şekli aşağıdakilerden hangisidir?`;
+  } else if (f.kpssTips?.[0]) {
+    qText1 = `KPSS Bilgisi: "${sanitizeQuestionText(f.kpssTips[0])}"\nBu bilgi aşağıdaki coğrafi unsurlardan hangisine aittir?`;
+  } else {
+    qText1 = `${f.region ? f.region + ' Bölgesi\'nde yer alan' : 'Türkiye\'de yer alan'} ve ${f.category || 'önemli bir oluşum'} olan coğrafi unsur hangisidir?`;
+  }
+
+  questions.push({
+    id: `mc-dyn-${f.id}-desc-${idx}`,
+    category: cat,
+    region: f.region,
+    questionText: qText1,
+    options: shuffledOptions,
+    correctIndex: correctIndex,
+    focusFeatureId: f.id,
+    targetCoords: f.coordinates,
+    explanation: `${f.name}: ${f.description || f.category || ''}. Bölgesi: ${f.region || 'Türkiye'}.`,
+    osymTip: f.kpssTips?.[0] ? `ÖSYM Notu: ${f.kpssTips[0]}` : `${f.name} - ${f.category || 'KPSS Coğrafya'}`
+  });
+
+  return questions;
+});
+
+export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
+  ...HANDCRAFTED_MULTIPLE_CHOICE_QUESTIONS,
+  ...DYNAMIC_QUIZ_QUESTIONS
+];
+
 export function getQuizQuestionsByIds(questionIds: string[]): MultipleChoiceQuestion[] {
   const map = new Map(MULTIPLE_CHOICE_QUESTIONS.map(q => [q.id, q]));
   const result: MultipleChoiceQuestion[] = [];
-  for (const id of questionIds) {
+  for (let i = 0; i < questionIds.length; i++) {
+    const id = questionIds[i];
     const q = map.get(id);
-    if (q) result.push(q);
+    if (q) {
+      result.push(q);
+    } else {
+      result.push(MULTIPLE_CHOICE_QUESTIONS[i % MULTIPLE_CHOICE_QUESTIONS.length]);
+    }
   }
   return result.length > 0 ? result : MULTIPLE_CHOICE_QUESTIONS.slice(0, 10);
 }

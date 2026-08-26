@@ -1605,17 +1605,32 @@ export const LAKES_DATA: GeoFeature[] = [
   },
   {
     id: 'l-avlan',
-    name: 'Avlan ve Elmalı Gölleri',
+    name: 'Avlan Gölü',
     type: 'lake',
     subCategory: 'karstic',
     category: 'Karstik Polye Gölü',
     coordinates: [29.930, 36.580],
     elevation: 1030,
     region: 'Akdeniz',
-    description: 'Antalya Elmalı Polyesi\'nde kireçtaşlarının erimesiyle oluşan karstik göller.',
+    description: 'Antalya Elmalı Polyesi\'nde kireçtaşlarının erimesiyle oluşan karstik polye gölü.',
     kpssTips: [
       'Döneminde kurutulup ekolojik dengenin bozulması üzerine yeniden su tutulmaya başlanan karstik göldür.',
-      'Karstik polyelerin tabanında yer alır.'
+      'Karstik Elmalı Polyesi tabanında yer alır.'
+    ],
+    mnemonic: 'Avlan = Elmalı Polyesi Karstik Gölü'
+  },
+  {
+    id: 'l-elmali-karagol',
+    name: 'Elmalı Karagöl',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Göl (Elmalı)',
+    coordinates: [29.850, 36.750],
+    elevation: 1050,
+    region: 'Akdeniz',
+    description: 'Antalya Elmalı Ovası\'nda kireçtaşlarının erimesiyle oluşan karstik çukurluk gölü.',
+    kpssTips: [
+      'Teke Yöresi ve Göller Bölgesi karstik erime göllerindendir.'
     ]
   },
   {
@@ -1635,19 +1650,61 @@ export const LAKES_DATA: GeoFeature[] = [
   },
   {
     id: 'l-kizoren-obruk',
-    name: 'Kızören ve Çıralı Obruk Gölleri',
+    name: 'Kızören Obruk Gölü',
     type: 'lake',
     subCategory: 'karstic',
-    category: 'Karstik Obruk Gölü',
+    category: 'Karstik Obruk Gölü (Ramsar)',
     coordinates: [33.180, 38.170],
     elevation: 990,
     region: 'İç Anadolu',
-    description: 'Konya Karapınar ve Obruk Platosu\'nda yeraltı kireçtaşı mağara tavanlarının çökmesiyle oluşan karstik obruk gölleri.',
+    description: 'Konya Karapınar ve Obruk Platosu\'nda yeraltı kireçtaşı mağara tavanının çökmesiyle oluşan 145 metre derinliğinde karstik obruk gölü.',
     kpssTips: [
       'Kızören Obruğu 145 metre derinliği ile Türkiye\'nin en tipik obruk gölüdür ve Ramsar alanıdır.',
-      'İç Anadolu Obruk Platosu\'nun karstik çöküntüleridir.'
+      'İç Anadolu Obruk Platosu\'nun karstik çöküntüsüdür.'
     ],
-    mnemonic: 'Kızören & Çıralı = Obruk Platosu Karstik Çökme Gölleri'
+    mnemonic: 'Kızören Obruğu = Obruk Platosu Ramsar Alanı Karstik Çökme Gölü'
+  },
+  {
+    id: 'l-cirali-obruk',
+    name: 'Çıralı Obruk Gölü',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Obruk Gölü',
+    coordinates: [33.550, 37.750],
+    elevation: 1000,
+    region: 'İç Anadolu',
+    description: 'Konya Karapınar civarında yeraltı kireçtaşlarının erimesi ve tavan çökmesiyle oluşan dairesel dik obruk gölü.',
+    kpssTips: [
+      'Obruk Platosu\'nun tipik karstik çökme obruk göllerindendir.'
+    ]
+  },
+  {
+    id: 'l-meyil-obruk',
+    name: 'Meyil Obruk Gölü',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Obruk Gölü',
+    coordinates: [33.620, 37.850],
+    elevation: 1010,
+    region: 'İç Anadolu',
+    description: 'Konya Karapınar bölgesinde yer alan, derin ve dik yamaçlı karstik çökme obruk gölü.',
+    kpssTips: [
+      'Tuzlu ve mineralli sularıyla bilinen karstik obruk gölüdür.'
+    ]
+  },
+  {
+    id: 'l-timras-obruk',
+    name: 'Timraş Obruk Gölü',
+    type: 'lake',
+    subCategory: 'karstic',
+    category: 'Karstik Obruk Gölü (Çumra)',
+    coordinates: [32.750, 37.600],
+    elevation: 1015,
+    region: 'İç Anadolu',
+    description: 'Konya Çumra ilçesinde kireçtaşı mağarasının çökmesiyle oluşan 30 metreyi aşan derinlikteki karstik göl.',
+    kpssTips: [
+      'Konya havzasındaki tarihi karstik çökme göllerindendir.'
+    ]
   },
   {
     id: 'l-kovada',
@@ -2483,12 +2540,15 @@ export const PASSES_DATA: GeoFeature[] = [
 ];
 
 export const PLAINS_PLATEAUS_DATA: GeoFeature[] = [
+  // ==========================================
+  // 1. DELTA OVALARI (KIYI ALÜVYAL BİRİKİM)
+  // ==========================================
   {
     id: 'pl-cukurova',
     name: 'Çukurova (Delta Ovası)',
     type: 'plain',
     subCategory: 'delta',
-    category: 'Delta Ovası',
+    category: 'Delta Ovası (Seyhan & Ceyhan)',
     coordinates: [35.300, 36.850],
     region: 'Akdeniz',
     description: 'Seyhan ve Ceyhan nehirlerinin taşıdığı alüvyonlarla oluşan Türkiye\'nin EN BÜYÜK DELTA OVASIDIR.',
@@ -2499,51 +2559,795 @@ export const PLAINS_PLATEAUS_DATA: GeoFeature[] = [
     mnemonic: 'Çukurova = Türkiye\'nin En Büyük Alüvyal Deltası (Seyhan + Ceyhan)'
   },
   {
-    id: 'pl-bafra-carsamba',
-    name: 'Bafra ve Çarşamba Delta Ovaları',
+    id: 'pl-silifke',
+    name: 'Silifke Delta Ovası (Göksu Deltası)',
     type: 'plain',
     subCategory: 'delta',
-    category: 'Karadeniz Deltaları',
-    coordinates: [36.200, 41.450],
-    region: 'Karadeniz',
-    description: 'Bafra (Kızılırmak) ve Çarşamba (Yeşilırmak) tarafından Karadeniz kıyısında oluşturulan verimli ovalar.',
+    category: 'Delta Ovası (Göksu)',
+    coordinates: [34.020, 36.300],
+    region: 'Akdeniz',
+    description: 'Göksu Nehri\'nin Akdeniz\'e döküldüğü yerde oluşturduğu, Ramsar korumalı zengin sulak alan ve verimli delta ovası.',
     kpssTips: [
-      'Karadeniz Bölgesi\'nin en büyük kıyı tarım ovalarıdır.',
-      'Tütün, çeltik (pirinç), mısır ve sebze yetiştiriciliği yaygındır.'
+      'Göksu Deltası (Silifke) Akdeniz\'in 2. büyük deltasıdır ve Ramsar alanıdır.',
+      'Çeltik, yerfıstığı, çilek ve turfanda sebze yetiştirilir.'
+    ],
+    mnemonic: 'Silifke Deltası = Göksu Nehri + Ramsar Alanı'
+  },
+  {
+    id: 'pl-bafra',
+    name: 'Bafra Delta Ovası',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Delta Ovası (Kızılırmak)',
+    coordinates: [35.900, 41.560],
+    region: 'Karadeniz',
+    description: 'Kızılırmak Nehri\'nin Karadeniz\'e döküldüğü yerde oluşturduğu Karadeniz\'in en büyük delta ovası.',
+    kpssTips: [
+      'Kızılırmak Deltası ve Bafra Ovası UNESCO Dünya Mirası Geçici Listesi\'ndedir.',
+      'Tütün, çeltik (pirinç) ve sebze üretiminde liderdir.'
+    ],
+    mnemonic: 'Bafra = Kızılırmak Deltası'
+  },
+  {
+    id: 'pl-carsamba',
+    name: 'Çarşamba Delta Ovası',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Delta Ovası (Yeşilırmak)',
+    coordinates: [36.720, 41.200],
+    region: 'Karadeniz',
+    description: 'Yeşilırmak Nehri\'nin taşıdığı alüvyonlarla Karadeniz sahilinde oluşturduğu verimli delta ovası.',
+    kpssTips: [
+      'Yeşilırmak tarafından Samsun sahilinde inşa edilmiştir.',
+      'Mısır, fındık, soya ve çeltik tarımı çok yaygındır.'
+    ],
+    mnemonic: 'Çarşamba = Yeşilırmak Deltası'
+  },
+  {
+    id: 'pl-dikili-bakircay',
+    name: 'Dikili Delta Ovası (Bakırçay Deltası)',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Ege Deltası (Bakırçay)',
+    coordinates: [26.890, 39.070],
+    region: 'Ege',
+    description: 'Bakırçay Nehri\'nin Çandarlı Körfezi\'nde oluşturduğu verimli alüvyal delta ovası.',
+    kpssTips: [
+      'Ege Bölgesi\'nin en kuzeydeki delta ovasıdır (Bakırçay ağzı).'
     ]
   },
   {
-    id: 'pl-takkee',
-    name: 'TAKKEM Karstik Ovaları (Polye)',
+    id: 'pl-menemen-gediz',
+    name: 'Menemen Delta Ovası (Gediz Deltası)',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Ege Deltası (Gediz)',
+    coordinates: [26.960, 38.580],
+    region: 'Ege',
+    description: 'Gediz Nehri\'nin İzmir Körfezi girişinde oluşturduğu, flamingoların üreme sahası (İzmir Kuş Cenneti) ve verimli tarım deltası.',
+    kpssTips: [
+      'Gediz Nehri İzmir Körfezi\'ni doldurmasın diye 1886\'da yatağı kuzeye (Menemen dışına) kaydırılmıştır (ÖSYM Klasik Soru)!'
+    ],
+    mnemonic: 'Menemen = Gediz Deltası + Kuş Cenneti + Yatağı Değiştirilen Nehir'
+  },
+  {
+    id: 'pl-selcuk-kucukmenderes',
+    name: 'Selçuk Delta Ovası (Küçük Menderes Deltası)',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Ege Deltası (Küçük Menderes)',
+    coordinates: [27.280, 37.950],
+    region: 'Ege',
+    description: 'Küçük Menderes Nehri\'nin taşıdığı alüvyonlarla Efes antik liman kentini denizden kilometrelerce içeride bırakan delta ovası.',
+    kpssTips: [
+      'Alüvyonlar tarihi Efes Antik Limanı\'nı doldurarak liman özelliğini kaybettirmiştir.'
+    ],
+    mnemonic: 'Selçuk = Küçük Menderes + Efes Limanını Dolduran Alüvyon'
+  },
+  {
+    id: 'pl-balat-buyukmenderes',
+    name: 'Balat Delta Ovası (Büyük Menderes Deltası)',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Ege Deltası (Büyük Menderes)',
+    coordinates: [27.220, 37.550],
+    region: 'Ege',
+    description: 'Büyük Menderes Nehri\'nin Ege Denizi\'ne ulaştığı sahada oluşturduğu ve tarihi Milet antik limanını karaya hapseden geniş delta.',
+    kpssTips: [
+      'Büyük Menderes deltası Milet antik liman kentini doldurup iç kısımlarda bırakmıştır.',
+      'Dilek Yarımadası - Büyük Menderes Deltası Milli Parkı içindedir.'
+    ],
+    mnemonic: 'Balat = Büyük Menderes + Milet Limanını Dolduran Delta'
+  },
+  {
+    id: 'pl-samandag-asi',
+    name: 'Asi Deltası / Samandağ Ovası',
+    type: 'plain',
+    subCategory: 'delta',
+    category: 'Delta Ovası (Asi)',
+    coordinates: [35.950, 36.080],
+    region: 'Akdeniz',
+    description: 'Lübnan ve Suriye\'den gelip Hatay Samandağ\'dan Akdeniz\'e dökülen Asi Nehri\'nin oluşturduğu kıyı alüvyal ovası.',
+    kpssTips: [
+      'Asi Nehri\'nin ağzında oluşan Samandağ sahili dünyanın en uzun kumsallarındandır.'
+    ]
+  },
+
+  // ==========================================
+  // 2. KARSTİK OVALAR (POLYELER - TAKKEM KURALI)
+  // ==========================================
+  {
+    id: 'pl-tefenni',
+    name: 'Tefenni Ovası (Karstik Polye)',
     type: 'plain',
     subCategory: 'karstic',
-    category: 'Karstik Ova (Polye)',
-    coordinates: [29.800, 37.100],
+    category: 'Karstik Ova (TAKKEM - T)',
+    coordinates: [29.780, 37.310],
     region: 'Akdeniz',
-    description: 'Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı ve Muğla karstik ovaları (TAKKEM kuralı).',
+    description: 'Burdur Tefenni ilçesinde kireçtaşlarının erimesiyle oluşan TAKKEM kuralının "T" harfi karstik polye ovası.',
     kpssTips: [
-      'Kireçtaşının erimesiyle oluşan geniş polyelerdir.',
-      'Arazisi karstik olduğu için suları kolayca sızdırır.'
+      'TAKKEM karstik polyeler şifresinin ilk ovasıdır (Tefenni - Burdur).',
+      'Tabanı kalkerli karstik arazidir.'
     ],
-    mnemonic: 'TAKKEM = Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla'
+    mnemonic: 'TAKKEM: T = Tefenni (Burdur)'
   },
   {
-    id: 'pl-tektonik-kaf',
-    name: 'Kuzey Anadolu Tektonik Ovaları',
+    id: 'pl-acipayam',
+    name: 'Acıpayam Ovası (Karstik Polye)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Ova (TAKKEM - A)',
+    coordinates: [29.350, 37.430],
+    region: 'Ege',
+    description: 'Denizli Acıpayam ilçesinde kireçtaşlarının kimyasal erimesiyle oluşan TAKKEM kuralının "A" harfi karstik polye ovası.',
+    kpssTips: [
+      'TAKKEM kodlamasındaki "A" = Acıpayam Ovası (Denizli).',
+      'Verimli karstik polye tabanında tarım yapılır.'
+    ],
+    mnemonic: 'TAKKEM: A = Acıpayam (Denizli)'
+  },
+  {
+    id: 'pl-korkuteli',
+    name: 'Korkuteli Ovası (Karstik Polye)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Ova (TAKKEM - K)',
+    coordinates: [30.200, 37.060],
+    region: 'Akdeniz',
+    description: 'Antalya Korkuteli ilçesinde yer alan, Türkiye mantarcılığının merkezi niteliğindeki TAKKEM karstik polye ovası.',
+    kpssTips: [
+      'TAKKEM kodlamasındaki birinci "K" = Korkuteli Ovası (Antalya).',
+      'Kültür mantarı üretiminde Türkiye birincisidir.'
+    ],
+    mnemonic: 'TAKKEM: K = Korkuteli (Antalya)'
+  },
+  {
+    id: 'pl-kestel',
+    name: 'Kestel Ovası (Karstik Polye)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Ova (TAKKEM - K)',
+    coordinates: [30.400, 37.380],
+    region: 'Akdeniz',
+    description: 'Burdur Bucak ve Antalya sınırında kireçtaşı bloklarının erimesiyle oluşan TAKKEM karstik polye ovası.',
+    kpssTips: [
+      'TAKKEM kodlamasındaki ikinci "K" = Kestel Ovası (Burdur/Bucak).',
+      'Karstik düdenlerle yeraltına su boşalımı gerçekleşir.'
+    ],
+    mnemonic: 'TAKKEM: K = Kestel (Burdur)'
+  },
+  {
+    id: 'pl-elmali',
+    name: 'Elmalı Ovası (Karstik Polye)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Ova (TAKKEM - E)',
+    coordinates: [29.920, 36.730],
+    region: 'Akdeniz',
+    description: 'Antalya Elmalı ilçesinde yer alan, Avlan ve Karagöl gibi karstik gölleri barındıran TAKKEM "E" harfi karstik polye ovası.',
+    kpssTips: [
+      'TAKKEM kodlamasındaki "E" = Elmalı Ovası (Antalya).',
+      'Elma yetiştiriciliği ve karstik polye yapısıyla ünlüdür.'
+    ],
+    mnemonic: 'TAKKEM: E = Elmalı (Antalya)'
+  },
+  {
+    id: 'pl-mugla',
+    name: 'Muğla Ovası (Menteşe Polyesi)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Ova (TAKKEM - M)',
+    coordinates: [28.370, 37.210],
+    region: 'Ege',
+    description: 'Muğla il merkezinin kurulu olduğu Menteşe yöresindeki TAKKEM kuralının son harfi olan karstik polye ovası.',
+    kpssTips: [
+      'TAKKEM kodlamasındaki "M" = Muğla Ovası (Muğla Menteşe).',
+      'Karstik çukur alanında yerleşim kurulmuştur.'
+    ],
+    mnemonic: 'TAKKEM: M = Muğla Ovası'
+  },
+  {
+    id: 'pl-tavas',
+    name: 'Tavas Ovası (Karstik Polye)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Polye (Denizli)',
+    coordinates: [29.070, 37.570],
+    region: 'Ege',
+    description: 'Denizli ili güneyinde kireçtaşlarının çözünmesiyle şekillenmiş geniş karstik polye havzası.',
+    kpssTips: [
+      'Ege ile Akdeniz geçiş kuşağındaki önemli karstik polyelerdendir.'
+    ]
+  },
+  {
+    id: 'pl-civril',
+    name: 'Çivril Ovası',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik & Alüvyal Ova',
+    coordinates: [29.740, 38.300],
+    region: 'Ege',
+    description: 'Büyük Menderes\'in yukarı çığırında Işıklı Gölü çevresinde oluşan karstik tabanlı verimli ova.',
+    kpssTips: [
+      'Işıklı Gölü ve elma bahçeleriyle meşhurdur.'
+    ]
+  },
+  {
+    id: 'pl-gembos',
+    name: 'Gembos Ovası (Karstik Polye)',
+    type: 'plain',
+    subCategory: 'karstic',
+    category: 'Karstik Polye (Antalya/Konya)',
+    coordinates: [31.500, 37.250],
+    region: 'Akdeniz',
+    description: 'Antalya Derebucak ve İbradı arasında yer alan, karlar eridiğinde göle dönüşen dönemsel karstik polye ovası.',
+    kpssTips: [
+      'Gembos Düdeni ve karstik yeraltı su akıntılarıyla Beyşehir Gölü ve Manavgat Çayı\'na su iletir.'
+    ]
+  },
+
+  // ==========================================
+  // 3. TEKTONİK OVALAR & İÇ OVALAR
+  // ==========================================
+  {
+    id: 'pl-konya',
+    name: 'Konya Ovası',
     type: 'plain',
     subCategory: 'tectonic',
-    category: 'Tektonik Ova',
-    coordinates: [30.400, 40.750],
-    region: 'Marmara',
-    description: 'Adapazarı, Düzce, Bolu, Erbaa, Niksar, Taşova ve Erzincan tektonik fay ovaları.',
+    category: 'Eski Göl Tabanı & En Büyük İç Ova',
+    coordinates: [32.500, 37.870],
+    region: 'İç Anadolu',
+    description: 'Kuvaterner dönemindeki dev gölün kuruması ve tektonik çöküntüyle oluşan TÜRKİYE\'NİN EN BÜYÜK İÇ OVASI ve tahıl ambarı.',
     kpssTips: [
-      'Fay hatları boyunca çöküntü alanlarında yer alırlar.',
-      'Deprem riski yüksektir ancak tarım toprakları verimlidir.'
+      'Türkiye\'nin en geniş iç ovasıdır.',
+      'Yeraltı sularının aşırı çekilmesine bağlı olarak obruk oluşumlarının en yoğun yaşandığı ovadır.',
+      'KOP (Konya Ovası Projesi / Mavi Tünel) ile Göksu Nehri suları buraya aktarılmaktadır.'
+    ],
+    mnemonic: 'Konya Ovası = En Büyük İç Ova + Eski Göl Tabanı + Obruk Riski + Mavi Tünel / KOP'
+  },
+  {
+    id: 'pl-aksaray',
+    name: 'Aksaray Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik İç Ova',
+    coordinates: [34.020, 38.370],
+    region: 'İç Anadolu',
+    description: 'Tuz Gölü havzasının güneydoğusunda Hasan Dağı volkanik külleri ve alüvyonlarla zenginleşmiş tektonik ova.',
+    kpssTips: [
+      'İç Anadolu tahıl ve şeker pancarı üretim sahalarındandır.'
     ]
+  },
+  {
+    id: 'pl-eregli',
+    name: 'Ereğli Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Ova (Konya Ereğli)',
+    coordinates: [34.050, 37.510],
+    region: 'İç Anadolu',
+    description: 'Toros Dağları kuzey eteğinde Akgöl bataklığı ve karstik kaynaklarla beslenen zengin tarım ovası.',
+    kpssTips: [
+      'Beyaz kiraz ve siyah havuç üretimiyle tanınır.'
+    ]
+  },
+  {
+    id: 'pl-eskisehir',
+    name: 'Eskişehir Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Çöküntü Ovası',
+    coordinates: [30.520, 39.770],
+    region: 'İç Anadolu',
+    description: 'Porsuk Çayı\'nın suladığı verimli tektonik ova.',
+    kpssTips: [
+      'Lüle taşı çıkarımı ve şekerpancarı tarımı yapılır.'
+    ]
+  },
+  {
+    id: 'pl-harran',
+    name: 'Harran (Altınbaşak) Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Ova / GAP Sulama Sahası',
+    coordinates: [39.020, 36.870],
+    region: 'Güneydoğu Anadolu',
+    description: 'Şanlıurfa\'da GAP tünelleriyle (Şanlıurfa Tüneli) Fırat Nehri sularının ulaştığı ve Türkiye pamuk üretiminde rekor kıran kırmızı killi dev ova.',
+    kpssTips: [
+      'GAP ile sulamaya açılan en büyük ovadır.',
+      'Türkiye PAMUK üretiminde 1. sıradadır.',
+      'Aşırı ve vahşi sulamaya bağlı taban suyu yükselmesi ve TUZLANMA (Çoraklaşma) riski taşır (ÖSYM KPSS Sorusu).'
+    ],
+    mnemonic: 'Harran = GAP Sulaması + Türkiye Pamuk Şampiyonu + Tuzlanma Riski'
+  },
+  {
+    id: 'pl-ceylanpinar',
+    name: 'Ceylanpınar Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Ova / TİGEM Sahası',
+    coordinates: [39.980, 36.830],
+    region: 'Güneydoğu Anadolu',
+    description: 'Suriye sınırında yer alan, Türkiye\'nin en büyük devlet tarım işletmesi (TİGEM) arazisine ev sahipliği yapan ova.',
+    kpssTips: [
+      'TİGEM Ceylanpınar Tarım İşletmesi Türkiye\'nin en büyük tek parça tarım arazisidir.'
+    ]
+  },
+  {
+    id: 'pl-suruc',
+    name: 'Suruç Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Ova / Suruç Tüneli',
+    coordinates: [38.420, 36.970],
+    region: 'Güneydoğu Anadolu',
+    description: 'Şanlıurfa\'da Türkiye\'nin en uzun sulama tüneli olan Suruç Tüneli ile Atatürk Barajı\'ndan su alan ova.',
+    kpssTips: [
+      'Suruç Tüneli Türkiye\'nin en uzun, dünyanın en uzun 5. su iletim tünelidir.'
+    ]
+  },
+  {
+    id: 'pl-amik',
+    name: 'Amik Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Graben / Çöküntü Ovası (Ölü Deniz Fayı)',
+    coordinates: [36.350, 36.300],
+    region: 'Akdeniz',
+    description: 'Hatay\'da Ölü Deniz ve Doğu Anadolu Fay Hattı graben çukurluğunda Asi Nehri\'nin taşıdığı topraklarla oluşan verimli tektonik çöküntü ovası.',
+    kpssTips: [
+      'Gölbaşı (Amik Gölü) kurutularak tarıma açılmış ancak kışın sel ve su baskını riski artmıştır.',
+      'Pamuk, buğday ve narenciye yetiştirilir.'
+    ]
+  },
+  {
+    id: 'pl-igdir',
+    name: 'Iğdır (Sürmeli) Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Mikroklima Çöküntü Ovası (Doğu\'nun Çukurova\'sı)',
+    coordinates: [44.050, 39.920],
+    region: 'Doğu Anadolu',
+    description: 'Aras Nehri kenarında etrafı yüksek dağlarla çevrili derin tektonik çukurlukta yer alan ve "DOĞU\'NUN ÇUKUROVA\'SI" olarak bilinen mikroklima sahası.',
+    kpssTips: [
+      'Çevresine göre alçakta (Fön rüzgarları etkisiyle) kaldığı için PAMUK ve KAYISI yetiştirilebilen MİKROKLİMA alanıdır (ÖSYM Favorisi).',
+      'Doğu Anadolu\'nun en ılık ve en az yağış alan yöresidir.'
+    ],
+    mnemonic: 'IĞDIR OVASI = Doğu\'nun Çukurova\'sı + Fön Rüzgarı + Mikroklima Pamuk'
+  },
+  {
+    id: 'pl-mus',
+    name: 'Muş Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Çöküntü Ovası (DAF)',
+    coordinates: [41.500, 38.740],
+    region: 'Doğu Anadolu',
+    description: 'Murat Nehri havzasında Doğu Anadolu Fay zonunda yer alan Doğu Anadolu\'nun en geniş ovalarından biri.',
+    kpssTips: [
+      'Şekerpancarı, buğday ve tütün tarımı ile büyükbaş hayvancılık yapılır.'
+    ]
+  },
+  {
+    id: 'pl-elazig-uluova',
+    name: 'Elazığ (Uluova) Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Ova (DAF)',
+    coordinates: [39.220, 38.680],
+    region: 'Doğu Anadolu',
+    description: 'Elazığ il merkezinin güneyinde Keban Baraj Gölü kıyısında yer alan verimli tektonik ova.',
+    kpssTips: [
+      'Keban Barajı\'nın yapımıyla ovanın bir kısmı sular altında kalmıştır.'
+    ]
+  },
+  {
+    id: 'pl-malatya',
+    name: 'Malatya Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Çöküntü Ovası',
+    coordinates: [38.320, 38.350],
+    region: 'Doğu Anadolu',
+    description: 'Tohma ve Fırat nehirlerinin beslediği, dünya kuru kayısı üretiminin başkenti tektonik ova.',
+    kpssTips: [
+      'Dünya kuru kayısı ihracatının lider üretim merkezidir.'
+    ]
+  },
+  {
+    id: 'pl-kahramanmaras',
+    name: 'Kahramanmaraş Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Çöküntü Ovası (DAF)',
+    coordinates: [36.930, 37.580],
+    region: 'Akdeniz',
+    description: 'Doğu Anadolu Fay Hattı kuşağında verimli alüvyonlarla kaplı kırmızı toprak zengini sanayi ve tarım ovası.',
+    kpssTips: [
+      'Kırmızı biber, pamuk ve tekstil sanayisinin hammaddesi üretilir.'
+    ]
+  },
+  {
+    id: 'pl-erzincan',
+    name: 'Erzincan Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Kuzey Anadolu Fayı (KAF) Tektonik Ovası',
+    coordinates: [39.500, 39.750],
+    region: 'Doğu Anadolu',
+    description: 'Karasu Nehri kenarında Kuzey Anadolu Fay kuşağında yer alan tektonik çöküntü ovası.',
+    kpssTips: [
+      'Deprem riski çok yüksektir (1939 ve 1992 büyük depremleri).',
+      'Tulum peyniri, şeker pancarı ve sebze üretimi yapılır.'
+    ]
+  },
+  {
+    id: 'pl-erzurum',
+    name: 'Erzurum Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Yüksek Tektonik Ova',
+    coordinates: [41.270, 39.900],
+    region: 'Doğu Anadolu',
+    description: '1900 metre rakımda yer alan, kışların çok sert geçtiği yüksek tektonik çöküntü ovası.',
+    kpssTips: [
+      'Karasu nehri tarafından drene edilir.'
+    ]
+  },
+  {
+    id: 'pl-pasinler',
+    name: 'Pasinler (Hasankale) Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Ova (Aras Havzası)',
+    coordinates: [41.670, 39.980],
+    region: 'Doğu Anadolu',
+    description: 'Aras Nehri kollarının suladığı şifalı termal sularıyla ünlü Erzurum tektonik ovası.',
+    kpssTips: [
+      'Patates ve yem bitkileri üretimi yaygındır.'
+    ]
+  },
+  {
+    id: 'pl-adapazari',
+    name: 'Adapazarı Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'KAF Tektonik Fay Ovası',
+    coordinates: [30.400, 40.780],
+    region: 'Marmara',
+    description: 'Sakarya Nehri\'nin alüvyonlarla doldurduğu Kuzey Anadolu Fayı üzerindeki tektonik çöküntü ovası.',
+    kpssTips: [
+      'Sanayi tesislerinin tarım topraklarını işgal ettiği tipik ovamızdır.',
+      'Mısır, fındık ve kavak yetiştiriciliği yapılır.'
+    ]
+  },
+  {
+    id: 'pl-duzce',
+    name: 'Düzce Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'KAF Tektonik Çöküntü Ovası',
+    coordinates: [31.160, 40.840],
+    region: 'Karadeniz',
+    description: 'Bolu Dağı eteklerinde Melen Çayı havzasındaki tektonik fay ovası.',
+    kpssTips: [
+      'Fındık ve tütün tarımı yapılır; 1. derece deprem bölgesidir.'
+    ]
+  },
+  {
+    id: 'pl-bolu',
+    name: 'Bolu Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'KAF Tektonik Ovası',
+    coordinates: [31.600, 40.730],
+    region: 'Karadeniz',
+    description: 'Köroğlu Dağları ile Abant Dağları arasında Kuzey Anadolu Fayı çanağındaki tektonik ova.',
+    kpssTips: [
+      'Beyaz et (tavukçuluk) ve patates üretiminde merkezdir.'
+    ]
+  },
+  {
+    id: 'pl-tosya',
+    name: 'Tosya Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'KAF Tektonik Ovası (Kastamonu)',
+    coordinates: [34.040, 41.020],
+    region: 'Karadeniz',
+    description: 'Devrez Çayı vadisinde yer alan çeltik (pirinç) üretimiyle meşhur tektonik ova.',
+    kpssTips: [
+      'Tosya pirinciyle (Sarıkılçık) coğrafi işaretlidir.'
+    ]
+  },
+  {
+    id: 'pl-erbaa',
+    name: 'Erbaa Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Kelkit Vadisi Tektonik Ovası (Tokat)',
+    coordinates: [36.570, 40.670],
+    region: 'Karadeniz',
+    description: 'Kelkit Çayı\'nın suladığı verimli bağ yaprağı ve tütün ovası.',
+    kpssTips: [
+      'Erbaa asma yaprağı ile tanınır.'
+    ]
+  },
+  {
+    id: 'pl-niksar',
+    name: 'Niksar Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'KAF Tektonik Ovası (Tokat)',
+    coordinates: [36.950, 40.590],
+    region: 'Karadeniz',
+    description: 'Kelkit fayı üzerindeki ceviz ve meyve bahçeleriyle kaplı tektonik ova.',
+    kpssTips: [
+      'Niksar cevizi meşhurdur.'
+    ]
+  },
+  {
+    id: 'pl-tasova',
+    name: 'Taşova Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Yeşilırmak Tektonik Ovası (Amasya)',
+    coordinates: [36.320, 40.770],
+    region: 'Karadeniz',
+    description: 'Yeşilırmak ve Destek Çayı birleşimindeki tektonik fay ovası.',
+    kpssTips: [
+      'Amasya elması ve bamya üretimi yapılır.'
+    ]
+  },
+  {
+    id: 'pl-bursa',
+    name: 'Bursa Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Dağ Eteği Ovası (Uludağ)',
+    coordinates: [29.060, 40.200],
+    region: 'Marmara',
+    description: 'Uludağ\'dan inen akarsuların taşıdığı alüvyonların birikmesiyle oluşan Türkiye\'nin en tipik DAĞ ETEĞİ OVASIDIR.',
+    kpssTips: [
+      'Dağ Eteği Ovası denince akla gelen İLK örnektir (Uludağ etekleri).',
+      'Sanayi ve konut işgali altında kalmış verimli şeftali ve meyve bahçeleri sahasıdır.'
+    ],
+    mnemonic: 'Bursa Ovası = Dağ Eteği Ovası (Uludağ)'
+  },
+  {
+    id: 'pl-inegol',
+    name: 'İnegöl Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik Çöküntü Ovası',
+    coordinates: [29.510, 40.080],
+    region: 'Marmara',
+    description: 'Uludağ ve Domaniç dağları arasındaki mobilya sanayisi ve ayçekirdeği tarımı ovası.',
+    kpssTips: [
+      'İnegöl mobilya sanayisi ve ayçekirdeğiyle bilinir.'
+    ]
+  },
+  {
+    id: 'pl-balikesir',
+    name: 'Balıkesir Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Tektonik İç Ova (Marmara)',
+    coordinates: [27.880, 39.650],
+    region: 'Marmara',
+    description: 'Güney Marmara\'da hayvancılık ve süt ürünleri üretimiyle öne çıkan tektonik ova.',
+    kpssTips: [
+      'Marmara Bölgesi\'nin en verimli tarım ve hayvancılık ovalarındandır.'
+    ]
+  },
+  {
+    id: 'pl-manisa-gediz',
+    name: 'Gediz / Manisa Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Ege Graben Ovası (Gediz)',
+    coordinates: [27.430, 38.610],
+    region: 'Ege',
+    description: 'Bozdağlar ile Yunt Dağları arasındaki Gediz Grabeninde yer alan çekirdeksiz kuru üzümün başkenti tektonik ova.',
+    kpssTips: [
+      'Çekirdeksiz Sultaniye üzüm üretiminde dünya lideridir.'
+    ]
+  },
+  {
+    id: 'pl-kucukmenderes-odemis',
+    name: 'Ödemiş / Küçük Menderes Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Ege Graben Ovası (Küçük Menderes)',
+    coordinates: [27.970, 38.230],
+    region: 'Ege',
+    description: 'Bozdağlar ile Aydın Dağları arasındaki graben çukurluğunda yer alan patates ve süt cenneti ova.',
+    kpssTips: [
+      'Yılda iki kez patates hasadı yapılan zengin graben ovasıdır.'
+    ]
+  },
+  {
+    id: 'pl-buyukmenderes-aydin',
+    name: 'Aydın / Söke Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Ege Graben Ovası (Büyük Menderes)',
+    coordinates: [27.840, 37.850],
+    region: 'Ege',
+    description: 'Aydın Dağları ile Menteşe Dağları arasındaki Büyük Menderes Grabeninde yer alan incir ve pamuk ovası.',
+    kpssTips: [
+      'Türkiye incir üretiminde 1. sıradadır.'
+    ]
+  },
+  {
+    id: 'pl-bakircay-bergama',
+    name: 'Bergama / Bakırçay Ovası',
+    type: 'plain',
+    subCategory: 'tectonic',
+    category: 'Ege Graben Ovası (Bakırçay)',
+    coordinates: [27.180, 39.120],
+    region: 'Ege',
+    description: 'Madra Dağı ile Yunt Dağları arasındaki Bakırçay Graben çöküntüsündeki ova.',
+    kpssTips: [
+      'Pamuk, zeytin ve domates üretimi yoğundur.'
+    ]
+  },
+  {
+    id: 'pl-develi',
+    name: 'Develi Ovası',
+    type: 'plain',
+    subCategory: 'volcanic',
+    category: 'Volkanik Ova (Kayseri)',
+    coordinates: [35.480, 38.390],
+    region: 'İç Anadolu',
+    description: 'Erciyes Dağı\'nın püskürttüğü lav ve tüflerin çukurluğu doldurmasıyla oluşan Türkiye\'deki nadir VOLKANİK OVALARDANDIR.',
+    kpssTips: [
+      'Türkiye\'nin en belirgin Volkanik Ova örneğidir (Erciyes Dağı volkanik dolgusu).',
+      'Sultan Sazlığı Ramsar sulak alanını da barındırır.'
+    ],
+    mnemonic: 'Develi Ovası = Erciyes Volkanik Dolgu Ovası + Sultan Sazlığı'
+  },
+
+  // ==========================================
+  // 4. PLATOLAR (AŞINIM / TABAKA DÜZLÜĞÜ / KARSTİK / VOLKANİK)
+  // ==========================================
+  {
+    id: 'pl-teke',
+    name: 'Teke Platosu',
+    type: 'plateau',
+    subCategory: 'karstic',
+    category: 'Karstik Plato (Antalya/Muğla)',
+    coordinates: [29.800, 36.600],
+    elevation: 1250,
+    region: 'Akdeniz',
+    description: 'Antalya ile Fethiye arasında kireçtaşı (kalker) araziden oluşan, suyun derinlere sızdığı, engebeli ve seyrek nüfuslu karstik plato.',
+    kpssTips: [
+      'Kireçtaşı erimeleri yaygındır, su tutmaz.',
+      'Türkiye\'nin en seyrek nüfuslu alanlarındandır.',
+      'KIL KEÇİSİ yetiştiriciliği birinci sıradadır.'
+    ],
+    mnemonic: 'Teke = Karstik Kalker + Seyrek Nüfus + Kıl Keçisi'
+  },
+  {
+    id: 'pl-taseli',
+    name: 'Taşeli Platosu',
+    type: 'plateau',
+    subCategory: 'karstic',
+    category: 'Karstik Plato (Mersin/Karaman)',
+    coordinates: [32.800, 36.600],
+    elevation: 1400,
+    region: 'Akdeniz',
+    description: 'Mersin, Karaman ve Antalya sınırında Göksu Nehri kanyonlarıyla derin yarılmış, engebeli ve karstik kalkerli plato.',
+    kpssTips: [
+      'Göksu kanyonları ile parçalanmıştır.',
+      'Karstik yapı nedeniyle tarım zordur, nüfus çok seyrektir.',
+      'KIL KEÇİSİ otlatıcılığı yaygındır.'
+    ],
+    mnemonic: 'Taşeli = Göksu Kanyonları + Karstik Yapı + Kıl Keçisi'
+  },
+  {
+    id: 'pl-haymana',
+    name: 'Haymana Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü Platosu (Ankara)',
+    coordinates: [32.500, 39.430],
+    elevation: 1100,
+    region: 'İç Anadolu',
+    description: 'Ankara güneyinde yer alan, geniş bozkırlarla kaplı, TİFTİK (ANKARA) KEÇİSİ yetiştiriciliğinin merkez platosu.',
+    kpssTips: [
+      'Tabaka Düzlüğü (Yatay Duruşlu) platodur.',
+      'TİFTİK KEÇİSİ (Ankara Keçisi) ve tahıl tarımı yaygındır.'
+    ],
+    mnemonic: 'Haymana = Ankara Tiftik Keçisi + Tabaka Düzlüğü'
+  },
+  {
+    id: 'pl-cihanbeyli',
+    name: 'Cihanbeyli Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü Platosu (Konya)',
+    coordinates: [32.900, 38.650],
+    elevation: 1000,
+    region: 'İç Anadolu',
+    description: 'Tuz Gölü batısında Konya kuzeyinde yer alan, Türkiye\'nin en önemli tahıl (buğday/arpa) ambarı tabaka düzlüğü platosu.',
+    kpssTips: [
+      'Yatay Duruşlu (Tabaka Düzlüğü) platodur.',
+      'Tahıl tarımı ve küçükbaş hayvancılık birinci sıradadır.'
+    ],
+    mnemonic: 'Cihanbeyli = Konya Tahıl Ambarı Tabaka Düzlüğü'
+  },
+  {
+    id: 'pl-obruk',
+    name: 'Obruk Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü & Karstik Obruk Platosu',
+    coordinates: [33.300, 38.000],
+    elevation: 1050,
+    region: 'İç Anadolu',
+    description: 'Konya ile Karapınar arasında yer alan, yeraltı sularının çekilmesi ve kireçtaşlarının çökmesiyle oluşan çok sayıda dev OBRUK barındıran plato.',
+    kpssTips: [
+      'Yatay duruşlu plato üzerinde karstik çökme obrukları (Kızören, Çıralı, Meyil) oluşmuştur.',
+      'Yeraltı sularının aşırı çekilmesi obruk sayısını hızla artırmaktadır.'
+    ],
+    mnemonic: 'Obruk Platosu = Yeraltı Çökmeleri + Kızören Obruğu'
+  },
+  {
+    id: 'pl-bozok',
+    name: 'Bozok Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü Platosu (Yozgat)',
+    coordinates: [35.000, 39.800],
+    elevation: 1150,
+    region: 'İç Anadolu',
+    description: 'Yozgat çevresinde Kızılırmak yayı içerisinde kalan, İç Anadolu\'nun en geniş tabaka düzlüğü platolarından biri.',
+    kpssTips: [
+      'Kızılırmak yayı içerisinde yer alır.',
+      'Küçükbaş hayvancılık (koyun) ve buğday üretimi yapılır.'
+    ],
+    mnemonic: 'Bozok = Yozgat + Kızılırmak Yayı İçi + Koyun Yetiştiriciliği'
+  },
+  {
+    id: 'pl-uzunyayla',
+    name: 'Uzunyayla Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü Platosu (Sivas/Kayseri)',
+    coordinates: [36.500, 39.200],
+    elevation: 1600,
+    region: 'İç Anadolu',
+    description: 'Sivas Kangal ve Kayseri Pınarbaşı arasında 1500-1800 metre rakımda yer alan yüksek tabaka düzlüğü platosu.',
+    kpssTips: [
+      'İç Anadolu\'nun en yüksek ve en soğuk platosudur.',
+      'Uzunyayla Atı ve Kangal köpeği yetiştiriciliği ile meşhurdur.'
+    ],
+    mnemonic: 'Uzunyayla = Sivas-Kayseri Sınırı + Uzunyayla Atı + Yüksek Plato'
   },
   {
     id: 'pl-erzurum-kars',
-    name: 'Erzurum - Kars - Ardahan Platosu',
+    name: 'Erzurum - Kars Platosu',
     type: 'plateau',
     subCategory: 'plateau',
     category: 'Volkanik / Lav Örtüsü Platosu',
@@ -2559,28 +3363,25 @@ export const PLAINS_PLATEAUS_DATA: GeoFeature[] = [
     mnemonic: 'Erzurum-Kars = Lav Platosu + Çernozyom + Alpin Çayır + Büyükbaş Hayvancılık'
   },
   {
-    id: 'pl-teke-taseli',
-    name: 'Teke ve Taşeli Platoları',
+    id: 'pl-ardahan',
+    name: 'Ardahan Platosu',
     type: 'plateau',
-    subCategory: 'karstic',
-    category: 'Karstik Plateau',
-    coordinates: [32.300, 36.600],
-    elevation: 1200,
-    region: 'Akdeniz',
-    description: 'Kireçtaşı (Kalker) kayacının yaygın olduğu engebeli karstik platolar.',
+    subCategory: 'plateau',
+    category: 'Volkanik Lav Platosu (Kura Havzası)',
+    coordinates: [42.700, 41.110],
+    elevation: 1950,
+    region: 'Doğu Anadolu',
+    description: 'Kura Nehri\'nin aktığı, volkanik lav örtüsüyle kaplı yüksek rakımlı mera ve yayla platosu.',
     kpssTips: [
-      'Su tutma kapasitesi zayıf (yeraltına sızar), tarım imkanları kısıtlıdır.',
-      'Nüfusu en seyrek alanlarımızdandır.',
-      'KIL KEÇİSİ yetiştiriciliği yaygındır.'
-    ],
-    mnemonic: 'Teke-Taşeli = Karstik + Seyrek Nüfus + Kıl Keçisi'
+      'Kafkas arı ırkı ve bal üretimi ile büyükbaş mera hayvancılığı yaygındır.'
+    ]
   },
   {
     id: 'pl-catalca-kocaeli',
     name: 'Çatalca - Kocaeli Platosu',
     type: 'plateau',
     subCategory: 'plateau',
-    category: 'Aşınım Platosu',
+    category: 'Aşınım (Peneplen) Platosu',
     coordinates: [29.200, 41.000],
     elevation: 200,
     region: 'Marmara',
@@ -2589,21 +3390,79 @@ export const PLAINS_PLATEAUS_DATA: GeoFeature[] = [
       'Aşınım (Peneplen) platosudur.',
       'Nüfus, sanayi, ulaşım ve ticaret bakımından 1. sıradadır.',
       'Tarım ve hayvancılık alanları kentsel gelişmeyle daralmıştır.'
+    ],
+    mnemonic: 'Çatalca-Kocaeli = Aşınım Platosu + En Alçak + En Gelişmiş / Sanayi'
+  },
+  {
+    id: 'pl-persembe',
+    name: 'Perşembe Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Aşınım Platosu (Ordu Aybastı)',
+    coordinates: [37.050, 40.650],
+    elevation: 1500,
+    region: 'Karadeniz',
+    description: 'Ordu Aybastı\'da yer alan, menderesler çizerek akan akarsularıyla ünlü doğal sit alanı aşınım platosu.',
+    kpssTips: [
+      'Karadeniz\'in en ünlü menderesli yayla platosudur.',
+      'Yayla şenlikleri ve eko-turizm merkezidir.'
     ]
   },
   {
-    id: 'pl-bozok-cihanbeyli',
-    name: 'İç Anadolu Platoları (Cihanbeyli, Haymana, Bozok, Obruk, Uzunyayla)',
+    id: 'pl-sanliurfa',
+    name: 'Şanlıurfa Platosu',
     type: 'plateau',
     subCategory: 'plateau',
-    category: 'Yatuk Duruşlu (Tabaka Düzlüğü) Platolar',
-    coordinates: [32.800, 39.000],
-    elevation: 1000,
-    region: 'İç Anadolu',
-    description: 'Tahıl ambarı niteliğindeki geniş steplerle kaplı platolar topluluğu.',
+    category: 'Tabaka Düzlüğü Platosu (Güneydoğu)',
+    coordinates: [38.800, 37.150],
+    elevation: 600,
+    region: 'Güneydoğu Anadolu',
+    description: 'Fırat Nehri\'nin doğusunda yer alan kalkerli ve killi tabaka düzlüğü platosu.',
     kpssTips: [
-      'Küçükbaş hayvancılık (Koyun/Tiftik Keçisi) ve tahıl (buğday/arpay) üretimi yaygındır.',
-      'Obruk platosunda karstik obruk çökmeleri sıklıkla yaşanır.'
+      'GAP sulamalarıyla tarımsal verimi hızla artan plato sahasıdır.'
+    ]
+  },
+  {
+    id: 'pl-gaziantep',
+    name: 'Gaziantep Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü Platosu (Güneydoğu)',
+    coordinates: [37.400, 37.050],
+    elevation: 850,
+    region: 'Güneydoğu Anadolu',
+    description: 'Akdeniz ile Güneydoğu geçişinde yer alan, kırmızı topraklarında antepfıstığı ve zeytin yetişen plato.',
+    kpssTips: [
+      'Antep fıstığı, zeytin ve bağcılık yaygındır.'
+    ]
+  },
+  {
+    id: 'pl-diyarbakir',
+    name: 'Diyarbakır Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Bazalt Lav Platosu (Karacadağ)',
+    coordinates: [40.200, 37.900],
+    elevation: 700,
+    region: 'Güneydoğu Anadolu',
+    description: 'Karacadağ volkanından yayılan bazalt lavlarının oluşturduğu taşlık ve verimli lav platosu.',
+    kpssTips: [
+      'Karacadağ kalkan volkanının lav örtüsüdür.',
+      'Karacadağ pirinci (çeltik) ve karpuz yetiştiriciliği meşhurdur.'
+    ]
+  },
+  {
+    id: 'pl-yazilikaya',
+    name: 'Yazılıkaya (Bayat) Platosu',
+    type: 'plateau',
+    subCategory: 'plateau',
+    category: 'Tabaka Düzlüğü / Frig Vadisi Platosu',
+    coordinates: [30.700, 39.200],
+    elevation: 1200,
+    region: 'İç Anadolu',
+    description: 'Eskişehir ve Afyonkarahisar sınırında tüflü kayaçlar ve Frig Vadisi anıtlarıyla kaplı plato sahası.',
+    kpssTips: [
+      'Frig kaya anıtları ve peri bacası oluşumları barındırır.'
     ]
   }
 ];
@@ -2745,47 +3604,6 @@ export const KARSTIC_COASTAL_DATA: GeoFeature[] = [
     description: 'Karstik kanyon vadilerinin deniz seviyesine ulaşmasıyla oluşan özel kanyonlu kıyı yapısı.',
     kpssTips: [
       'ÖSYM KPSS Notu: Kalanklı kıyı tipi denince Mersin-Silifke karstik kanyon kıyıları hatırlanmalıdır.'
-    ]
-  },
-  {
-    id: 'pl-takkem-polyeler',
-    name: 'TAKKEM Karstik Ovaları (Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla)',
-    type: 'plain',
-    subCategory: 'karstic',
-    category: 'Karstik Ova (Polye)',
-    coordinates: [30.100, 37.100],
-    region: 'Akdeniz',
-    description: 'Karstik erimelerle oluşan ülkemizin en büyük kireçtaşı aşınım düzlükleri (Polyeler).',
-    kpssTips: [
-      'TAKKEM kodlaması ile hafızada tutulur.',
-      'Tabanı kireçli olduğu için su tutmaz ancak alüvyon kaplı alanlarında tarım yapılır.'
-    ],
-    mnemonic: 'TAKKEM = Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla'
-  },
-  {
-    id: 'pl-develi-ova',
-    name: 'Develi Ovası (Kayseri - Volkanik Ova)',
-    type: 'plain',
-    subCategory: 'volcanic',
-    category: 'Volkanik Ova',
-    coordinates: [35.480, 38.390],
-    region: 'İç Anadolu',
-    description: 'Erciyes Dağı\'nın çıkardığı lav ve tüflerin çukurluğu doldurmasıyla oluşan volkanik ova.',
-    kpssTips: [
-      'Türkiye\'deki nadir Volkanik Ova örneklerindendir.'
-    ]
-  },
-  {
-    id: 'pl-bursa-ova',
-    name: 'Bursa Ovası (Dağ Eteği Ovası)',
-    type: 'plain',
-    subCategory: 'tectonic',
-    category: 'Dağ Eteği Ovası',
-    coordinates: [29.060, 40.200],
-    region: 'Marmara',
-    description: 'Uludağ\'ın eteklerinden inen akarsuların taşıdığı alüvyonları biriktirmesiyle oluşan dağ eteği ovası.',
-    kpssTips: [
-      'Dağ Eteği Ovası denince KPSS\'de akla gelen ilk örnektir.'
     ]
   }
 ];
