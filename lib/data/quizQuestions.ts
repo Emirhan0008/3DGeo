@@ -4,7 +4,7 @@ export interface PinGameQuestion {
   id: string;
   title: string;
   questionText: string;
-  category: 'Dağlar' | 'Akarsular' | 'Göller' | 'Sınır Kapıları' | 'Geçitler' | 'Platolar & Ovalar' | 'Madenler' | 'Karstik & Kıyı';
+  category: 'Dağlar' | 'Akarsular' | 'Göller' | 'Sınır Kapıları' | 'Geçitler' | 'Platolar & Ovalar' | 'Madenler' | 'Karstik & Kıyı' | 'Antik Kentler' | 'Mağaralar';
   region?: 'Marmara' | 'Ege' | 'Akdeniz' | 'İç Anadolu' | 'Karadeniz' | 'Doğu Anadolu' | 'Güneydoğu Anadolu';
   targetFeatureId: string;
   targetCoords: [number, number]; // [lng, lat]
@@ -956,8 +956,12 @@ function mapTypeToPinCategory(type: string, categoryName?: string): PinGameQuest
   if (type === 'plateau' || type === 'plain') return 'Platolar & Ovalar';
   if (type === 'mine') return 'Madenler';
   if (type === 'karstic' || type === 'coastal') return 'Karstik & Kıyı';
+  if (type === 'ancient_city') return 'Antik Kentler';
+  if (type === 'cave') return 'Mağaralar';
 
   if (categoryName) {
+    if (categoryName.includes('Antik') || categoryName.includes('Ören') || categoryName.includes('Hitit') || categoryName.includes('Frig') || categoryName.includes('Lidya')) return 'Antik Kentler';
+    if (categoryName.includes('Mağara') || categoryName.includes('Damlataş') || categoryName.includes('Sarkıt')) return 'Mağaralar';
     if (categoryName.includes('Dağ') || categoryName.includes('Volkan')) return 'Dağlar';
     if (categoryName.includes('Akarsu') || categoryName.includes('Nehir')) return 'Akarsular';
     if (categoryName.includes('Göl')) return 'Göller';
@@ -979,6 +983,10 @@ const DYNAMIC_PIN_QUESTIONS: PinGameQuestion[] = ALL_GEO_FEATURES
 
     if (cleanDesc && cleanDesc.length > 10) {
       qText = `${cleanDesc} Bu coğrafi unsur haritada nerededir?`;
+    } else if (f.type === 'ancient_city') {
+      qText = `Tarihi ve arkeolojik zenginliğimiz olan ${f.name} haritada nerededir?`;
+    } else if (f.type === 'cave') {
+      qText = `Önemli karstik mağaralarımızdan biri olan ${f.name} haritada nerededir?`;
     } else if (f.type === 'border_gate') {
       qText = `Sınır kapılarımızdan biri olan ${f.name} haritada nerededir?`;
     } else if (f.type === 'pass') {

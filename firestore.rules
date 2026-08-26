@@ -52,7 +52,7 @@ service cloud.firestore {
       allow get: if isValidId(rumuzId);
       allow list: if false;
       allow create, update: if isValidId(rumuzId);
-      allow delete: if false;
+      allow delete: if isValidId(rumuzId);
     }
 
     match /duels/{duelId} {

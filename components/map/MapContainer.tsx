@@ -160,7 +160,9 @@ const CATEGORY_STYLES: Record<GeoFeature['type'], { bg: string; ring: string; pu
   mine: { bg: 'bg-slate-600', ring: 'ring-slate-400', pulse: 'bg-slate-400', badgeBg: 'bg-slate-900/90', text: 'text-slate-200', border: 'border-slate-400/60' },
   province: { bg: 'bg-rose-500', ring: 'ring-rose-400', pulse: 'bg-rose-400', badgeBg: 'bg-rose-950/90', text: 'text-rose-200', border: 'border-rose-400/60' },
   karstic: { bg: 'bg-purple-600', ring: 'ring-purple-400', pulse: 'bg-purple-400', badgeBg: 'bg-purple-950/90', text: 'text-purple-200', border: 'border-purple-400/60' },
-  coastal: { bg: 'bg-teal-500', ring: 'ring-teal-400', pulse: 'bg-teal-400', badgeBg: 'bg-teal-950/90', text: 'text-teal-200', border: 'border-teal-400/60' }
+  coastal: { bg: 'bg-teal-500', ring: 'ring-teal-400', pulse: 'bg-teal-400', badgeBg: 'bg-teal-950/90', text: 'text-teal-200', border: 'border-teal-400/60' },
+  ancient_city: { bg: 'bg-amber-600', ring: 'ring-amber-300', pulse: 'bg-amber-400', badgeBg: 'bg-amber-950/90', text: 'text-amber-100', border: 'border-amber-400/70' },
+  cave: { bg: 'bg-indigo-600', ring: 'ring-indigo-400', pulse: 'bg-indigo-400', badgeBg: 'bg-indigo-950/90', text: 'text-indigo-200', border: 'border-indigo-400/60' }
 };
 
 // Interior Regional Boundary Division Lines (7 Geographical Regions)
@@ -528,6 +530,8 @@ export default function MapContainer() {
       if (feat.type === 'plateau' && !layers.plateaus) return false;
       if (feat.type === 'karstic' && !layers.karstics) return false;
       if (feat.type === 'coastal' && !layers.coastal) return false;
+      if (feat.type === 'ancient_city' && !layers.ancientCities) return false;
+      if (feat.type === 'cave' && !layers.caves) return false;
       if (feat.type === 'mine' && !layers.mines) return false;
       if (feat.type === 'province' && !layers.provinces) return false;
       return true;
@@ -557,6 +561,8 @@ export default function MapContainer() {
       else if (feature.type === 'plateau') iconSymbol = '🏜️';
       else if (feature.type === 'karstic') iconSymbol = '🕳️';
       else if (feature.type === 'coastal') iconSymbol = '🏖️';
+      else if (feature.type === 'ancient_city') iconSymbol = '🏛️';
+      else if (feature.type === 'cave') iconSymbol = '🦇';
       else if (feature.type === 'mine') iconSymbol = '⛏️';
       else if (feature.type === 'province') iconSymbol = '🏛️';
 

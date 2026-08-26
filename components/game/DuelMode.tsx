@@ -74,6 +74,9 @@ export default function DuelMode() {
     setActiveDuelPlayerKey,
     flyToCoords,
     unlockedBadges,
+    avatarIcon,
+    avatarBg,
+    equippedTitle,
     duelStats,
     recordDuelFinish
   } = useAppStore();
@@ -690,6 +693,9 @@ export default function DuelMode() {
                 rumuz={rumuz}
                 unlockedBadges={unlockedBadges}
                 duelWins={duelStats.duelWins}
+                avatarIcon={avatarIcon}
+                avatarBg={avatarBg}
+                equippedTitle={equippedTitle}
                 size="md"
               />
               <div>
@@ -1113,6 +1119,9 @@ export default function DuelMode() {
                 rumuz={activeDuelSession.player1.rumuz}
                 unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : ['3D Coğrafyacı']}
                 duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : 1}
+                avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : '⚔️'}
+                avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : 'night_blue'}
+                equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : 'KPSS Adayı'}
                 size="lg"
               />
               <span className="text-sm font-black text-indigo-300 max-w-[120px] truncate mt-2">
@@ -1197,6 +1206,9 @@ export default function DuelMode() {
                   rumuz={activeDuelSession.player1.rumuz}
                   unlockedBadges={unlockedBadges}
                   duelWins={duelStats.duelWins}
+                  avatarIcon={avatarIcon}
+                  avatarBg={avatarBg}
+                  equippedTitle={equippedTitle}
                   size="sm"
                 />
                 <span className="text-xs font-bold text-slate-200 truncate">
@@ -1445,6 +1457,9 @@ export default function DuelMode() {
                 rumuz={myPlayer?.rumuz || 'Sen'}
                 unlockedBadges={unlockedBadges}
                 duelWins={duelStats.duelWins}
+                avatarIcon={avatarIcon}
+                avatarBg={avatarBg}
+                equippedTitle={equippedTitle}
                 size="sm"
               />
               <div className="min-w-0">
@@ -1649,6 +1664,9 @@ export default function DuelMode() {
               rumuz={myPlayer?.rumuz || 'Sen'}
               unlockedBadges={unlockedBadges}
               duelWins={duelStats.duelWins}
+              avatarIcon={avatarIcon}
+              avatarBg={avatarBg}
+              equippedTitle={equippedTitle}
               size="sm"
             />
             <div className="min-w-0">

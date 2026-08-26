@@ -1,7 +1,7 @@
 export interface GeoFeature {
   id: string;
   name: string;
-  type: 'mountain' | 'river' | 'lake' | 'plateau' | 'plain' | 'border_gate' | 'pass' | 'province' | 'mine' | 'karstic' | 'coastal';
+  type: 'mountain' | 'river' | 'lake' | 'plateau' | 'plain' | 'border_gate' | 'pass' | 'province' | 'mine' | 'karstic' | 'coastal' | 'ancient_city' | 'cave';
   category?: string; // e.g., 'Volkanik Dağ', 'Kıvrım Dağ', 'Kırık Dağ', 'Karstik Göl', etc.
   subCategory?: 'volcanic' | 'fold' | 'fault' | 'glacial' | 'delta' | 'tectonic' | 'karstic' | string;
   coordinates: [number, number]; // [lng, lat]
@@ -4207,6 +4207,512 @@ export const MINES_DATA: GeoFeature[] = [
   }
 ];
 
+export const ANCIENT_CITIES_DATA: GeoFeature[] = [
+  {
+    id: 'ac-efes',
+    name: 'Efes Antik Kenti (Ephesos)',
+    type: 'ancient_city',
+    category: 'Antik Kent & UNESCO Dünya Mirası',
+    coordinates: [27.341, 37.940],
+    region: 'Ege',
+    description: 'İzmir Selçuk ilçesinde yer alan, Klasik Yunan ve Roma dönemlerinin en görkemli liman kenti. Celsus Kütüphanesi, Hadrian Tapınağı ve Artemis Tapınağı ile ünlüdür.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'ndedir.',
+      'Dünyanın Yedi Harikası\'ndan biri olan Artemis Tapınağı ve Hristiyanlık için hac merkezi kabul edilen Meryem Ana Evi buradadır.',
+      'Küçük Menderes nehrinin getirdiği alüvyonlar yüzünden liman dolmuş ve kent denizden uzaklaşmıştır.'
+    ],
+    mnemonic: 'EFES = İzmir Selçuk + Artemis Tapınağı + Celsus Kütüphanesi + Alüvyonla dolan liman'
+  },
+  {
+    id: 'ac-milet',
+    name: 'Milet Antik Kenti (Miletos)',
+    type: 'ancient_city',
+    category: 'Antik Kent & Felsefe Başkenti',
+    coordinates: [27.276, 37.531],
+    region: 'Ege',
+    description: 'Aydın Didim yakınlarında yer alan, antik çağın en önemli felsefe ve bilim merkezi. Thales, Anaksimandros ve Anaksimenes burada yaşamıştır.',
+    kpssTips: [
+      'Büyük Menderes nehrinin getirdiği alüvyonlar yüzünden liman özelliği kaybolmuş ve Bafa Gölü (Çamiçi) oluşmuştur.',
+      'Şehir plancısı Hippodamos\'un geliştirdiği "Izgara Kent Planı" ilk kez burada uygulanmıştır.'
+    ],
+    mnemonic: 'MİLET = Felsefenin Doğduğu Kent (Thales) + Büyük Menderes alüvyonuyla kapanan liman'
+  },
+  {
+    id: 'ac-priene',
+    name: 'Priene Antik Kenti',
+    type: 'ancient_city',
+    category: 'İyon Antik Kenti & Izgara Plan',
+    coordinates: [27.297, 37.660],
+    region: 'Ege',
+    description: 'Aydın Söke ilçesinde Samson Dağı eteklerinde kurulmuş, Athena Polias Tapınağı ve ızgara sokak planıyla ünlü İyon kenti.',
+    kpssTips: [
+      'Büyük Menderes deltasının büyümesiyle denizden kilometrelerce içeride kalmıştır.',
+      'Dünyanın en düzenli antik ızgara şehir planı örneklerindendir.'
+    ]
+  },
+  {
+    id: 'ac-hierapolis',
+    name: 'Hierapolis Antik Kenti (Pamukkale)',
+    type: 'ancient_city',
+    category: 'Antik Kent & Termal Şifa Merkezi (UNESCO)',
+    coordinates: [29.127, 37.925],
+    region: 'Ege',
+    description: 'Denizli Pamukkale travertenlerinin hemen üzerinde kurulmuş Helenistik ve Roma termal şifa kenti. Antik havuz (Kleopatra Havuzu), dev nekropol ve tiyatrosuyla tanınır.',
+    kpssTips: [
+      'Pamukkale ile birlikte "Karma Miras" (hem doğal hem kültürel) olarak UNESCO Dünya Mirası Listesi\'ndedir.',
+      'Kalkerli termal suların oluşturduğu travertenlerle iç içedir.'
+    ],
+    mnemonic: 'HİERAPOLIS = Denizli Pamukkale + Termal Şifa + Karma Miras'
+  },
+  {
+    id: 'ac-afrodisias',
+    name: 'Afrodisias Antik Kenti (Aphrodisias)',
+    type: 'ancient_city',
+    category: 'Antik Kent & Heykeltıraşlık Okulu (UNESCO)',
+    coordinates: [28.724, 37.708],
+    region: 'Ege',
+    description: 'Aydın Karacasu ilçesinde yer alan, Aşk ve Güzellik Tanrıçası Afrodit\'e adanmış, Roma döneminin en ünlü mermer heykeltıraşlık merkezidir.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'nde yer alır.',
+      'Fotoğrafçı Ara Güler\'in tesadüfen keşfetmesi ve Prof. Dr. Kenan Erim\'in kazılarıyla dünya arkeolojisine kazandırılmıştır.',
+      'Antik dünyanın en iyi korunmuş stadyumu buradadır (30.000 kişilik).'
+    ],
+    mnemonic: 'AFRODİSİAS = Aydın Karacasu + Ara Güler + Mermer Heykeltıraşlık + UNESCO'
+  },
+  {
+    id: 'ac-truva',
+    name: 'Truva Antik Kenti (Troia)',
+    type: 'ancient_city',
+    category: 'Antik Kent & Destanlar Kenti (UNESCO)',
+    coordinates: [26.239, 39.957],
+    region: 'Marmara',
+    description: 'Çanakkale Tevfikiye köyünde yer alan, Homeros\'un İlyada Destanı\'na konu olan efsanevi Truva Savaşı\'nın geçtiği 9 katmanlı antik kent.',
+    kpssTips: [
+      '1998 yılından beri UNESCO Dünya Mirası Listesi\'ndedir.',
+      'Çanakkale Boğazı girişinde stratejik konumu nedeniyle tarih boyunca 9 kez yıkılıp yeniden kurulmuştur (Truva I - IX).'
+    ],
+    mnemonic: 'TRUVA = Çanakkale + İlyada Destanı + Tahta At + UNESCO'
+  },
+  {
+    id: 'ac-hattusa',
+    name: 'Hattuşa (Boğazköy) Hitit Başkenti',
+    type: 'ancient_city',
+    category: 'Hitit İmparatorluğu Başkenti (UNESCO)',
+    coordinates: [34.615, 40.019],
+    region: 'Karadeniz',
+    description: 'Çorum Boğazkale ilçesinde yer alan, "Bin Tanrılı Şehir" olarak bilinen Hitit İmparatorluğu\'nun başkentidir.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'ndedir; ayrıca çivi yazılı tablet arşivi UNESCO Dünya Belleği kütüğündedir.',
+      'Tarihteki ilk yazılı barış antlaşması olan Kadeş Antlaşması metni burada bulunmuştur.',
+      'Aslanlı Kapı, Kral Kapısı ve Yazılıkaya Açık Hava Tapınağı ile ünlüdür.'
+    ],
+    mnemonic: 'HATTUŞA = Çorum Boğazköy + Hitit Başkenti + Kadeş Antlaşması + UNESCO'
+  },
+  {
+    id: 'ac-alacahoyuk',
+    name: 'Alacahöyük Ören Yeri',
+    type: 'ancient_city',
+    category: 'Hatti & Hitit Kültür Merkezi',
+    coordinates: [34.697, 40.233],
+    region: 'Karadeniz',
+    description: 'Çorum Alaca ilçesinde yer alan, Atatürk\'ün şahsi bütçesiyle Türkiye Cumhuriyeti\'nin ilk milli kazısının yapıldığı Hatti-Hitit yerleşimidir.',
+    kpssTips: [
+      'Cumhuriyet döneminin İLK resmi arkeolojik kazısıdır (1935, Remzi Oğuz Arık & Hamit Zübeyr Koşay).',
+      'Hatti prens mezarları, tunç Güneş Kursları ve Sfenksli Kapı burada bulunmuştur.'
+    ],
+    mnemonic: 'ALACAHÖYÜK = Çorum + Atatürk\'ün İlk Kazısı + Güneş Kursu + Sfenksli Kapı'
+  },
+  {
+    id: 'ac-kultepe',
+    name: 'Kültepe (Kaniş / Karum)',
+    type: 'ancient_city',
+    category: 'Asur Ticaret Kolonisi & İlk Yazılı Belgeler',
+    coordinates: [35.635, 38.850],
+    region: 'İç Anadolu',
+    description: 'Kayseri il merkezinin kuzeydoğusunda yer alan, Anadolu\'da Tarihi Çağları (yazıyı) başlatan Asur Ticaret Kolonileri merkezidir.',
+    kpssTips: [
+      'Anadolu\'daki İLK yazılı belgeler (Kültepe Kil Tabletleri - çivi yazısı) burada bulunmuştur.',
+      'Anadolu\'nun Tarih Öncesi Çağlardan Tarih Çağlarına geçtiği yerdir.'
+    ],
+    mnemonic: 'KÜLTEPE = Kayseri + Asur Kolonileri + Anadolu\'da İlk Yazı ve Kil Tabletler'
+  },
+  {
+    id: 'ac-gordion',
+    name: 'Gordion Antik Kenti',
+    type: 'ancient_city',
+    category: 'Frigya Başkenti (UNESCO)',
+    coordinates: [31.983, 39.651],
+    region: 'İç Anadolu',
+    description: 'Ankara Polatlı Yassıhöyük\'te yer alan, Sakarya Nehri kıyısındaki kadim Frigya Krallığı başkenti. Kral Midas Tümülüsü ve Gordion Düğümü efsanesiyle meşhurdur.',
+    kpssTips: [
+      '2023 yılında UNESCO Dünya Mirası Listesi\'ne dahil edilmiştir.',
+      'Dünyanın en eski ahşap mezar odasına sahip Midas Tümülüsü buradadır.'
+    ],
+    mnemonic: 'GORDİON = Ankara Polatlı + Frig Başkenti + Kral Midas + UNESCO (2023)'
+  },
+  {
+    id: 'ac-sardes',
+    name: 'Sardes Antik Kenti (Sardis)',
+    type: 'ancient_city',
+    category: 'Lidya Başkenti & Paranın Doğduğu Yer',
+    coordinates: [28.040, 38.488],
+    region: 'Ege',
+    description: 'Manisa Salihli Sart beldesinde, Sart Çayı (Paktolos) kıyısında yer alan Lidya Krallığı\'nın görkemli başkenti.',
+    kpssTips: [
+      'Tarihte İLK madeni paranın (elektron sikke) darp edildiği merkezdir.',
+      'Meşhur ticaret güzergahı "Kral Yolu" Sardes\'ten başlayıp Mezopotamya\'daki Sus kentine kadar uzanır.',
+      'Artemis Tapınağı ve görkemli Sinagog kalıntıları buradadır.'
+    ],
+    mnemonic: 'SARDES = Manisa Salihli + Lidya Başkenti + İlk Para + Kral Yolu Başlangıcı'
+  },
+  {
+    id: 'ac-patara',
+    name: 'Patara Antik Kenti',
+    type: 'ancient_city',
+    category: 'Likya Birliği Başkenti & Demokratik Meclis',
+    coordinates: [29.314, 36.260],
+    region: 'Akdeniz',
+    description: 'Antalya Kaş ile Muğla Fethiye arasında yer alan, Likya Birliği\'nin oy hakkına sahip başkenti ve dünyanın ayakta kalan en eski demokratik meclis binasına ev sahipliği yapan antik kent.',
+    kpssTips: [
+      'Dünyanın ilk demokratik meclis binası (Bouleuterion) buradadır.',
+      'Noel Baba olarak bilinen Aziz Nikolaos (St. Nicholas) Patara doğumludur.',
+      '18 km uzunluğundaki kumsalı Caretta Caretta kaplumbağalarının yumurtlama alanıdır.'
+    ],
+    mnemonic: 'PATARA = Antalya Kaş + Likya Başkenti + İlk Demokratik Meclis + Noel Baba\'nın Doğum Yeri'
+  },
+  {
+    id: 'ac-perge',
+    name: 'Perge Antik Kenti',
+    type: 'ancient_city',
+    category: 'Pamfilya Başkenti & Heykel Şehri',
+    coordinates: [30.852, 36.960],
+    region: 'Akdeniz',
+    description: 'Antalya Aksu ilçesinde yer alan, Helenistik kuleleri, sütunlu anıtsal caddesi, stadyumu ve su kanallarıyla Pamfilya bölgesinin başkenti.',
+    kpssTips: [
+      'Ünlü geometrici Apollonios\'un yaşadığı kenttir.',
+      'Antalya Müzesi\'nde sergilenen paha biçilmez Roma heykellerinin büyük kısmı Perge kazılarından çıkarılmıştır.'
+    ]
+  },
+  {
+    id: 'ac-aspendos',
+    name: 'Aspendos Antik Kenti ve Tiyatrosu',
+    type: 'ancient_city',
+    category: 'Antik Tiyatro & Su Kemerleri',
+    coordinates: [31.172, 36.939],
+    region: 'Akdeniz',
+    description: 'Antalya Serik ilçesinde Köprüçay (Eurymedon) yakınlarında yer alan, mimar Zenon tarafından inşa edilmiş Akdeniz havzasının en iyi korunmuş Roma tiyatrosu.',
+    kpssTips: [
+      'Akustiği mükemmel olan tiyatrosu günümüzde dahi festival ve konserlerde kullanılmaktadır.',
+      'Roma dönemi su kemerleri mühendislik harikası kabul edilir.'
+    ],
+    mnemonic: 'ASPENDOS = Antalya Serik + En İyi Korunmuş Roma Tiyatrosu (Zenon)'
+  },
+  {
+    id: 'ac-sagalassos',
+    name: 'Sagalassos Antik Kenti',
+    type: 'ancient_city',
+    category: 'Pisidya Dağ Kenti & Antoninler Çeşmesi',
+    coordinates: [30.520, 37.677],
+    region: 'Akdeniz',
+    description: 'Burdur Ağlasun ilçesinde 1750 metre rakımda Toros Dağları yamacında kurulmuş, "Bulutların Ülkesi" Pisidya kenti.',
+    kpssTips: [
+      'Hala şırıl şırıl orijinal kaynağından su akan "Antoninler Çeşmesi" ile meşhurdur.',
+      'Büyük İskender\'in fethettiği en zorlu dağ kentlerindendir.'
+    ],
+    mnemonic: 'SAGALASSOS = Burdur Ağlasun + Antoninler Çeşmesi + Pisidya Dağ Kenti'
+  },
+  {
+    id: 'ac-catalhoyuk',
+    name: 'Çatalhöyük Neolitik Kenti',
+    type: 'ancient_city',
+    category: 'İlk Toplu Köy/Şehir Yerleşimi (UNESCO)',
+    coordinates: [32.828, 37.667],
+    region: 'İç Anadolu',
+    description: 'Konya Çumra ilçesinde yer alan, sokaksız bitişik evleri, çatıdan girişleri ve ana tanrıça figürinleriyle insanlık tarihinin ilk kentsel yerleşim modeli.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'ndedir.',
+      'İnsanlığın ilk planlı yerleşik köy-kent yaşamını, tarım ve hayvancılık kültürünü başlatan merkezlerden biridir.',
+      'Hasan Dağı volkanik patlamasını gösteren tarihin ilk harita/duvar resmi burada bulunmuştur.'
+    ],
+    mnemonic: 'ÇATALHÖYÜK = Konya Çumra + İlk Toplu Yerleşim + Çatıdan Girişli Evler + UNESCO'
+  },
+  {
+    id: 'ac-gobeklitepe',
+    name: 'Göbeklitepe Arkeolojik Alanı',
+    type: 'ancient_city',
+    category: 'Tarihin Sıfır Noktası & İlk Tapınak (UNESCO)',
+    coordinates: [38.922, 37.223],
+    region: 'Güneydoğu Anadolu',
+    description: 'Şanlıurfa Haliliye ilçesinde Örencik köyü yakınında yer alan, M.Ö. 9600 yılına tarihlenen dünyanın bilinen en eski anıtsal tapınak kompleksi.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'ndedir (2018). "Tarihin Sıfır Noktası" olarak tescillenmiştir.',
+      'İnsanoğlunun avcı-toplayıcıyken inanç merkezleri inşa ettiğini kanıtlayarak yerleşik hayat teorilerini kökten değiştirmiştir.',
+      'T biçimli dev kireçtaşı sütunlar ve üzerindeki hayvan kabartmalarıyla meşhurdur.'
+    ],
+    mnemonic: 'GÖBEKLİTEPE = Şanlıurfa + M.Ö. 9600 İlk Tapınak + Tarihin Sıfır Noktası + UNESCO'
+  },
+  {
+    id: 'ac-zeugma',
+    name: 'Zeugma Antik Kenti (Belkıs)',
+    type: 'ancient_city',
+    category: 'Mozaik Başkenti & Çingene Kızı',
+    coordinates: [37.866, 37.058],
+    region: 'Güneydoğu Anadolu',
+    description: 'Gaziantep Nizip ilçesinde Fırat Nehri kıyısında kurulmuş, Roma lejyon garnizonu ve dünya çapında eşsiz taban mozaiklerinin çıktığı antik kent.',
+    kpssTips: [
+      'Birecik Barajı göl suları altında kalmaması için kurtarma kazıları yapılmış, çıkarılan eserler Gaziantep Zeugma Mozaik Müzesi\'nde sergilenmektedir.',
+      'Simge eseri "Çingene Kızı (Maenad)" mozaiğidir.'
+    ],
+    mnemonic: 'ZEUGMA = Gaziantep Nizip + Fırat Kıyısı + Çingene Kızı Mozaiği + Birecik Barajı'
+  },
+  {
+    id: 'ac-hasankeyf',
+    name: 'Hasankeyf Kadim Yerleşimi',
+    type: 'ancient_city',
+    category: 'Dicle Kıyısı Kayalara Oyulu Tarih',
+    coordinates: [41.411, 37.712],
+    region: 'Güneydoğu Anadolu',
+    description: 'Batman ili sınırlarında Dicle Nehri kıyısında kurulmuş, binlerce yıllık kaya yerleşimleri, kalesi ve Artuklu köprüsüyle ünlü tarihi merkez.',
+    kpssTips: [
+      'Ilısu (Veysel Eroğlu) Barajı göl alanı içinde kaldığı için Zeynel Bey Türbesi, Er-Rızk Camii gibi yapılar yeni yerleşim alanına taşınmıştır.'
+    ],
+    mnemonic: 'HASANKEYF = Batman + Dicle Nehri + Artuklu Eserleri + Ilısu Barajı'
+  },
+  {
+    id: 'ac-dara',
+    name: 'Dara Antik Kenti (Anastasiopolis)',
+    type: 'ancient_city',
+    category: 'Doğu Roma Garnizonu & Kaya Su Sarnıçları',
+    coordinates: [40.942, 37.178],
+    region: 'Güneydoğu Anadolu',
+    description: 'Mardin Merkez Oğuz köyünde yer alan, Sasani İmparatorluğu\'na karşı Doğu Roma (Bizans) tarafından kurulmuş dev askeri garnizon kenti.',
+    kpssTips: [
+      'Kayalara oyulmuş devasa su sarnıçları (Zindan), kaya mezarları ve agorasıyla "Mezopotamya\'nın Efes\'i" olarak anılır.'
+    ],
+    mnemonic: 'DARA = Mardin + Doğu Roma Askeri Kenti + Devasa Kaya Sarnıçları'
+  },
+  {
+    id: 'ac-ani',
+    name: 'Ani Tarihi Kenti (Ani Harabeleri)',
+    type: 'ancient_city',
+    category: 'Binbir Kiliseli Şehir & İpek Yolu (UNESCO)',
+    coordinates: [43.573, 40.508],
+    region: 'Doğu Anadolu',
+    description: 'Kars Arpaçay ilçesinde Türkiye-Ermenistan sınırında Arpaçay kanyonu kenarında yer alan, Bagratlı Krallığı ve Selçuklu dönemlerinin görkemli başkenti.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'ndedir (2016).',
+      'Anadolu\'da Türkler tarafından inşa edilen İLK cami olan "Menuçehr Camii" buradadır.',
+      'Surlar, Ani Katedrali (Fethiye Camii) ve kiliseleriyle ünlüdür.'
+    ],
+    mnemonic: 'ANİ HARABELERİ = Kars Arpaçay + Menuçehr Camii (İlk Türk Camii) + UNESCO'
+  },
+  {
+    id: 'ac-nemrut-oren',
+    name: 'Nemrut Dağı Tümülüsü ve Dev Heykelleri',
+    type: 'ancient_city',
+    category: 'Kommagene Krallığı & Dev Heykeller (UNESCO)',
+    coordinates: [38.741, 37.981],
+    region: 'Güneydoğu Anadolu',
+    description: 'Adıyaman Kahta ilçesinde 2150 metre rakımlı Nemrut Dağı zirvesinde kurulmuş Kommagene Kralı I. Antiochos\'un anıt mezarı ve dev tanrı heykelleri.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Listesi\'ndedir.',
+      'Güneşin doğuşu ve batışının en etkileyici izlendiği teraslara sahiptir (Doğu ve Batı terasları).'
+    ],
+    mnemonic: 'NEMRUT ÖREN YERİ = Adıyaman Kahta + Kommagene Krallığı + Dev Heykeller + UNESCO'
+  }
+];
+
+export const CAVES_DATA: GeoFeature[] = [
+  {
+    id: 'cv-damlatas',
+    name: 'Damlataş Mağarası',
+    type: 'cave',
+    category: 'Karstik Mağara & Astım Şifa Merkezi',
+    coordinates: [31.989, 36.542],
+    region: 'Akdeniz',
+    description: 'Antalya Alanya ilçe merkezinde deniz kenarında 1948 yılında dinamit patlatılmasıyla tesadüfen keşfedilen karstik damlataşı mağarası.',
+    kpssTips: [
+      'Türkiye\'nin turizme açılan ilk mağaralarındandır ve astım hastalarına iyi gelen sabit sıcaklık (%95 nem, 22°C) mikroklimasına sahiptir.',
+      'Sarkıt ve dikitlerinin binlerce yılda oluşması nedeniyle "Damlataş" adını almıştır.'
+    ],
+    mnemonic: 'DAMLATAŞ = Antalya Alanya + Karstik + Astım Şifası + Sabit Sıcaklık'
+  },
+  {
+    id: 'cv-karain',
+    name: 'Karain Mağarası',
+    type: 'cave',
+    category: 'Paleolitik İnsan Yaşam Alanı (İlk Çağ)',
+    coordinates: [30.570, 36.978],
+    region: 'Akdeniz',
+    description: 'Antalya Döşemealtı ilçesinde Yağca köyü sınırlarında yer alan, Türkiye\'nin içinde insan yaşamış en büyük doğal mağarası.',
+    kpssTips: [
+      'Anadolu\'da Paleolitik (Eski Taş) Çağdan itibaren kesintisiz 500.000 yıl yerleşim görmüş en eski insan barınağıdır.',
+      'UNESCO Dünya Mirası Geçici Listesi\'ndedir.'
+    ],
+    mnemonic: 'KARAİN = Antalya + Paleolitik Çağ + Anadolu\'da En Eski İnsan Barınağı'
+  },
+  {
+    id: 'cv-dim',
+    name: 'Dim Mağarası',
+    type: 'cave',
+    category: 'Karstik Mağara & Yeraltı Gölü',
+    coordinates: [32.110, 36.540],
+    region: 'Akdeniz',
+    description: 'Antalya Alanya ilçesinde Dim Çayı vadisi yamacında yer alan, 360 metre uzunluğunda görkemli sarkıt, dikit ve sonunda küçük bir göl barındıran karstik mağara.',
+    kpssTips: [
+      'Türkiye\'nin özel sektör tarafından işletmeye açılan ilk turizm mağarasıdır.',
+      'Dört ana salonu ve dipteki karstik gölüyle ünlüdür.'
+    ]
+  },
+  {
+    id: 'cv-insuyu',
+    name: 'İnsuyu Mağarası',
+    type: 'cave',
+    category: 'Türkiye\'de Turizme Açılan İLK Mağara (1965)',
+    coordinates: [30.334, 37.662],
+    region: 'Akdeniz',
+    description: 'Burdur il merkezinin güneydoğusunda Çatağıl köyünde yer alan, 1965 yılında Türkiye\'de turizme resmen açılan İLK karstik mağaradır.',
+    kpssTips: [
+      'Türkiye\'de turizme açılan İLK mağaradır (1965).',
+      'İçerisinde irili ufaklı 9 karstik gölcük bulunur (Büyük Göl, Dilek Gölü vb.).'
+    ],
+    mnemonic: 'İNSUYU = Burdur + Türkiye\'de Turizme Açılan İLK Mağara (1965)'
+  },
+  {
+    id: 'cv-ballica',
+    name: 'Ballıca Mağarası',
+    type: 'cave',
+    category: 'Soğan Sarkıtları (Dünya Çapında Nadir) & UNESCO',
+    coordinates: [36.030, 40.228],
+    region: 'Karadeniz',
+    description: 'Tokat Pazar ilçesinde yer alan, dünyada eşine az rastlanan "Soğan Sarkıtları (Spelotem)" ve 8 salonuyla büyüleyen dev karstik mağara.',
+    kpssTips: [
+      'UNESCO Dünya Mirası Geçici Listesi\'ndedir.',
+      'Dünyanın en zengin soğan sarkıtı oluşumlarına sahip mağarasıdır; yüksek oksijen seviyesiyle astım ve koah hastalarınca ziyaret edilir.'
+    ],
+    mnemonic: 'BALLICA = Tokat Pazar + Soğan Sarkıtı + UNESCO Adayı'
+  },
+  {
+    id: 'cv-gilindire',
+    name: 'Gilindire (Aynalıgöl) Mağarası',
+    type: 'cave',
+    category: 'Buzul Çağı Sualtı Karstik Gölü',
+    coordinates: [33.402, 36.142],
+    region: 'Akdeniz',
+    description: 'Mersin Aydıncık ilçesinde deniz kıyısında bir çoban tarafından keşfedilen, Buzul Çağı sonunda sular altında kalmış sarkıt-dikitleri ve kristal berraklığındaki gölüyle meşhur doğa harikası.',
+    kpssTips: [
+      'Dip kısmındaki Aynalıgöl (karstik sualtı gölü) buzul çağının izlerini bozulmadan günümüze taşımıştır.',
+      'Türkiye\'nin en etkileyici dikey ve yatay damlataşı galerilerindendir.'
+    ],
+    mnemonic: 'GİLİNDİRE = Mersin Aydıncık + Aynalıgöl + Buzul Çağı Sualtı Sarkıtları'
+  },
+  {
+    id: 'cv-dupnisa',
+    name: 'Dupnisa Mağarası',
+    type: 'cave',
+    category: 'Trakya\'nın Turizme Açık TEK Mağarası',
+    coordinates: [27.558, 41.841],
+    region: 'Marmara',
+    description: 'Kırklareli Demirköy ilçesi Sarpdere köyünde Yıldız (Istranca) Dağları derinliklerinde yer alan 3 katlı devasa karstik mağara sistemi.',
+    kpssTips: [
+      'Trakya Bölgesi\'nin turizme açık TEK mağarasıdır.',
+      'Üst katı kuru, alt katından ise yer altı nehri akar; zengin yarasa kolonilerine ev sahipliği yapar.'
+    ],
+    mnemonic: 'DUPNİSA = Kırklareli Istrancalar + Trakya\'nın Tek Turistik Mağarası'
+  },
+  {
+    id: 'cv-karaca',
+    name: 'Karaca Mağarası',
+    type: 'cave',
+    category: 'Damlataşı Ormanı & Beyaz Travertenler',
+    coordinates: [39.385, 40.548],
+    region: 'Karadeniz',
+    description: 'Gümüşhane Torul ilçesi Cebeli köyünde yer alan, rengarenk sarkıt, dikit, sütun ve traverten basamaklarıyla süslü karstik mağara.',
+    kpssTips: [
+      'Gümüşhane\'nin en önemli turizm cazibe merkezidir.',
+      'Havası solunum yolu hastalıklarına iyi gelmektedir.'
+    ],
+    mnemonic: 'KARACA = Gümüşhane Torul + Beyaz Traverten Havuzları ve Damlataşı'
+  },
+  {
+    id: 'cv-oylat',
+    name: 'Oylat Mağarası',
+    type: 'cave',
+    category: 'Türkiye\'nin En Uzun Mağaralarından (Fay Karsti)',
+    coordinates: [29.591, 39.932],
+    region: 'Marmara',
+    description: 'Bursa İnegöl ilçesinde Oylat Kaplıcaları yakınında yer alan, 665 metre uzunluğunda dev salonlara sahip karstik mağara.',
+    kpssTips: [
+      'Marmara Bölgesi\'nin en uzun ve en görkemli mağaralarındandır.',
+      'Oylat kaplıcaları ve vadi turizmiyle entegredir.'
+    ]
+  },
+  {
+    id: 'cv-cal',
+    name: 'Çal Mağarası',
+    type: 'cave',
+    category: 'İçinden Şelale Akan Dünyanın 2. En Uzun Mağarası',
+    coordinates: [39.378, 40.928],
+    region: 'Karadeniz',
+    description: 'Trabzon Düzköy ilçesinde yer alan, içinden dere ve şelale akan dünyanın en uzun ikinci mağarası olarak kabul edilen karstik doğa harikası.',
+    kpssTips: [
+      'İçindeki ahşap yürüyüş yolları altından debisi yüksek dere akar ve şelale oluşturur.',
+      'Doğu Karadeniz yayla turizminin simgelerindendir.'
+    ],
+    mnemonic: 'ÇAL MAĞARASI = Trabzon Düzköy + İçinden Şelale Akan Mağara'
+  },
+  {
+    id: 'cv-tinaztepe',
+    name: 'Tınaztepe Mağarası',
+    type: 'cave',
+    category: 'Toros Karstik Mağara Sistemi',
+    coordinates: [31.905, 37.382],
+    region: 'İç Anadolu',
+    description: 'Konya Seydişehir ile Antalya Akseki yolu üzerinde Toros Dağları eteklerinde yer alan, 22 km toplam uzunluğuyla Türkiye\'nin en uzun karstik galerilerinden biri.',
+    kpssTips: [
+      'Konya-Antalya geçiş güzergahında Toros kireçtaşı kuşağında yer alır.'
+    ]
+  },
+  {
+    id: 'cv-kaklik',
+    name: 'Kaklık Mağarası (Yeraltı Pamukkalesi)',
+    type: 'cave',
+    category: 'Yeraltındaki Pamukkale (Kükürtlü Traverten)',
+    coordinates: [29.383, 37.770],
+    region: 'Ege',
+    description: 'Denizli Honaz ilçesi Kaklık kasabasında yer alan, tavanı çökmüş bir düden içinde basamak basamak oluşan kükürtlü beyaz traverten havuzları.',
+    kpssTips: [
+      '"Yeraltındaki Pamukkale" veya "Küçük Pamukkale" olarak adlandırılır.',
+      'Kükürtlü ve berrak termal sularıyla cilt hastalıklarına şifa sağlar.'
+    ],
+    mnemonic: 'KAKLIK = Denizli Honaz + Yeraltı Pamukkalesi (Kükürtlü Traverten Mağarası)'
+  },
+  {
+    id: 'cv-cehennemagzi',
+    name: 'Cehennemağzı Mağaraları',
+    type: 'cave',
+    category: 'Mitolojik Mağara (Herakles Efsanesi)',
+    coordinates: [31.413, 41.282],
+    region: 'Karadeniz',
+    description: 'Zonguldak Karadeniz Ereğli ilçesinde yer alan, mitolojide Herakles\'in (Herkül) yer altı dünyasının bekçisi üç başlı köpek Kerberos\'u yeryüzüne çıkardığına inanılan mağaralar.',
+    kpssTips: [
+      'Erken Hristiyanlık döneminde gizli ibadethane (Kilise Mağara) olarak kullanılmıştır.'
+    ]
+  },
+  {
+    id: 'cv-gokgol',
+    name: 'Gökgöl Mağarası',
+    type: 'cave',
+    category: 'Fosil Karstik Mağara & Mikroklima',
+    coordinates: [31.831, 41.436],
+    region: 'Karadeniz',
+    description: 'Zonguldak il merkezinin girişinde yer alan, 3.350 metre uzunluğuyla Zonguldak\'ın en uzun, Türkiye\'nin ise sayılı büyük karstik mağaralarından biri.',
+    kpssTips: [
+      'Mikroklima özelliği sayesinde astım ve bronşit hastalarının ziyaret ettiği önemli bir sağlık turizmi merkezidir.'
+    ]
+  }
+];
+
 export const ALL_GEO_FEATURES: GeoFeature[] = [
   ...MOUNTAINS_DATA,
   ...RIVERS_DATA,
@@ -4215,7 +4721,9 @@ export const ALL_GEO_FEATURES: GeoFeature[] = [
   ...PASSES_DATA,
   ...PLAINS_PLATEAUS_DATA,
   ...KARSTIC_COASTAL_DATA,
-  ...MINES_DATA
+  ...MINES_DATA,
+  ...ANCIENT_CITIES_DATA,
+  ...CAVES_DATA
 ];
 
 export function getFeatureImageUrl(item?: { id?: string; name?: string; type?: string; category?: string; title?: string } | null): string {
@@ -4226,6 +4734,21 @@ export function getFeatureImageUrl(item?: { id?: string; name?: string; type?: s
   const type = (item.type || '').toLowerCase();
 
   // Curated High-Res Turkey Geography Photography
+  if (id.includes('efes') || name.includes('efes')) {
+    return 'https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=800&q=80';
+  }
+  if (id.includes('hierapolis') || name.includes('hierapolis') || name.includes('pamukkale')) {
+    return 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80';
+  }
+  if (id.includes('gobekli') || name.includes('göbeklitepe')) {
+    return 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&q=80';
+  }
+  if (type === 'ancient_city' || name.includes('antik') || name.includes('ören')) {
+    return 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80';
+  }
+  if (type === 'cave' || name.includes('mağara')) {
+    return 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=800&q=80';
+  }
   if (id.includes('agri') || name.includes('ağrı')) {
     return 'https://images.unsplash.com/photo-1627916607164-7b20241db935?w=800&q=80';
   }

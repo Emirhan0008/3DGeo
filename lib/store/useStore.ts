@@ -32,6 +32,8 @@ export interface LayerState {
   borderGates: boolean;
   mines: boolean;
   provinces: boolean;
+  ancientCities: boolean;
+  caves: boolean;
 }
 
 export interface DuelStats {
@@ -118,6 +120,14 @@ export interface AppState {
   recordDuelFinish: (winnerId: string | 'draw', myPlayerId: string, myScore: number) => void;
 
   // Gamification, Category Mastery & Badges
+  avatarIcon: string;
+  avatarBg: string;
+  equippedTitle: string;
+  unlockedTitles: string[];
+  setAvatarIcon: (icon: string) => void;
+  setAvatarBg: (bg: string) => void;
+  setEquippedTitle: (title: string) => void;
+  unlockTitle: (title: string) => void;
   unlockedBadges: string[];
   categoryMasteryProgress: Record<string, number>;
   latestUnlockedBadge: { name: string; icon: string; desc: string } | null;
@@ -141,6 +151,7 @@ export interface AppState {
   // Tracked Weak Spots / Misplaced Geography Items
   missedItems: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
   resetStats: () => void;
+  clearAllUserData: () => void;
   hydrateUserData: (data: Partial<AppState>) => void;
 }
 
@@ -157,6 +168,10 @@ function saveStatsToLocalStorage(state: AppState) {
       totalDistanceErrorKm: state.totalDistanceErrorKm,
       pinGuessCount: state.pinGuessCount,
       unlockedBadges: state.unlockedBadges,
+      avatarIcon: state.avatarIcon,
+      avatarBg: state.avatarBg,
+      equippedTitle: state.equippedTitle,
+      unlockedTitles: state.unlockedTitles,
       categoryMasteryProgress: state.categoryMasteryProgress,
       missedItems: state.missedItems,
       duelStats: state.duelStats
@@ -304,6 +319,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     borderGates: false,
     mines: false,
     provinces: false,
+    ancientCities: false,
+    caves: false,
   },
   toggleLayer: (layerKey) =>
     set((state) => ({
@@ -328,6 +345,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         borderGates: true,
         mines: true,
         provinces: true,
+        ancientCities: true,
+        caves: true,
       }
     }),
   clearAllLayers: () =>
@@ -349,6 +368,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         borderGates: false,
         mines: false,
         provinces: false,
+        ancientCities: false,
+        caves: false,
       }
     }),
 
@@ -444,6 +465,29 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Gamification, Category Mastery & Badge State
+  avatarIcon: getStoredStatsFromLocalStorage().avatarIcon || '🐣',
+  avatarBg: getStoredStatsFromLocalStorage().avatarBg || 'indigo_midnight',
+  equippedTitle: getStoredStatsFromLocalStorage().equippedTitle || '3D Coğrafyacı Çırağı',
+  unlockedTitles: getStoredStatsFromLocalStorage().unlockedTitles || ['3D Coğrafyacı Çırağı'],
+  setAvatarIcon: (icon) => {
+    set({ avatarIcon: icon });
+    saveStatsToLocalStorage(get());
+  },
+  setAvatarBg: (bg) => {
+    set({ avatarBg: bg });
+    saveStatsToLocalStorage(get());
+  },
+  setEquippedTitle: (title) => {
+    set({ equippedTitle: title });
+    saveStatsToLocalStorage(get());
+  },
+  unlockTitle: (title) => {
+    const current = get().unlockedTitles;
+    if (!current.includes(title)) {
+      set({ unlockedTitles: [...current, title] });
+      saveStatsToLocalStorage(get());
+    }
+  },
   latestUnlockedBadge: null,
   clearLatestUnlockedBadge: () => set({ latestUnlockedBadge: null }),
 
@@ -500,6 +544,62 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     });
     saveStatsToLocalStorage(get());
+  },
+
+  clearAllUserData: () => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('kpss3d_user_stats');
+        localStorage.removeItem('kpss3d_active_rumuz');
+        localStorage.removeItem('kpss3d_active_pin');
+      } catch (e) {
+        console.warn('LocalStorage clear error:', e);
+      }
+    }
+    set({
+      score: 0,
+      streak: 0,
+      quizScore: 0,
+      avatarIcon: '🐣',
+      avatarBg: 'indigo_midnight',
+      equippedTitle: '3D Coğrafyacı Çırağı',
+      unlockedTitles: ['3D Coğrafyacı Çırağı'],
+      unlockedBadges: ['3D Coğrafyacı Çırağı'],
+      categoryMasteryProgress: {},
+      regionalStats: {
+        'Marmara': { correct: 0, wrong: 0 },
+        'Ege': { correct: 0, wrong: 0 },
+        'Akdeniz': { correct: 0, wrong: 0 },
+        'İç Anadolu': { correct: 0, wrong: 0 },
+        'Karadeniz': { correct: 0, wrong: 0 },
+        'Doğu Anadolu': { correct: 0, wrong: 0 },
+        'Güneydoğu Anadolu': { correct: 0, wrong: 0 }
+      },
+      categoryStats: {
+        'Dağlar': { correct: 0, wrong: 0 },
+        'Akarsular': { correct: 0, wrong: 0 },
+        'Göller': { correct: 0, wrong: 0 },
+        'Sınır Kapıları': { correct: 0, wrong: 0 },
+        'Geçitler': { correct: 0, wrong: 0 },
+        'Platolar & Ovalar': { correct: 0, wrong: 0 },
+        'Madenler': { correct: 0, wrong: 0 },
+        'Karstik & Kıyı': { correct: 0, wrong: 0 }
+      },
+      totalQuestionsAnswered: 0,
+      correctAnswersCount: 0,
+      totalDistanceErrorKm: 0,
+      pinGuessCount: 0,
+      missedItems: {},
+      duelStats: {
+        duelWins: 0,
+        duelLosses: 0,
+        duelDraws: 0,
+        totalDuelsPlayed: 0,
+        duelScore: 0,
+        duelStreak: 0,
+        bestDuelStreak: 0
+      }
+    });
   },
 
   hydrateUserData: (data) => {

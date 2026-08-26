@@ -1,14 +1,18 @@
 'use client';
 
 import React from 'react';
-import { getPrestigeTier } from '@/lib/data/badgesData';
+import { getPrestigeTier, AVATAR_THEMES } from '@/lib/data/badgesData';
 
 interface AvatarWithBadgeFrameProps {
   rumuz: string;
   unlockedBadges?: string[];
   duelWins?: number;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  avatarIcon?: string;
+  avatarBg?: string;
+  equippedTitle?: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showBadgePin?: boolean;
+  showTitleBadge?: boolean;
   className?: string;
 }
 
@@ -16,57 +20,86 @@ export default function AvatarWithBadgeFrame({
   rumuz,
   unlockedBadges = [],
   duelWins = 0,
+  avatarIcon,
+  avatarBg,
+  equippedTitle,
   size = 'md',
   showBadgePin = true,
+  showTitleBadge = false,
   className = ''
 }: AvatarWithBadgeFrameProps) {
-  const prestige = getPrestigeTier(unlockedBadges, duelWins);
-  const initial = (rumuz?.trim()?.[0] || 'K').toUpperCase();
+  const prestige = getPrestigeTier(unlockedBadges, duelWins, equippedTitle);
+  const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
+  const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
+
+  // Custom or theme background
+  const themeObj = AVATAR_THEMES.find(t => t.id === avatarBg);
+  const bgClass = themeObj?.bgGradient || prestige.gradientBg;
+  const borderClass = themeObj?.borderGlow || prestige.frameBorderClass;
 
   const sizeClasses = {
+    xs: {
+      container: 'w-6 h-6 text-[10px]',
+      pin: '-top-1 -right-1 w-3 h-3 text-[7px]',
+      titleText: 'text-[9px]'
+    },
     sm: {
-      container: 'w-7 h-7 text-xs',
-      pin: '-top-1 -right-1 w-3.5 h-3.5 text-[8px]'
+      container: 'w-8 h-8 text-xs font-black',
+      pin: '-top-1 -right-1 w-3.5 h-3.5 text-[8px]',
+      titleText: 'text-[10px]'
     },
     md: {
       container: 'w-10 h-10 text-sm font-black',
-      pin: '-top-1.5 -right-1.5 w-5 h-5 text-[10px]'
+      pin: '-top-1.5 -right-1.5 w-4.5 h-4.5 text-[10px]',
+      titleText: 'text-[11px]'
     },
     lg: {
       container: 'w-14 h-14 text-lg font-black',
-      pin: '-top-2 -right-2 w-6 h-6 text-xs'
+      pin: '-top-2 -right-2 w-6 h-6 text-xs',
+      titleText: 'text-xs'
     },
     xl: {
       container: 'w-20 h-20 text-2xl font-black',
-      pin: '-top-2.5 -right-2.5 w-7 h-7 text-sm'
+      pin: '-top-2.5 -right-2.5 w-7 h-7 text-sm',
+      titleText: 'text-sm'
     }
   }[size];
 
+  const activeTitle = equippedTitle || prestige.title;
+
   return (
-    <div
-      className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none ${sizeClasses.container} ${prestige.frameBorderClass} ${prestige.gradientBg} ${className}`}
-      title={`${rumuz} (${prestige.title} - ${prestige.badgeCount} Rozet, ${duelWins} Düello Zaferi)`}
-    >
-      {/* Background radial glow */}
-      {prestige.tier !== 'starter' && (
-        <div
-          className={`absolute -inset-0.5 rounded-full bg-gradient-to-r ${prestige.glowClass} opacity-40 blur-xs -z-10`}
-        />
-      )}
+    <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
+      <div
+        className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-lg ${sizeClasses.container} ${borderClass} ${bgClass}`}
+        title={`${rumuz} • ${activeTitle} (${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
+      >
+        {/* Background radial glow */}
+        {prestige.tier !== 'starter' && (
+          <div
+            className={`absolute -inset-0.5 rounded-full bg-gradient-to-r ${prestige.glowClass} opacity-50 blur-xs -z-10`}
+          />
+        )}
 
-      {/* Center Initials */}
-      <span className="text-white drop-shadow-sm font-extrabold tracking-tight">
-        {initial}
-      </span>
+        {/* Center Icon / Initial */}
+        <span className={`text-white drop-shadow-md font-black tracking-tight ${isEmojiIcon ? 'scale-110' : ''}`}>
+          {displayIcon}
+        </span>
 
-      {/* Glorious Edge Badge Pin */}
-      {showBadgePin && (
-        <div
-          className={`absolute ${sizeClasses.pin} rounded-full bg-slate-900 border border-amber-400/80 shadow-md flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
-          title={`${prestige.pinBadgeName} (${prestige.title})`}
-        >
-          <span>{prestige.pinIcon}</span>
-        </div>
+        {/* Glorious Edge Badge Pin */}
+        {showBadgePin && (
+          <div
+            className={`absolute ${sizeClasses.pin} rounded-full bg-slate-900 border border-amber-400/90 shadow-md flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
+            title={`${prestige.pinBadgeName} • ${activeTitle}`}
+          >
+            <span>{prestige.pinIcon}</span>
+          </div>
+        )}
+      </div>
+
+      {showTitleBadge && (
+        <span className={`font-extrabold text-amber-300 truncate max-w-[120px] text-center px-1.5 py-0.5 rounded bg-black/60 border border-amber-400/30 ${sizeClasses.titleText}`}>
+          {activeTitle}
+        </span>
       )}
     </div>
   );

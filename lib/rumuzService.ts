@@ -1,10 +1,14 @@
 import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export interface RumuzProfileData {
   rumuz: string;
   rumuzKey: string;
   pin: string;
+  avatarIcon?: string;
+  avatarBg?: string;
+  equippedTitle?: string;
+  unlockedTitles?: string[];
   score: number;
   streak: number;
   totalQuestionsAnswered: number;
@@ -12,6 +16,16 @@ export interface RumuzProfileData {
   totalDistanceErrorKm: number;
   pinGuessCount: number;
   unlockedBadges: string[];
+  categoryMasteryProgress?: Record<string, number>;
+  duelStats?: {
+    duelWins: number;
+    duelLosses: number;
+    duelDraws: number;
+    totalDuelsPlayed: number;
+    duelScore: number;
+    duelStreak: number;
+    bestDuelStreak: number;
+  };
   isBlindMapMode: boolean;
   regionalStats: Record<string, { correct: number; wrong: number }>;
   categoryStats: Record<string, { correct: number; wrong: number }>;
@@ -65,12 +79,12 @@ export async function checkRumuzExists(rumuz: string): Promise<{ exists: boolean
 }
 
 /**
- * Registers or updates a unique rumuz profile in Firestore with PIN protection.
+ * Registers or updates a unique rumuz profile in Firestore with PIN protection and rich gamification stats.
  */
 export async function saveRumuzProfile(
   rumuz: string,
   pin: string,
-  stats: Omit<RumuzProfileData, 'rumuz' | 'rumuzKey' | 'pin' | 'updatedAt'>
+  stats: Partial<RumuzProfileData>
 ): Promise<RumuzProfileData> {
   const key = normalizeRumuzKey(rumuz);
   const path = `rumuzes/${key}`;
@@ -79,6 +93,10 @@ export async function saveRumuzProfile(
     rumuz: rumuz.trim(),
     rumuzKey: key,
     pin: pin.trim(),
+    avatarIcon: stats.avatarIcon || '🐣',
+    avatarBg: stats.avatarBg || 'indigo_midnight',
+    equippedTitle: stats.equippedTitle || '3D Coğrafyacı Çırağı',
+    unlockedTitles: stats.unlockedTitles || ['3D Coğrafyacı Çırağı'],
     score: stats.score || 0,
     streak: stats.streak || 0,
     totalQuestionsAnswered: stats.totalQuestionsAnswered || 0,
@@ -86,6 +104,16 @@ export async function saveRumuzProfile(
     totalDistanceErrorKm: stats.totalDistanceErrorKm || 0,
     pinGuessCount: stats.pinGuessCount || 0,
     unlockedBadges: stats.unlockedBadges || ['3D Coğrafyacı Çırağı'],
+    categoryMasteryProgress: stats.categoryMasteryProgress || {},
+    duelStats: stats.duelStats || {
+      duelWins: 0,
+      duelLosses: 0,
+      duelDraws: 0,
+      totalDuelsPlayed: 0,
+      duelScore: 0,
+      duelStreak: 0,
+      bestDuelStreak: 0
+    },
     isBlindMapMode: !!stats.isBlindMapMode,
     regionalStats: stats.regionalStats || {},
     categoryStats: stats.categoryStats || {},
@@ -128,5 +156,113 @@ export async function verifyAndLoadRumuzProfile(
     console.error('Rumuz verification error:', error);
     handleFirestoreError(error, OperationType.GET, path);
     return { success: false, errorMsg: 'Veritabanı bağlantı hatası.' };
+  }
+}
+
+/**
+ * Updates profile avatar, title, or PIN in Firestore.
+ */
+export async function updateRumuzCustomization(
+  rumuz: string,
+  pin: string,
+  updates: Partial<RumuzProfileData>
+): Promise<{ success: boolean; profile?: RumuzProfileData; errorMsg?: string }> {
+  const key = normalizeRumuzKey(rumuz);
+  const path = `rumuzes/${key}`;
+  try {
+    const snap = await getDoc(doc(db, 'rumuzes', key));
+    if (!snap.exists()) {
+      return { success: false, errorMsg: 'Profil bulunamadı.' };
+    }
+    const current = snap.data() as RumuzProfileData;
+    if (current.pin && current.pin !== pin.trim()) {
+      return { success: false, errorMsg: 'Güvenlik doğrulaması başarısız: Şifre uyuşmuyor.' };
+    }
+
+    const newProfile: RumuzProfileData = {
+      ...current,
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
+    await setDoc(doc(db, 'rumuzes', key), newProfile, { merge: true });
+    return { success: true, profile: newProfile };
+  } catch (error) {
+    console.error('Customization update error:', error);
+    handleFirestoreError(error, OperationType.UPDATE, path);
+    return { success: false, errorMsg: 'Profil güncellenirken hata oluştu.' };
+  }
+}
+
+/**
+ * Renames a rumuz by migrating data to a new unique key and deleting the old document.
+ */
+export async function changeRumuzNickname(
+  oldRumuz: string,
+  newRumuz: string,
+  pin: string
+): Promise<{ success: boolean; profile?: RumuzProfileData; errorMsg?: string }> {
+  const oldKey = normalizeRumuzKey(oldRumuz);
+  const newKey = normalizeRumuzKey(newRumuz);
+
+  if (oldKey === newKey) {
+    return { success: false, errorMsg: 'Yeni rumuz eskisinden farklı olmalıdır.' };
+  }
+
+  // 1. Verify old rumuz exists and PIN matches
+  const checkOld = await verifyAndLoadRumuzProfile(oldRumuz, pin);
+  if (!checkOld.success || !checkOld.profile) {
+    return { success: false, errorMsg: checkOld.errorMsg || 'Mevcut profil doğrulanamadı.' };
+  }
+
+  // 2. Verify new rumuz does not already exist
+  const checkNew = await checkRumuzExists(newRumuz);
+  if (checkNew.exists) {
+    return { success: false, errorMsg: `'${newRumuz}' rumuzu zaten başka bir kullanıcı tarafından alınmış.` };
+  }
+
+  // 3. Create new document
+  const migratedData: RumuzProfileData = {
+    ...checkOld.profile,
+    rumuz: newRumuz.trim(),
+    rumuzKey: newKey,
+    updatedAt: new Date().toISOString()
+  };
+
+  try {
+    await setDoc(doc(db, 'rumuzes', newKey), migratedData);
+    // 4. Delete old document
+    await deleteDoc(doc(db, 'rumuzes', oldKey));
+    return { success: true, profile: migratedData };
+  } catch (error) {
+    console.error('Rumuz rename error:', error);
+    handleFirestoreError(error, OperationType.WRITE, `rumuzes/${newKey}`);
+    return { success: false, errorMsg: 'Rumuz değiştirme işlemi sırasında hata oluştu.' };
+  }
+}
+
+/**
+ * Permanently deletes user rumuz profile from Firestore and removes from existence.
+ */
+export async function deleteRumuzProfile(
+  rumuz: string,
+  pin: string
+): Promise<{ success: boolean; errorMsg?: string }> {
+  const key = normalizeRumuzKey(rumuz);
+  const path = `rumuzes/${key}`;
+
+  // 1. Verify PIN before deletion
+  const verifyRes = await verifyAndLoadRumuzProfile(rumuz, pin);
+  if (!verifyRes.success) {
+    return { success: false, errorMsg: verifyRes.errorMsg || 'Silme onayı için doğru şifre girilmelidir.' };
+  }
+
+  try {
+    await deleteDoc(doc(db, 'rumuzes', key));
+    return { success: true };
+  } catch (error) {
+    console.error('Rumuz delete error:', error);
+    handleFirestoreError(error, OperationType.DELETE, path);
+    return { success: false, errorMsg: 'Profil silinirken veritabanı hatası oluştu.' };
   }
 }

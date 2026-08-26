@@ -33,6 +33,9 @@ export default function StatsModal() {
     score,
     streak,
     unlockedBadges,
+    avatarIcon,
+    avatarBg,
+    equippedTitle,
     categoryMasteryProgress,
     totalQuestionsAnswered,
     correctAnswersCount,
@@ -151,6 +154,9 @@ export default function StatsModal() {
             rumuz="Sen"
             unlockedBadges={unlockedBadges}
             duelWins={duelStats.duelWins}
+            avatarIcon={avatarIcon}
+            avatarBg={avatarBg}
+            equippedTitle={equippedTitle}
             size="md"
           />
           <div>
@@ -366,6 +372,9 @@ export default function StatsModal() {
                 rumuz="Sen"
                 unlockedBadges={unlockedBadges}
                 duelWins={duelStats.duelWins}
+                avatarIcon={avatarIcon}
+                avatarBg={avatarBg}
+                equippedTitle={equippedTitle}
                 size="lg"
               />
               <div>

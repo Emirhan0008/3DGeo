@@ -20,6 +20,8 @@ import {
   saveRumuzProfile, 
   verifyAndLoadRumuzProfile 
 } from '@/lib/rumuzService';
+import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
+import ProfileEditModal from '@/components/ui/ProfileEditModal';
 import { 
   LogIn, 
   LogOut, 
@@ -33,7 +35,8 @@ import {
   User as UserIcon,
   KeyRound,
   CloudCheck,
-  CheckCircle2
+  CheckCircle2,
+  Settings
 } from 'lucide-react';
 
 export default function AuthUserButton() {
@@ -42,6 +45,7 @@ export default function AuthUserButton() {
   const [localPin, setLocalPin] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showProfileEditModal, setShowProfileEditModal] = useState(false);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -64,6 +68,12 @@ export default function AuthUserButton() {
     totalDistanceErrorKm,
     pinGuessCount,
     unlockedBadges,
+    avatarIcon,
+    avatarBg,
+    equippedTitle,
+    unlockedTitles,
+    categoryMasteryProgress,
+    duelStats,
     isBlindMapMode,
     regionalStats,
     categoryStats,
@@ -92,11 +102,17 @@ export default function AuthUserButton() {
               hydrateUserData({
                 score: result.profile.score ?? st.score,
                 streak: result.profile.streak ?? st.streak,
+                avatarIcon: result.profile.avatarIcon ?? st.avatarIcon,
+                avatarBg: result.profile.avatarBg ?? st.avatarBg,
+                equippedTitle: result.profile.equippedTitle ?? st.equippedTitle,
+                unlockedTitles: result.profile.unlockedTitles ?? st.unlockedTitles,
                 totalQuestionsAnswered: result.profile.totalQuestionsAnswered ?? st.totalQuestionsAnswered,
                 correctAnswersCount: result.profile.correctAnswersCount ?? st.correctAnswersCount,
                 totalDistanceErrorKm: result.profile.totalDistanceErrorKm ?? st.totalDistanceErrorKm,
                 pinGuessCount: result.profile.pinGuessCount ?? st.pinGuessCount,
                 unlockedBadges: result.profile.unlockedBadges ?? st.unlockedBadges,
+                categoryMasteryProgress: result.profile.categoryMasteryProgress ?? st.categoryMasteryProgress,
+                duelStats: result.profile.duelStats ?? st.duelStats,
                 isBlindMapMode: result.profile.isBlindMapMode ?? st.isBlindMapMode,
                 regionalStats: result.profile.regionalStats ?? st.regionalStats,
                 categoryStats: result.profile.categoryStats ?? st.categoryStats,
@@ -197,11 +213,17 @@ export default function AuthUserButton() {
     const currentStats = {
       score,
       streak,
+      avatarIcon,
+      avatarBg,
+      equippedTitle,
+      unlockedTitles,
       totalQuestionsAnswered,
       correctAnswersCount,
       totalDistanceErrorKm,
       pinGuessCount,
       unlockedBadges,
+      categoryMasteryProgress,
+      duelStats,
       isBlindMapMode,
       regionalStats,
       categoryStats,
@@ -259,7 +281,7 @@ export default function AuthUserButton() {
 
       return () => clearTimeout(timer);
     }
-  }, [firebaseUser, localRumuz, localPin, score, streak, totalQuestionsAnswered, correctAnswersCount, unlockedBadges, isBlindMapMode, pinGuessCount, totalDistanceErrorKm, regionalStats, categoryStats, missedItems]);
+  }, [firebaseUser, localRumuz, localPin, score, streak, totalQuestionsAnswered, correctAnswersCount, unlockedBadges, isBlindMapMode, pinGuessCount, totalDistanceErrorKm, regionalStats, categoryStats, missedItems, avatarIcon, avatarBg, equippedTitle, unlockedTitles, duelStats, categoryMasteryProgress]);
 
   // Live Rumuz existence check when user types in the input
   const handleRumuzInputChange = async (val: string) => {
@@ -378,11 +400,17 @@ export default function AuthUserButton() {
         hydrateUserData({
           score: prof.score ?? score,
           streak: prof.streak ?? streak,
+          avatarIcon: prof.avatarIcon ?? avatarIcon,
+          avatarBg: prof.avatarBg ?? avatarBg,
+          equippedTitle: prof.equippedTitle ?? equippedTitle,
+          unlockedTitles: prof.unlockedTitles ?? unlockedTitles,
           totalQuestionsAnswered: prof.totalQuestionsAnswered ?? totalQuestionsAnswered,
           correctAnswersCount: prof.correctAnswersCount ?? correctAnswersCount,
           totalDistanceErrorKm: prof.totalDistanceErrorKm ?? totalDistanceErrorKm,
           pinGuessCount: prof.pinGuessCount ?? pinGuessCount,
           unlockedBadges: prof.unlockedBadges ?? unlockedBadges,
+          categoryMasteryProgress: prof.categoryMasteryProgress ?? categoryMasteryProgress,
+          duelStats: prof.duelStats ?? duelStats,
           isBlindMapMode: prof.isBlindMapMode ?? isBlindMapMode,
           regionalStats: prof.regionalStats ?? regionalStats,
           categoryStats: prof.categoryStats ?? categoryStats,
@@ -415,11 +443,17 @@ export default function AuthUserButton() {
         const savedProf = await saveRumuzProfile(nameToSet, pinToSet, {
           score,
           streak,
+          avatarIcon,
+          avatarBg,
+          equippedTitle,
+          unlockedTitles,
           totalQuestionsAnswered,
           correctAnswersCount,
           totalDistanceErrorKm,
           pinGuessCount,
           unlockedBadges,
+          categoryMasteryProgress,
+          duelStats,
           isBlindMapMode,
           regionalStats,
           categoryStats,
@@ -496,30 +530,64 @@ export default function AuthUserButton() {
           <span>Rumuz Gir / Giriş Yap</span>
         </button>
       ) : (
-        <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border-2 border-emerald-400/80 rounded-xl px-2.5 py-1 text-xs font-black shrink-0 shadow-lg">
-          <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-[10px] shadow">
-              {activeDisplayName[0].toUpperCase()}
-            </div>
+        <div className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border-2 border-amber-400/70 rounded-xl p-1 text-xs font-black shrink-0 shadow-lg">
+          <button
+            onClick={() => setShowProfileEditModal(true)}
+            className="flex items-center gap-2 px-1.5 py-0.5 hover:bg-white/10 rounded-lg transition-all text-left"
+            title="Profili Düzenle, Avatarını Değiştir veya Hesabı Yönet"
+          >
+            <AvatarWithBadgeFrame
+              rumuz={activeDisplayName}
+              unlockedBadges={unlockedBadges}
+              duelWins={duelStats.duelWins}
+              avatarIcon={avatarIcon}
+              avatarBg={avatarBg}
+              equippedTitle={equippedTitle}
+              size="sm"
+            />
             <div className="flex flex-col">
-              <span className="text-amber-300 font-black truncate max-w-[95px] leading-tight">
-                {activeDisplayName}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-amber-300 font-black truncate max-w-[90px] leading-tight">
+                  {activeDisplayName}
+                </span>
+                <Settings className="w-3 h-3 text-slate-400 hover:text-amber-300 transition-colors" />
+              </div>
               <span className="text-[9px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5">
-                <CloudCheck className="w-3 h-3 text-emerald-300" />
-                Bulut Eşitlendi
+                <CloudCheck className="w-2.5 h-2.5 text-emerald-300" />
+                {equippedTitle}
               </span>
             </div>
-          </div>
+          </button>
 
           <button
             onClick={handleSignOut}
-            className="p-1 text-slate-400 hover:text-rose-400 transition-colors ml-1 border-l border-white/10 pl-1.5"
+            className="p-1 text-slate-400 hover:text-rose-400 transition-colors border-l border-white/10 pl-1.5 pr-1"
             title="Oturumu Kapat / Rumuz Değiştir"
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
+      )}
+
+      {/* Profile Edit & Account Deletion Modal */}
+      {showProfileEditModal && mounted && createPortal(
+        <ProfileEditModal
+          isOpen={showProfileEditModal}
+          onClose={() => setShowProfileEditModal(false)}
+          currentRumuz={activeDisplayName || ''}
+          currentPin={localPin || ''}
+          onProfileUpdated={(newRumuz, newPin) => {
+            setLocalRumuz(newRumuz);
+            if (newPin) setLocalPin(newPin);
+          }}
+          onProfileDeleted={() => {
+            setLocalRumuz(null);
+            setLocalPin(null);
+            setFirebaseUser(null);
+            setShowProfileEditModal(false);
+          }}
+        />,
+        document.body
       )}
 
       {/* Auth Selector Modal */}
