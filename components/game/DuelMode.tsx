@@ -19,7 +19,10 @@ import {
   handleRoundTimeout,
   calculateDuelScore,
   DistanceScoreBreakdown,
-  DuelType
+  DuelType,
+  findCrossModeWaitingRooms,
+  joinSuggestedDuelRoom,
+  WaitingRoomSuggestion
 } from '@/lib/duelService';
 import { checkRumuzExists, saveRumuzProfile, normalizeRumuzKey } from '@/lib/rumuzService';
 import { 
@@ -110,6 +113,16 @@ export default function DuelMode() {
   const [opponentRoundScore, setOpponentRoundScore] = useState<DistanceScoreBreakdown | null>(null);
   const [recordedFinishedId, setRecordedFinishedId] = useState<string | null>(null);
 
+  // Cross-mode matchmaking suggestions & 1-min waiting tracker
+  const [waitingSeconds, setWaitingSeconds] = useState<number>(0);
+  const [crossModeSuggestions, setCrossModeSuggestions] = useState<WaitingRoomSuggestion[]>([]);
+  const [joiningSuggestionId, setJoiningSuggestionId] = useState<string | null>(null);
+
+  // 2-click outside exit confirmation state
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
+  const [outsideClickWarning, setOutsideClickWarning] = useState<boolean>(false);
+  const outsideClickRef = useRef<{ count: number; lastTime: number }>({ count: 0, lastTime: 0 });
+
   // Bot auto-play ref
   const botTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activeDuelRef = useRef(activeDuelSession);
@@ -117,6 +130,89 @@ export default function DuelMode() {
   useEffect(() => {
     activeDuelRef.current = activeDuelSession;
   }, [activeDuelSession]);
+
+  // Track waiting time and poll for cross-mode waiting rooms
+  useEffect(() => {
+    if (!activeDuelSession || activeDuelSession.status !== 'waiting') {
+      setWaitingSeconds(0);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setWaitingSeconds(prev => prev + 1);
+    }, 1000);
+
+    const pollSuggestions = () => {
+      const myId = normalizeRumuzKey(rumuz);
+      findCrossModeWaitingRooms(myId).then(suggs => {
+        // Exclude current room
+        const filtered = suggs.filter(s => s.id !== activeDuelSession.id);
+        setCrossModeSuggestions(filtered);
+      });
+    };
+
+    pollSuggestions();
+    const suggInterval = setInterval(pollSuggestions, 4000);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(suggInterval);
+    };
+  }, [activeDuelSession?.id, activeDuelSession?.status, rumuz]);
+
+  // Outside click listener: Double click outside duel UI triggers Exit Confirmation
+  useEffect(() => {
+    const isDuelActive = activeDuelSession && (
+      activeDuelSession.status === 'in_progress' ||
+      activeDuelSession.status === 'round_reveal' ||
+      activeDuelSession.status === 'starting'
+    );
+
+    if (!isDuelActive) {
+      outsideClickRef.current = { count: 0, lastTime: 0 };
+      return;
+    }
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      // Check if click was inside duel card or HUD elements
+      const isInsideDuelUI = target.closest(
+        '#duel-active-hud, #duel-active-card, #duel-round-reveal-banner, #duel-exit-modal, button, input, a'
+      );
+
+      if (isInsideDuelUI) {
+        outsideClickRef.current = { count: 0, lastTime: 0 };
+        return;
+      }
+
+      const now = Date.now();
+      const { count, lastTime } = outsideClickRef.current;
+
+      if (now - lastTime < 2800) {
+        const newCount = count + 1;
+        if (newCount >= 2) {
+          setShowExitConfirmModal(true);
+          setOutsideClickWarning(false);
+          outsideClickRef.current = { count: 0, lastTime: 0 };
+        } else {
+          outsideClickRef.current = { count: newCount, lastTime: now };
+          setOutsideClickWarning(true);
+          setTimeout(() => setOutsideClickWarning(false), 2400);
+        }
+      } else {
+        outsideClickRef.current = { count: 1, lastTime: now };
+        setOutsideClickWarning(true);
+        setTimeout(() => setOutsideClickWarning(false), 2400);
+      }
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [activeDuelSession?.status]);
 
   // Clean up waiting duel rooms on component unmount or browser tab close
   useEffect(() => {
@@ -552,8 +648,30 @@ export default function DuelMode() {
     }
   };
 
+  // Handle accepting a cross-mode suggestion
+  const handleAcceptSuggestion = async (suggestion: WaitingRoomSuggestion) => {
+    if (!activeDuelSession) return;
+    setJoiningSuggestionId(suggestion.id);
+    try {
+      const myId = normalizeRumuzKey(rumuz);
+      // Leave current waiting lobby first
+      await leaveOrCancelDuel(activeDuelSession.id);
+      const res = await joinSuggestedDuelRoom(suggestion.id, { id: myId, rumuz, rumuzKey: myId });
+      if (res.success && res.duel) {
+        setActiveDuelSession(res.duel);
+      } else {
+        setLobbyError(res.errorMsg || 'Önerilen maça bağlanılamadı.');
+      }
+    } catch {
+      setLobbyError('Önerilen maça geçilirken hata oluştu.');
+    } finally {
+      setJoiningSuggestionId(null);
+    }
+  };
+
   // Handle Leave or Cancel
   const handleLeaveDuel = async () => {
+    setShowExitConfirmModal(false);
     if (activeDuelSession) {
       await leaveOrCancelDuel(activeDuelSession.id);
     }
@@ -994,19 +1112,29 @@ export default function DuelMode() {
   }
 
   // -------------------------------------------------------------
-  // 3. ODA BEKLEME EKRANI
+  // 3. ODA BEKLEME EKRANI (Akıllı Çapraz Mod Eşleştirme & 1 Dk Öneri Desteği)
   // -------------------------------------------------------------
   if (activeDuelSession.status === 'waiting') {
+    const mins = Math.floor(waitingSeconds / 60);
+    const secs = waitingSeconds % 60;
+    const formattedWaiting = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
     return (
-      <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150">
+      <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="w-full max-w-md bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150 my-auto">
           <div className="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center mx-auto mb-3 animate-pulse">
             <Loader2 className="w-7 h-7 text-amber-400 animate-spin" />
           </div>
 
-          <h2 className="text-lg font-black text-amber-400 mb-1">
-            {activeDuelSession.mode === 'private' ? 'Arkadaşınız Bekleniyor...' : 'Canlı Rakip Aranıyor...'}
-          </h2>
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <h2 className="text-lg font-black text-amber-400">
+              {activeDuelSession.mode === 'private' ? 'Arkadaşınız Bekleniyor...' : 'Canlı Rakip Aranıyor...'}
+            </h2>
+            <span className="text-xs font-mono font-black text-amber-300 bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 rounded-lg">
+              ⏱️ {formattedWaiting}
+            </span>
+          </div>
+
           <p className="text-xs text-slate-400 mb-3">
             {activeDuelSession.duelType === 'kpss_test' ? '📝 KPSS Test Modu' : '📍 Harita İşaretleme Modu'} • {activeDuelSession.categoryFilter} • {activeDuelSession.questionCount} Soru
           </p>
@@ -1036,17 +1164,64 @@ export default function DuelMode() {
             </div>
           )}
 
+          {/* Çapraz Mod Eşleştirme Önerisi (Farklı modda veya soru sayısında bekleyenler) */}
+          {crossModeSuggestions.length > 0 && (
+            <div className="mb-3 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-black text-amber-300 border-b border-white/10 pb-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Farklı Modda Rakip Bekleyen Adaylar Bulundu:</span>
+              </div>
+              {crossModeSuggestions.map((sugg) => (
+                <div 
+                  key={sugg.id} 
+                  className="p-2.5 rounded-xl bg-gradient-to-r from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 flex items-center justify-between gap-2 text-xs"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-extrabold text-indigo-300 truncate">{sugg.hostRumuz}</span>
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 shrink-0">
+                        {Math.floor(sugg.waitingDurationSec / 60)}d {sugg.waitingDurationSec % 60}s bekliyor
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-0.5 truncate">
+                      {sugg.duelType === 'kpss_test' ? '📝 KPSS Test' : '📍 Harita İşaretleme'} • {sugg.questionCount} Soru • {sugg.categoryFilter}
+                    </p>
+                  </div>
+
+                  <button
+                    disabled={joiningSuggestionId === sugg.id}
+                    onClick={() => handleAcceptSuggestion(sugg)}
+                    className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950 font-black text-xs rounded-lg shadow-md transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                  >
+                    {joiningSuggestionId === sugg.id ? 'Bağlanıyor...' : '🚀 Maça Katıl'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 1 Dakika ve Üzeri Bekleme Tavsiyesi */}
+          {waitingSeconds >= 45 && (
+            <div className="mb-3 p-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-xs text-left flex items-start gap-2">
+              <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-amber-300 block font-bold">Bekleme Süresi 1 Dakikaya Yaklaştı:</strong>
+                <span>Dilerseniz hemen Yapay Zeka (AI) KPSS botuna karşı başlayarak pratik yapabilir ve istatistik toplayabilirsiniz.</span>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <button
               onClick={handleLeaveDuel}
-              className="flex-1 py-2 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all"
+              className="flex-1 py-2 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
             >
               Aramayı İptal Et
             </button>
 
             <button
               onClick={handleStartBotDuel}
-              className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-1"
+              className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-1 cursor-pointer"
             >
               <Bot className="w-4 h-4" />
               <span>Yapay Zekaya Geç</span>
@@ -1424,7 +1599,7 @@ export default function DuelMode() {
     return (
       <div className="absolute inset-0 z-30 pointer-events-none flex flex-col justify-between p-2 sm:p-4">
         {/* Top Floating Match Header */}
-        <div className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/80 rounded-2xl shadow-2xl p-2.5 text-white animate-in fade-in duration-150">
+        <div id="duel-active-hud" className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/80 rounded-2xl shadow-2xl p-2.5 text-white animate-in fade-in duration-150">
           {/* Row 1: Kategori, Bölge & Tur */}
           <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -1441,7 +1616,7 @@ export default function DuelMode() {
                 {activeDuelSession.currentRound + 1}/{activeDuelSession.questionCount}
               </span>
               <button
-                onClick={handleLeaveDuel}
+                onClick={() => setShowExitConfirmModal(true)}
                 className="p-1 rounded-lg bg-white/10 hover:bg-red-500/30 text-slate-300 transition-all cursor-pointer"
                 title="Düellodan Çık"
               >
@@ -1517,7 +1692,7 @@ export default function DuelMode() {
         </div>
 
         {/* Center / Bottom: KPSS Question & Choice Options Card */}
-        <div className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/60 rounded-2xl shadow-2xl p-3 sm:p-4 text-white my-auto animate-in slide-in-from-bottom-3 duration-200">
+        <div id="duel-active-card" className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/60 rounded-2xl shadow-2xl p-3 sm:p-4 text-white my-auto animate-in slide-in-from-bottom-3 duration-200">
           <div className="font-extrabold text-xs sm:text-sm text-slate-100 leading-relaxed mb-3">
             {currentTestQ.questionText}
           </div>
@@ -1616,6 +1791,47 @@ export default function DuelMode() {
             </div>
           )}
         </div>
+
+        {/* 2-Click Outside Warning Toast */}
+        {outsideClickWarning && (
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="px-3.5 py-1.5 rounded-full bg-rose-600/95 text-white border border-rose-400/80 shadow-2xl text-xs font-black flex items-center gap-1.5 backdrop-blur-md">
+              <AlertCircle className="w-4 h-4 text-amber-300 animate-pulse shrink-0" />
+              <span>Düellodan çıkmak için ekrana 1 kez daha dokunun</span>
+            </div>
+          </div>
+        )}
+
+        {/* Exit Confirmation Modal */}
+        {showExitConfirmModal && (
+          <div id="duel-exit-modal" className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 pointer-events-auto">
+            <div className="w-full max-w-sm bg-[#09090b]/98 border-2 border-rose-500/80 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150">
+              <div className="w-12 h-12 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center mx-auto mb-3 text-rose-400">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-black text-white mb-1.5">
+                Düellodan Çıkmak İstiyor Musunuz?
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                Aktif bir düellodan ayrılırsanız maç hükmen sonlanır ve skorunuz kaydedilmez.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowExitConfirmModal(false)}
+                  className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-slate-200 font-extrabold text-xs rounded-xl transition-all cursor-pointer"
+                >
+                  Devam Et
+                </button>
+                <button
+                  onClick={handleLeaveDuel}
+                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-xl shadow-lg shadow-rose-600/30 transition-all cursor-pointer"
+                >
+                  Evet, Çık
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1630,7 +1846,7 @@ export default function DuelMode() {
   return (
     <>
       {/* Top Floating Match Header Bar */}
-      <div className="absolute top-11 sm:top-2 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-auto max-w-xl sm:max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-2xl shadow-2xl p-2 sm:p-2.5 text-white animate-in fade-in duration-200">
+      <div id="duel-active-hud" className="absolute top-11 sm:top-2 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-auto max-w-xl sm:max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border-2 border-amber-400/80 rounded-2xl shadow-2xl p-2 sm:p-2.5 text-white animate-in fade-in duration-200">
         {/* Row 1: Soru İsmi, Kategori & Tur Sayısı */}
         <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-1.5">
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -1648,7 +1864,7 @@ export default function DuelMode() {
               {activeDuelSession.currentRound + 1}/{activeDuelSession.questionCount}
             </span>
             <button
-              onClick={handleLeaveDuel}
+              onClick={() => setShowExitConfirmModal(true)}
               className="p-1 rounded-lg bg-white/10 hover:bg-red-500/30 text-slate-300 transition-all cursor-pointer"
               title="Düellodan Çık"
             >
@@ -1817,6 +2033,47 @@ export default function DuelMode() {
               </>
             )}
           </button>
+        </div>
+      )}
+
+      {/* 2-Click Outside Warning Toast */}
+      {outsideClickWarning && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="px-3.5 py-1.5 rounded-full bg-rose-600/95 text-white border border-rose-400/80 shadow-2xl text-xs font-black flex items-center gap-1.5 backdrop-blur-md">
+            <AlertCircle className="w-4 h-4 text-amber-300 animate-pulse shrink-0" />
+            <span>Düellodan çıkmak için ekrana 1 kez daha dokunun</span>
+          </div>
+        </div>
+      )}
+
+      {/* Exit Confirmation Modal */}
+      {showExitConfirmModal && (
+        <div id="duel-exit-modal" className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 pointer-events-auto">
+          <div className="w-full max-w-sm bg-[#09090b]/98 border-2 border-rose-500/80 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center mx-auto mb-3 text-rose-400">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-black text-white mb-1.5">
+              Düellodan Çıkmak İstiyor Musunuz?
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              Aktif bir düellodan ayrılırsanız maç hükmen sonlanır ve skorunuz kaydedilmez.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowExitConfirmModal(false)}
+                className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-slate-200 font-extrabold text-xs rounded-xl transition-all cursor-pointer"
+              >
+                Devam Et
+              </button>
+              <button
+                onClick={handleLeaveDuel}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-xl shadow-lg shadow-rose-600/30 transition-all cursor-pointer"
+              >
+                Evet, Çık
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

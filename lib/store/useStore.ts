@@ -46,6 +46,16 @@ export interface DuelStats {
   bestDuelStreak: number;
 }
 
+export interface BotStats {
+  botWins: number;
+  botLosses: number;
+  botDraws: number;
+  totalBotDuelsPlayed: number;
+  botScore: number;
+  botStreak: number;
+  bestBotStreak: number;
+}
+
 export interface AppState {
   // Navigation & UI
   activeTab: ActiveTabType;
@@ -117,7 +127,8 @@ export interface AppState {
   duelPinCoords: [number, number] | null;
   setDuelPinCoords: (coords: [number, number] | null) => void;
   duelStats: DuelStats;
-  recordDuelFinish: (winnerId: string | 'draw', myPlayerId: string, myScore: number) => void;
+  botStats: BotStats;
+  recordDuelFinish: (winnerId: string | 'draw', myPlayerId: string, myScore: number, isBotGame?: boolean) => void;
 
   // Gamification, Category Mastery & Badges
   avatarIcon: string;
@@ -174,7 +185,8 @@ function saveStatsToLocalStorage(state: AppState) {
       unlockedTitles: state.unlockedTitles,
       categoryMasteryProgress: state.categoryMasteryProgress,
       missedItems: state.missedItems,
-      duelStats: state.duelStats
+      duelStats: state.duelStats,
+      botStats: state.botStats
     };
     localStorage.setItem('kpss3d_user_stats', JSON.stringify(payload));
   } catch (e) {
@@ -239,6 +251,21 @@ function processBadgeEvaluation(
     // Track Passes and Gates
     if (cat === 'Geçitler' || cat === 'Sınır Kapıları') {
       newProgress['PassesAndGates'] = (newProgress['PassesAndGates'] || 0) + 1;
+    }
+
+    // Track Plateaus and Plains
+    if (cat === 'Platolar & Ovalar' || cat === 'Platolar' || cat === 'Ovalar') {
+      newProgress['PlateausPlains'] = (newProgress['PlateausPlains'] || 0) + 1;
+    }
+
+    // Track Karstic and Coastal
+    if (cat === 'Karstik & Kıyı' || cat === 'Kıyı Şekilleri' || cat === 'Karstik Şekiller') {
+      newProgress['KarsticCoastal'] = (newProgress['KarsticCoastal'] || 0) + 1;
+    }
+
+    // Track Volcanic and Glacial
+    if (cat === 'Volkanizma & Buzul' || cat === 'Buzul Şekilleri' || cat === 'Volkanik Oluşumlar') {
+      newProgress['VolcanicGlacial'] = (newProgress['VolcanicGlacial'] || 0) + 1;
     }
 
     // Track Blind Map Mode
@@ -463,6 +490,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     duelStreak: 0,
     bestDuelStreak: 0
   },
+  botStats: getStoredStatsFromLocalStorage().botStats || {
+    botWins: 0,
+    botLosses: 0,
+    botDraws: 0,
+    totalBotDuelsPlayed: 0,
+    botScore: 0,
+    botStreak: 0,
+    bestBotStreak: 0
+  },
 
   // Gamification, Category Mastery & Badge State
   avatarIcon: getStoredStatsFromLocalStorage().avatarIcon || '🐣',
@@ -541,6 +577,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         duelScore: 0,
         duelStreak: 0,
         bestDuelStreak: 0
+      },
+      botStats: {
+        botWins: 0,
+        botLosses: 0,
+        botDraws: 0,
+        totalBotDuelsPlayed: 0,
+        botScore: 0,
+        botStreak: 0,
+        bestBotStreak: 0
       }
     });
     saveStatsToLocalStorage(get());
@@ -598,6 +643,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         duelScore: 0,
         duelStreak: 0,
         bestDuelStreak: 0
+      },
+      botStats: {
+        botWins: 0,
+        botLosses: 0,
+        botDraws: 0,
+        totalBotDuelsPlayed: 0,
+        botScore: 0,
+        botStreak: 0,
+        bestBotStreak: 0
       }
     });
   },
@@ -607,60 +661,113 @@ export const useAppStore = create<AppState>((set, get) => ({
     saveStatsToLocalStorage(get());
   },
 
-  recordDuelFinish: (winnerId, myPlayerId, myScore) => {
+  recordDuelFinish: (winnerId, myPlayerId, myScore, isBotGame) => {
     const state = get();
     const isWin = winnerId === myPlayerId;
     const isDraw = winnerId === 'draw';
     const isLoss = !isWin && !isDraw;
+    const isBot = isBotGame !== undefined ? isBotGame : !!(state.activeDuelSession?.player2?.isBot || state.activeDuelSession?.player1?.isBot);
 
-    const newWins = state.duelStats.duelWins + (isWin ? 1 : 0);
-    const newLosses = state.duelStats.duelLosses + (isLoss ? 1 : 0);
-    const newDraws = state.duelStats.duelDraws + (isDraw ? 1 : 0);
-    const newTotal = state.duelStats.totalDuelsPlayed + 1;
-    const newScore = state.duelStats.duelScore + myScore;
-    const newStreak = isWin ? state.duelStats.duelStreak + 1 : 0;
-    const newBestStreak = Math.max(state.duelStats.bestDuelStreak, newStreak);
-
-    const updatedDuelStats: DuelStats = {
-      duelWins: newWins,
-      duelLosses: newLosses,
-      duelDraws: newDraws,
-      totalDuelsPlayed: newTotal,
-      duelScore: newScore,
-      duelStreak: newStreak,
-      bestDuelStreak: newBestStreak
-    };
-
-    // Check duel badges
     const newBadges = [...state.unlockedBadges];
     let newlyUnlockedBadge = state.latestUnlockedBadge;
 
-    if (!newBadges.includes('Arena Çaylağı') && newTotal >= 1) {
-      newBadges.push('Arena Çaylağı');
-      newlyUnlockedBadge = { name: 'Arena Çaylağı', icon: '⚔️', desc: 'İlk canlı 1v1 düellonu tamamladın!' };
-    }
-    if (!newBadges.includes('1v1 Gladyatör') && newWins >= 3) {
-      newBadges.push('1v1 Gladyatör');
-      newlyUnlockedBadge = { name: '1v1 Gladyatör', icon: '🛡️', desc: 'Düellolarda 3 zafer kazandın!' };
-    }
-    if (!newBadges.includes('Düello Şampiyonu') && newWins >= 10) {
-      newBadges.push('Düello Şampiyonu');
-      newlyUnlockedBadge = { name: 'Düello Şampiyonu', icon: '👑', desc: '10 düello zaferiyle KPSS zirvesine oturdun!' };
-    }
-    if (!newBadges.includes('Yenilmez Fatih') && newStreak >= 3) {
-      newBadges.push('Yenilmez Fatih');
-      newlyUnlockedBadge = { name: 'Yenilmez Fatih', icon: '🏆', desc: 'Üst üste 3 düello maçı kazandın!' };
-    }
-    if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 8) {
-      newBadges.push('Efsanevi Coğrafyacı');
-      newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '8 rozetle efsanevi prestij seviyesine ulaştın!' };
-    }
+    if (isBot) {
+      // Handle Bot Match statistics & separate achievements
+      const newWins = state.botStats.botWins + (isWin ? 1 : 0);
+      const newLosses = state.botStats.botLosses + (isLoss ? 1 : 0);
+      const newDraws = state.botStats.botDraws + (isDraw ? 1 : 0);
+      const newTotal = state.botStats.totalBotDuelsPlayed + 1;
+      const newScore = state.botStats.botScore + myScore;
+      const newStreak = isWin ? state.botStats.botStreak + 1 : 0;
+      const newBestStreak = Math.max(state.botStats.bestBotStreak, newStreak);
 
-    set({
-      duelStats: updatedDuelStats,
-      unlockedBadges: newBadges,
-      latestUnlockedBadge: newlyUnlockedBadge
-    });
+      const updatedBotStats: BotStats = {
+        botWins: newWins,
+        botLosses: newLosses,
+        botDraws: newDraws,
+        totalBotDuelsPlayed: newTotal,
+        botScore: newScore,
+        botStreak: newStreak,
+        bestBotStreak: newBestStreak
+      };
+
+      if (!newBadges.includes('Yapay Zeka Çırağı') && newWins >= 1) {
+        newBadges.push('Yapay Zeka Çırağı');
+        newlyUnlockedBadge = { name: 'Yapay Zeka Çırağı', icon: '🤖', desc: 'Yapay zekaya karşı ilk zaferini kazandın!' };
+      }
+      if (!newBadges.includes('Turing Ustası') && newWins >= 5) {
+        newBadges.push('Turing Ustası');
+        newlyUnlockedBadge = { name: 'Turing Ustası', icon: '🧠', desc: 'Yapay zekaya karşı 5 zaferle hızını kanıtladın!' };
+      }
+      if (!newBadges.includes('Yapay Zeka Mat Eden') && newWins >= 10) {
+        newBadges.push('Yapay Zeka Mat Eden');
+        newlyUnlockedBadge = { name: 'Yapay Zeka Mat Eden', icon: '⚡', desc: 'Yapay zekayı 10 kez mat ettin!' };
+      }
+      if (!newBadges.includes('Siber Antrenör') && newWins >= 20) {
+        newBadges.push('Siber Antrenör');
+        newlyUnlockedBadge = { name: 'Siber Antrenör', icon: '🚀', desc: 'Yapay zekaya karşı 20 zaferle antrenman ustası oldun!' };
+      }
+      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 8) {
+        newBadges.push('Efsanevi Coğrafyacı');
+        newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '8 rozetle efsanevi prestij seviyesine ulaştın!' };
+      }
+
+      set({
+        botStats: updatedBotStats,
+        unlockedBadges: newBadges,
+        latestUnlockedBadge: newlyUnlockedBadge
+      });
+    } else {
+      // Handle Real Player 1v1 PvP Live Duel statistics & achievements
+      const newWins = state.duelStats.duelWins + (isWin ? 1 : 0);
+      const newLosses = state.duelStats.duelLosses + (isLoss ? 1 : 0);
+      const newDraws = state.duelStats.duelDraws + (isDraw ? 1 : 0);
+      const newTotal = state.duelStats.totalDuelsPlayed + 1;
+      const newScore = state.duelStats.duelScore + myScore;
+      const newStreak = isWin ? state.duelStats.duelStreak + 1 : 0;
+      const newBestStreak = Math.max(state.duelStats.bestDuelStreak, newStreak);
+
+      const updatedDuelStats: DuelStats = {
+        duelWins: newWins,
+        duelLosses: newLosses,
+        duelDraws: newDraws,
+        totalDuelsPlayed: newTotal,
+        duelScore: newScore,
+        duelStreak: newStreak,
+        bestDuelStreak: newBestStreak
+      };
+
+      if (!newBadges.includes('Arena Çaylağı') && newTotal >= 1) {
+        newBadges.push('Arena Çaylağı');
+        newlyUnlockedBadge = { name: 'Arena Çaylağı', icon: '⚔️', desc: 'İlk canlı 1v1 gerçek rakip düellonu tamamladın!' };
+      }
+      if (!newBadges.includes('1v1 Gladyatör') && newWins >= 3) {
+        newBadges.push('1v1 Gladyatör');
+        newlyUnlockedBadge = { name: '1v1 Gladyatör', icon: '🛡️', desc: 'Canlı düellolarda gerçek rakiplere karşı 3 zafer kazandın!' };
+      }
+      if (!newBadges.includes('Düello Şampiyonu') && newWins >= 10) {
+        newBadges.push('Düello Şampiyonu');
+        newlyUnlockedBadge = { name: 'Düello Şampiyonu', icon: '👑', desc: '10 canlı düello zaferiyle KPSS arenasında zirveye oturdun!' };
+      }
+      if (!newBadges.includes('Tahtın Sahibi') && newWins >= 25) {
+        newBadges.push('Tahtın Sahibi');
+        newlyUnlockedBadge = { name: 'Tahtın Sahibi', icon: '🏆', desc: '25 canlı düello zaferiyle mutlak arena efsanesi oldun!' };
+      }
+      if (!newBadges.includes('Yenilmez Fatih') && newStreak >= 3) {
+        newBadges.push('Yenilmez Fatih');
+        newlyUnlockedBadge = { name: 'Yenilmez Fatih', icon: '🔥', desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın!' };
+      }
+      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 8) {
+        newBadges.push('Efsanevi Coğrafyacı');
+        newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '8 rozetle efsanevi prestij seviyesine ulaştın!' };
+      }
+
+      set({
+        duelStats: updatedDuelStats,
+        unlockedBadges: newBadges,
+        latestUnlockedBadge: newlyUnlockedBadge
+      });
+    }
 
     saveStatsToLocalStorage(get());
   },

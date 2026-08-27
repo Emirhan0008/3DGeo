@@ -45,6 +45,7 @@ export default function StatsModal() {
     pinGuessCount,
     missedItems,
     duelStats,
+    botStats,
     flyToCoords,
     setActiveTab,
     isBlindMapMode,
@@ -55,6 +56,7 @@ export default function StatsModal() {
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'regions' | 'weakspots' | 'duel_stats' | 'ai_report'>('overview');
+  const [badgeFilter, setBadgeFilter] = useState<'all' | 'bot' | 'pvp' | 'geo'>('all');
 
   const accuracyPct = totalQuestionsAnswered > 0
     ? Math.round((correctAnswersCount / totalQuestionsAnswered) * 100)
@@ -66,6 +68,10 @@ export default function StatsModal() {
 
   const duelWinRate = duelStats.totalDuelsPlayed > 0
     ? Math.round((duelStats.duelWins / duelStats.totalDuelsPlayed) * 100)
+    : 0;
+
+  const botWinRate = botStats && botStats.totalBotDuelsPlayed > 0
+    ? Math.round((botStats.botWins / botStats.totalBotDuelsPlayed) * 100)
     : 0;
 
   // Determine user competence rank
@@ -365,59 +371,122 @@ export default function StatsModal() {
 
       {/* SUB-TAB 2: 1v1 DUEL STATS */}
       {activeSubTab === 'duel_stats' && (
-        <div className="space-y-3 animate-in fade-in duration-200">
-          <div className="p-3 bg-gradient-to-r from-rose-950/60 via-[#09090b] to-indigo-950/60 border border-rose-500/30 rounded-xl flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AvatarWithBadgeFrame 
-                rumuz="Sen"
-                unlockedBadges={unlockedBadges}
-                duelWins={duelStats.duelWins}
-                avatarIcon={avatarIcon}
-                avatarBg={avatarBg}
-                equippedTitle={equippedTitle}
-                size="lg"
-              />
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300">1v1 Canlı Düello Karnesi</span>
-                <div className="font-extrabold text-sm sm:text-base text-white mt-0.5 flex items-center gap-2">
-                  <span>{duelStats.duelWins} Galibiyet</span>
-                  <span className="text-slate-400 text-xs">/ {duelStats.duelLosses} Mağlubiyet</span>
-                  {duelStats.duelDraws > 0 && <span className="text-amber-400 text-xs">/ {duelStats.duelDraws} Berabere</span>}
+        <div className="space-y-3.5 animate-in fade-in duration-200">
+          {/* Card 1: Live PvP 1v1 Düello Karnesi */}
+          <div className="p-3 bg-gradient-to-r from-rose-950/60 via-[#09090b] to-indigo-950/60 border border-rose-500/40 rounded-xl space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AvatarWithBadgeFrame 
+                  rumuz="Sen"
+                  unlockedBadges={unlockedBadges}
+                  duelWins={duelStats.duelWins}
+                  avatarIcon={avatarIcon}
+                  avatarBg={avatarBg}
+                  equippedTitle={equippedTitle}
+                  size="md"
+                />
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-500/20 px-2 py-0.5 rounded-full border border-rose-500/30">
+                      ⚔️ CANLI GERÇEK OYUNCU (PVP) DÜELLO
+                    </span>
+                  </div>
+                  <div className="font-extrabold text-sm sm:text-base text-white mt-1 flex items-center gap-2">
+                    <span>{duelStats.duelWins} Galibiyet</span>
+                    <span className="text-slate-400 text-xs">/ {duelStats.duelLosses} Mağlubiyet</span>
+                    {duelStats.duelDraws > 0 && <span className="text-amber-400 text-xs">/ {duelStats.duelDraws} Berabere</span>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <div className="text-xs font-black text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                  %{duelWinRate} Kazanma
                 </div>
               </div>
             </div>
 
-            <div className="text-right">
-              <div className="text-xs font-black text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                %{duelWinRate} Kazanma
+            {/* Live PvP Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Swords className="w-3.5 h-3.5 text-rose-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">Canlı Maç</span>
+                <div className="font-black text-base text-white">{duelStats.totalDuelsPlayed}</div>
+              </div>
+
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Trophy className="w-3.5 h-3.5 text-amber-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">PvP Puanı</span>
+                <div className="font-black text-base text-amber-300">{duelStats.duelScore}</div>
+              </div>
+
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Flame className="w-3.5 h-3.5 text-orange-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">PvP Seri</span>
+                <div className="font-black text-base text-orange-400">{duelStats.duelStreak} 🔥</div>
+              </div>
+
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Crown className="w-3.5 h-3.5 text-yellow-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">En İyi PvP Seri</span>
+                <div className="font-black text-base text-yellow-400">{duelStats.bestDuelStreak} 👑</div>
               </div>
             </div>
           </div>
 
-          {/* Duel Details Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
-              <Swords className="w-4 h-4 text-rose-400 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">Toplam Düello</span>
-              <div className="font-black text-lg text-white">{duelStats.totalDuelsPlayed}</div>
+          {/* Card 2: AI Bot Antrenman Arenası Karnesi */}
+          <div className="p-3 bg-gradient-to-r from-indigo-950/60 via-[#09090b] to-purple-950/60 border border-indigo-500/40 rounded-xl space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-400/50 flex items-center justify-center text-xl shrink-0">
+                  🤖
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30">
+                      🤖 YAPAY ZEKA (AI) BOT ANTRENMANI
+                    </span>
+                  </div>
+                  <div className="font-extrabold text-sm sm:text-base text-white mt-1 flex items-center gap-2">
+                    <span>{botStats?.botWins || 0} Galibiyet</span>
+                    <span className="text-slate-400 text-xs">/ {botStats?.botLosses || 0} Mağlubiyet</span>
+                    {(botStats?.botDraws || 0) > 0 && <span className="text-amber-400 text-xs">/ {botStats?.botDraws} Berabere</span>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <div className="text-xs font-black text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-lg border border-indigo-500/30">
+                  %{botWinRate} Kazanma
+                </div>
+              </div>
             </div>
 
-            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
-              <Trophy className="w-4 h-4 text-amber-400 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">Düello Puanı</span>
-              <div className="font-black text-lg text-amber-300">{duelStats.duelScore}</div>
-            </div>
+            {/* AI Bot Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Bot className="w-3.5 h-3.5 text-indigo-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">Bot Maçı</span>
+                <div className="font-black text-base text-white">{botStats?.totalBotDuelsPlayed || 0}</div>
+              </div>
 
-            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
-              <Flame className="w-4 h-4 text-orange-400 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">Galibiyet Serisi</span>
-              <div className="font-black text-lg text-orange-400">{duelStats.duelStreak} 🔥</div>
-            </div>
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <BrainCircuit className="w-3.5 h-3.5 text-purple-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">Bot Puanı</span>
+                <div className="font-black text-base text-purple-300">{botStats?.botScore || 0}</div>
+              </div>
 
-            <div className="p-2.5 bg-white/5 border border-white/10 rounded-xl">
-              <Crown className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-              <span className="text-[9px] uppercase font-bold text-slate-400">En İyi Seri</span>
-              <div className="font-black text-lg text-yellow-400">{duelStats.bestDuelStreak} 👑</div>
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Flame className="w-3.5 h-3.5 text-amber-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">Bot Seri</span>
+                <div className="font-black text-base text-amber-400">{botStats?.botStreak || 0} 🔥</div>
+              </div>
+
+              <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400 mx-auto mb-1" />
+                <span className="text-[9px] uppercase font-bold text-slate-400">En İyi Bot Seri</span>
+                <div className="font-black text-base text-cyan-300">{botStats?.bestBotStreak || 0} ⚡</div>
+              </div>
             </div>
           </div>
         </div>
@@ -589,7 +658,7 @@ export default function StatsModal() {
 
       {/* Badges & Category Mastery Section */}
       <div className="mt-4 pt-3.5 border-t border-white/10 space-y-2.5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <h3 className="font-extrabold text-xs uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
             <Award className="w-4 h-4 text-amber-400" />
             <span>KATEGORİ UZMANLIK ROZETLERİ &amp; BAŞARIMLAR ({unlockedBadges.length}/{ALL_BADGES.length})</span>
@@ -600,8 +669,60 @@ export default function StatsModal() {
           </span>
         </div>
 
+        {/* Badge Category Filter Pills */}
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[11px]">
+          <button
+            onClick={() => setBadgeFilter('all')}
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap ${
+              badgeFilter === 'all'
+                ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            Tümü ({ALL_BADGES.length})
+          </button>
+
+          <button
+            onClick={() => setBadgeFilter('bot')}
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+              badgeFilter === 'bot'
+                ? 'bg-indigo-600 text-white shadow-md font-black'
+                : 'bg-white/5 text-slate-400 hover:text-indigo-300 hover:bg-white/10'
+            }`}
+          >
+            <span>🤖 Yapay Zeka ({ALL_BADGES.filter(b => b.category === 'Yapay Zeka Arenası').length})</span>
+          </button>
+
+          <button
+            onClick={() => setBadgeFilter('pvp')}
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+              badgeFilter === 'pvp'
+                ? 'bg-rose-600 text-white shadow-md font-black'
+                : 'bg-white/5 text-slate-400 hover:text-rose-300 hover:bg-white/10'
+            }`}
+          >
+            <span>⚔️ 1v1 Canlı Düello ({ALL_BADGES.filter(b => b.category === 'Canlı 1v1 Düello').length})</span>
+          </button>
+
+          <button
+            onClick={() => setBadgeFilter('geo')}
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+              badgeFilter === 'geo'
+                ? 'bg-emerald-600 text-white shadow-md font-black'
+                : 'bg-white/5 text-slate-400 hover:text-emerald-300 hover:bg-white/10'
+            }`}
+          >
+            <span>🗺️ Coğrafya &amp; Bölge ({ALL_BADGES.filter(b => b.category !== 'Yapay Zeka Arenası' && b.category !== 'Canlı 1v1 Düello').length})</span>
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {ALL_BADGES.map((badge) => {
+          {ALL_BADGES.filter((badge) => {
+            if (badgeFilter === 'bot') return badge.category === 'Yapay Zeka Arenası';
+            if (badgeFilter === 'pvp') return badge.category === 'Canlı 1v1 Düello';
+            if (badgeFilter === 'geo') return badge.category !== 'Yapay Zeka Arenası' && badge.category !== 'Canlı 1v1 Düello';
+            return true;
+          }).map((badge) => {
             const isUnlocked = unlockedBadges.includes(badge.name);
             const currentCount = (categoryMasteryProgress && categoryMasteryProgress[badge.trackerKey]) || 0;
             const targetCount = badge.targetCount || 1;

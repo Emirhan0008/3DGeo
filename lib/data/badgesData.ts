@@ -199,6 +199,24 @@ export const ALL_TITLES: UserTitle[] = [
     requiredMetricText: 'Sınır Kapıları & Geçitlerde 3 doğru'
   },
   {
+    id: 'bot_avcisi_unvan',
+    name: 'Yapay Zeka Mat Eden',
+    icon: '🤖',
+    tier: 'silver',
+    desc: 'Yapay Zeka Coğrafya Botunu antrenman arenasında defalarca alt eden usta.',
+    requiredBadge: 'Yapay Zeka Mat Eden',
+    requiredMetricText: 'Bot Arenasında 10 Zafer Kazan'
+  },
+  {
+    id: 'turing_ustasi_unvan',
+    name: 'Turing Fatihi',
+    icon: '🧠',
+    tier: 'gold',
+    desc: 'Algoritmik hız ve bilgi refleksinde yapay zekayı geride bırakan dahi.',
+    requiredBadge: 'Turing Ustası',
+    requiredMetricText: 'Bot Arenasında 5 Zafer Kazan'
+  },
+  {
     id: 'dilsiz_harita_dehasi',
     name: 'Dilsiz Harita Dehası',
     icon: '🙈',
@@ -214,7 +232,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'gold',
     desc: 'Canlı 1v1 coğrafya düellolarında rakiplerini alt eden savaşçı.',
     requiredBadge: '1v1 Gladyatör',
-    requiredMetricText: '3 Düello zaferi kazan'
+    requiredMetricText: '3 Canlı Düello zaferi kazan'
   },
   {
     id: 'seri_canavari_unvan',
@@ -230,9 +248,18 @@ export const ALL_TITLES: UserTitle[] = [
     name: 'Arena Şampiyonu',
     icon: '👑',
     tier: 'diamond',
-    desc: '10 düello zaferiyle KPSS coğrafya arenasında tahta oturan hükümdar.',
+    desc: '10 canlı düello zaferiyle KPSS coğrafya arenasında tahta oturan hükümdar.',
     requiredBadge: 'Düello Şampiyonu',
-    requiredMetricText: '10 Düello zaferi kazan'
+    requiredMetricText: '10 Canlı Düello zaferi kazan'
+  },
+  {
+    id: 'tahtin_sahibi',
+    name: 'Arena Efsanesi',
+    icon: '⚔️',
+    tier: 'diamond',
+    desc: '25 canlı PVP düello zaferiyle kırılması güç bir rekor kıran efsane.',
+    requiredBadge: 'Tahtın Sahibi',
+    requiredMetricText: '25 Canlı Düello zaferi kazan'
   },
   {
     id: 'kpss_sampiyonu',
@@ -360,6 +387,45 @@ export const ALL_BADGES: Badge[] = [
     trackerKey: 'PassesAndGates',
     associatedTitle: 'Sınır & Geçit Bekçisi'
   },
+
+  // --- JEOMORFOLOJİ & YER ŞEKİLLERİ ÖZEL ROZETLERİ ---
+  {
+    id: 'plato_ova_fatihi',
+    name: 'Platolar & Ovalar Hakimi',
+    icon: '🗺️',
+    category: 'Jeomorfoloji',
+    tier: 'silver',
+    tierLevel: 2,
+    desc: 'Tabaka düzlüğü, karstik, lav ve aşınım platoları ile delta ve tektonik ovaları eksiksiz bildin.',
+    targetCount: 3,
+    reqText: 'Platolar & Ovalar sorularında 3 doğru cevap ver.',
+    trackerKey: 'PlateausPlains'
+  },
+  {
+    id: 'karstik_sekiller_ustasi',
+    name: 'Karstik & Kıyı Şekilleri Uzmanı',
+    icon: '🏖️',
+    category: 'Jeomorfoloji',
+    tier: 'silver',
+    tierLevel: 2,
+    desc: 'Lapya-dolin-polye dizilimi, obruklar, mağaralar, travertenler ve falez/tombolo yapılarını bildin.',
+    targetCount: 3,
+    reqText: 'Karstik & Kıyı kategorisinde 3 doğru cevap ver.',
+    trackerKey: 'KarsticCoastal'
+  },
+  {
+    id: 'volkanik_sekiller_ustasi',
+    name: 'Volkanizma & Buzul Bilgesi',
+    icon: '🌋',
+    category: 'Jeomorfoloji',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Maarlar, kalderalar, genç volkan konileri ve yüksek dağlardaki aktüel/sirk buzullarını çözdün.',
+    targetCount: 3,
+    reqText: 'Volkanik & Buzul oluşum sorularında 3 doğru cevap ver.',
+    trackerKey: 'VolcanicGlacial'
+  },
+
   {
     id: 'dilsiz_harita_kasirgasi',
     name: '3D Dilsiz Harita Kasırgası',
@@ -428,29 +494,81 @@ export const ALL_BADGES: Badge[] = [
     associatedTitle: 'KPSS Coğrafya Şampiyonu'
   },
 
-  // --- 1v1 CANLI DÜELLO & REKABET ROZETLERİ (KADEMELİ 1-4) ---
+  // --- YAPAY ZEKA (BOT) ANTRENMAN ARENASI BAŞARIMLARI (ÖZEL) ---
+  {
+    id: 'bot_caylagi',
+    name: 'Yapay Zeka Çırağı',
+    icon: '🤖',
+    category: 'Yapay Zeka Arenası',
+    tier: 'bronze',
+    tierLevel: 1,
+    desc: 'Yapay zeka antrenman modunda ilk maçını tamamlayıp galibiyet kazandın.',
+    targetCount: 1,
+    reqText: 'Yapay zekaya karşı 1 galibiyet al.',
+    trackerKey: 'BotWins1'
+  },
+  {
+    id: 'bot_kiran',
+    name: 'Turing Ustası',
+    icon: '🧠',
+    category: 'Yapay Zeka Arenası',
+    tier: 'silver',
+    tierLevel: 2,
+    desc: 'Yapay zeka botuna karşı 5 maç kazanarak hızını ve bilgini kanıtladın.',
+    targetCount: 5,
+    reqText: 'Yapay zekaya karşı 5 galibiyet al.',
+    trackerKey: 'BotWins5',
+    associatedTitle: 'Turing Fatihi'
+  },
+  {
+    id: 'bot_mat_eden',
+    name: 'Yapay Zeka Mat Eden',
+    icon: '⚡',
+    category: 'Yapay Zeka Arenası',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Yapay zeka botuna karşı 10 galibiyetle antrenman arenasını fethettin.',
+    targetCount: 10,
+    reqText: 'Yapay zekaya karşı 10 galibiyet al.',
+    trackerKey: 'BotWins10',
+    associatedTitle: 'Yapay Zeka Mat Eden'
+  },
+  {
+    id: 'siber_antrenor',
+    name: 'Siber Antrenör',
+    icon: '🚀',
+    category: 'Yapay Zeka Arenası',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Yapay zeka botuna karşı 20 maç kazanarak kusursuz antrenman seviyesine ulaştın.',
+    targetCount: 20,
+    reqText: 'Yapay zekaya karşı 20 galibiyet al.',
+    trackerKey: 'BotWins20'
+  },
+
+  // --- 1v1 CANLI GERÇEK OYUNCU DÜELLO ROZETLERİ (KADEMELİ 1-4) ---
   {
     id: 'arena_caylagi',
     name: 'Arena Çaylağı',
     icon: '⚔️',
-    category: 'Düello Başarımı',
+    category: 'Canlı 1v1 Düello',
     tier: 'bronze',
     tierLevel: 1,
-    desc: 'İlk 1v1 canlı coğrafya düellona katıldın.',
+    desc: 'İlk canlı 1v1 gerçek rakip coğrafya düellona katıldın.',
     targetCount: 1,
-    reqText: 'En az 1 düelloyu tamamla.',
+    reqText: 'En az 1 canlı düelloyu tamamla.',
     trackerKey: 'DuelPlayed1'
   },
   {
     id: 'duello_gladyatoru',
     name: '1v1 Gladyatör',
     icon: '🛡️',
-    category: 'Düello Başarımı',
+    category: 'Canlı 1v1 Düello',
     tier: 'gold',
     tierLevel: 3,
-    desc: 'Canlı düellolarda 3 zafer kazanarak rüştünü ispatladın.',
+    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 3 zafer kazandın.',
     targetCount: 3,
-    reqText: 'Düellolarda 3 maç kazan.',
+    reqText: 'Canlı düellolarda 3 maç kazan.',
     trackerKey: 'DuelWins3',
     associatedTitle: '1v1 Gladyatör'
   },
@@ -458,14 +576,27 @@ export const ALL_BADGES: Badge[] = [
     id: 'duello_sampiyonu',
     name: 'Düello Şampiyonu',
     icon: '👑',
-    category: 'Düello Başarımı',
+    category: 'Canlı 1v1 Düello',
     tier: 'diamond',
     tierLevel: 4,
-    desc: '10 düello zaferiyle KPSS coğrafya arenasında tahta oturdun.',
+    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 10 zaferle arenada tahta oturdun.',
     targetCount: 10,
-    reqText: 'Düellolarda 10 maç kazan.',
+    reqText: 'Canlı düellolarda 10 maç kazan.',
     trackerKey: 'DuelWins10',
     associatedTitle: 'Arena Şampiyonu'
+  },
+  {
+    id: 'tahtin_sahibi',
+    name: 'Tahtın Sahibi',
+    icon: '🏆',
+    category: 'Canlı 1v1 Düello',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Canlı 1v1 düellolarda 25 zafer kazanarak mutlak arena efsanesi oldun.',
+    targetCount: 25,
+    reqText: 'Canlı düellolarda 25 maç kazan.',
+    trackerKey: 'DuelWins25',
+    associatedTitle: 'Arena Efsanesi'
   },
   {
     id: 'simsek_refleks',
@@ -482,13 +613,13 @@ export const ALL_BADGES: Badge[] = [
   {
     id: 'yenilmez_fatih',
     name: 'Yenilmez Fatih',
-    icon: '🏆',
-    category: 'Düello Serisi',
+    icon: '🔥',
+    category: 'Canlı 1v1 Düello',
     tier: 'gold',
     tierLevel: 3,
-    desc: 'Düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın.',
+    desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın.',
     targetCount: 3,
-    reqText: 'Üst üste 3 düello maçı kazan.',
+    reqText: 'Üst üste 3 canlı düello maçı kazan.',
     trackerKey: 'DuelStreak3'
   },
   {

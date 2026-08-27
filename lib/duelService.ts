@@ -195,7 +195,20 @@ export function generateRoomCode(): string {
 }
 
 /**
+ * Fisher-Yates array shuffling helper for strictly randomized questions
+ */
+export function shuffleArray<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+/**
  * Builds question IDs list based on duel type, category filter and question count.
+ * Ensures questions are strictly randomized on every match.
  */
 export function prepareDuelQuestions(categoryFilter: string, questionCount: number, duelType: DuelType = 'pin_map'): string[] {
   if (duelType === 'kpss_test') {
@@ -203,10 +216,11 @@ export function prepareDuelQuestions(categoryFilter: string, questionCount: numb
     if (!pool || pool.length === 0) {
       pool = MULTIPLE_CHOICE_QUESTIONS;
     }
+    const shuffled = shuffleArray([...pool]);
     const result: string[] = [];
     let idx = 0;
     while (result.length < questionCount) {
-      result.push(pool[idx % pool.length].id);
+      result.push(shuffled[idx % shuffled.length].id);
       idx++;
     }
     return result;
@@ -216,10 +230,11 @@ export function prepareDuelQuestions(categoryFilter: string, questionCount: numb
   if (!pool || pool.length === 0) {
     pool = PIN_GAME_QUESTIONS;
   }
+  const shuffled = shuffleArray([...pool]);
   const result: string[] = [];
   let idx = 0;
   while (result.length < questionCount) {
-    result.push(pool[idx % pool.length].id);
+    result.push(shuffled[idx % shuffled.length].id);
     idx++;
   }
   return result;
@@ -523,6 +538,125 @@ export async function joinPrivateDuelRoom(
     console.error('Join duel room error:', error);
     handleFirestoreError(error, OperationType.GET, 'duels');
     return { success: false, errorMsg: 'Odaya bağlanırken veritabanı hatası oluştu.' };
+  }
+}
+
+export interface WaitingRoomSuggestion {
+  id: string;
+  roomCode: string;
+  hostRumuz: string;
+  hostId: string;
+  duelType: DuelType;
+  questionCount: 10 | 20 | 30;
+  categoryFilter: string;
+  waitingDurationSec: number;
+  createdAt: string;
+}
+
+/**
+ * Discovers active waiting players across all modes & question counts,
+ * especially useful for suggesting matches when someone is waiting > 1 minute.
+ */
+export async function findCrossModeWaitingRooms(
+  excludePlayerId: string
+): Promise<WaitingRoomSuggestion[]> {
+  try {
+    const q = query(
+      collection(db, 'duels'),
+      where('mode', '==', 'quick'),
+      where('status', '==', 'waiting'),
+      limit(15)
+    );
+
+    const snap = await getDocs(q);
+    const now = Date.now();
+    const suggestions: WaitingRoomSuggestion[] = [];
+
+    for (const docSnap of snap.docs) {
+      const data = docSnap.data() as DuelSession;
+      if (!data || data.player1.id === excludePlayerId || data.player2) continue;
+
+      const lastHeartbeatTime = data.lastHeartbeat || (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
+      const ageSec = (now - lastHeartbeatTime) / 1000;
+      if (ageSec > 35) {
+        // Stale room
+        deleteDoc(doc(db, 'duels', data.id)).catch(() => {});
+        continue;
+      }
+
+      const createdTime = data.createdAt ? new Date(data.createdAt).getTime() : now;
+      const waitingSec = Math.max(0, Math.floor((now - createdTime) / 1000));
+
+      suggestions.push({
+        id: data.id,
+        roomCode: data.roomCode,
+        hostRumuz: data.player1.rumuz,
+        hostId: data.player1.id,
+        duelType: data.duelType || 'pin_map',
+        questionCount: data.questionCount || 10,
+        categoryFilter: data.categoryFilter || 'Genel',
+        waitingDurationSec: waitingSec,
+        createdAt: data.createdAt
+      });
+    }
+
+    // Sort by longest waiting first
+    return suggestions.sort((a, b) => b.waitingDurationSec - a.waitingDurationSec);
+  } catch (error) {
+    console.warn('Find cross mode waiting rooms error:', error);
+    return [];
+  }
+}
+
+/**
+ * Immediately joins a suggested waiting duel room across modes/question counts.
+ */
+export async function joinSuggestedDuelRoom(
+  duelId: string,
+  player: { id: string; rumuz: string; rumuzKey: string }
+): Promise<{ success: boolean; duel?: DuelSession; errorMsg?: string }> {
+  try {
+    const duelRef = doc(db, 'duels', duelId);
+    const duelSnap = await getDoc(duelRef);
+    if (!duelSnap.exists()) {
+      return { success: false, errorMsg: 'Önerilen oda artık mevcut değil veya kapandı.' };
+    }
+
+    const duelData = duelSnap.data() as DuelSession;
+    if (duelData.status !== 'waiting' || duelData.player2) {
+      return { success: false, errorMsg: 'Bu odaya başka bir oyuncu katıldı.' };
+    }
+
+    const now = Date.now();
+    const joiningPlayer: DuelPlayer = {
+      id: player.id,
+      rumuz: player.rumuz,
+      rumuzKey: player.rumuzKey,
+      isHost: false,
+      score: 0,
+      totalDistanceKm: 0,
+      currentGuess: null,
+      currentOptionAnswer: null,
+      isReady: true,
+      pingMs: 0
+    };
+
+    const updatedFields = {
+      player2: joiningPlayer,
+      status: 'starting',
+      roundStartTime: now + 8000,
+      lastHeartbeat: now,
+      updatedAt: new Date(now).toISOString()
+    };
+
+    await updateDoc(duelRef, updatedFields);
+    return {
+      success: true,
+      duel: { ...duelData, ...updatedFields } as DuelSession
+    };
+  } catch (error) {
+    console.error('Join suggested duel error:', error);
+    return { success: false, errorMsg: 'Önerilen maça bağlanırken hata oluştu.' };
   }
 }
 

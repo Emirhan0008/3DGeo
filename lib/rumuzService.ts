@@ -26,6 +26,15 @@ export interface RumuzProfileData {
     duelStreak: number;
     bestDuelStreak: number;
   };
+  botStats?: {
+    botWins: number;
+    botLosses: number;
+    botDraws: number;
+    totalBotDuelsPlayed: number;
+    botScore: number;
+    botStreak: number;
+    bestBotStreak: number;
+  };
   isBlindMapMode: boolean;
   regionalStats: Record<string, { correct: number; wrong: number }>;
   categoryStats: Record<string, { correct: number; wrong: number }>;
@@ -113,6 +122,15 @@ export async function saveRumuzProfile(
       duelScore: 0,
       duelStreak: 0,
       bestDuelStreak: 0
+    },
+    botStats: stats.botStats || {
+      botWins: 0,
+      botLosses: 0,
+      botDraws: 0,
+      totalBotDuelsPlayed: 0,
+      botScore: 0,
+      botStreak: 0,
+      bestBotStreak: 0
     },
     isBlindMapMode: !!stats.isBlindMapMode,
     regionalStats: stats.regionalStats || {},
