@@ -158,61 +158,66 @@ export default function DuelMode() {
       clearInterval(timer);
       clearInterval(suggInterval);
     };
-  }, [activeDuelSession?.id, activeDuelSession?.status, rumuz]);
+  }, [activeDuelSession, rumuz]);
 
   // Outside click listener: Double click outside duel UI triggers Exit Confirmation
+  // CRITICAL: Only active in KPSS Test mode. NEVER active in pin_map game (where user clicks the map to place pins)!
   useEffect(() => {
+    // If duel is active and it's a map duel, do NOT listen for outside clicks (map clicks are gameplay!)
+    if (activeDuelSession && activeDuelSession.duelType === 'pin_map') {
+      outsideClickRef.current = { count: 0, lastTime: 0 };
+      return;
+    }
+
     const isDuelActive = activeDuelSession && (
       activeDuelSession.status === 'in_progress' ||
       activeDuelSession.status === 'round_reveal' ||
       activeDuelSession.status === 'starting'
     );
 
-    if (!isDuelActive) {
-      outsideClickRef.current = { count: 0, lastTime: 0 };
-      return;
-    }
+    // Only attach pointerdown listener when in KPSS Test mode
+    if (isDuelActive && activeDuelSession.duelType === 'kpss_test') {
+      const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+        const target = e.target as HTMLElement | null;
+        if (!target) return;
 
-    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
+        // Check if click was inside duel card or HUD elements
+        const isInsideDuelUI = target.closest(
+          '#duel-active-hud, #duel-active-card, #duel-round-reveal-banner, #duel-exit-modal, button, input, a'
+        );
 
-      // Check if click was inside duel card or HUD elements
-      const isInsideDuelUI = target.closest(
-        '#duel-active-hud, #duel-active-card, #duel-round-reveal-banner, #duel-exit-modal, button, input, a'
-      );
-
-      if (isInsideDuelUI) {
-        outsideClickRef.current = { count: 0, lastTime: 0 };
-        return;
-      }
-
-      const now = Date.now();
-      const { count, lastTime } = outsideClickRef.current;
-
-      if (now - lastTime < 2800) {
-        const newCount = count + 1;
-        if (newCount >= 2) {
-          setShowExitConfirmModal(true);
-          setOutsideClickWarning(false);
+        if (isInsideDuelUI) {
           outsideClickRef.current = { count: 0, lastTime: 0 };
+          return;
+        }
+
+        const now = Date.now();
+        const { count, lastTime } = outsideClickRef.current;
+
+        if (now - lastTime < 2800) {
+          const newCount = count + 1;
+          if (newCount >= 2) {
+            setShowExitConfirmModal(true);
+            setOutsideClickWarning(false);
+            outsideClickRef.current = { count: 0, lastTime: 0 };
+          } else {
+            outsideClickRef.current = { count: newCount, lastTime: now };
+            setOutsideClickWarning(true);
+            setTimeout(() => setOutsideClickWarning(false), 2400);
+          }
         } else {
-          outsideClickRef.current = { count: newCount, lastTime: now };
+          outsideClickRef.current = { count: 1, lastTime: now };
           setOutsideClickWarning(true);
           setTimeout(() => setOutsideClickWarning(false), 2400);
         }
-      } else {
-        outsideClickRef.current = { count: 1, lastTime: now };
-        setOutsideClickWarning(true);
-        setTimeout(() => setOutsideClickWarning(false), 2400);
-      }
-    };
+      };
 
-    window.addEventListener('pointerdown', handlePointerDown);
-    return () => {
-      window.removeEventListener('pointerdown', handlePointerDown);
-    };
-  }, [activeDuelSession?.status]);
+      window.addEventListener('pointerdown', handlePointerDown);
+      return () => {
+        window.removeEventListener('pointerdown', handlePointerDown);
+      };
+    }
+  }, [activeDuelSession]);
 
   // Clean up waiting duel rooms on component unmount or browser tab close
   useEffect(() => {
@@ -1120,8 +1125,18 @@ export default function DuelMode() {
     const formattedWaiting = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 
     return (
-      <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div className="w-full max-w-md bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150 my-auto">
+      <div 
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowExitConfirmModal(true);
+          }
+        }}
+        className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto cursor-pointer"
+      >
+        <div 
+          onClick={(e) => e.stopPropagation()} 
+          className="w-full max-w-md bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150 my-auto cursor-default"
+        >
           <div className="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center mx-auto mb-3 animate-pulse">
             <Loader2 className="w-7 h-7 text-amber-400 animate-spin" />
           </div>
@@ -1597,9 +1612,20 @@ export default function DuelMode() {
     };
 
     return (
-      <div className="absolute inset-0 z-30 pointer-events-none flex flex-col justify-between p-2 sm:p-4">
+      <div 
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowExitConfirmModal(true);
+          }
+        }}
+        className="absolute inset-0 z-30 bg-slate-950/30 backdrop-blur-[2px] flex flex-col justify-between p-2 sm:p-4 cursor-pointer overflow-y-auto"
+      >
         {/* Top Floating Match Header */}
-        <div id="duel-active-hud" className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/80 rounded-2xl shadow-2xl p-2.5 text-white animate-in fade-in duration-150">
+        <div 
+          id="duel-active-hud" 
+          onClick={(e) => e.stopPropagation()}
+          className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/80 rounded-2xl shadow-2xl p-2.5 text-white animate-in fade-in duration-150 cursor-default"
+        >
           {/* Row 1: Kategori, Bölge & Tur */}
           <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -1625,7 +1651,7 @@ export default function DuelMode() {
             </div>
           </div>
 
-          {/* Row 2: Sen | 40s Timer | Rakip */}
+          {/* Row 2: Sen | 40s / Reveal Timer | Rakip */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <AvatarWithBadgeFrame 
@@ -1655,15 +1681,19 @@ export default function DuelMode() {
             {/* Timer */}
             <div className="flex flex-col items-center shrink-0 px-2">
               <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-black text-xs sm:text-sm shadow-lg ${
-                timeLeftSec <= 5
+                isReveal
+                  ? 'bg-amber-500/30 border-amber-400 text-amber-300 animate-pulse'
+                  : timeLeftSec <= 5
                   ? 'bg-rose-500/30 border-rose-400 text-rose-300 animate-ping'
                   : timeLeftSec <= 15
                   ? 'bg-amber-500/30 border-amber-400 text-amber-300'
                   : 'bg-indigo-500/30 border-indigo-400 text-indigo-300'
               }`}>
-                {timeLeftSec}s
+                {isReveal ? `${revealCountdown}s` : `${timeLeftSec}s`}
               </div>
-              <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Süre</span>
+              <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">
+                {isReveal ? 'Sonraki' : 'Süre'}
+              </span>
             </div>
 
             {/* Opponent */}
@@ -1692,7 +1722,11 @@ export default function DuelMode() {
         </div>
 
         {/* Center / Bottom: KPSS Question & Choice Options Card */}
-        <div id="duel-active-card" className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/60 rounded-2xl shadow-2xl p-3 sm:p-4 text-white my-auto animate-in slide-in-from-bottom-3 duration-200">
+        <div 
+          id="duel-active-card" 
+          onClick={(e) => e.stopPropagation()}
+          className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/60 rounded-2xl shadow-2xl p-3 sm:p-4 text-white my-auto animate-in slide-in-from-bottom-3 duration-200 cursor-default"
+        >
           <div className="font-extrabold text-xs sm:text-sm text-slate-100 leading-relaxed mb-3">
             {currentTestQ.questionText}
           </div>

@@ -973,15 +973,17 @@ function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
       roundIndex: duel.currentRound,
       questionId: currentQId || `q_${duel.currentRound}`,
       targetTitle: questionObj?.questionText || `Soru #${duel.currentRound + 1}`,
-      targetCoords: questionObj?.targetCoords || [35.0, 39.0],
-      targetCategory: questionObj?.category || duel.categoryFilter,
+      targetCoords: (questionObj?.targetCoords && Array.isArray(questionObj.targetCoords) && questionObj.targetCoords.length === 2)
+        ? questionObj.targetCoords
+        : [35.0, 39.0],
+      targetCategory: questionObj?.category || duel.categoryFilter || 'KPSS Coğrafya Testi',
       player1Guess: null,
       player2Guess: null,
       player1Points: p1Correct ? 1000 : 0,
       player2Points: p2Correct ? 1000 : 0,
       player1DistanceKm: 0,
       player2DistanceKm: 0,
-      options: questionObj?.options,
+      options: questionObj?.options ? [...questionObj.options] : ['A', 'B', 'C', 'D', 'E'],
       correctOptionIndex: correctIdx,
       player1SelectedOption: p1Opt,
       player2SelectedOption: p2Opt,
@@ -999,14 +1001,22 @@ function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
     roundIndex: duel.currentRound,
     questionId: currentQId || `q_${duel.currentRound}`,
     targetTitle: questionObj?.title || `Soru #${duel.currentRound + 1}`,
-    targetCoords: questionObj?.targetCoords || [35.0, 39.0],
-    targetCategory: questionObj?.category || duel.categoryFilter,
+    targetCoords: (questionObj?.targetCoords && Array.isArray(questionObj.targetCoords) && questionObj.targetCoords.length === 2)
+      ? questionObj.targetCoords
+      : [35.0, 39.0],
+    targetCategory: questionObj?.category || duel.categoryFilter || 'Harita İşaretleme',
     player1Guess: duel.player1.currentGuess || null,
     player2Guess: duel.player2?.currentGuess || null,
     player1Points: duel.player1.currentGuess?.pointsEarned || 0,
     player2Points: duel.player2?.currentGuess?.pointsEarned || 0,
     player1DistanceKm: duel.player1.currentGuess ? Math.round(duel.player1.currentGuess.distanceKm * 10) / 10 : 850,
-    player2DistanceKm: duel.player2?.currentGuess ? Math.round(duel.player2.currentGuess.distanceKm * 10) / 10 : 850
+    player2DistanceKm: duel.player2?.currentGuess ? Math.round(duel.player2.currentGuess.distanceKm * 10) / 10 : 850,
+    options: [],
+    correctOptionIndex: 0,
+    player1SelectedOption: null,
+    player2SelectedOption: null,
+    player1IsCorrect: false,
+    player2IsCorrect: false
   };
 
   const existingHistory = duel.roundHistory || [];
