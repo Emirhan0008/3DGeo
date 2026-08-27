@@ -44,6 +44,9 @@ const REGION_CENTERS: Record<string, { coords: [number, number]; zoom: number }>
   'Güneydoğu Anadolu': { coords: [39.5, 37.5], zoom: 7.2 },
 };
 
+// CARTO Basemaps API Key (removes watermark)
+const CARTO_API_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY || 'cb1_2agd_1_5de5cae01a980fd116b4e89b';
+
 // Reliable MapLibre Style Specifications that support both normal and Blind Map (Dilsiz Harita) modes
 const MAP_STYLE_CONFIGS: Record<MapStyleType, (isBlind: boolean) => maplibregl.StyleSpecification | string> = {
   topographic: (isBlind) => ({
@@ -54,14 +57,14 @@ const MAP_STYLE_CONFIGS: Record<MapStyleType, (isBlind: boolean) => maplibregl.S
         type: 'raster',
         tiles: [
           isBlind
-            ? 'https://a.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png'
-            : 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+            ? `https://a.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
+            : `https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
           isBlind
-            ? 'https://b.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png'
-            : 'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+            ? `https://b.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
+            : `https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`,
           isBlind
-            ? 'https://c.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png'
-            : 'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
+            ? `https://c.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
+            : `https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
         ],
         tileSize: 256,
         attribution: '&copy; CARTO &copy; OpenStreetMap',
@@ -86,7 +89,7 @@ const MAP_STYLE_CONFIGS: Record<MapStyleType, (isBlind: boolean) => maplibregl.S
         type: 'raster',
         tiles: [
           isBlind
-            ? 'https://a.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png'
+            ? `https://a.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
             : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
         ],
         tileSize: 256,
@@ -110,8 +113,8 @@ const MAP_STYLE_CONFIGS: Record<MapStyleType, (isBlind: boolean) => maplibregl.S
         type: 'raster',
         tiles: [
           isBlind
-            ? 'https://a.basemaps.cartocdn.com/rastertiles/dark_nolabels/{z}/{x}/{y}.png'
-            : 'https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png'
+            ? `https://a.basemaps.cartocdn.com/rastertiles/dark_nolabels/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
+            : `https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
         ],
         tileSize: 256,
         attribution: 'CARTO',
@@ -396,11 +399,11 @@ export default function MapContainer() {
         storeState.submitPinGuess(e.lngLat.lng, e.lngLat.lat);
       }
 
-      // 2. 1v1 Real-time Map Duel Guess
+      // 2. 1v1 Real-time Map Duel Guess (Only for map pin duels, not KPSS multiple choice test)
       if (storeState.activeTab === 'duel') {
         const session = storeState.activeDuelSession;
         const playerKey = storeState.activeDuelPlayerKey;
-        if (session && session.status === 'in_progress' && playerKey) {
+        if (session && session.status === 'in_progress' && playerKey && session.duelType !== 'kpss_test') {
           const currentPlayer = playerKey === 'player1' ? session.player1 : session.player2;
           if (currentPlayer && !currentPlayer.currentGuess) {
             const questions = getQuestionsByIds(session.questionIds);
