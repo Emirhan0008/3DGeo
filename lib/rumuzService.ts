@@ -1,5 +1,5 @@
 import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, limit, query, orderBy } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, limit, query } from 'firebase/firestore';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -14,52 +14,135 @@ export interface LeaderboardEntry {
   totalDuels: number;
   unlockedBadgesCount: number;
   accuracyPct: number;
+  isAnonymous?: boolean;
   updatedAt?: string;
   isCurrentUser?: boolean;
 }
 
 export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak' = 'score'): Promise<LeaderboardEntry[]> {
   try {
-    const rumuzesRef = collection(db, 'rumuzes');
-    let q;
-    if (sortBy === 'duels') {
-      q = query(rumuzesRef, orderBy('duelStats.duelWins', 'desc'), limit(50));
-    } else if (sortBy === 'streak') {
-      q = query(rumuzesRef, orderBy('streak', 'desc'), limit(50));
-    } else {
-      q = query(rumuzesRef, orderBy('score', 'desc'), limit(50));
+    const resultsMap = new Map<string, LeaderboardEntry>();
+
+    // 1. Fetch from rumuzes collection
+    try {
+      const rumuzesRef = collection(db, 'rumuzes');
+      const snap = await getDocs(query(rumuzesRef, limit(60)));
+      snap.forEach((docSnap) => {
+        const d = docSnap.data() as RumuzProfileData;
+        if (!d.rumuz) return;
+        const totalAnswers = d.totalQuestionsAnswered || 0;
+        const correct = d.correctAnswersCount || 0;
+        const accuracyPct = totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0;
+        const duelWins = d.duelStats?.duelWins || 0;
+        const totalDuels = d.duelStats?.totalDuelsPlayed || 0;
+        const key = d.rumuzKey || docSnap.id;
+
+        resultsMap.set(key, {
+          rank: 0,
+          rumuz: d.rumuz,
+          rumuzKey: key,
+          avatarIcon: d.avatarIcon || '🐣',
+          avatarBg: d.avatarBg || 'indigo_midnight',
+          equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
+          score: d.score || 0,
+          streak: d.streak || 0,
+          duelWins,
+          totalDuels,
+          unlockedBadgesCount: (d.unlockedBadges || []).length,
+          accuracyPct,
+          isAnonymous: !!d.isAnonymous,
+          updatedAt: d.updatedAt
+        });
+      });
+    } catch (e) {
+      console.warn('Rumuzes query error:', e);
     }
 
-    const snap = await getDocs(q);
-    const results: LeaderboardEntry[] = [];
+    // 2. Retroactive scan: Fetch duel_rooms to detect all players who ever played duels
+    try {
+      const duelRoomsRef = collection(db, 'duel_rooms');
+      const duelSnap = await getDocs(query(duelRoomsRef, limit(50)));
+      duelSnap.forEach((dDoc) => {
+        const data = dDoc.data();
+        const p1 = data.player1;
+        const p2 = data.player2;
 
-    snap.forEach((docSnap) => {
-      const d = docSnap.data() as RumuzProfileData;
-      if (!d.rumuz) return;
-      const totalAnswers = d.totalQuestionsAnswered || 0;
-      const correct = d.correctAnswersCount || 0;
-      const accuracyPct = totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0;
-      const duelWins = d.duelStats?.duelWins || 0;
-      const totalDuels = d.duelStats?.totalDuelsPlayed || 0;
-
-      results.push({
-        rank: 0,
-        rumuz: d.rumuz,
-        rumuzKey: d.rumuzKey || docSnap.id,
-        avatarIcon: d.avatarIcon || '🐣',
-        avatarBg: d.avatarBg || 'indigo_midnight',
-        equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
-        score: d.score || 0,
-        streak: d.streak || 0,
-        duelWins,
-        totalDuels,
-        unlockedBadgesCount: (d.unlockedBadges || []).length,
-        accuracyPct,
-        updatedAt: d.updatedAt
+        [p1, p2].forEach((p) => {
+          if (!p || !p.rumuz) return;
+          const pKey = p.rumuzKey || normalizeRumuzKey(p.rumuz);
+          const isWinner = data.winnerId === p.id;
+          
+          if (!resultsMap.has(pKey)) {
+            // New player discovered from past duel history!
+            resultsMap.set(pKey, {
+              rank: 0,
+              rumuz: p.rumuz,
+              rumuzKey: pKey,
+              avatarIcon: p.isBot ? '🤖' : '⚔️',
+              avatarBg: p.isBot ? 'emerald_forest' : 'gold_glory',
+              equippedTitle: p.isBot ? 'Yapay Zeka Rakip' : '1v1 Gladyatör',
+              score: p.score || 100,
+              streak: isWinner ? 1 : 0,
+              duelWins: isWinner ? 1 : 0,
+              totalDuels: 1,
+              unlockedBadgesCount: 1,
+              accuracyPct: 75,
+              isAnonymous: false,
+              updatedAt: data.updatedAt || data.createdAt
+            });
+          } else {
+            // Update existing entry if duel room has additional wins/games
+            const existing = resultsMap.get(pKey)!;
+            if (isWinner && existing.duelWins === 0) {
+              existing.duelWins += 1;
+            }
+            if (existing.totalDuels === 0) {
+              existing.totalDuels += 1;
+            }
+          }
+        });
       });
-    });
+    } catch (e) {
+      console.warn('Duel rooms retro scan warning:', e);
+    }
 
-    // Secondary client-side sorting guarantee in case Firestore index is warming up
+    // 3. Scan users collection in case of Firebase Auth registered users
+    try {
+      const usersRef = collection(db, 'users');
+      const userSnap = await getDocs(query(usersRef, limit(30)));
+      userSnap.forEach((uDoc) => {
+        const uData = uDoc.data();
+        const dName = uData.displayName || uData.email?.split('@')[0];
+        if (!dName) return;
+        const uKey = normalizeRumuzKey(dName);
+        if (!resultsMap.has(uKey)) {
+          const totalAnswers = uData.totalQuestionsAnswered || 0;
+          const correct = uData.correctAnswersCount || 0;
+          resultsMap.set(uKey, {
+            rank: 0,
+            rumuz: dName,
+            rumuzKey: uKey,
+            avatarIcon: '🎓',
+            avatarBg: 'cyan_mythic',
+            equippedTitle: 'KPSS Coğrafya Üstadı',
+            score: uData.score || 0,
+            streak: uData.streak || 0,
+            duelWins: 0,
+            totalDuels: 0,
+            unlockedBadgesCount: (uData.unlockedBadges || []).length,
+            accuracyPct: totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0,
+            isAnonymous: !!uData.isAnonymous,
+            updatedAt: uData.updatedAt
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('Users collection scan warning:', e);
+    }
+
+    const results = Array.from(resultsMap.values());
+
+    // Sort results based on selected tab
     results.sort((a, b) => {
       if (sortBy === 'duels') {
         if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
@@ -79,38 +162,8 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
       rank: idx + 1
     }));
   } catch (err) {
-    console.warn('Global leaderboard query fallback:', err);
-    // Fallback: query without order or return empty list
-    try {
-      const rumuzesRef = collection(db, 'rumuzes');
-      const snap = await getDocs(query(rumuzesRef, limit(40)));
-      const results: LeaderboardEntry[] = [];
-      snap.forEach((docSnap) => {
-        const d = docSnap.data() as RumuzProfileData;
-        if (!d.rumuz) return;
-        const totalAnswers = d.totalQuestionsAnswered || 0;
-        const correct = d.correctAnswersCount || 0;
-        results.push({
-          rank: 0,
-          rumuz: d.rumuz,
-          rumuzKey: d.rumuzKey || docSnap.id,
-          avatarIcon: d.avatarIcon || '🐣',
-          avatarBg: d.avatarBg || 'indigo_midnight',
-          equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
-          score: d.score || 0,
-          streak: d.streak || 0,
-          duelWins: d.duelStats?.duelWins || 0,
-          totalDuels: d.duelStats?.totalDuelsPlayed || 0,
-          unlockedBadgesCount: (d.unlockedBadges || []).length,
-          accuracyPct: totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0,
-          updatedAt: d.updatedAt
-        });
-      });
-      results.sort((a, b) => b.score - a.score);
-      return results.map((e, idx) => ({ ...e, rank: idx + 1 }));
-    } catch {
-      return [];
-    }
+    console.warn('Global leaderboard general error:', err);
+    return [];
   }
 }
 
@@ -149,6 +202,7 @@ export interface RumuzProfileData {
     bestBotStreak: number;
   };
   isBlindMapMode: boolean;
+  isAnonymous?: boolean;
   regionalStats: Record<string, { correct: number; wrong: number }>;
   categoryStats: Record<string, { correct: number; wrong: number }>;
   missedItems: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
@@ -396,4 +450,114 @@ export async function deleteRumuzProfile(
     handleFirestoreError(error, OperationType.DELETE, path);
     return { success: false, errorMsg: 'Profil silinirken veritabanı hatası oluştu.' };
   }
+}
+
+/**
+ * Toggles anonymous display mode (***) for user on global leaderboard.
+ */
+export async function setRumuzAnonymity(
+  rumuz: string,
+  isAnonymous: boolean
+): Promise<{ success: boolean; errorMsg?: string }> {
+  const key = normalizeRumuzKey(rumuz);
+
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kpss3d_is_anonymous', isAnonymous ? 'true' : 'false');
+    }
+    await setDoc(doc(db, 'rumuzes', key), {
+      isAnonymous,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.warn('Set anonymity error:', error);
+    return { success: false, errorMsg: 'Gizlilik ayarı kaydedilemedi.' };
+  }
+}
+
+let syncTimeout: NodeJS.Timeout | null = null;
+
+/**
+ * Automatically persists full user score, stats, titles, and unlocked badges to Cloud Firestore.
+ * Ensures user state is never lost even across devices or browser reloads.
+ */
+export function autoSyncStoreToCloud(stateData: {
+  score: number;
+  streak: number;
+  avatarIcon?: string;
+  avatarBg?: string;
+  equippedTitle?: string;
+  unlockedTitles?: string[];
+  totalQuestionsAnswered?: number;
+  correctAnswersCount?: number;
+  totalDistanceErrorKm?: number;
+  pinGuessCount?: number;
+  unlockedBadges?: string[];
+  categoryMasteryProgress?: Record<string, number>;
+  duelStats?: {
+    duelWins: number;
+    duelLosses: number;
+    duelDraws: number;
+    totalDuelsPlayed: number;
+    duelScore: number;
+    duelStreak: number;
+    bestDuelStreak: number;
+  };
+  botStats?: {
+    botWins: number;
+    botLosses: number;
+    botDraws: number;
+    totalBotDuelsPlayed: number;
+    botScore: number;
+    botStreak: number;
+    bestBotStreak: number;
+  };
+  isBlindMapMode?: boolean;
+  regionalStats?: Record<string, { correct: number; wrong: number }>;
+  categoryStats?: Record<string, { correct: number; wrong: number }>;
+  missedItems?: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
+}) {
+  if (typeof window === 'undefined') return;
+
+  const activeRumuz = localStorage.getItem('kpss3d_active_rumuz') || 'KPSS Gezgini';
+  const activePin = localStorage.getItem('kpss3d_active_pin') || '1234';
+  const isAnon = localStorage.getItem('kpss3d_is_anonymous') === 'true';
+  const key = normalizeRumuzKey(activeRumuz);
+
+  if (syncTimeout) clearTimeout(syncTimeout);
+
+  syncTimeout = setTimeout(async () => {
+    try {
+      const payload: Partial<RumuzProfileData> = {
+        rumuz: activeRumuz,
+        rumuzKey: key,
+        pin: activePin,
+        isAnonymous: isAnon,
+        score: stateData.score,
+        streak: stateData.streak,
+        avatarIcon: stateData.avatarIcon || '🐣',
+        avatarBg: stateData.avatarBg || 'indigo_midnight',
+        equippedTitle: stateData.equippedTitle || '3D Coğrafyacı Çırağı',
+        unlockedTitles: stateData.unlockedTitles || ['3D Coğrafyacı Çırağı'],
+        totalQuestionsAnswered: stateData.totalQuestionsAnswered || 0,
+        correctAnswersCount: stateData.correctAnswersCount || 0,
+        totalDistanceErrorKm: stateData.totalDistanceErrorKm || 0,
+        pinGuessCount: stateData.pinGuessCount || 0,
+        unlockedBadges: stateData.unlockedBadges || ['3D Coğrafyacı Çırağı'],
+        categoryMasteryProgress: stateData.categoryMasteryProgress || {},
+        duelStats: stateData.duelStats,
+        botStats: stateData.botStats,
+        isBlindMapMode: !!stateData.isBlindMapMode,
+        regionalStats: stateData.regionalStats || {},
+        categoryStats: stateData.categoryStats || {},
+        missedItems: stateData.missedItems || {},
+        updatedAt: new Date().toISOString()
+      };
+
+      await setDoc(doc(db, 'rumuzes', key), payload, { merge: true });
+    } catch (e) {
+      console.warn('Auto cloud sync background notice:', e);
+    }
+  }, 1000);
 }

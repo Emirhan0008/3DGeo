@@ -11,6 +11,7 @@ import {
 } from '../data/quizQuestions';
 import { ALL_BADGES } from '../data/badgesData';
 import type { DuelSession } from '../duelService';
+import { autoSyncStoreToCloud } from '../rumuzService';
 
 export type MapStyleType = 'topographic' | 'hybrid' | 'dark' | 'satellite';
 export type ActiveTabType = 'map' | 'pin_game' | 'duel' | 'quiz_test' | 'flashcards' | 'stats' | 'ai_tutor';
@@ -189,6 +190,28 @@ function saveStatsToLocalStorage(state: AppState) {
       botStats: state.botStats
     };
     localStorage.setItem('kpss3d_user_stats', JSON.stringify(payload));
+    
+    // Automatically replicate to Cloud Firestore in the background
+    autoSyncStoreToCloud({
+      score: state.score,
+      streak: state.streak,
+      avatarIcon: state.avatarIcon,
+      avatarBg: state.avatarBg,
+      equippedTitle: state.equippedTitle,
+      unlockedTitles: state.unlockedTitles,
+      totalQuestionsAnswered: state.totalQuestionsAnswered,
+      correctAnswersCount: state.correctAnswersCount,
+      totalDistanceErrorKm: state.totalDistanceErrorKm,
+      pinGuessCount: state.pinGuessCount,
+      unlockedBadges: state.unlockedBadges,
+      categoryMasteryProgress: state.categoryMasteryProgress,
+      duelStats: state.duelStats,
+      botStats: state.botStats,
+      isBlindMapMode: state.isBlindMapMode,
+      regionalStats: state.regionalStats,
+      categoryStats: state.categoryStats,
+      missedItems: state.missedItems
+    });
   } catch (e) {
     console.warn('LocalStorage save error:', e);
   }

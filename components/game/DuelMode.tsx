@@ -58,6 +58,7 @@ import {
 
 const CATEGORIES = [
   { id: 'Genel', label: 'Genel Karma (Tüm KPSS)', icon: '🌟' },
+  { id: 'Şehir Bulmaca (81 İl)', label: 'Şehir Bulmaca (81 İl & Plaka)', icon: '🇹🇷' },
   { id: 'Dağlar', label: 'Dağlar & Masifler', icon: '⛰️' },
   { id: 'Akarsular', label: 'Akarsular & Nehirler', icon: '🌊' },
   { id: 'Göller', label: 'Göller & Doğal Göller', icon: '💧' },

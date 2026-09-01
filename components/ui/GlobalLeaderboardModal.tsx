@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
-import { fetchGlobalLeaderboard, LeaderboardEntry } from '@/lib/rumuzService';
+import { fetchGlobalLeaderboard, setRumuzAnonymity, LeaderboardEntry } from '@/lib/rumuzService';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
 import {
   Trophy,
@@ -12,7 +12,9 @@ import {
   X,
   Sparkles,
   Loader2,
-  TrendingUp
+  TrendingUp,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface GlobalLeaderboardModalProps {
@@ -34,6 +36,13 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
   const [activeTab, setActiveTab] = useState<'score' | 'duels' | 'streak'>('score');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('kpss3d_is_anonymous') === 'true';
+    }
+    return false;
+  });
+  const [isTogglingAnon, setIsTogglingAnon] = useState(false);
 
   const activeRumuz = typeof window !== 'undefined' ? localStorage.getItem('kpss3d_active_rumuz') || 'Misafir Gezgin' : 'Misafir Gezgin';
 
@@ -54,6 +63,18 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
       loadLeaderboard(activeTab);
     }
   }, [isOpen, activeTab, loadLeaderboard]);
+
+  const handleToggleAnonymity = async () => {
+    const nextVal = !isAnonymous;
+    setIsTogglingAnon(true);
+    setIsAnonymous(nextVal);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kpss3d_is_anonymous', nextVal ? 'true' : 'false');
+    }
+    await setRumuzAnonymity(activeRumuz, nextVal);
+    setIsTogglingAnon(false);
+    await loadLeaderboard(activeTab);
+  };
 
   if (!isOpen) return null;
 
@@ -98,42 +119,68 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
           </div>
         </div>
 
-        {/* Tab Selection */}
-        <div className="px-3.5 sm:px-4 pt-3 pb-2 flex items-center gap-1.5 sm:gap-2 border-b border-white/10 overflow-x-auto bg-black/40">
-          <button
-            onClick={() => setActiveTab('score')}
-            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border cursor-pointer ${
-              activeTab === 'score'
-                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
-                : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
-            }`}
-          >
-            <Trophy className="w-4 h-4" />
-            <span>🏆 Toplam Puan</span>
-          </button>
+        {/* Tab Selection & Privacy Toggle */}
+        <div className="px-3.5 sm:px-4 pt-3 pb-2 flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-white/10 bg-black/40">
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto overflow-x-auto">
+            <button
+              onClick={() => setActiveTab('score')}
+              className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border cursor-pointer ${
+                activeTab === 'score'
+                  ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
+                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+              }`}
+            >
+              <Trophy className="w-4 h-4" />
+              <span>🏆 Toplam Puan</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('duels')}
-            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border cursor-pointer ${
-              activeTab === 'duels'
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 shadow-md shadow-indigo-500/20'
-                : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
-            }`}
-          >
-            <Swords className="w-4 h-4" />
-            <span>⚔️ 1v1 Düello</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('duels')}
+              className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border cursor-pointer ${
+                activeTab === 'duels'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 shadow-md shadow-indigo-500/20'
+                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+              }`}
+            >
+              <Swords className="w-4 h-4" />
+              <span>⚔️ 1v1 Düello</span>
+            </button>
 
+            <button
+              onClick={() => setActiveTab('streak')}
+              className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border cursor-pointer ${
+                activeTab === 'streak'
+                  ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white border-rose-300 shadow-md shadow-rose-500/20'
+                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+              }`}
+            >
+              <Flame className="w-4 h-4" />
+              <span>🔥 Seri Rekoru</span>
+            </button>
+          </div>
+
+          {/* User Rumuz Privacy Toggle */}
           <button
-            onClick={() => setActiveTab('streak')}
-            className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border cursor-pointer ${
-              activeTab === 'streak'
-                ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white border-rose-300 shadow-md shadow-rose-500/20'
-                : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+            onClick={handleToggleAnonymity}
+            disabled={isTogglingAnon}
+            className={`w-full sm:w-auto px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              isAnonymous
+                ? 'bg-purple-950/70 border-purple-500 text-purple-200 shadow-sm'
+                : 'bg-white/5 hover:bg-white/10 border-white/15 text-slate-300 hover:text-white'
             }`}
+            title={isAnonymous ? 'Rumuzun şu an gizli (*** olarak görünüyor)' : 'Rumuzunu gizle'}
           >
-            <Flame className="w-4 h-4" />
-            <span>🔥 Seri Rekoru</span>
+            {isAnonymous ? (
+              <>
+                <EyeOff className="w-3.5 h-3.5 text-purple-300" />
+                <span>🔒 Rumuz Gizli (***)</span>
+              </>
+            ) : (
+              <>
+                <Eye className="w-3.5 h-3.5 text-slate-400" />
+                <span>Rumuzumu Gizle (***)</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -152,7 +199,14 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">Senin Profilin</span>
-                <span className="text-xs font-black text-white truncate">{activeRumuz}</span>
+                <span className="text-xs font-black text-white truncate">
+                  {isAnonymous ? `*** (${activeRumuz} - Gizli)` : activeRumuz}
+                </span>
+                {isAnonymous && (
+                  <span className="px-1.5 py-0.2 rounded bg-purple-500/30 text-purple-300 text-[9px] font-bold border border-purple-400/30">
+                    Gizli Mod
+                  </span>
+                )}
               </div>
               <p className="text-[11px] font-semibold text-slate-300 truncate">
                 {equippedTitle || '3D Coğrafyacı Çırağı'}
@@ -195,6 +249,12 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               const isSecond = entry.rank === 2;
               const isThird = entry.rank === 3;
               const isCurrentUser = entry.rumuz.toLowerCase() === activeRumuz.toLowerCase();
+
+              const displayedName = entry.isAnonymous
+                ? isCurrentUser
+                  ? `*** (${entry.rumuz} - Sen)`
+                  : '*** (Gizli Gezgin)'
+                : entry.rumuz;
 
               const rankBadge = isFirst ? (
                 <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950 flex items-center justify-center font-black text-xs shadow-lg shadow-amber-500/50 ring-2 ring-amber-300">
@@ -240,11 +300,14 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-black text-xs sm:text-sm text-white truncate">{entry.rumuz}</span>
+                        <span className="font-black text-xs sm:text-sm text-white truncate">{displayedName}</span>
                         {isCurrentUser && (
                           <span className="px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 text-[9px] font-black uppercase">
                             Sen
                           </span>
+                        )}
+                        {entry.isAnonymous && (
+                          <span className="text-[10px] text-purple-300 font-bold">🔒</span>
                         )}
                       </div>
                       <p className="text-[10px] text-slate-300 truncate">
