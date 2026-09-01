@@ -271,6 +271,24 @@ export const ALL_TITLES: UserTitle[] = [
     requiredMetricText: '300 toplam test puanına ulaş'
   },
   {
+    id: 'il_81_fatihi',
+    name: '81 İl Fatihi',
+    icon: '🇹🇷',
+    tier: 'gold',
+    desc: 'Türkiye\'nin 81 ilinin yerini ve coğrafi özelliklerini ezbere bilen usta.',
+    requiredBadge: '81 İl Kaşifi',
+    requiredMetricText: '81 İl modunda başarı elde et'
+  },
+  {
+    id: 'kusursuz_nisanci',
+    name: 'Kusursuz Nişancı',
+    icon: '🎯',
+    tier: 'gold',
+    desc: 'Harita testlerinde 10km altı milimetrik tam isabetler tutturan usta.',
+    requiredBadge: 'Tam İsabet Kaptan',
+    requiredMetricText: '10km altı isabet yap'
+  },
+  {
     id: 'efsanevi_elmas_deha',
     name: 'Efsanevi Harita Dehası',
     icon: '💎',
@@ -748,7 +766,8 @@ export function getDuelPrestigeTier(
 }
 
 /**
- * Calculates user's avatar frame prestige and crowning badge based on unlocked badges and duel wins.
+ * Calculates user's avatar frame prestige and crowning badge based on unlocked badges, duel wins, and equipped title.
+ * The top-right pin emblem specifically inherits the equipped title's unique icon and prestige!
  */
 export function getPrestigeTier(
   unlockedBadges: string[] = [],
@@ -757,53 +776,70 @@ export function getPrestigeTier(
 ): PrestigeTierInfo {
   const count = unlockedBadges.length;
 
-  if (count >= 8 || duelWins >= 10 || unlockedBadges.includes('Efsanevi Coğrafyacı') || unlockedBadges.includes('Düello Şampiyonu')) {
+  // 1. Look up equipped title details
+  const cleanTitleName = (customTitle || '').replace(/^[^\w\s\u00C0-\u017F]+/i, '').trim();
+  const matchedTitle = ALL_TITLES.find(t => 
+    t.name === customTitle || 
+    t.id === customTitle || 
+    t.name.toLowerCase() === cleanTitleName.toLowerCase() ||
+    (customTitle && customTitle.includes(t.name))
+  );
+
+  const activeTitleName = matchedTitle?.name || customTitle || '3D Coğrafyacı Çırağı';
+  const activePinIcon = matchedTitle?.icon || (count >= 8 ? '💎' : count >= 5 ? '👑' : count >= 2 ? '🛡️' : '🐣');
+  const titleTier = matchedTitle?.tier || (count >= 8 ? 'diamond' : count >= 5 ? 'gold' : count >= 2 ? 'silver' : 'bronze');
+
+  // Diamond / Mythic Level
+  if (titleTier === 'diamond' || count >= 8 || duelWins >= 10 || unlockedBadges.includes('Efsanevi Coğrafyacı') || unlockedBadges.includes('Düello Şampiyonu')) {
     return {
       tier: 'diamond_mythic',
-      title: customTitle || 'Efsanevi Elmas Deha',
+      title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'border-2 border-cyan-400 ring-2 ring-purple-500/80 shadow-[0_0_20px_rgba(6,182,212,0.6)] animate-pulse',
       glowClass: 'from-cyan-500 via-indigo-500 to-fuchsia-500',
-      pinIcon: '💎',
-      pinBadgeName: 'Efsanevi Elmas Prestij',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitleName,
       gradientBg: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950'
     };
   }
 
-  if (count >= 5 || duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('KPSS Coğrafya Üstadı')) {
+  // Gold Champion Level
+  if (titleTier === 'gold' || count >= 5 || duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('KPSS Coğrafya Üstadı')) {
     return {
       tier: 'gold_champion',
-      title: customTitle || 'Altın Şampiyon',
+      title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'border-2 border-amber-400 ring-2 ring-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.5)]',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-600',
-      pinIcon: '👑',
-      pinBadgeName: 'Altın Şampiyon Prestij',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitleName,
       gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900'
     };
   }
 
-  if (count >= 2 || duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı') || unlockedBadges.includes('Tam İsabet Kaptan')) {
+  // Silver / Warrior Level
+  if (titleTier === 'silver' || count >= 2 || duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı') || unlockedBadges.includes('Tam İsabet Kaptan')) {
     return {
       tier: 'bronze_silver',
-      title: customTitle || 'Gümüş Savaşçı',
+      title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'border-2 border-slate-300 ring-1 ring-slate-400/40 shadow-[0_0_10px_rgba(203,213,225,0.3)]',
       glowClass: 'from-slate-300 via-slate-100 to-slate-400',
-      pinIcon: '🛡️',
-      pinBadgeName: 'Gümüş Savaşçı Prestij',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitleName,
       gradientBg: 'bg-gradient-to-tr from-slate-800 via-indigo-950 to-slate-900'
     };
   }
 
+  // Starter Level
   return {
     tier: 'starter',
-    title: customTitle || 'Çırak Gezgin',
+    title: activeTitleName,
     badgeCount: count,
     frameBorderClass: 'border border-indigo-500/40 ring-1 ring-indigo-500/20',
     glowClass: 'from-indigo-500 to-purple-500',
-    pinIcon: '🐣',
-    pinBadgeName: '3D Coğrafyacı Çırağı',
+    pinIcon: activePinIcon,
+    pinBadgeName: activeTitleName,
     gradientBg: 'bg-gradient-to-tr from-indigo-950 to-slate-900'
   };
 }

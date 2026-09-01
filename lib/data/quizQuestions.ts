@@ -1,10 +1,11 @@
 import { ALL_GEO_FEATURES, GeoFeature } from './turkeyData';
+import { PROVINCES_81_DATA } from './provinces81Data';
 
 export interface PinGameQuestion {
   id: string;
   title: string;
   questionText: string;
-  category: 'Dağlar' | 'Akarsular' | 'Göller' | 'Sınır Kapıları' | 'Geçitler' | 'Platolar & Ovalar' | 'Madenler' | 'Karstik & Kıyı' | 'Antik Kentler' | 'Mağaralar';
+  category: 'Dağlar' | 'Akarsular' | 'Göller' | 'Sınır Kapıları' | 'Geçitler' | 'Platolar & Ovalar' | 'Madenler' | 'Karstik & Kıyı' | 'Antik Kentler' | 'Mağaralar' | 'Şehirler';
   region?: 'Marmara' | 'Ege' | 'Akdeniz' | 'İç Anadolu' | 'Karadeniz' | 'Doğu Anadolu' | 'Güneydoğu Anadolu';
   targetFeatureId: string;
   targetCoords: [number, number]; // [lng, lat]
@@ -35,6 +36,9 @@ export function matchesCategory(itemCategory: string, filterCategory: string): b
 
   if (normItem === normFilter) return true;
   if (normItem.includes(normFilter) || normFilter.includes(normItem)) return true;
+
+  // 81 İl / Şehirler
+  if ((normFilter.includes('şehir') || normFilter.includes('81') || normFilter.includes('il')) && (normItem.includes('şehir') || normItem.includes('il'))) return true;
 
   // Split tokens like "Platolar & Ovalar", "Karstik & Kıyı", "Madenler / Enerji"
   const filterParts = normFilter.split(/[&,/+]/).map(s => s.trim()).filter(Boolean);
@@ -100,6 +104,20 @@ export function getCurrentQuizQuestion(quizTestIndex: number, category: string, 
   return list[safeIndex];
 }
 
+const TURKEY_PROVINCES_AND_DISTRICTS = [
+  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Afyon', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan',
+  'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu',
+  'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ',
+  'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta',
+  'İstanbul', 'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kırıkkale', 'Kırklareli',
+  'Kırşehir', 'Kilis', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla',
+  'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop',
+  'Sivas', 'Şanlıurfa', 'Urfa', 'Şırnak', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van',
+  'Yalova', 'Yozgat', 'Zonguldak',
+  'Silopi', 'Susurluk', 'Emet', 'Kırka', 'Bigadiç', 'Mustafakemalpaşa', 'Fethiye', 'Bodrum', 'Kaş',
+  'Çarşamba', 'Bafra', 'Anamur', 'Alanya', 'Manavgat', 'Ceyhan', 'Seyhan', 'Elbistan', 'Afşin', 'Hamitabat', 'Çatalağzı'
+];
+
 export function cleanFeatureTitle(title: string): string {
   if (!title) return '';
   return title
@@ -117,15 +135,13 @@ export function cleanOptionName(option: string): string {
   // Remove parenthesized notes like (Bitlis), (Samsun), (Manisa), (Burdur), (Maar), (Badlands) etc.
   clean = clean.replace(/\s*\([^)]*\)/g, '');
 
-  // Remove leading/trailing city prefixes if attached like "Hakkari Cilo" -> "Cilo Dağları"
-  clean = clean.replace(/^Hakkari\s+/i, '');
-  clean = clean.replace(/^Bitlis\s+/i, '');
-  clean = clean.replace(/^Manisa\s+/i, '');
-  clean = clean.replace(/^Konya\s+/i, '');
-  clean = clean.replace(/^Burdur\s+/i, '');
-  clean = clean.replace(/^Kayseri\s+/i, '');
-  clean = clean.replace(/^Adana\s+/i, '');
-  clean = clean.replace(/^Samsun\s+/i, '');
+  // Remove trailing or leading city attachments like " - Samsun", " / İzmir", "Bursa Uludağ"
+  TURKEY_PROVINCES_AND_DISTRICTS.forEach(city => {
+    const regTrailing = new RegExp(`\\s*[-/:]\\s*${city}\\b`, 'gi');
+    clean = clean.replace(regTrailing, '');
+    const regLeading = new RegExp(`^${city}\\s+`, 'gi');
+    clean = clean.replace(regLeading, '');
+  });
 
   return clean.replace(/\s+/g, ' ').trim();
 }
@@ -133,20 +149,50 @@ export function cleanOptionName(option: string): string {
 /**
  * Derives province / city name from a GeoFeature or question for map display
  */
-export function getFeatureCityName(featureOrCoords: any, name?: string, region?: string): string {
+export function getFeatureCityName(
+  featureOrCoords: {
+    plate?: number;
+    name?: string;
+    id?: string;
+    targetFeatureId?: string;
+    province?: string;
+    city?: string;
+    title?: string;
+    region?: string;
+  } | null | undefined,
+  name?: string,
+  region?: string
+): string {
   if (!featureOrCoords) return '';
   
+  // If it's an 81 İl item
+  if (featureOrCoords.plate) {
+    return `${featureOrCoords.name} (Plaka: ${featureOrCoords.plate})`;
+  }
+  const fId = String(featureOrCoords.id || featureOrCoords.targetFeatureId || '');
+  if (fId.startsWith('province-')) {
+    const plateNum = parseInt(fId.replace('province-', ''), 10);
+    const p = PROVINCES_81_DATA.find(prov => prov.plate === plateNum);
+    if (p) return `${p.name} (Plaka: ${p.plate})`;
+  }
+
   // If GeoFeature object has explicit province / city
   if (featureOrCoords.province) return featureOrCoords.province;
   if (featureOrCoords.city) return featureOrCoords.city;
 
   const targetName = (featureOrCoords.title || featureOrCoords.name || name || '').toLowerCase();
   
+  // Direct province match
+  const matchedProv = PROVINCES_81_DATA.find(p => targetName.startsWith(p.name.toLowerCase()) || targetName.includes(p.name.toLowerCase()));
+  if (fId.startsWith('province-') || targetName.includes('il merkezi')) {
+    if (matchedProv) return `${matchedProv.name} (Plaka: ${matchedProv.plate})`;
+  }
+
   // Specific famous landmark mapping
-  if (targetName.includes('ağrı')) return 'Ağrı / Iğdır';
+  if (targetName.includes('ağrı dağı')) return 'Ağrı / Iğdır';
   if (targetName.includes('erciyes')) return 'Kayseri';
   if (targetName.includes('hasan dağ')) return 'Aksaray / Niğde';
-  if (targetName.includes('nemrut')) return targetName.includes('adıyaman') ? 'Adıyaman' : 'Bitlis';
+  if (targetName.includes('nemrut')) return targetName.includes('adıyaman') || targetName.includes('heykel') || targetName.includes('tümülüs') ? 'Adıyaman' : 'Bitlis';
   if (targetName.includes('süphan')) return 'Bitlis / Van';
   if (targetName.includes('tendürek')) return 'Ağrı / Van';
   if (targetName.includes('cilo') || targetName.includes('uludoruk')) return 'Hakkari';
@@ -170,44 +216,48 @@ export function getFeatureCityName(featureOrCoords: any, name?: string, region?:
   if (targetName.includes('bafra') || targetName.includes('çarşamba') || targetName.includes('canik')) return 'Samsun';
   if (targetName.includes('silifke')) return 'Mersin';
   if (targetName.includes('insuyu')) return 'Burdur';
-  if (targetName.includes('damlataş') || targetName.includes('karain') || targetName.includes('düden')) return 'Antalya';
-  if (targetName.includes('manavgat')) return 'Antalya';
-  if (targetName.includes('tortum')) return 'Erzurum';
-  if (targetName.includes('muradiye') || targetName.includes('van gölü')) return 'Van';
+  if (targetName.includes('damlataş') || targetName.includes('karain') || targetName.includes('düden') || targetName.includes('manavgat')) return 'Antalya';
+  if (targetName.includes('tortum') || targetName.includes('palandöken')) return 'Erzurum';
+  if (targetName.includes('muradiye') || targetName.includes('van gölü') || targetName.includes('akdamar')) return 'Van';
   if (targetName.includes('çıldır')) return 'Ardahan / Kars';
-  if (targetName.includes('bozok')) return 'Yozgat';
-  if (targetName.includes('haymana')) return 'Ankara';
-  if (targetName.includes('cihanbeyli')) return 'Konya';
+  if (targetName.includes('bozok') || targetName.includes('çamlık')) return 'Yozgat';
+  if (targetName.includes('haymana') || targetName.includes('mogan') || targetName.includes('eymir')) return 'Ankara';
+  if (targetName.includes('cihanbeyli') || targetName.includes('çatalhöyük') || targetName.includes('obruk')) return 'Konya';
   if (targetName.includes('teke')) return 'Antalya / Muğla';
   if (targetName.includes('taşeli')) return 'Mersin / Karaman';
-  if (targetName.includes('erzurum-kars') || targetName.includes('ardahan')) return 'Erzurum / Kars';
-  if (targetName.includes('obruk')) return 'Konya';
-  if (targetName.includes('yazılıkaya')) return 'Eskişehir';
-  if (targetName.includes('kapıdağ')) return 'Balıkesir';
-  if (targetName.includes('inceburun')) return 'Sinop';
-  if (targetName.includes('menemen')) return 'İzmir';
-  if (targetName.includes('balat')) return 'Aydın';
+  if (targetName.includes('erzurum-kars')) return 'Erzurum / Kars';
+  if (targetName.includes('yazılıkaya') || targetName.includes('porsuk')) return 'Eskişehir';
+  if (targetName.includes('kapıdağ') || targetName.includes('manyas')) return 'Balıkesir';
+  if (targetName.includes('inceburun') || targetName.includes('hamsilos')) return 'Sinop';
+  if (targetName.includes('menemen') || targetName.includes('efes') || targetName.includes('bergama')) return 'İzmir';
+  if (targetName.includes('balat') || targetName.includes('afrodisias')) return 'Aydın';
   if (targetName.includes('dikili')) return 'İzmir';
+  if (targetName.includes('göbeklitepe') || targetName.includes('harran') || targetName.includes('karahantepe')) return 'Şanlıurfa';
+  if (targetName.includes('zeukma') || targetName.includes('zeugma') || targetName.includes('rumkale')) return 'Gaziantep';
+  if (targetName.includes('ani harabeleri') || targetName.includes('sarıkamış')) return 'Kars';
+  if (targetName.includes('hattuşa') || targetName.includes('alacahöyük')) return 'Çorum';
+  if (targetName.includes('divriği')) return 'Sivas';
+  if (targetName.includes('keban') || targetName.includes('hazar gölü')) return 'Elazığ';
+  if (targetName.includes('munzur')) return 'Tunceli';
+  if (targetName.includes('ulubey')) return 'Uşak';
+  if (targetName.includes('filyos') || targetName.includes('çatalağzı') || targetName.includes('gökgöl')) return 'Zonguldak';
+  if (targetName.includes('kardemir') || targetName.includes('safranbolu')) return 'Karabük';
+  if (targetName.includes('botan')) return 'Siirt';
+  if (targetName.includes('ihlara')) return 'Aksaray';
+  if (targetName.includes('abant') || targetName.includes('yedigöller')) return 'Bolu';
+  if (targetName.includes('ballıca')) return 'Tokat';
+  if (targetName.includes('dupnisa') || targetName.includes('iğneada')) return 'Kırklareli';
+  if (targetName.includes('karaca mağarası')) return 'Gümüşhane';
+  if (targetName.includes('oylat')) return 'Bursa';
+  if (targetName.includes('çal mağarası') || targetName.includes('sümela') || targetName.includes('uzungöl')) return 'Trabzon';
+  if (targetName.includes('kaklık')) return 'Denizli';
+  if (targetName.includes('cehennemağzı')) return 'Zonguldak';
 
   if (featureOrCoords.region || region) {
     return `${featureOrCoords.region || region} Bölgesi`;
   }
   return '';
 }
-
-const TURKEY_PROVINCES_AND_DISTRICTS = [
-  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Afyon', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan',
-  'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu',
-  'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ',
-  'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta',
-  'İstanbul', 'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kırıkkale', 'Kırklareli',
-  'Kırşehir', 'Kilis', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla',
-  'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop',
-  'Sivas', 'Şanlıurfa', 'Urfa', 'Şırnak', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van',
-  'Yalova', 'Yozgat', 'Zonguldak',
-  'Silopi', 'Susurluk', 'Emet', 'Kırka', 'Bigadiç', 'Mustafakemalpaşa', 'Fethiye', 'Bodrum', 'Kaş',
-  'Çarşamba', 'Bafra', 'Anamur', 'Alanya', 'Manavgat', 'Ceyhan', 'Seyhan', 'Elbistan', 'Afşin', 'Hamitabat', 'Çatalağzı'
-];
 
 export function sanitizeQuestionText(text: string): string {
   if (!text) return '';
@@ -1107,9 +1157,23 @@ const DYNAMIC_PIN_QUESTIONS: PinGameQuestion[] = ALL_GEO_FEATURES
     };
   });
 
+export const PROVINCE_PIN_QUESTIONS: PinGameQuestion[] = PROVINCES_81_DATA.map((p) => ({
+  id: `pin-province-${p.plate}`,
+  title: `${p.name} (İl Merkezi - Plaka: ${p.plate < 10 ? '0' + p.plate : p.plate})`,
+  questionText: `Haritada ${p.name} ilini bulun ve tam konumunu işaretleyin! (${p.famousFor})`,
+  category: 'Şehirler' as const,
+  region: p.region,
+  targetFeatureId: `province-${p.plate}`,
+  targetCoords: p.coordinates,
+  hint: `${p.region} Bölgesi'nde yer alır. Plaka Kodu: ${p.plate}. Önemli özellikleri: ${p.famousFor}`,
+  explanation: `${p.name} (Plaka: ${p.plate}, ${p.region} Bölgesi): ${p.famousFor}`,
+  kpssTip: `KPSS & 81 İl Bilgisi: ${p.name} ili ${p.region} Bölgesi'ndedir. Anahtar kavramlar: ${p.kpssKeywords.join(', ')}`
+}));
+
 export const PIN_GAME_QUESTIONS: PinGameQuestion[] = [
   ...HANDCRAFTED_PIN_QUESTIONS,
-  ...DYNAMIC_PIN_QUESTIONS
+  ...DYNAMIC_PIN_QUESTIONS,
+  ...PROVINCE_PIN_QUESTIONS
 ];
 
 const HANDCRAFTED_MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
