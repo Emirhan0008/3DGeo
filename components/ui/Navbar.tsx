@@ -16,11 +16,13 @@ import {
   Maximize2,
   Minimize2,
   Swords,
-  Trophy
+  Trophy,
+  MessageSquarePlus
 } from 'lucide-react';
 import { useAppFullscreen } from '@/lib/utils';
 import AuthUserButton from './AuthUserButton';
 import GlobalLeaderboardModal from './GlobalLeaderboardModal';
+import FeedbackModal from './FeedbackModal';
 
 export default function Navbar() {
   const {
@@ -39,6 +41,7 @@ export default function Navbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const { isFullscreen, toggleFullscreen } = useAppFullscreen();
 
   // Search autocomplete items
@@ -259,10 +262,20 @@ export default function Navbar() {
           {/* Firebase User Auth */}
           <AuthUserButton />
 
+          {/* Feedback Button */}
+          <button
+            onClick={() => setIsFeedbackOpen(true)}
+            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl border transition-all text-xs font-bold flex items-center gap-1 shrink-0 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 cursor-pointer"
+            title="Geri Bildirim & Öneri Gönder"
+          >
+            <MessageSquarePlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+            <span className="hidden xl:inline text-[11px]">Geri Bildirim</span>
+          </button>
+
           {/* AI Tutor Button */}
           <button
             onClick={() => setAiDrawerOpen(!isAiDrawerOpen)}
-            className={`p-1 sm:p-1.5 rounded-lg sm:rounded-xl border transition-all text-xs font-bold flex items-center gap-1 shrink-0 ${
+            className={`p-1 sm:p-1.5 rounded-lg sm:rounded-xl border transition-all text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer ${
               isAiDrawerOpen
                 ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
                 : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
@@ -377,6 +390,7 @@ export default function Navbar() {
           </button>
         </div>
         <GlobalLeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
+        <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
       </>
     );
   }
@@ -388,6 +402,7 @@ export default function Navbar() {
         {renderNavbarContent()}
       </header>
       <GlobalLeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
+      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
     </>
   );
 }

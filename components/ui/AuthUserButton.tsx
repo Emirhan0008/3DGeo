@@ -592,11 +592,17 @@ export default function AuthUserButton() {
 
       {/* Auth Selector Modal */}
       {showAuthModal && mounted && createPortal(
-        <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-[#09090b] border-2 border-amber-400/80 rounded-2xl max-w-md w-full p-5 text-slate-100 shadow-2xl relative space-y-4">
+        <div 
+          className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowAuthModal(false)}
+        >
+          <div 
+            className="bg-[#09090b] border-2 border-amber-400/80 rounded-2xl max-w-md w-full p-5 text-slate-100 shadow-2xl relative space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setShowAuthModal(false)}
-              className="absolute top-3 right-3 p-1.5 rounded-xl bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-white transition-all"
+              className="absolute top-3 right-3 p-1.5 rounded-xl bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-white transition-all cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
