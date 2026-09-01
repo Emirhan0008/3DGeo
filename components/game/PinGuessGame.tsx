@@ -20,6 +20,7 @@ import {
 
 const CATEGORIES = [
   'Genel',
+  'Şehir Bulmaca (81 İl)',
   'Dağlar',
   'Akarsular',
   'Göller',

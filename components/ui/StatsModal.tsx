@@ -768,11 +768,14 @@ export default function StatsModal() {
                       <span>{badge.reqText}</span>
                       <span className="font-extrabold text-amber-400">{currentCount}/{targetCount} (%{progressPct})</span>
                     </div>
-                    <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500"
                         style={{ width: `${progressPct}%` }}
                       />
+                    </div>
+                    <div className="text-[8px] text-slate-400 font-semibold text-right">
+                      Kalan: <strong className="text-amber-300">{Math.max(0, targetCount - currentCount)} adet/zafer</strong>
                     </div>
                   </div>
                 )}

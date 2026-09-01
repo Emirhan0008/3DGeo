@@ -41,126 +41,170 @@ export interface AvatarThemeOption {
 }
 
 export const AVATAR_ICONS: AvatarIconOption[] = [
-  { id: 'apprentice', icon: '🐣', label: 'Çırak Kuş', minBadgesRequired: 0 },
-  { id: 'mountain', icon: '🏔️', label: 'Doruk Zirvesi', minBadgesRequired: 1 },
-  { id: 'compass', icon: '🧭', label: 'Altın Pusula', minBadgesRequired: 1 },
-  { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi', minBadgesRequired: 2 },
-  { id: 'eagle', icon: '🦅', label: 'Anadolu Kartalı', minBadgesRequired: 2 },
-  { id: 'target', icon: '🎯', label: 'Keskin Nişancı', minBadgesRequired: 2 },
-  { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü', minDuelWinsRequired: 1 },
-  { id: 'shield', icon: '🛡️', label: 'Muhafız Kalkanı', minBadgesRequired: 3 },
-  { id: 'water', icon: '🌊', label: 'Akarsu Dalgaları', minBadgesRequired: 3 },
-  { id: 'volcano', icon: '🌋', label: 'Volkan Ateşi', minBadgesRequired: 3 },
-  { id: 'temple', icon: '🏛️', label: 'Karstik Kanyon', minBadgesRequired: 3 },
-  { id: 'fire', icon: '🔥', label: 'Seri Alevi', minBadgesRequired: 4 },
-  { id: 'lightning', icon: '⚡', label: 'Şimşek Hız', minBadgesRequired: 4 },
-  { id: 'lion', icon: '🦁', label: 'Bozkır Aslanı', minBadgesRequired: 5 },
+  { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas', minBadgesRequired: 8, minDuelWinsRequired: 10 },
+  { id: 'crown', icon: '👑', label: 'Arena Kralı', minDuelWinsRequired: 10 },
+  { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu', minDuelWinsRequired: 5 },
   { id: 'grad_cap', icon: '🎓', label: 'KPSS Üstadı', minBadgesRequired: 5 },
-  { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu', minDuelWinsRequired: 3 },
-  { id: 'crown', icon: '👑', label: 'Arena Kralı', minDuelWinsRequired: 5 },
-  { id: 'rocket', icon: '🚀', label: 'Derece Roketi', minBadgesRequired: 7 },
-  { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas', minBadgesRequired: 8 }
+  { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü', minDuelWinsRequired: 3 },
+  { id: 'target', icon: '🎯', label: 'Keskin Nişancı', minBadgesRequired: 3 },
+  { id: 'shield', icon: '🛡️', label: 'Muhafız Kalkanı', minBadgesRequired: 2 },
+  { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi', minDuelWinsRequired: 1 },
+  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin', minBadgesRequired: 0 }
 ];
 
 export const AVATAR_THEMES: AvatarThemeOption[] = [
   {
+    id: 'cyan_mythic',
+    name: '💎 Elmas & Efsanevi Lig',
+    bgGradient: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
+    borderGlow: 'border-cyan-400 ring-2 ring-purple-500/80 shadow-[0_0_20px_rgba(6,182,212,0.6)]',
+    badgePinBg: 'bg-cyan-900 border-cyan-300'
+  },
+  {
+    id: 'gold_glory',
+    name: '👑 Altın & Şampiyon Lig',
+    bgGradient: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
+    borderGlow: 'border-amber-400 ring-2 ring-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.6)]',
+    badgePinBg: 'bg-amber-900 border-amber-300'
+  },
+  {
     id: 'indigo_midnight',
-    name: 'Gece Yarısı Mavisi',
-    bgGradient: 'bg-gradient-to-tr from-indigo-950 via-slate-900 to-indigo-900',
-    borderGlow: 'border-indigo-500/60 ring-indigo-500/30',
+    name: '🛡️ Gümüş & Uzman Lig',
+    bgGradient: 'bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800',
+    borderGlow: 'border-slate-300 ring-1 ring-slate-400/50 shadow-[0_0_10px_rgba(203,213,225,0.4)]',
     badgePinBg: 'bg-indigo-900 border-indigo-400'
   },
   {
     id: 'emerald_forest',
-    name: 'Zümrüt Yeşili',
+    name: '🐣 Bronz & Çırak Lig',
     bgGradient: 'bg-gradient-to-tr from-emerald-950 via-teal-950 to-slate-900',
-    borderGlow: 'border-emerald-400/80 ring-emerald-500/40 shadow-emerald-500/20',
+    borderGlow: 'border-emerald-500/50 ring-1 ring-emerald-500/30',
     badgePinBg: 'bg-emerald-900 border-emerald-400'
-  },
-  {
-    id: 'gold_glory',
-    name: 'Kraliyet Altını',
-    bgGradient: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-    borderGlow: 'border-amber-400 ring-amber-500/50 shadow-amber-500/30',
-    badgePinBg: 'bg-amber-900 border-amber-300'
-  },
-  {
-    id: 'ruby_fire',
-    name: 'Yakut Alevi',
-    bgGradient: 'bg-gradient-to-tr from-rose-950 via-red-950 to-orange-950',
-    borderGlow: 'border-rose-400 ring-red-500/50 shadow-red-500/30',
-    badgePinBg: 'bg-rose-900 border-rose-400'
-  },
-  {
-    id: 'amethyst_mystic',
-    name: 'Ametist Büyüsü',
-    bgGradient: 'bg-gradient-to-tr from-purple-950 via-fuchsia-950 to-indigo-950',
-    borderGlow: 'border-purple-400 ring-fuchsia-500/50 shadow-purple-500/30',
-    badgePinBg: 'bg-purple-900 border-purple-400'
-  },
-  {
-    id: 'cyan_mythic',
-    name: 'Kutup Elması',
-    bgGradient: 'bg-gradient-to-tr from-cyan-950 via-blue-950 to-slate-900',
-    borderGlow: 'border-cyan-400 ring-cyan-500/60 shadow-cyan-500/40',
-    badgePinBg: 'bg-cyan-900 border-cyan-300'
   }
 ];
 
 export const ALL_TITLES: UserTitle[] = [
+  // --- 💎 ELMAS & EFSANEVİ KADEME (EN YÜKSEK VE EN ZOR ÜNVANLAR EN ÜSTTE) ---
   {
-    id: 'cografyaci_ciragi',
-    name: '3D Coğrafyacı Çırağı',
-    icon: '🐣',
-    tier: 'bronze',
-    desc: 'Coğrafya öğrenim serüvenine adım atan hevesli öğrenci.',
-    requiredBadge: '3D Coğrafyacı Çırağı',
-    requiredMetricText: 'Varsayılan Başlangıç Ünvanı'
+    id: 'efsanevi_elmas_deha',
+    name: 'Efsanevi Harita Dehası',
+    icon: '💎',
+    tier: 'diamond',
+    desc: 'Tüm kademeli rozetleri toplayarak efsane mertebesine yükselen elit üstat.',
+    requiredBadge: 'Efsanevi Coğrafyacı',
+    requiredMetricText: '8 veya daha fazla rozet kazan'
   },
   {
-    id: 'harita_kasifi',
-    name: 'Harita Kaşifi',
-    icon: '🗺️',
-    tier: 'bronze',
-    desc: 'Türkiye topoğrafyasında ilk yer şekillerini keşfeden gezgin.',
+    id: 'tahtin_sahibi',
+    name: 'Arena Efsanesi',
+    icon: '⚔️',
+    tier: 'diamond',
+    desc: '25 canlı PVP düello zaferiyle kırılması güç bir rekor kıran efsane.',
+    requiredBadge: 'Tahtın Sahibi',
+    requiredMetricText: '25 Canlı Düello zaferi kazan'
+  },
+  {
+    id: 'duello_krali',
+    name: 'Arena Şampiyonu',
+    icon: '👑',
+    tier: 'diamond',
+    desc: '10 canlı düello zaferiyle KPSS coğrafya arenasında tahta oturan hükümdar.',
+    requiredBadge: 'Düello Şampiyonu',
+    requiredMetricText: '10 Canlı Düello zaferi kazan'
+  },
+  {
+    id: 'kpss_sampiyonu',
+    name: 'KPSS Coğrafya Şampiyonu',
+    icon: '🎓',
+    tier: 'diamond',
+    desc: 'KPSS Coğrafya test havuzunu domine eden ve dereceye koşan üstat.',
+    requiredBadge: 'KPSS Coğrafya Üstadı',
+    requiredMetricText: '300 toplam test puanına ulaş'
+  },
+
+  // --- 👑 ALTIN & ŞAMPİYON KADEME ---
+  {
+    id: 'il_81_fatihi',
+    name: '81 İl Fatihi',
+    icon: '🇹🇷',
+    tier: 'gold',
+    desc: 'Türkiye\'nin 81 ilinin yerini ve coğrafi özelliklerini ezbere bilen usta.',
+    requiredBadge: '81 İl Kaşifi',
+    requiredMetricText: '81 İl Şehir Bulmaca modunda başarı elde et'
+  },
+  {
+    id: 'kusursuz_nisanci',
+    name: 'Kusursuz Nişancı',
+    icon: '🎯',
+    tier: 'gold',
+    desc: 'Harita testlerinde 10km altı milimetrik tam isabetler tutturan usta.',
     requiredBadge: 'Tam İsabet Kaptan',
-    requiredMetricText: '15km altı tam isabet yap'
+    requiredMetricText: '10km altı tam isabet yap'
   },
   {
-    id: 'toroslar_fatihi',
-    name: 'Toroslar Fatihi',
-    icon: '🏛️',
-    tier: 'silver',
-    desc: 'Akdeniz karstik şekilleri, polye ve Toros dağ sisteminin uzmanı.',
-    requiredBadge: 'Akdeniz Karstik Şekiller & Toroslar Kaptanı',
-    requiredMetricText: 'Akdeniz Bölgesi testlerinde 3 doğru'
+    id: 'seri_canavari_unvan',
+    name: 'Yenilmez Seri Canavarı',
+    icon: '🔥',
+    tier: 'gold',
+    desc: 'Ardı ardına sıfır hatayla soru zincirleri kuran coğrafya makinesi.',
+    requiredBadge: '5\'li Seri Canavarı',
+    requiredMetricText: '5 üst üste doğru cevap ver'
   },
   {
-    id: 'horst_graben_ustasi',
-    name: 'Horst-Graben Ustası',
-    icon: '🏖️',
-    tier: 'silver',
-    desc: 'Ege kırık dağları ve enine kıyı yapısına bütünüyle hakim usta.',
-    requiredBadge: 'Ege Kıyı & Horst-Graben Fatihi',
-    requiredMetricText: 'Ege Bölgesi testlerinde 3 doğru'
+    id: 'arena_gladyatoru',
+    name: '1v1 Gladyatör',
+    icon: '🛡️',
+    tier: 'gold',
+    desc: 'Canlı 1v1 coğrafya düellolarında rakiplerini alt eden savaşçı.',
+    requiredBadge: '1v1 Gladyatör',
+    requiredMetricText: '3 Canlı Düello zaferi kazan'
   },
   {
-    id: 'gap_muhafizi',
-    name: 'GAP & Fırat Muhafızı',
-    icon: '🌾',
-    tier: 'silver',
-    desc: 'Güneydoğu Anadolu ovaları, barajları ve Fırat-Dicle havzası hakimi.',
-    requiredBadge: 'Güneydoğu Anadolu Baraj & Ovalar Şampiyonu',
-    requiredMetricText: 'Güneydoğu testlerinde 3 doğru'
+    id: 'dilsiz_harita_dehasi',
+    name: 'Dilsiz Harita Dehası',
+    icon: '🙈',
+    tier: 'gold',
+    desc: 'Harita yazıları ve sınır çizgileri olmadan yer şekillerini gözü kapalı bulan dahi.',
+    requiredBadge: '3D Dilsiz Harita Kasırgası',
+    requiredMetricText: 'Dilsiz modda 3 doğru tahmin'
   },
   {
-    id: 'volkan_avcisi',
-    name: 'Volkan & Bozkır Bilgesi',
-    icon: '🌋',
+    id: 'turing_ustasi_unvan',
+    name: 'Turing Fatihi',
+    icon: '🧠',
+    tier: 'gold',
+    desc: 'Algoritmik hız ve bilgi refleksinde yapay zekayı geride bırakan dahi.',
+    requiredBadge: 'Turing Ustası',
+    requiredMetricText: 'Bot Arenasında 5 Zafer Kazan'
+  },
+
+  // --- 🛡️ GÜMÜŞ & UZMAN KADEME ---
+  {
+    id: 'bot_avcisi_unvan',
+    name: 'Yapay Zeka Mat Eden',
+    icon: '🤖',
     tier: 'silver',
-    desc: 'İç Anadolu platoları ve sönmüş volkan dizilimini eksiksiz bilen bilge.',
-    requiredBadge: 'İç Anadolu Platoları & Volkanları Üstadı',
-    requiredMetricText: 'İç Anadolu testlerinde 3 doğru'
+    desc: 'Yapay Zeka Coğrafya Botunu antrenman arenasında defalarca alt eden usta.',
+    requiredBadge: 'Yapay Zeka Mat Eden',
+    requiredMetricText: 'Bot Arenasında 10 Zafer Kazan'
+  },
+  {
+    id: 'sinir_bekcisi',
+    name: 'Sınır & Geçit Bekçisi',
+    icon: '🚪',
+    tier: 'silver',
+    desc: 'Türkiye\'nin tüm stratejik sınır kapılarını ve dağ geçitlerini ezberleyen muhafız.',
+    requiredBadge: 'Türkiye Sınır Kapıları & Geçit Muhafızı',
+    requiredMetricText: 'Sınır Kapıları & Geçitlerde 3 doğru'
+  },
+  {
+    id: 'bogazlar_hakimi',
+    name: 'Boğazlar & Marmara Hakimi',
+    icon: '🌉',
+    tier: 'silver',
+    desc: 'Marmara iklim geçişleri, boğazlar ve sanayi-tarım coğrafyası uzmanı.',
+    requiredBadge: 'Marmara İklim & Coğrafya Uzmanı',
+    requiredMetricText: 'Marmara testlerinde 3 doğru'
   },
   {
     id: 'karadeniz_kaplani',
@@ -181,123 +225,209 @@ export const ALL_TITLES: UserTitle[] = [
     requiredMetricText: 'Doğu Anadolu akarsu ve göllerinde 3 doğru'
   },
   {
-    id: 'bogazlar_hakimi',
-    name: 'Boğazlar & Marmara Hakimi',
-    icon: '🌉',
+    id: 'volkan_avcisi',
+    name: 'Volkan & Bozkır Bilgesi',
+    icon: '🌋',
     tier: 'silver',
-    desc: 'Marmara iklim geçişleri, boğazlar ve sanayi-tarım coğrafyası uzmanı.',
-    requiredBadge: 'Marmara İklim & Coğrafya Uzmanı',
-    requiredMetricText: 'Marmara testlerinde 3 doğru'
+    desc: 'İç Anadolu platoları ve sönmüş volkan dizilimini eksiksiz bilen bilge.',
+    requiredBadge: 'İç Anadolu Platoları & Volkanları Üstadı',
+    requiredMetricText: 'İç Anadolu testlerinde 3 doğru'
   },
   {
-    id: 'sinir_bekcisi',
-    name: 'Sınır & Geçit Bekçisi',
-    icon: '🚪',
+    id: 'gap_muhafizi',
+    name: 'GAP & Fırat Muhafızı',
+    icon: '🌾',
     tier: 'silver',
-    desc: 'Türkiye\'nin tüm stratejik sınır kapılarını ve dağ geçitlerini ezberleyen muhafız.',
-    requiredBadge: 'Türkiye Sınır Kapıları & Geçit Muhafızı',
-    requiredMetricText: 'Sınır Kapıları & Geçitlerde 3 doğru'
+    desc: 'Güneydoğu Anadolu ovaları, barajları ve Fırat-Dicle havzası hakimi.',
+    requiredBadge: 'Güneydoğu Anadolu Baraj & Ovalar Şampiyonu',
+    requiredMetricText: 'Güneydoğu testlerinde 3 doğru'
   },
   {
-    id: 'bot_avcisi_unvan',
-    name: 'Yapay Zeka Mat Eden',
-    icon: '🤖',
+    id: 'horst_graben_ustasi',
+    name: 'Horst-Graben Ustası',
+    icon: '🏖️',
     tier: 'silver',
-    desc: 'Yapay Zeka Coğrafya Botunu antrenman arenasında defalarca alt eden usta.',
-    requiredBadge: 'Yapay Zeka Mat Eden',
-    requiredMetricText: 'Bot Arenasında 10 Zafer Kazan'
+    desc: 'Ege kırık dağları ve enine kıyı yapısına bütünüyle hakim usta.',
+    requiredBadge: 'Ege Kıyı & Horst-Graben Fatihi',
+    requiredMetricText: 'Ege Bölgesi testlerinde 3 doğru'
   },
   {
-    id: 'turing_ustasi_unvan',
-    name: 'Turing Fatihi',
-    icon: '🧠',
-    tier: 'gold',
-    desc: 'Algoritmik hız ve bilgi refleksinde yapay zekayı geride bırakan dahi.',
-    requiredBadge: 'Turing Ustası',
-    requiredMetricText: 'Bot Arenasında 5 Zafer Kazan'
+    id: 'toroslar_fatihi',
+    name: 'Toroslar Fatihi',
+    icon: '🏛️',
+    tier: 'silver',
+    desc: 'Akdeniz karstik şekilleri, polye ve Toros dağ sisteminin uzmanı.',
+    requiredBadge: 'Akdeniz Karstik Şekiller & Toroslar Kaptanı',
+    requiredMetricText: 'Akdeniz Bölgesi testlerinde 3 doğru'
   },
+
+  // --- 🐣 BRONZ & ÇIRAK KADEME ---
   {
-    id: 'dilsiz_harita_dehasi',
-    name: 'Dilsiz Harita Dehası',
-    icon: '🙈',
-    tier: 'gold',
-    desc: 'Harita yazıları ve sınır çizgileri olmadan yer şekillerini gözü kapalı bulan dahi.',
-    requiredBadge: '3D Dilsiz Harita Kasırgası',
-    requiredMetricText: 'Dilsiz modda 3 doğru tahmin'
-  },
-  {
-    id: 'arena_gladyatoru',
-    name: '1v1 Gladyatör',
-    icon: '🛡️',
-    tier: 'gold',
-    desc: 'Canlı 1v1 coğrafya düellolarında rakiplerini alt eden savaşçı.',
-    requiredBadge: '1v1 Gladyatör',
-    requiredMetricText: '3 Canlı Düello zaferi kazan'
-  },
-  {
-    id: 'seri_canavari_unvan',
-    name: 'Yenilmez Seri Canavarı',
-    icon: '🔥',
-    tier: 'gold',
-    desc: 'Ardı ardına sıfır hatayla soru zincirleri kuran coğrafya makinesi.',
-    requiredBadge: '5\'li Seri Canavarı',
-    requiredMetricText: '5 üst üste doğru cevap ver'
-  },
-  {
-    id: 'duello_krali',
-    name: 'Arena Şampiyonu',
-    icon: '👑',
-    tier: 'diamond',
-    desc: '10 canlı düello zaferiyle KPSS coğrafya arenasında tahta oturan hükümdar.',
-    requiredBadge: 'Düello Şampiyonu',
-    requiredMetricText: '10 Canlı Düello zaferi kazan'
-  },
-  {
-    id: 'tahtin_sahibi',
-    name: 'Arena Efsanesi',
-    icon: '⚔️',
-    tier: 'diamond',
-    desc: '25 canlı PVP düello zaferiyle kırılması güç bir rekor kıran efsane.',
-    requiredBadge: 'Tahtın Sahibi',
-    requiredMetricText: '25 Canlı Düello zaferi kazan'
-  },
-  {
-    id: 'kpss_sampiyonu',
-    name: 'KPSS Coğrafya Şampiyonu',
-    icon: '🎓',
-    tier: 'diamond',
-    desc: 'KPSS Coğrafya test havuzunu domine eden ve dereceye koşan üstat.',
-    requiredBadge: 'KPSS Coğrafya Üstadı',
-    requiredMetricText: '300 toplam test puanına ulaş'
-  },
-  {
-    id: 'il_81_fatihi',
-    name: '81 İl Fatihi',
-    icon: '🇹🇷',
-    tier: 'gold',
-    desc: 'Türkiye\'nin 81 ilinin yerini ve coğrafi özelliklerini ezbere bilen usta.',
-    requiredBadge: '81 İl Kaşifi',
-    requiredMetricText: '81 İl modunda başarı elde et'
-  },
-  {
-    id: 'kusursuz_nisanci',
-    name: 'Kusursuz Nişancı',
-    icon: '🎯',
-    tier: 'gold',
-    desc: 'Harita testlerinde 10km altı milimetrik tam isabetler tutturan usta.',
+    id: 'harita_kasifi',
+    name: 'Harita Kaşifi',
+    icon: '🗺️',
+    tier: 'bronze',
+    desc: 'Türkiye topoğrafyasında ilk yer şekillerini keşfeden gezgin.',
     requiredBadge: 'Tam İsabet Kaptan',
-    requiredMetricText: '10km altı isabet yap'
+    requiredMetricText: '15km altı tam isabet yap'
   },
   {
-    id: 'efsanevi_elmas_deha',
-    name: 'Efsanevi Harita Dehası',
-    icon: '💎',
-    tier: 'diamond',
-    desc: 'Tüm kademeli rozetleri toplayarak efsane mertebesine yükselen elit üstat.',
-    requiredBadge: 'Efsanevi Coğrafyacı',
-    requiredMetricText: '8 veya daha fazla rozet kazan'
+    id: 'cografyaci_ciragi',
+    name: '3D Coğrafyacı Çırağı',
+    icon: '🐣',
+    tier: 'bronze',
+    desc: 'Coğrafya öğrenim serüvenine adım atan hevesli öğrenci.',
+    requiredBadge: '3D Coğrafyacı Çırağı',
+    requiredMetricText: 'Varsayılan Başlangıç Ünvanı'
   }
 ];
+
+export interface TitleProgressInfo {
+  isUnlocked: boolean;
+  currentValue: number;
+  targetValue: number;
+  progressPct: number;
+  remainingText: string;
+  metricLabel: string;
+}
+
+export function getTitleProgress(
+  title: UserTitle,
+  unlockedBadges: string[] = [],
+  duelWins: number = 0,
+  score: number = 0,
+  categoryMasteryProgress: Record<string, number> = {},
+  botWins: number = 0
+): TitleProgressInfo {
+  const isBadgeUnlocked = !title.requiredBadge || unlockedBadges.includes(title.requiredBadge) || title.id === 'cografyaci_ciragi';
+  
+  if (isBadgeUnlocked) {
+    return {
+      isUnlocked: true,
+      currentValue: 1,
+      targetValue: 1,
+      progressPct: 100,
+      remainingText: 'Kuşanılabilir ✓',
+      metricLabel: title.requiredMetricText
+    };
+  }
+
+  // Calculate granular progress based on specific title targets
+  let current = 0;
+  let target = 1;
+  let unit = '';
+
+  switch (title.id) {
+    case 'tahtin_sahibi':
+      current = duelWins;
+      target = 25;
+      unit = 'zafer';
+      break;
+    case 'duello_krali':
+      current = duelWins;
+      target = 10;
+      unit = 'zafer';
+      break;
+    case 'arena_gladyatoru':
+      current = duelWins;
+      target = 3;
+      unit = 'zafer';
+      break;
+    case 'efsanevi_elmas_deha':
+      current = unlockedBadges.length;
+      target = 8;
+      unit = 'rozet';
+      break;
+    case 'kpss_sampiyonu':
+      current = score;
+      target = 300;
+      unit = 'puan';
+      break;
+    case 'turing_ustasi_unvan':
+      current = botWins;
+      target = 5;
+      unit = 'bot zaferi';
+      break;
+    case 'bot_avcisi_unvan':
+      current = botWins;
+      target = 10;
+      unit = 'bot zaferi';
+      break;
+    case 'seri_canavari_unvan':
+      current = categoryMasteryProgress['max_streak'] || 0;
+      target = 5;
+      unit = 'seri doğru';
+      break;
+    case 'dilsiz_harita_dehasi':
+      current = categoryMasteryProgress['dilsiz_harita'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'toroslar_fatihi':
+      current = categoryMasteryProgress['Akdeniz_Karstik'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'horst_graben_ustasi':
+      current = categoryMasteryProgress['Ege_Genel'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'gap_muhafizi':
+      current = categoryMasteryProgress['Güneydoğu_Barajlar'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'volkan_avcisi':
+      current = categoryMasteryProgress['İç Anadolu_Volkanlar'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'karadeniz_kaplani':
+      current = categoryMasteryProgress['Karadeniz_Genel'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'dogu_kalesi':
+      current = categoryMasteryProgress['Doğu Anadolu_Akarsular'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'bogazlar_hakimi':
+      current = categoryMasteryProgress['Marmara_Genel'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'sinir_bekcisi':
+      current = categoryMasteryProgress['Sınır Kapıları_Geçitler'] || 0;
+      target = 3;
+      unit = 'doğru';
+      break;
+    case 'il_81_fatihi':
+      current = categoryMasteryProgress['81_il_provinces'] || 0;
+      target = 1;
+      unit = 'tamamlama';
+      break;
+    default:
+      current = 0;
+      target = 1;
+      unit = 'adım';
+      break;
+  }
+
+  const clamped = Math.min(target, Math.max(0, current));
+  const pct = Math.min(100, Math.round((clamped / target) * 100));
+  const remaining = Math.max(0, target - clamped);
+
+  return {
+    isUnlocked: clamped >= target,
+    currentValue: clamped,
+    targetValue: target,
+    progressPct: pct,
+    remainingText: clamped >= target ? 'Kazanıldı ✓' : `${remaining} ${unit} kaldı`,
+    metricLabel: title.requiredMetricText
+  };
+}
 
 export const ALL_BADGES: Badge[] = [
   // --- KADEMELİ BÖLGE UZMANLIKLARI (SEVİYE 1 - 2) ---

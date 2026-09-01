@@ -8,6 +8,7 @@ import {
   AVATAR_ICONS, 
   AVATAR_THEMES, 
   getPrestigeTier,
+  getTitleProgress,
   BadgeTier
 } from '@/lib/data/badgesData';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
@@ -53,6 +54,8 @@ export default function ProfileEditModal({
     equippedTitle,
     unlockedBadges,
     duelStats,
+    botStats,
+    score,
     categoryMasteryProgress,
     setAvatarIcon,
     setAvatarBg,
@@ -441,45 +444,73 @@ export default function ProfileEditModal({
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
                 {ALL_TITLES.map((titleObj) => {
-                  const isUnlocked = !titleObj.requiredBadge || unlockedBadges.includes(titleObj.requiredBadge);
+                  const prog = getTitleProgress(
+                    titleObj,
+                    unlockedBadges,
+                    duelStats?.duelWins || 0,
+                    score || 0,
+                    categoryMasteryProgress,
+                    botStats?.botWins || 0
+                  );
+                  const isUnlocked = prog.isUnlocked;
                   const isEquipped = equippedTitle === titleObj.name;
 
                   return (
                     <div
                       key={titleObj.id}
-                      className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-all ${
+                      className={`p-2.5 rounded-xl border flex flex-col justify-between gap-1.5 transition-all ${
                         isEquipped
                           ? 'bg-amber-500/20 border-amber-400 ring-2 ring-amber-400/50 shadow-md'
                           : isUnlocked
                           ? 'bg-white/5 hover:bg-white/10 border-white/10'
-                          : 'bg-black/40 border-white/5 opacity-45'
+                          : 'bg-black/40 border-white/5 opacity-75'
                       }`}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-lg shrink-0">{titleObj.icon}</span>
-                        <div className="min-w-0">
-                          <div className="font-black text-xs text-white truncate">{titleObj.name}</div>
-                          <p className="text-[10px] text-slate-300 truncate">
-                            {isUnlocked ? titleObj.desc : `🔒 Gereksinim: ${titleObj.requiredMetricText}`}
-                          </p>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-lg shrink-0">{titleObj.icon}</span>
+                          <div className="min-w-0">
+                            <div className="font-black text-xs text-white truncate">{titleObj.name}</div>
+                            <p className="text-[10px] text-slate-300 truncate">
+                              {isUnlocked ? titleObj.desc : titleObj.requiredMetricText}
+                            </p>
+                          </div>
                         </div>
+
+                        {isUnlocked ? (
+                          <button
+                            onClick={() => handleEquipTitle(titleObj.name)}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all cursor-pointer ${
+                              isEquipped
+                                ? 'bg-amber-400 text-slate-950 shadow'
+                                : 'bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-200'
+                            }`}
+                          >
+                            {isEquipped ? 'Kuşanıldı ✓' : 'Kuşan'}
+                          </button>
+                        ) : (
+                          <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-slate-400 shrink-0">
+                            Kilitli
+                          </span>
+                        )}
                       </div>
 
-                      {isUnlocked ? (
-                        <button
-                          onClick={() => handleEquipTitle(titleObj.name)}
-                          className={`px-2 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all ${
-                            isEquipped
-                              ? 'bg-amber-400 text-slate-950'
-                              : 'bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-200'
-                          }`}
-                        >
-                          {isEquipped ? 'Kuşanıldı ✓' : 'Kuşan'}
-                        </button>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-500 shrink-0">Kilitli</span>
+                      {/* Progress Bar & Remaining Counter for Titles */}
+                      {!isUnlocked && (
+                        <div className="mt-1 pt-1.5 border-t border-white/10 space-y-1">
+                          <div className="flex items-center justify-between text-[9px] font-bold">
+                            <span className="text-amber-400">{prog.remainingText}</span>
+                            <span className="text-slate-300">{prog.currentValue}/{prog.targetValue} (%{prog.progressPct})</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300"
+                              style={{ width: `${prog.progressPct}%` }}
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
                   );
@@ -527,6 +558,7 @@ export default function ProfileEditModal({
                         const currentProgress = (categoryMasteryProgress && categoryMasteryProgress[badge.trackerKey]) || 0;
                         const target = badge.targetCount || 1;
                         const pct = Math.min(100, Math.round((currentProgress / target) * 100));
+                        const remaining = Math.max(0, target - currentProgress);
 
                         return (
                           <div
@@ -534,7 +566,7 @@ export default function ProfileEditModal({
                             className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
                               isUnlocked
                                 ? 'bg-gradient-to-r from-amber-950/40 to-slate-900 border-amber-500/50 shadow-md'
-                                : 'bg-white/5 border-white/10 opacity-70'
+                                : 'bg-white/5 border-white/10 opacity-75'
                             }`}
                           >
                             <div className="flex items-start gap-2.5">
@@ -560,13 +592,18 @@ export default function ProfileEditModal({
                             </div>
 
                             {!isUnlocked && (
-                              <div className="mt-2 pt-1 border-t border-white/5 space-y-1">
-                                <div className="flex justify-between text-[9px] text-slate-400">
+                              <div className="mt-2 pt-1.5 border-t border-white/10 space-y-1">
+                                <div className="flex justify-between items-center text-[9px] text-slate-400">
                                   <span>{badge.reqText}</span>
-                                  <span className="font-extrabold text-amber-400">{currentProgress}/{target}</span>
+                                  <span className="font-extrabold text-amber-400">
+                                    {currentProgress}/{target} (%{pct})
+                                  </span>
                                 </div>
-                                <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                                  <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                  <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full" style={{ width: `${pct}%` }} />
+                                </div>
+                                <div className="text-[8px] text-slate-400 font-semibold text-right">
+                                  Kalan: <strong className="text-amber-300">{remaining} adet/zafer</strong>
                                 </div>
                               </div>
                             )}

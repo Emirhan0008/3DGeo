@@ -13,47 +13,32 @@ import {
   Search, 
   Mountain,
   Sliders,
-  ChevronDown,
   Maximize2,
   Minimize2,
-  Swords
+  Swords,
+  Trophy
 } from 'lucide-react';
 import { useAppFullscreen } from '@/lib/utils';
-
-const CATEGORIES = [
-  'Genel',
-  'Dağlar',
-  'Akarsular',
-  'Göller',
-  'Sınır Kapıları',
-  'Geçitler',
-  'Platolar & Ovalar',
-  'Madenler',
-  'Karstik & Kıyı'
-];
-
 import AuthUserButton from './AuthUserButton';
+import GlobalLeaderboardModal from './GlobalLeaderboardModal';
 
 export default function Navbar() {
   const {
     activeTab,
     setActiveTab,
-    score,
-    streak,
     setSelectedFeature,
     flyToCoords,
     toggleSidebar,
     layers,
     setAiDrawerOpen,
-    isAiDrawerOpen,
-    gameCategoryFilter,
-    setGameCategoryFilter
+    isAiDrawerOpen
   } = useAppStore();
 
   const activeLayersCount = Object.values(layers).filter(Boolean).length;
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const { isFullscreen, toggleFullscreen } = useAppFullscreen();
 
   // Search autocomplete items
@@ -203,24 +188,18 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {/* Category Selector */}
-          <div className="relative hidden xl:block">
-            <select
-              value={gameCategoryFilter}
-              onChange={(e) => setGameCategoryFilter(e.target.value)}
-              className="appearance-none bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-2 py-1 text-[11px] font-bold text-amber-300 pr-5 focus:outline-none cursor-pointer"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat} className="bg-[#09090b] text-slate-100">
-                  {cat === 'Genel' ? '🌐 Genel (Tüm Şekiller)' : cat}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-amber-400 pointer-events-none" />
-          </div>
+          {/* Global Leaderboard Button (Replaces Score and Category) */}
+          <button
+            onClick={() => setIsLeaderboardOpen(true)}
+            className="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/10 hover:from-amber-500 hover:to-yellow-500 hover:text-slate-950 text-amber-300 border border-amber-400/50 hover:border-amber-300 text-[10px] sm:text-xs font-black flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
+            title="Global Sıralama ve Canlı Liderlik Tablosunu Aç"
+          >
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 group-hover:text-slate-950" />
+            <span className="font-extrabold tracking-tight">Sıralama</span>
+          </button>
 
           {/* Search Bar */}
-          <div className="relative w-16 xs:w-24 sm:w-32 md:w-36">
+          <div className="relative w-16 xs:w-20 sm:w-28 md:w-36">
             <div className="relative flex items-center">
               <Search className="absolute left-1.5 sm:left-2 w-3 h-3 text-slate-400" />
               <input
@@ -253,13 +232,6 @@ export default function Navbar() {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Score / Streak */}
-          <div className="hidden sm:flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] font-bold shrink-0">
-            <span className="text-emerald-400">{score}p</span>
-            <span className="text-slate-600">|</span>
-            <span className="text-orange-400">{streak}🔥</span>
           </div>
 
           {/* Fullscreen Button - Highlighted & Pulsing on Harita Testi if not fullscreen */}
@@ -393,23 +365,29 @@ export default function Navbar() {
   // In Fullscreen Mode: Dedicated floating minimize button on top-right outside of cards
   if (isFullscreen) {
     return (
-      <div className="fixed top-2 right-2 sm:top-3 sm:right-3.5 z-50 pointer-events-auto select-none">
-        <button
-          onClick={toggleFullscreen}
-          title="Ekranı Küçült (Tam Ekrandan Çık)"
-          className="group relative flex items-center gap-1 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-[#09090b]/90 backdrop-blur-xl border border-amber-400/80 text-amber-300 hover:text-slate-950 hover:bg-amber-400 rounded-xl shadow-2xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all cursor-pointer font-black text-xs"
-        >
-          <Minimize2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:scale-110 transition-transform stroke-[2.5]" />
-          <span className="text-[10px] sm:text-xs font-black">Küçült</span>
-        </button>
-      </div>
+      <>
+        <div className="fixed top-2 right-2 sm:top-3 sm:right-3.5 z-50 pointer-events-auto select-none">
+          <button
+            onClick={toggleFullscreen}
+            title="Ekranı Küçült (Tam Ekrandan Çık)"
+            className="group relative flex items-center gap-1 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-[#09090b]/90 backdrop-blur-xl border border-amber-400/80 text-amber-300 hover:text-slate-950 hover:bg-amber-400 rounded-xl shadow-2xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all cursor-pointer font-black text-xs"
+          >
+            <Minimize2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:scale-110 transition-transform stroke-[2.5]" />
+            <span className="text-[10px] sm:text-xs font-black">Küçült</span>
+          </button>
+        </div>
+        <GlobalLeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
+      </>
     );
   }
 
   // Standard Non-Fullscreen Top Fixed Navbar
   return (
-    <header className="relative z-30 w-full bg-[#09090b]/95 backdrop-blur-xl border-b border-white/10 text-slate-100 px-2 sm:px-4 py-1 sm:py-1.5 shadow-xl select-none">
-      {renderNavbarContent()}
-    </header>
+    <>
+      <header className="relative z-30 w-full bg-[#09090b]/95 backdrop-blur-xl border-b border-white/10 text-slate-100 px-2 sm:px-4 py-1 sm:py-1.5 shadow-xl select-none">
+        {renderNavbarContent()}
+      </header>
+      <GlobalLeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
+    </>
   );
 }

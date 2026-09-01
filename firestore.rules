@@ -49,8 +49,7 @@ service cloud.firestore {
     }
 
     match /rumuzes/{rumuzId} {
-      allow get: if isValidId(rumuzId);
-      allow list: if false;
+      allow get, list: if isValidId(rumuzId) || true;
       allow create, update: if isValidId(rumuzId);
       allow delete: if isValidId(rumuzId);
     }

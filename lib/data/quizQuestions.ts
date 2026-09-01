@@ -2214,12 +2214,39 @@ const DYNAMIC_QUIZ_QUESTIONS: MultipleChoiceQuestion[] = ALL_GEO_FEATURES.flatMa
   return questions;
 });
 
+const PROVINCE_MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = PROVINCES_81_DATA.flatMap((p, idx) => {
+  const otherProvinces = PROVINCES_81_DATA.filter(other => other.name !== p.name);
+  const sameRegion = otherProvinces.filter(other => other.region === p.region);
+  const distractorPool = sameRegion.length >= 4 ? sameRegion : otherProvinces;
+  const shuffledPool = shuffleArray(distractorPool).slice(0, 4);
+
+  const rawOptions = [p.name, ...shuffledPool.map(o => o.name)];
+  const shuffledOptions = shuffleArray(rawOptions);
+  const correctIndex = shuffledOptions.indexOf(p.name);
+
+  // Question 1: Famous for & keywords
+  const q1: MultipleChoiceQuestion = {
+    id: `mc-prov-${p.plate}-feat-${idx}`,
+    category: 'Şehir Bulmaca (81 İl)',
+    region: p.region,
+    questionText: `"${p.famousFor}" ve "${p.kpssKeywords.join(', ')}" coğrafi özellikleriyle öne çıkan ${p.region} Bölgesi ilimiz hangisidir?`,
+    options: shuffledOptions,
+    correctIndex: correctIndex >= 0 ? correctIndex : 0,
+    targetCoords: p.coordinates,
+    explanation: `${p.name} (Plaka: ${p.plate}): ${p.famousFor}. Bölgesi: ${p.region}.`,
+    osymTip: `KPSS 81 İl Bilgisi: ${p.name} ilinde ${p.kpssKeywords.join(', ')} özellikleri sorularda sıkça geçer.`
+  };
+
+  return [q1];
+});
+
 export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
   ...HANDCRAFTED_MULTIPLE_CHOICE_QUESTIONS.map(q => ({
     ...q,
     options: q.options.map(opt => cleanOptionName(opt))
   })),
-  ...DYNAMIC_QUIZ_QUESTIONS
+  ...DYNAMIC_QUIZ_QUESTIONS,
+  ...PROVINCE_MULTIPLE_CHOICE_QUESTIONS
 ];
 
 export function getQuizQuestionsByIds(questionIds: string[]): MultipleChoiceQuestion[] {

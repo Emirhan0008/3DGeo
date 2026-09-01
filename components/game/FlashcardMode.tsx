@@ -27,6 +27,7 @@ export default function FlashcardMode() {
   const baseList = useMemo(() => {
     const filtered = ALL_GEO_FEATURES.filter((f) => {
       if (selectedCategory === 'Hepsi') return true;
+      if (selectedCategory === '81 İl & Şehirler') return f.type === 'province' || f.category?.includes('İl');
       if (selectedCategory === 'Dağlar') return f.type === 'mountain';
       if (selectedCategory === 'Akarsular') return f.type === 'river';
       if (selectedCategory === 'Göller') return f.type === 'lake';
@@ -83,12 +84,12 @@ export default function FlashcardMode() {
     <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 w-[92%] max-w-lg bg-[#09090b]/90 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-4 transition-all">
       {/* Category Filter Pills & Close Button */}
       <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-3 gap-2">
-        <div className="flex items-center gap-1.5 overflow-x-auto text-xs py-0.5">
-          {['Hepsi', 'Dağlar', 'Akarsular', 'Göller', 'Sınır Kapıları', 'Geçitler', 'Ovalar & Platolar', 'Madenler'].map((cat) => (
+        <div className="flex items-center gap-1.5 overflow-x-auto text-xs py-0.5 scrollbar-none">
+          {['Hepsi', '81 İl & Şehirler', 'Dağlar', 'Akarsular', 'Göller', 'Sınır Kapıları', 'Geçitler', 'Ovalar & Platolar', 'Madenler'].map((cat) => (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all ${
+              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-indigo-600 text-white shadow-md'
                   : 'bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200'

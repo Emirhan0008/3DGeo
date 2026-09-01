@@ -1,5 +1,118 @@
 import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, limit, query, orderBy } from 'firebase/firestore';
+
+export interface LeaderboardEntry {
+  rank: number;
+  rumuz: string;
+  rumuzKey: string;
+  avatarIcon: string;
+  avatarBg: string;
+  equippedTitle: string;
+  score: number;
+  streak: number;
+  duelWins: number;
+  totalDuels: number;
+  unlockedBadgesCount: number;
+  accuracyPct: number;
+  updatedAt?: string;
+  isCurrentUser?: boolean;
+}
+
+export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak' = 'score'): Promise<LeaderboardEntry[]> {
+  try {
+    const rumuzesRef = collection(db, 'rumuzes');
+    let q;
+    if (sortBy === 'duels') {
+      q = query(rumuzesRef, orderBy('duelStats.duelWins', 'desc'), limit(50));
+    } else if (sortBy === 'streak') {
+      q = query(rumuzesRef, orderBy('streak', 'desc'), limit(50));
+    } else {
+      q = query(rumuzesRef, orderBy('score', 'desc'), limit(50));
+    }
+
+    const snap = await getDocs(q);
+    const results: LeaderboardEntry[] = [];
+
+    snap.forEach((docSnap) => {
+      const d = docSnap.data() as RumuzProfileData;
+      if (!d.rumuz) return;
+      const totalAnswers = d.totalQuestionsAnswered || 0;
+      const correct = d.correctAnswersCount || 0;
+      const accuracyPct = totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0;
+      const duelWins = d.duelStats?.duelWins || 0;
+      const totalDuels = d.duelStats?.totalDuelsPlayed || 0;
+
+      results.push({
+        rank: 0,
+        rumuz: d.rumuz,
+        rumuzKey: d.rumuzKey || docSnap.id,
+        avatarIcon: d.avatarIcon || '🐣',
+        avatarBg: d.avatarBg || 'indigo_midnight',
+        equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
+        score: d.score || 0,
+        streak: d.streak || 0,
+        duelWins,
+        totalDuels,
+        unlockedBadgesCount: (d.unlockedBadges || []).length,
+        accuracyPct,
+        updatedAt: d.updatedAt
+      });
+    });
+
+    // Secondary client-side sorting guarantee in case Firestore index is warming up
+    results.sort((a, b) => {
+      if (sortBy === 'duels') {
+        if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
+        return b.score - a.score;
+      }
+      if (sortBy === 'streak') {
+        if (b.streak !== a.streak) return b.streak - a.streak;
+        return b.score - a.score;
+      }
+      if (b.score !== a.score) return b.score - a.score;
+      return b.duelWins - a.duelWins;
+    });
+
+    // Assign 1-indexed ranks
+    return results.map((entry, idx) => ({
+      ...entry,
+      rank: idx + 1
+    }));
+  } catch (err) {
+    console.warn('Global leaderboard query fallback:', err);
+    // Fallback: query without order or return empty list
+    try {
+      const rumuzesRef = collection(db, 'rumuzes');
+      const snap = await getDocs(query(rumuzesRef, limit(40)));
+      const results: LeaderboardEntry[] = [];
+      snap.forEach((docSnap) => {
+        const d = docSnap.data() as RumuzProfileData;
+        if (!d.rumuz) return;
+        const totalAnswers = d.totalQuestionsAnswered || 0;
+        const correct = d.correctAnswersCount || 0;
+        results.push({
+          rank: 0,
+          rumuz: d.rumuz,
+          rumuzKey: d.rumuzKey || docSnap.id,
+          avatarIcon: d.avatarIcon || '🐣',
+          avatarBg: d.avatarBg || 'indigo_midnight',
+          equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
+          score: d.score || 0,
+          streak: d.streak || 0,
+          duelWins: d.duelStats?.duelWins || 0,
+          totalDuels: d.duelStats?.totalDuelsPlayed || 0,
+          unlockedBadgesCount: (d.unlockedBadges || []).length,
+          accuracyPct: totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0,
+          updatedAt: d.updatedAt
+        });
+      });
+      results.sort((a, b) => b.score - a.score);
+      return results.map((e, idx) => ({ ...e, rank: idx + 1 }));
+    } catch {
+      return [];
+    }
+  }
+}
 
 export interface RumuzProfileData {
   rumuz: string;
