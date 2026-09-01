@@ -816,6 +816,8 @@ export default function DuelMode() {
                 rumuz={rumuz}
                 unlockedBadges={unlockedBadges}
                 duelWins={duelStats.duelWins}
+                duelStreak={duelStats.duelStreak}
+                isDuelMode={true}
                 avatarIcon={avatarIcon}
                 avatarBg={avatarBg}
                 equippedTitle={equippedTitle}
@@ -1309,6 +1311,8 @@ export default function DuelMode() {
                 rumuz={activeDuelSession.player1.rumuz}
                 unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : ['3D Coğrafyacı']}
                 duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : 1}
+                duelStreak={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : 0}
+                isDuelMode={true}
                 avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : '⚔️'}
                 avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : 'night_blue'}
                 equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : 'KPSS Adayı'}
@@ -1335,6 +1339,8 @@ export default function DuelMode() {
                 rumuz={activeDuelSession.player2?.rumuz || 'Rakip'}
                 unlockedBadges={activeDuelSession.player2?.isBot ? ['KPSS Yapay Zeka'] : ['1v1 Gladyatör']}
                 duelWins={activeDuelSession.player2?.isBot ? 99 : 3}
+                duelStreak={activeDuelSession.player2?.isBot ? 5 : 1}
+                isDuelMode={true}
                 size="lg"
               />
               <span className="text-sm font-black text-rose-300 max-w-[120px] truncate mt-2">
@@ -1396,6 +1402,8 @@ export default function DuelMode() {
                   rumuz={activeDuelSession.player1.rumuz}
                   unlockedBadges={unlockedBadges}
                   duelWins={duelStats.duelWins}
+                  duelStreak={duelStats.duelStreak}
+                  isDuelMode={true}
                   avatarIcon={avatarIcon}
                   avatarBg={avatarBg}
                   equippedTitle={equippedTitle}
@@ -1422,6 +1430,8 @@ export default function DuelMode() {
                   rumuz={activeDuelSession.player2?.rumuz || 'Rakip'}
                   unlockedBadges={activeDuelSession.player2?.isBot ? ['KPSS Yapay Zeka'] : ['Düello Yarışçısı']}
                   duelWins={activeDuelSession.player2?.isBot ? 50 : 2}
+                  duelStreak={activeDuelSession.player2?.isBot ? 2 : 0}
+                  isDuelMode={true}
                   size="sm"
                 />
                 <span className="text-xs font-bold text-slate-200 truncate">
@@ -1658,6 +1668,8 @@ export default function DuelMode() {
                 rumuz={myPlayer?.rumuz || 'Sen'}
                 unlockedBadges={unlockedBadges}
                 duelWins={duelStats.duelWins}
+                duelStreak={duelStats.duelStreak}
+                isDuelMode={true}
                 avatarIcon={avatarIcon}
                 avatarBg={avatarBg}
                 equippedTitle={equippedTitle}
@@ -1715,6 +1727,8 @@ export default function DuelMode() {
                 rumuz={otherPlayer?.rumuz || 'Rakip'}
                 unlockedBadges={otherPlayer?.isBot ? ['KPSS Yapay Zeka'] : ['Düello Yarışçısı']}
                 duelWins={otherPlayer?.isBot ? 50 : 2}
+                duelStreak={otherPlayer?.isBot ? 2 : 0}
+                isDuelMode={true}
                 size="sm"
               />
             </div>
@@ -1914,6 +1928,8 @@ export default function DuelMode() {
               rumuz={myPlayer?.rumuz || 'Sen'}
               unlockedBadges={unlockedBadges}
               duelWins={duelStats.duelWins}
+              duelStreak={duelStats.duelStreak}
+              isDuelMode={true}
               avatarIcon={avatarIcon}
               avatarBg={avatarBg}
               equippedTitle={equippedTitle}
@@ -1967,6 +1983,8 @@ export default function DuelMode() {
               rumuz={otherPlayer?.rumuz || 'Rakip'}
               unlockedBadges={otherPlayer?.isBot ? ['KPSS Yapay Zeka'] : ['Düello Yarışçısı']}
               duelWins={otherPlayer?.isBot ? 50 : 2}
+              duelStreak={otherPlayer?.isBot ? 2 : 0}
+              isDuelMode={true}
               size="sm"
             />
           </div>

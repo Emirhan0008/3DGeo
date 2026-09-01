@@ -7,7 +7,8 @@ import { ALL_GEO_FEATURES, GeoFeature } from '@/lib/data/turkeyData';
 import turkeyProvincesGeoJSON from '@/public/data/turkey-provinces.json';
 import { 
   getCurrentPinQuestion,
-  getCurrentQuizQuestion
+  getCurrentQuizQuestion,
+  getFeatureCityName
 } from '@/lib/data/quizQuestions';
 import { getQuestionsByIds, submitPlayerGuess } from '@/lib/duelService';
 import { 
@@ -399,13 +400,13 @@ export default function MapContainer() {
         storeState.submitPinGuess(e.lngLat.lng, e.lngLat.lat);
       }
 
-      // 2. 1v1 Real-time Map Duel Guess (Only for map pin duels, not KPSS multiple choice test)
+      // 2. 1v1 Real-time Map Duel Guess (Only for map pin duels, allows changing pin freely until round expires)
       if (storeState.activeTab === 'duel') {
         const session = storeState.activeDuelSession;
         const playerKey = storeState.activeDuelPlayerKey;
         if (session && session.status === 'in_progress' && playerKey && session.duelType !== 'kpss_test') {
           const currentPlayer = playerKey === 'player1' ? session.player1 : session.player2;
-          if (currentPlayer && !currentPlayer.currentGuess) {
+          if (currentPlayer) {
             const questions = getQuestionsByIds(session.questionIds);
             const currentQ = questions[session.currentRound];
             if (currentQ) {
@@ -757,12 +758,14 @@ export default function MapContainer() {
 
       // Target Location Marker (Gold Star)
       if (currentQ) {
+        const cityName = getFeatureCityName(currentQ, currentQ.title, currentQ.region);
+        const cityLabel = cityName ? ` • ${cityName}` : '';
         const targetEl = document.createElement('div');
         targetEl.className = 'relative flex items-center justify-center';
         targetEl.innerHTML = `
           <div class="absolute w-10 h-10 bg-amber-400/50 rounded-full animate-pulse"></div>
           <div class="px-3 py-1 bg-amber-500 border-2 border-white text-slate-900 font-extrabold rounded-full shadow-2xl text-xs flex items-center gap-1">
-            ⭐ ${currentQ.title}
+            ⭐ ${currentQ.title}${cityLabel}
           </div>
         `;
         targetMarkerRef.current = new maplibregl.Marker({ element: targetEl })
@@ -835,13 +838,15 @@ export default function MapContainer() {
       }
       // If round is in reveal or finished phase (show both guesses, target, and comparison lines)
       else if ((session.status === 'round_reveal' || session.status === 'finished') && currentQ) {
+        const cityName = getFeatureCityName(currentQ, currentQ.title, currentQ.region);
+        const cityLabel = cityName ? ` • ${cityName}` : '';
         // Gold Target Marker
         const targetEl = document.createElement('div');
         targetEl.className = 'relative flex items-center justify-center';
         targetEl.innerHTML = `
           <div class="absolute w-12 h-12 bg-amber-400/60 rounded-full animate-pulse"></div>
           <div class="px-3.5 py-1.5 bg-amber-500 border-2 border-white text-slate-950 font-black text-xs sm:text-sm rounded-full shadow-2xl flex items-center gap-1.5 ring-2 ring-amber-300">
-            ⭐ DOĞRU YER: ${currentQ.title}
+            ⭐ DOĞRU YER: ${currentQ.title}${cityLabel}
           </div>
         `;
         targetMarkerRef.current = new maplibregl.Marker({ element: targetEl })

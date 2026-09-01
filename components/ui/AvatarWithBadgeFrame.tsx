@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
-import { getPrestigeTier, AVATAR_THEMES } from '@/lib/data/badgesData';
+import { getPrestigeTier, getDuelPrestigeTier, AVATAR_THEMES } from '@/lib/data/badgesData';
 
 interface AvatarWithBadgeFrameProps {
   rumuz: string;
   unlockedBadges?: string[];
   duelWins?: number;
+  duelStreak?: number;
+  isDuelMode?: boolean;
   avatarIcon?: string;
   avatarBg?: string;
   equippedTitle?: string;
@@ -20,6 +22,8 @@ export default function AvatarWithBadgeFrame({
   rumuz,
   unlockedBadges = [],
   duelWins = 0,
+  duelStreak = 0,
+  isDuelMode = false,
   avatarIcon,
   avatarBg,
   equippedTitle,
@@ -28,7 +32,10 @@ export default function AvatarWithBadgeFrame({
   showTitleBadge = false,
   className = ''
 }: AvatarWithBadgeFrameProps) {
-  const prestige = getPrestigeTier(unlockedBadges, duelWins, equippedTitle);
+  const prestige = isDuelMode 
+    ? getDuelPrestigeTier(duelWins, duelStreak, unlockedBadges)
+    : getPrestigeTier(unlockedBadges, duelWins, equippedTitle);
+
   const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
   const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
 
@@ -40,17 +47,17 @@ export default function AvatarWithBadgeFrame({
   const sizeClasses = {
     xs: {
       container: 'w-6 h-6 text-[10px]',
-      pin: '-top-1 -right-1 w-3 h-3 text-[7px]',
+      pin: '-top-1 -right-1 w-3.5 h-3.5 text-[8px]',
       titleText: 'text-[9px]'
     },
     sm: {
       container: 'w-8 h-8 text-xs font-black',
-      pin: '-top-1 -right-1 w-3.5 h-3.5 text-[8px]',
+      pin: '-top-1 -right-1 w-4 h-4 text-[9px]',
       titleText: 'text-[10px]'
     },
     md: {
       container: 'w-10 h-10 text-sm font-black',
-      pin: '-top-1.5 -right-1.5 w-4.5 h-4.5 text-[10px]',
+      pin: '-top-1.5 -right-1.5 w-5 h-5 text-[11px]',
       titleText: 'text-[11px]'
     },
     lg: {
@@ -60,12 +67,12 @@ export default function AvatarWithBadgeFrame({
     },
     xl: {
       container: 'w-20 h-20 text-2xl font-black',
-      pin: '-top-2.5 -right-2.5 w-7 h-7 text-sm',
+      pin: '-top-2.5 -right-2.5 w-8 h-8 text-sm',
       titleText: 'text-sm'
     }
   }[size];
 
-  const activeTitle = equippedTitle || prestige.title;
+  const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
 
   return (
     <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
@@ -76,7 +83,7 @@ export default function AvatarWithBadgeFrame({
         {/* Background radial glow */}
         {prestige.tier !== 'starter' && (
           <div
-            className={`absolute -inset-0.5 rounded-full bg-gradient-to-r ${prestige.glowClass} opacity-50 blur-xs -z-10`}
+            className={`absolute -inset-0.5 rounded-full bg-gradient-to-r ${prestige.glowClass} opacity-60 blur-[2px] -z-10 animate-pulse`}
           />
         )}
 
@@ -85,19 +92,19 @@ export default function AvatarWithBadgeFrame({
           {displayIcon}
         </span>
 
-        {/* Glorious Edge Badge Pin */}
+        {/* Glorious Top-Right Title / Badge Pin Icon */}
         {showBadgePin && (
           <div
-            className={`absolute ${sizeClasses.pin} rounded-full bg-slate-900 border border-amber-400/90 shadow-md flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
+            className={`absolute ${sizeClasses.pin} rounded-full bg-slate-950 border-2 border-amber-400 shadow-xl flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
             title={`${prestige.pinBadgeName} • ${activeTitle}`}
           >
-            <span>{prestige.pinIcon}</span>
+            <span className="leading-none">{prestige.pinIcon}</span>
           </div>
         )}
       </div>
 
       {showTitleBadge && (
-        <span className={`font-extrabold text-amber-300 truncate max-w-[120px] text-center px-1.5 py-0.5 rounded bg-black/60 border border-amber-400/30 ${sizeClasses.titleText}`}>
+        <span className={`font-extrabold text-amber-300 truncate max-w-[120px] text-center px-1.5 py-0.5 rounded bg-black/70 border border-amber-400/40 shadow-sm ${sizeClasses.titleText}`}>
           {activeTitle}
         </span>
       )}

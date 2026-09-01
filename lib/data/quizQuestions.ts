@@ -107,6 +107,94 @@ export function cleanFeatureTitle(title: string): string {
     .trim();
 }
 
+/**
+ * Strips province, district and spoiler hints from multiple choice options
+ */
+export function cleanOptionName(option: string): string {
+  if (!option) return '';
+  let clean = option;
+
+  // Remove parenthesized notes like (Bitlis), (Samsun), (Manisa), (Burdur), (Maar), (Badlands) etc.
+  clean = clean.replace(/\s*\([^)]*\)/g, '');
+
+  // Remove leading/trailing city prefixes if attached like "Hakkari Cilo" -> "Cilo Dağları"
+  clean = clean.replace(/^Hakkari\s+/i, '');
+  clean = clean.replace(/^Bitlis\s+/i, '');
+  clean = clean.replace(/^Manisa\s+/i, '');
+  clean = clean.replace(/^Konya\s+/i, '');
+  clean = clean.replace(/^Burdur\s+/i, '');
+  clean = clean.replace(/^Kayseri\s+/i, '');
+  clean = clean.replace(/^Adana\s+/i, '');
+  clean = clean.replace(/^Samsun\s+/i, '');
+
+  return clean.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Derives province / city name from a GeoFeature or question for map display
+ */
+export function getFeatureCityName(featureOrCoords: any, name?: string, region?: string): string {
+  if (!featureOrCoords) return '';
+  
+  // If GeoFeature object has explicit province / city
+  if (featureOrCoords.province) return featureOrCoords.province;
+  if (featureOrCoords.city) return featureOrCoords.city;
+
+  const targetName = (featureOrCoords.title || featureOrCoords.name || name || '').toLowerCase();
+  
+  // Specific famous landmark mapping
+  if (targetName.includes('ağrı')) return 'Ağrı / Iğdır';
+  if (targetName.includes('erciyes')) return 'Kayseri';
+  if (targetName.includes('hasan dağ')) return 'Aksaray / Niğde';
+  if (targetName.includes('nemrut')) return targetName.includes('adıyaman') ? 'Adıyaman' : 'Bitlis';
+  if (targetName.includes('süphan')) return 'Bitlis / Van';
+  if (targetName.includes('tendürek')) return 'Ağrı / Van';
+  if (targetName.includes('cilo') || targetName.includes('uludoruk')) return 'Hakkari';
+  if (targetName.includes('kaçkar')) return 'Rize / Artvin';
+  if (targetName.includes('uludağ')) return 'Bursa';
+  if (targetName.includes('kula')) return 'Manisa';
+  if (targetName.includes('meke') || targetName.includes('karapınar')) return 'Konya';
+  if (targetName.includes('salda')) return 'Burdur';
+  if (targetName.includes('pamukkale')) return 'Denizli';
+  if (targetName.includes('kapıkule') || targetName.includes('ipsala') || targetName.includes('hamzabeyli')) return 'Edirne';
+  if (targetName.includes('sarp')) return 'Artvin';
+  if (targetName.includes('habur')) return 'Şırnak';
+  if (targetName.includes('gümüşdoğrayan') || targetName.includes('gürbulak')) return 'Ağrı';
+  if (targetName.includes('dilucu')) return 'Iğdır';
+  if (targetName.includes('gülek') || targetName.includes('çukurova')) return 'Adana / Mersin';
+  if (targetName.includes('zigana')) return 'Trabzon / Gümüşhane';
+  if (targetName.includes('kop')) return 'Bayburt / Erzurum';
+  if (targetName.includes('sertavul')) return 'Karaman / Mersin';
+  if (targetName.includes('belen')) return 'Hatay';
+  if (targetName.includes('ovit')) return 'Rize / Erzurum';
+  if (targetName.includes('bafra') || targetName.includes('çarşamba') || targetName.includes('canik')) return 'Samsun';
+  if (targetName.includes('silifke')) return 'Mersin';
+  if (targetName.includes('insuyu')) return 'Burdur';
+  if (targetName.includes('damlataş') || targetName.includes('karain') || targetName.includes('düden')) return 'Antalya';
+  if (targetName.includes('manavgat')) return 'Antalya';
+  if (targetName.includes('tortum')) return 'Erzurum';
+  if (targetName.includes('muradiye') || targetName.includes('van gölü')) return 'Van';
+  if (targetName.includes('çıldır')) return 'Ardahan / Kars';
+  if (targetName.includes('bozok')) return 'Yozgat';
+  if (targetName.includes('haymana')) return 'Ankara';
+  if (targetName.includes('cihanbeyli')) return 'Konya';
+  if (targetName.includes('teke')) return 'Antalya / Muğla';
+  if (targetName.includes('taşeli')) return 'Mersin / Karaman';
+  if (targetName.includes('erzurum-kars') || targetName.includes('ardahan')) return 'Erzurum / Kars';
+  if (targetName.includes('obruk')) return 'Konya';
+  if (targetName.includes('yazılıkaya')) return 'Eskişehir';
+  if (targetName.includes('kapıdağ')) return 'Balıkesir';
+  if (targetName.includes('inceburun')) return 'Sinop';
+  if (targetName.includes('menemen')) return 'İzmir';
+  if (targetName.includes('balat')) return 'Aydın';
+  if (targetName.includes('dikili')) return 'İzmir';
+
+  if (featureOrCoords.region || region) {
+    return `${featureOrCoords.region || region} Bölgesi`;
+  }
+  return '';
+}
+
 const TURKEY_PROVINCES_AND_DISTRICTS = [
   'Adana', 'Adıyaman', 'Afyonkarahisar', 'Afyon', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan',
   'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu',
@@ -2029,16 +2117,17 @@ const DYNAMIC_QUIZ_QUESTIONS: MultipleChoiceQuestion[] = ALL_GEO_FEATURES.flatMa
   const distractors = getCategoryDistractors(f, ALL_GEO_FEATURES);
   if (distractors.length < 4) return questions;
 
-  const rawOptions = [f.name, ...distractors];
+  const rawOptions = [f.name, ...distractors].map(opt => cleanOptionName(opt));
+  const cleanedTargetName = cleanOptionName(f.name);
   const shuffledOptions = shuffleArray(rawOptions);
-  const correctIndex = shuffledOptions.indexOf(f.name);
+  const correctIndex = shuffledOptions.indexOf(cleanedTargetName);
   const cat = mapTypeToPinCategory(f.type, f.category);
 
   // Question 1: Feature Characteristics / Genesis
   const cleanDesc = f.description ? sanitizeQuestionText(f.description) : '';
   let qText1 = '';
   if (cleanDesc && cleanDesc.length > 15) {
-    qText1 = `"${cleanDesc}"\nYukarıda özellikleri ve konumu açıklanan coğrafi unsur / yer şekli aşağıdakilerden hangisidir?`;
+    qText1 = `"${cleanDesc}"\nYukarıda özellikleri açıklanan coğrafi unsur / yer şekli aşağıdakilerden hangisidir?`;
   } else if (f.kpssTips?.[0]) {
     qText1 = `KPSS Bilgisi: "${sanitizeQuestionText(f.kpssTips[0])}"\nBu bilgi aşağıdaki coğrafi unsurlardan hangisine aittir?`;
   } else {
@@ -2051,10 +2140,10 @@ const DYNAMIC_QUIZ_QUESTIONS: MultipleChoiceQuestion[] = ALL_GEO_FEATURES.flatMa
     region: f.region,
     questionText: qText1,
     options: shuffledOptions,
-    correctIndex: correctIndex,
+    correctIndex: correctIndex >= 0 ? correctIndex : 0,
     focusFeatureId: f.id,
     targetCoords: f.coordinates,
-    explanation: `${f.name}: ${f.description || f.category || ''}. Bölgesi: ${f.region || 'Türkiye'}.`,
+    explanation: `${f.name}: ${f.description || f.category || ''}. İli/Bölgesi: ${getFeatureCityName(f, f.name, f.region)}.`,
     osymTip: f.kpssTips?.[0] ? `ÖSYM Notu: ${f.kpssTips[0]}` : `${f.name} - ${f.category || 'KPSS Coğrafya'}`
   });
 
@@ -2062,7 +2151,10 @@ const DYNAMIC_QUIZ_QUESTIONS: MultipleChoiceQuestion[] = ALL_GEO_FEATURES.flatMa
 });
 
 export const MULTIPLE_CHOICE_QUESTIONS: MultipleChoiceQuestion[] = [
-  ...HANDCRAFTED_MULTIPLE_CHOICE_QUESTIONS,
+  ...HANDCRAFTED_MULTIPLE_CHOICE_QUESTIONS.map(q => ({
+    ...q,
+    options: q.options.map(opt => cleanOptionName(opt))
+  })),
   ...DYNAMIC_QUIZ_QUESTIONS
 ];
 

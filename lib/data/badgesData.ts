@@ -651,6 +651,103 @@ export interface PrestigeTierInfo {
 }
 
 /**
+ * Returns the most glorious auto-equipped title specifically for 1v1 duels based on duel wins/streaks
+ */
+export function getAutoEquippedDuelTitle(duelWins = 0, duelStreak = 0, unlockedBadges: string[] = []): string {
+  if (duelWins >= 25 || unlockedBadges.includes('Tahtın Sahibi')) {
+    return '👑 Arena Efsanesi';
+  }
+  if (duelWins >= 10 || unlockedBadges.includes('Düello Şampiyonu')) {
+    return '🏆 Düello Şampiyonu';
+  }
+  if (duelStreak >= 3 || unlockedBadges.includes('Yenilmez Fatih')) {
+    return '🔥 Yenilmez Fatih';
+  }
+  if (duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör')) {
+    return '⚔️ 1v1 Gladyatör';
+  }
+  if (duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı')) {
+    return '🛡️ Arena Savaşçısı';
+  }
+  return '🎯 Arena Adayı';
+}
+
+/**
+ * Calculates 1v1 duel exclusive prestige tier (borders, glow, top-right pin icon)
+ * Only 1v1 duel achievements are counted.
+ */
+export function getDuelPrestigeTier(
+  duelWins = 0,
+  duelStreak = 0,
+  unlockedBadges: string[] = []
+): PrestigeTierInfo {
+  const duelTitle = getAutoEquippedDuelTitle(duelWins, duelStreak, unlockedBadges);
+
+  if (duelWins >= 25 || unlockedBadges.includes('Tahtın Sahibi')) {
+    return {
+      tier: 'diamond_mythic',
+      title: duelTitle,
+      badgeCount: duelWins,
+      frameBorderClass: 'border-2 border-amber-300 ring-2 ring-purple-500 shadow-[0_0_25px_rgba(234,179,8,0.8)] animate-pulse',
+      glowClass: 'from-amber-400 via-purple-500 to-cyan-400',
+      pinIcon: '👑',
+      pinBadgeName: 'Tahtın Sahibi',
+      gradientBg: 'bg-gradient-to-tr from-amber-950 via-purple-950 to-slate-900'
+    };
+  }
+
+  if (duelWins >= 10 || unlockedBadges.includes('Düello Şampiyonu')) {
+    return {
+      tier: 'diamond_mythic',
+      title: duelTitle,
+      badgeCount: duelWins,
+      frameBorderClass: 'border-2 border-cyan-400 ring-2 ring-indigo-500 shadow-[0_0_20px_rgba(6,182,212,0.7)] animate-pulse',
+      glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
+      pinIcon: '🏆',
+      pinBadgeName: 'Düello Şampiyonu',
+      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950'
+    };
+  }
+
+  if (duelWins >= 3 || duelStreak >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('Yenilmez Fatih')) {
+    return {
+      tier: 'gold_champion',
+      title: duelTitle,
+      badgeCount: duelWins,
+      frameBorderClass: 'border-2 border-amber-400 ring-2 ring-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.6)]',
+      glowClass: 'from-amber-400 via-yellow-300 to-amber-600',
+      pinIcon: duelStreak >= 3 ? '🔥' : '⚔️',
+      pinBadgeName: '1v1 Gladyatör',
+      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900'
+    };
+  }
+
+  if (duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı')) {
+    return {
+      tier: 'bronze_silver',
+      title: duelTitle,
+      badgeCount: duelWins,
+      frameBorderClass: 'border-2 border-slate-300 ring-1 ring-slate-400/50 shadow-[0_0_10px_rgba(203,213,225,0.4)]',
+      glowClass: 'from-slate-300 via-slate-100 to-slate-400',
+      pinIcon: '🛡️',
+      pinBadgeName: 'Arena Savaşçısı',
+      gradientBg: 'bg-gradient-to-tr from-slate-800 via-indigo-950 to-slate-900'
+    };
+  }
+
+  return {
+    tier: 'starter',
+    title: duelTitle,
+    badgeCount: duelWins,
+    frameBorderClass: 'border border-indigo-500/50 ring-1 ring-indigo-500/30',
+    glowClass: 'from-indigo-500 to-purple-500',
+    pinIcon: '🎯',
+    pinBadgeName: 'Arena Adayı',
+    gradientBg: 'bg-gradient-to-tr from-indigo-950 to-slate-900'
+  };
+}
+
+/**
  * Calculates user's avatar frame prestige and crowning badge based on unlocked badges and duel wins.
  */
 export function getPrestigeTier(
