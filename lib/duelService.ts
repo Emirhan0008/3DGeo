@@ -12,6 +12,7 @@ import {
   limit, 
   deleteDoc
 } from 'firebase/firestore';
+import { recordFinishedDuelToRumuzes } from '@/lib/rumuzService';
 import { 
   PIN_GAME_QUESTIONS, 
   PinGameQuestion, 
@@ -1049,6 +1050,8 @@ export async function advanceDuelRound(duel: DuelSession): Promise<void> {
         'player2.readyToAdvance': false,
         updatedAt: new Date().toISOString()
       });
+      // Synchronize both duel players immediately to global rumuzes collection for leaderboard visibility
+      recordFinishedDuelToRumuzes({ ...duel, status: 'finished', winnerId, roundHistory: updatedHistory }).catch(() => {});
     } catch (error) {
       console.error('Finish duel error:', error);
       handleFirestoreError(error, OperationType.WRITE, `duels/${duel.id}`);
