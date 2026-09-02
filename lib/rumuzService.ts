@@ -34,28 +34,36 @@ export interface DuelSessionData {
 }
 
 export interface LeaderboardEntry {
-  rank: number;
+  rank: number; // 1-indexed for active ranked players, 0 for unranked/inactive
   rumuz: string;
   rumuzKey: string;
   avatarIcon: string;
   avatarBg: string;
   equippedTitle: string;
-  score: number;
-  streak: number;
+  score: number; // Total overall combined score
+  kpssScore: number; // KPSS test questions score
+  streak: number; // KPSS questions streak
+  correctAnswersCount: number;
+  totalQuestionsAnswered: number;
   duelWins: number;
   duelLosses: number;
   duelDraws: number;
   totalDuels: number;
   duelStreak: number;
   bestDuelStreak: number;
+  duelScore: number;
   unlockedBadgesCount: number;
   accuracyPct: number;
   isAnonymous?: boolean;
+  isUnranked?: boolean; // true if 0 points and 0 activity
+  statusText?: string;
   updatedAt?: string;
   isCurrentUser?: boolean;
 }
 
-export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak' = 'score'): Promise<LeaderboardEntry[]> {
+export type LeaderboardSortTab = 'total' | 'score' | 'kpss_test' | 'duels' | 'streak';
+
+export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total'): Promise<LeaderboardEntry[]> {
   try {
     const resultsMap = new Map<string, LeaderboardEntry>();
 
@@ -75,20 +83,26 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
         const totalDuels = d.duelStats?.totalDuelsPlayed || (duelWins + duelLosses + duelDraws);
         const duelStreak = d.duelStats?.duelStreak || 0;
         const bestDuelStreak = Math.max(d.duelStats?.bestDuelStreak || 0, duelStreak);
-        const duelScore = d.duelStats?.duelScore || 0;
+        const duelScore = d.duelStats?.duelScore || (duelWins * 120);
+        const kpssScore = correct * 10;
         const rawScore = d.score || 0;
 
         // Ensure real players who have activity never show 0 points
         let calculatedScore = rawScore;
         if (calculatedScore === 0) {
-          if (duelScore > 0) {
-            calculatedScore = duelScore;
-          } else if (duelWins > 0) {
-            calculatedScore = duelWins * 120 + correct * 10;
-          } else if (correct > 0) {
-            calculatedScore = correct * 10;
+          if (duelScore > 0 || kpssScore > 0) {
+            calculatedScore = duelScore + kpssScore;
           }
         }
+
+        const hasRealActivity = (
+          calculatedScore > 0 ||
+          duelWins > 0 ||
+          totalDuels > 0 ||
+          correct > 0 ||
+          totalAnswers > 0 ||
+          duelStreak > 0
+        );
 
         const key = d.rumuzKey || normalizeRumuzKey(d.rumuz) || docSnap.id;
 
@@ -100,16 +114,22 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
           avatarBg: d.avatarBg || 'indigo_midnight',
           equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
           score: calculatedScore,
+          kpssScore,
           streak: d.streak || 0,
+          correctAnswersCount: correct,
+          totalQuestionsAnswered: totalAnswers,
           duelWins,
           duelLosses,
           duelDraws,
           totalDuels,
           duelStreak,
           bestDuelStreak,
+          duelScore,
           unlockedBadgesCount: (d.unlockedBadges || []).length,
           accuracyPct,
           isAnonymous: !!d.isAnonymous,
+          isUnranked: !hasRealActivity,
+          statusText: hasRealActivity ? 'Aktif Oyuncu' : 'Sıralama Dışı (Henüz Aktif Değil)',
           updatedAt: d.updatedAt
         });
       });
@@ -143,16 +163,22 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
               avatarBg: 'gold_glory',
               equippedTitle: isWinner ? '1v1 Gladyatör' : '3D Coğrafyacı Çırağı',
               score: matchScore,
+              kpssScore: 0,
               streak: isWinner ? 1 : 0,
+              correctAnswersCount: 0,
+              totalQuestionsAnswered: 0,
               duelWins: isWinner ? 1 : 0,
               duelLosses: !isWinner && data.winnerId !== 'draw' ? 1 : 0,
               duelDraws: data.winnerId === 'draw' ? 1 : 0,
               totalDuels: 1,
               duelStreak: isWinner ? 1 : 0,
               bestDuelStreak: isWinner ? 1 : 0,
+              duelScore: matchScore,
               unlockedBadgesCount: 1,
               accuracyPct: 80,
               isAnonymous: false,
+              isUnranked: false,
+              statusText: 'Aktif Düellocu',
               updatedAt: data.updatedAt || data.createdAt
             });
           } else {
@@ -169,6 +195,8 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
             }
             if (existing.score === 0 && matchScore > 0) {
               existing.score = matchScore;
+              existing.isUnranked = false;
+              existing.statusText = 'Aktif Düellocu';
             }
           }
         });
@@ -189,17 +217,37 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
           const localTotal = parsed.duelStats?.totalDuelsPlayed || 0;
           const localStreak = parsed.duelStats?.duelStreak || 0;
           const localBestStreak = parsed.duelStats?.bestDuelStreak || localStreak;
-          const localScore = parsed.score || (parsed.duelStats?.duelScore || 0) || (localWins > 0 ? localWins * 120 : 0);
+          const localCorrect = parsed.correctAnswersCount || 0;
+          const localAnswers = parsed.totalQuestionsAnswered || 0;
+          const localKpssScore = localCorrect * 10;
+          const localDuelScore = parsed.duelStats?.duelScore || (localWins * 120);
+          const localScore = parsed.score || (localDuelScore + localKpssScore) || (localWins > 0 ? localWins * 120 : 0);
+
+          const hasLocalActivity = (
+            localScore > 0 ||
+            localWins > 0 ||
+            localTotal > 0 ||
+            localCorrect > 0 ||
+            localAnswers > 0 ||
+            localStreak > 0
+          );
 
           if (resultsMap.has(localKey)) {
             // Merge freshest local stats into the entry
             const existing = resultsMap.get(localKey)!;
             existing.score = Math.max(existing.score, localScore);
+            existing.kpssScore = Math.max(existing.kpssScore, localKpssScore);
+            existing.correctAnswersCount = Math.max(existing.correctAnswersCount, localCorrect);
+            existing.totalQuestionsAnswered = Math.max(existing.totalQuestionsAnswered, localAnswers);
             existing.duelWins = Math.max(existing.duelWins, localWins);
             existing.totalDuels = Math.max(existing.totalDuels, localTotal);
             existing.duelStreak = Math.max(existing.duelStreak, localStreak);
             existing.bestDuelStreak = Math.max(existing.bestDuelStreak, localBestStreak);
             existing.streak = Math.max(existing.streak, parsed.streak || 0);
+            if (hasLocalActivity) {
+              existing.isUnranked = false;
+              existing.statusText = 'Aktif Oyuncu';
+            }
           } else {
             resultsMap.set(localKey, {
               rank: 0,
@@ -209,16 +257,22 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
               avatarBg: parsed.avatarBg || 'indigo_midnight',
               equippedTitle: parsed.equippedTitle || '3D Coğrafyacı Çırağı',
               score: localScore,
+              kpssScore: localKpssScore,
               streak: parsed.streak || 0,
+              correctAnswersCount: localCorrect,
+              totalQuestionsAnswered: localAnswers,
               duelWins: localWins,
               duelLosses: parsed.duelStats?.duelLosses || 0,
               duelDraws: parsed.duelStats?.duelDraws || 0,
               totalDuels: localTotal,
               duelStreak: localStreak,
               bestDuelStreak: localBestStreak,
+              duelScore: localDuelScore,
               unlockedBadgesCount: (parsed.unlockedBadges || []).length,
-              accuracyPct: parsed.totalQuestionsAnswered > 0 ? Math.round(((parsed.correctAnswersCount || 0) / parsed.totalQuestionsAnswered) * 100) : 0,
+              accuracyPct: localAnswers > 0 ? Math.round((localCorrect / localAnswers) * 100) : 0,
               isAnonymous: localStorage.getItem('kpss3d_is_anonymous') === 'true',
+              isUnranked: !hasLocalActivity,
+              statusText: hasLocalActivity ? 'Aktif Oyuncu' : 'Sıralama Dışı (Henüz Aktif Değil)',
               updatedAt: new Date().toISOString()
             });
           }
@@ -228,14 +282,25 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
       }
     }
 
-    const results = Array.from(resultsMap.values());
+    const allEntries = Array.from(resultsMap.values());
 
-    // Sort results based on selected tab
-    results.sort((a, b) => {
+    // Separate into active ranked players and unranked/inactive players
+    const rankedPlayers = allEntries.filter(e => !e.isUnranked);
+    const unrankedPlayers = allEntries.filter(e => !!e.isUnranked);
+
+    // Sort active players based on selected tab
+    rankedPlayers.sort((a, b) => {
       if (sortBy === 'duels') {
         if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
         if (b.duelStreak !== a.duelStreak) return b.duelStreak - a.duelStreak;
         if (b.totalDuels !== a.totalDuels) return b.totalDuels - a.totalDuels;
+        return b.score - a.score;
+      }
+      if (sortBy === 'kpss_test') {
+        if (b.correctAnswersCount !== a.correctAnswersCount) return b.correctAnswersCount - a.correctAnswersCount;
+        if (b.kpssScore !== a.kpssScore) return b.kpssScore - a.kpssScore;
+        if (b.streak !== a.streak) return b.streak - a.streak;
+        if (b.accuracyPct !== a.accuracyPct) return b.accuracyPct - a.accuracyPct;
         return b.score - a.score;
       }
       if (sortBy === 'streak') {
@@ -245,16 +310,28 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
         if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
         return b.score - a.score;
       }
+      // Default: 'total' or 'score'
       if (b.score !== a.score) return b.score - a.score;
       if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
       return b.duelStreak - a.duelStreak;
     });
 
-    // Assign 1-indexed ranks
-    return results.map((entry, idx) => ({
+    // Assign 1-indexed ranks to active ranked players
+    const rankedWithIndex = rankedPlayers.map((entry, idx) => ({
       ...entry,
-      rank: idx + 1
+      rank: idx + 1,
+      isUnranked: false
     }));
+
+    // Assign rank 0 and unranked flag to inactive players
+    const unrankedWithFlag = unrankedPlayers.map((entry) => ({
+      ...entry,
+      rank: 0,
+      isUnranked: true,
+      statusText: 'Sıralama Dışı (Henüz Aktif Değil)'
+    }));
+
+    return [...rankedWithIndex, ...unrankedWithFlag];
   } catch (err) {
     console.warn('Global leaderboard general error:', err);
     return [];

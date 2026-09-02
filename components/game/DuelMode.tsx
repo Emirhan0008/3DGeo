@@ -512,7 +512,7 @@ export default function DuelMode() {
         if (remain <= 0) {
           clearInterval(revealTicker);
           // Zoom out map fully back to Turkey overview for next question!
-          flyToCoords([35.243, 38.963], 0, 0, 5.5);
+          flyToCoords([35.243, 38.963], 0, 0, 5.0);
           if (activeDuelPlayerKey === 'player1' || activeDuelSession.player2?.isBot) {
             advanceDuelRound(activeDuelSession);
           }
@@ -695,7 +695,7 @@ export default function DuelMode() {
     setLastRoundScore(null);
     setOpponentRoundScore(null);
     setRecordedFinishedId(null);
-    flyToCoords([35.243, 38.963], 0, 0, 5.5);
+    flyToCoords([35.243, 38.963], 0, 0, 5.0);
   };
 
   // Copy Room Code to clipboard
@@ -2069,7 +2069,7 @@ export default function DuelMode() {
                 const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
                 if (myId) {
                   if (activeDuelSession.player2?.isBot) {
-                    flyToCoords([35.243, 38.963], 0, 0, 5.5);
+                    flyToCoords([35.243, 38.963], 0, 0, 5.0);
                     advanceDuelRound(activeDuelSession);
                   } else {
                     voteToAdvanceDuelRound(activeDuelSession, myId);

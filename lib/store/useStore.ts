@@ -932,8 +932,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         lastGuessPoints: null
       });
     }
-    // Lock zoom to 5.5x at every question start
-    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
+    // Lock zoom to 5.0x at every question start for wider overview
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.0);
   },
 
   resetPinGame: () => {
@@ -946,8 +946,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       lastGuessDistanceKm: null,
       lastGuessPoints: null
     });
-    // Lock zoom to 5.5x at every question start
-    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
+    // Lock zoom to 5.0x at every question start for wider overview
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.0);
   },
 
   answerQuizQuestion: (optionIndex) => {
@@ -1038,8 +1038,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         isQuizAnswered: false
       });
     }
-    // Lock zoom to 5.5x at every question start
-    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
+    // Lock zoom to 5.0x at every question start for wider overview
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.0);
   },
 
   resetQuizTest: () => {
@@ -1051,8 +1051,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       quizSelectedOption: null,
       isQuizAnswered: false
     });
-    // Lock zoom to 5.5x at every question start
-    get().flyToCoords([35.243, 38.963], 0, 0, 5.5);
+    // Lock zoom to 5.0x at every question start for wider overview
+    get().flyToCoords([35.243, 38.963], 0, 0, 5.0);
   },
 
   // Real-time 1v1 Duel State

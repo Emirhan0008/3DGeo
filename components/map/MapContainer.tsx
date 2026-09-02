@@ -27,15 +27,23 @@ import {
   EyeOff
 } from 'lucide-react';
 
-// Turkey geographic bounding box (SW: [24.5, 35.0], NE: [45.5, 43.0])
+// Turkey geographic bounding box (SW: [20.0, 31.0], NE: [49.0, 46.5])
 const TURKEY_BOUNDS: maplibregl.LngLatBoundsLike = [
-  [24.5, 35.0], // Southwest longitude, latitude
-  [45.5, 43.0], // Northeast longitude, latitude
+  [20.0, 31.0], // Southwest longitude, latitude
+  [49.0, 46.5], // Northeast longitude, latitude
 ];
+
+// Responsive default zoom helper
+const getInitialOverviewZoom = () => {
+  if (typeof window !== 'undefined' && window.innerWidth < 640) {
+    return 4.4; // Mobile vertical view
+  }
+  return 5.0; // Desktop / tablet view
+};
 
 // Region camera focal points
 const REGION_CENTERS: Record<string, { coords: [number, number]; zoom: number }> = {
-  'Tüm Bölgeler': { coords: [35.243, 38.963], zoom: 6.2 },
+  'Tüm Bölgeler': { coords: [35.243, 38.963], zoom: 4.6 },
   'Marmara': { coords: [28.0, 40.8], zoom: 7.2 },
   'Ege': { coords: [28.2, 38.2], zoom: 7.2 },
   'Akdeniz': { coords: [32.5, 37.0], zoom: 7.2 },
@@ -355,7 +363,7 @@ export default function MapContainer() {
       container: mapContainerRef.current,
       style: styleFn(currentStore.isBlindMapMode),
       center: [35.243, 38.963], // Turkey Center
-      zoom: 5.5, // Default locked zoom
+      zoom: getInitialOverviewZoom(), // Wide overview zoom adapted for mobile and desktop
       pitch: 0,
       bearing: 0,
       maxPitch: 0,
@@ -363,8 +371,8 @@ export default function MapContainer() {
       touchPitch: false,
       pitchWithRotate: false,
       maxBounds: TURKEY_BOUNDS, // Strictly restrict map panning to Turkey only
-      minZoom: 5.0,
-      maxZoom: 9.5,
+      minZoom: 3.8, // Allows zooming out far enough on phones and desktops to see the whole country
+      maxZoom: 18.0, // Unlimited / deep zoom-in capability
     });
 
     mapRef.current = map;
@@ -451,7 +459,7 @@ export default function MapContainer() {
 
     mapRef.current.flyTo({
       center: cameraFlyTarget.coords,
-      zoom: cameraFlyTarget.zoom ?? 5.5,
+      zoom: cameraFlyTarget.zoom ?? getInitialOverviewZoom(),
       pitch: 0,
       bearing: 0,
       duration: 2200,
