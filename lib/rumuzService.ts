@@ -43,7 +43,11 @@ export interface LeaderboardEntry {
   score: number;
   streak: number;
   duelWins: number;
+  duelLosses: number;
+  duelDraws: number;
   totalDuels: number;
+  duelStreak: number;
+  bestDuelStreak: number;
   unlockedBadgesCount: number;
   accuracyPct: number;
   isAnonymous?: boolean;
@@ -66,8 +70,27 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
         const correct = d.correctAnswersCount || 0;
         const accuracyPct = totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0;
         const duelWins = d.duelStats?.duelWins || 0;
-        const totalDuels = d.duelStats?.totalDuelsPlayed || 0;
-        const key = d.rumuzKey || docSnap.id;
+        const duelLosses = d.duelStats?.duelLosses || 0;
+        const duelDraws = d.duelStats?.duelDraws || 0;
+        const totalDuels = d.duelStats?.totalDuelsPlayed || (duelWins + duelLosses + duelDraws);
+        const duelStreak = d.duelStats?.duelStreak || 0;
+        const bestDuelStreak = Math.max(d.duelStats?.bestDuelStreak || 0, duelStreak);
+        const duelScore = d.duelStats?.duelScore || 0;
+        const rawScore = d.score || 0;
+
+        // Ensure real players who have activity never show 0 points
+        let calculatedScore = rawScore;
+        if (calculatedScore === 0) {
+          if (duelScore > 0) {
+            calculatedScore = duelScore;
+          } else if (duelWins > 0) {
+            calculatedScore = duelWins * 120 + correct * 10;
+          } else if (correct > 0) {
+            calculatedScore = correct * 10;
+          }
+        }
+
+        const key = d.rumuzKey || normalizeRumuzKey(d.rumuz) || docSnap.id;
 
         resultsMap.set(key, {
           rank: 0,
@@ -76,10 +99,14 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
           avatarIcon: d.avatarIcon || '🐣',
           avatarBg: d.avatarBg || 'indigo_midnight',
           equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
-          score: d.score || 0,
+          score: calculatedScore,
           streak: d.streak || 0,
           duelWins,
+          duelLosses,
+          duelDraws,
           totalDuels,
+          duelStreak,
+          bestDuelStreak,
           unlockedBadgesCount: (d.unlockedBadges || []).length,
           accuracyPct,
           isAnonymous: !!d.isAnonymous,
@@ -90,7 +117,7 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
       console.warn('Rumuzes query notice:', e);
     }
 
-    // 2. Scan all live & finished matches from 'duels' collection to capture all duel participants
+    // 2. Scan matches from 'duels' collection to capture all duel participants
     try {
       const duelsRef = collection(db, 'duels');
       const duelSnap = await getDocs(query(duelsRef, limit(100)));
@@ -104,10 +131,10 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
           if (!p || !p.rumuz || p.isBot) return;
           const pKey = p.rumuzKey || normalizeRumuzKey(p.rumuz);
           const isWinner = data.winnerId === p.id;
-          const matchScore = p.score || 0;
+          const matchScore = p.score || 100;
           
           if (!resultsMap.has(pKey)) {
-            // Player who played duels discovered from duels collection!
+            // New player discovered from past duel history!
             resultsMap.set(pKey, {
               rank: 0,
               rumuz: p.rumuz,
@@ -118,18 +145,23 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
               score: matchScore,
               streak: isWinner ? 1 : 0,
               duelWins: isWinner ? 1 : 0,
+              duelLosses: !isWinner && data.winnerId !== 'draw' ? 1 : 0,
+              duelDraws: data.winnerId === 'draw' ? 1 : 0,
               totalDuels: 1,
+              duelStreak: isWinner ? 1 : 0,
+              bestDuelStreak: isWinner ? 1 : 0,
               unlockedBadgesCount: 1,
               accuracyPct: 80,
               isAnonymous: false,
               updatedAt: data.updatedAt || data.createdAt
             });
           } else {
-            // Ensure duel count and wins from recorded duels are properly represented
+            // Ensure duel count, score and win streak are properly merged
             const existing = resultsMap.get(pKey)!;
             if (data.status === 'finished') {
               if (isWinner && existing.duelWins === 0) {
                 existing.duelWins += 1;
+                existing.duelStreak = Math.max(existing.duelStreak, 1);
               }
               if (existing.totalDuels === 0) {
                 existing.totalDuels += 1;
@@ -145,15 +177,30 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
       console.warn('Duels collection scan notice:', e);
     }
 
-    // 3. Ensure active local user is present if they have played or solved questions
+    // 3. Ensure active local user is present & accurate with latest local values
     if (typeof window !== 'undefined') {
       try {
         const localRumuz = localStorage.getItem('kpss3d_active_rumuz');
         if (localRumuz && localRumuz.trim()) {
           const localKey = normalizeRumuzKey(localRumuz);
-          if (!resultsMap.has(localKey)) {
-            const rawStats = localStorage.getItem('kpss3d_user_stats');
-            const parsed = rawStats ? JSON.parse(rawStats) : {};
+          const rawStats = localStorage.getItem('kpss3d_user_stats');
+          const parsed = rawStats ? JSON.parse(rawStats) : {};
+          const localWins = parsed.duelStats?.duelWins || 0;
+          const localTotal = parsed.duelStats?.totalDuelsPlayed || 0;
+          const localStreak = parsed.duelStats?.duelStreak || 0;
+          const localBestStreak = parsed.duelStats?.bestDuelStreak || localStreak;
+          const localScore = parsed.score || (parsed.duelStats?.duelScore || 0) || (localWins > 0 ? localWins * 120 : 0);
+
+          if (resultsMap.has(localKey)) {
+            // Merge freshest local stats into the entry
+            const existing = resultsMap.get(localKey)!;
+            existing.score = Math.max(existing.score, localScore);
+            existing.duelWins = Math.max(existing.duelWins, localWins);
+            existing.totalDuels = Math.max(existing.totalDuels, localTotal);
+            existing.duelStreak = Math.max(existing.duelStreak, localStreak);
+            existing.bestDuelStreak = Math.max(existing.bestDuelStreak, localBestStreak);
+            existing.streak = Math.max(existing.streak, parsed.streak || 0);
+          } else {
             resultsMap.set(localKey, {
               rank: 0,
               rumuz: localRumuz,
@@ -161,10 +208,14 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
               avatarIcon: parsed.avatarIcon || '🐣',
               avatarBg: parsed.avatarBg || 'indigo_midnight',
               equippedTitle: parsed.equippedTitle || '3D Coğrafyacı Çırağı',
-              score: parsed.score || 0,
+              score: localScore,
               streak: parsed.streak || 0,
-              duelWins: parsed.duelStats?.duelWins || 0,
-              totalDuels: parsed.duelStats?.totalDuelsPlayed || 0,
+              duelWins: localWins,
+              duelLosses: parsed.duelStats?.duelLosses || 0,
+              duelDraws: parsed.duelStats?.duelDraws || 0,
+              totalDuels: localTotal,
+              duelStreak: localStreak,
+              bestDuelStreak: localBestStreak,
               unlockedBadgesCount: (parsed.unlockedBadges || []).length,
               accuracyPct: parsed.totalQuestionsAnswered > 0 ? Math.round(((parsed.correctAnswersCount || 0) / parsed.totalQuestionsAnswered) * 100) : 0,
               isAnonymous: localStorage.getItem('kpss3d_is_anonymous') === 'true',
@@ -183,15 +234,20 @@ export async function fetchGlobalLeaderboard(sortBy: 'score' | 'duels' | 'streak
     results.sort((a, b) => {
       if (sortBy === 'duels') {
         if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
+        if (b.duelStreak !== a.duelStreak) return b.duelStreak - a.duelStreak;
         if (b.totalDuels !== a.totalDuels) return b.totalDuels - a.totalDuels;
         return b.score - a.score;
       }
       if (sortBy === 'streak') {
-        if (b.streak !== a.streak) return b.streak - a.streak;
+        const bMaxStreak = Math.max(b.duelStreak, b.streak, b.bestDuelStreak);
+        const aMaxStreak = Math.max(a.duelStreak, a.streak, a.bestDuelStreak);
+        if (bMaxStreak !== aMaxStreak) return bMaxStreak - aMaxStreak;
+        if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
         return b.score - a.score;
       }
       if (b.score !== a.score) return b.score - a.score;
-      return b.duelWins - a.duelWins;
+      if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
+      return b.duelStreak - a.duelStreak;
     });
 
     // Assign 1-indexed ranks
@@ -481,6 +537,16 @@ export async function updateRumuzCustomization(
     };
 
     await setDoc(doc(db, 'rumuzes', key), newProfile, { merge: true });
+
+    if (typeof window !== 'undefined') {
+      if (updates.pin) {
+        localStorage.setItem('kpss3d_active_pin', updates.pin.trim());
+      }
+      if (updates.rumuz) {
+        localStorage.setItem('kpss3d_active_rumuz', updates.rumuz.trim());
+      }
+    }
+
     return { success: true, profile: newProfile };
   } catch (error) {
     console.error('Customization update error:', error);
@@ -490,24 +556,37 @@ export async function updateRumuzCustomization(
 }
 
 /**
- * Renames a rumuz by migrating data to a new unique key and deleting the old document.
+ * Renames a rumuz by migrating data to a new unique key and deleting the old document cleanly.
+ * Also updates local storage and past duel records so the user is never duplicated.
  */
 export async function changeRumuzNickname(
   oldRumuz: string,
   newRumuz: string,
-  pin: string
+  pin: string,
+  newPin?: string
 ): Promise<{ success: boolean; profile?: RumuzProfileData; errorMsg?: string }> {
   const oldKey = normalizeRumuzKey(oldRumuz);
   const newKey = normalizeRumuzKey(newRumuz);
-
-  if (oldKey === newKey) {
-    return { success: false, errorMsg: 'Yeni rumuz eskisinden farklı olmalıdır.' };
-  }
 
   // 1. Verify old rumuz exists and PIN matches
   const checkOld = await verifyAndLoadRumuzProfile(oldRumuz, pin);
   if (!checkOld.success || !checkOld.profile) {
     return { success: false, errorMsg: checkOld.errorMsg || 'Mevcut profil doğrulanamadı.' };
+  }
+
+  const effectivePin = newPin && newPin.trim() ? newPin.trim() : checkOld.profile.pin;
+
+  if (oldKey === newKey) {
+    // Same normalized key (e.g. casing change or only password change)
+    const updated = await updateRumuzCustomization(oldRumuz, pin, {
+      rumuz: newRumuz.trim(),
+      pin: effectivePin
+    });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kpss3d_active_rumuz', newRumuz.trim());
+      localStorage.setItem('kpss3d_active_pin', effectivePin);
+    }
+    return updated;
   }
 
   // 2. Verify new rumuz does not already exist
@@ -516,18 +595,60 @@ export async function changeRumuzNickname(
     return { success: false, errorMsg: `'${newRumuz}' rumuzu zaten başka bir kullanıcı tarafından alınmış.` };
   }
 
-  // 3. Create new document
+  // 3. Create new document with full migrated state
   const migratedData: RumuzProfileData = {
     ...checkOld.profile,
     rumuz: newRumuz.trim(),
     rumuzKey: newKey,
+    pin: effectivePin,
     updatedAt: new Date().toISOString()
   };
 
   try {
+    // Write new document
     await setDoc(doc(db, 'rumuzes', newKey), migratedData);
-    // 4. Delete old document
+    
+    // Delete old document in Firestore
     await deleteDoc(doc(db, 'rumuzes', oldKey));
+
+    // Update localStorage immediately so subsequent cloud sync never revives the old rumuz
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kpss3d_active_rumuz', newRumuz.trim());
+      localStorage.setItem('kpss3d_active_pin', effectivePin);
+      
+      const oldStats = localStorage.getItem('kpss3d_stats_' + oldRumuz);
+      if (oldStats) {
+        localStorage.setItem('kpss3d_stats_' + newRumuz.trim(), oldStats);
+        localStorage.removeItem('kpss3d_stats_' + oldRumuz);
+      }
+    }
+
+    // Clean up duels in background where old rumuz was recorded
+    try {
+      const duelsRef = collection(db, 'duels');
+      const duelSnap = await getDocs(query(duelsRef, limit(50)));
+      duelSnap.forEach(async (dDoc) => {
+        const dData = dDoc.data() as DuelSessionData;
+        let needsUpdate = false;
+        let p1 = dData.player1;
+        let p2 = dData.player2;
+
+        if (p1 && (p1.rumuz === oldRumuz || p1.rumuzKey === oldKey)) {
+          p1 = { ...p1, rumuz: newRumuz.trim(), rumuzKey: newKey };
+          needsUpdate = true;
+        }
+        if (p2 && (p2.rumuz === oldRumuz || p2.rumuzKey === oldKey)) {
+          p2 = { ...p2, rumuz: newRumuz.trim(), rumuzKey: newKey };
+          needsUpdate = true;
+        }
+        if (needsUpdate) {
+          await setDoc(doc(db, 'duels', dDoc.id), { player1: p1, player2: p2 }, { merge: true });
+        }
+      });
+    } catch {
+      // background duel clean up notice ignored
+    }
+
     return { success: true, profile: migratedData };
   } catch (error) {
     console.error('Rumuz rename error:', error);

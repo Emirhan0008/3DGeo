@@ -185,8 +185,8 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
         </div>
 
         {/* Current User Snapshot Banner */}
-        <div className="mx-3.5 sm:mx-4 my-2.5 p-3 rounded-xl bg-gradient-to-r from-amber-500/15 via-indigo-500/15 to-purple-500/15 border border-amber-400/40 flex items-center justify-between gap-2 shadow-inner">
-          <div className="flex items-center gap-2.5 min-w-0">
+        <div className="mx-3.5 sm:mx-4 my-2.5 p-3 rounded-xl bg-gradient-to-r from-amber-500/15 via-indigo-500/15 to-purple-500/15 border border-amber-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-inner">
+          <div className="flex items-center gap-2.5 min-w-0 w-full sm:w-auto">
             <AvatarWithBadgeFrame
               rumuz={activeRumuz}
               avatarIcon={avatarIcon}
@@ -196,8 +196,8 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               equippedTitle={equippedTitle}
               size="sm"
             />
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">Senin Profilin</span>
                 <span className="text-xs font-black text-white truncate">
                   {isAnonymous ? `*** (${activeRumuz} - Gizli)` : activeRumuz}
@@ -214,18 +214,22 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 text-right">
-            <div>
-              <div className="text-[9px] uppercase font-black text-slate-400">Puan</div>
+          <div className="grid grid-cols-4 sm:flex items-center gap-2 sm:gap-3 w-full sm:w-auto text-center sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-white/10">
+            <div className="bg-black/30 sm:bg-transparent p-1.5 sm:p-0 rounded-lg">
+              <div className="text-[9px] uppercase font-black text-amber-400">Puan</div>
               <div className="text-xs font-black text-emerald-400">{score} p</div>
             </div>
-            <div>
-              <div className="text-[9px] uppercase font-black text-slate-400">Düello</div>
-              <div className="text-xs font-black text-indigo-300">{duelStats.duelWins} Zafer</div>
+            <div className="bg-black/30 sm:bg-transparent p-1.5 sm:p-0 rounded-lg">
+              <div className="text-[9px] uppercase font-black text-indigo-300">Düello Zafer</div>
+              <div className="text-xs font-black text-indigo-200">⚔️ {duelStats.duelWins}</div>
             </div>
-            <div>
-              <div className="text-[9px] uppercase font-black text-slate-400">Seri</div>
-              <div className="text-xs font-black text-orange-400">{streak} 🔥</div>
+            <div className="bg-black/30 sm:bg-transparent p-1.5 sm:p-0 rounded-lg">
+              <div className="text-[9px] uppercase font-black text-orange-400">Seri Zafer</div>
+              <div className="text-xs font-black text-orange-300">🔥 {duelStats.duelStreak}</div>
+            </div>
+            <div className="bg-black/30 sm:bg-transparent p-1.5 sm:p-0 rounded-lg">
+              <div className="text-[9px] uppercase font-black text-yellow-400">En İyi Seri</div>
+              <div className="text-xs font-black text-yellow-200">⚡ {Math.max(duelStats.bestDuelStreak || 0, streak || 0)}</div>
             </div>
           </div>
         </div>
@@ -277,7 +281,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               return (
                 <div
                   key={entry.rumuzKey || entry.rumuz}
-                  className={`p-2.5 sm:p-3 rounded-xl border transition-all flex items-center justify-between gap-2.5 ${
+                  className={`p-2.5 sm:p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
                     isCurrentUser
                       ? 'bg-amber-500/20 border-amber-400 ring-2 ring-amber-400/50 shadow-lg'
                       : isFirst
@@ -298,8 +302,8 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                       size="sm"
                     />
 
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-black text-xs sm:text-sm text-white truncate">{displayedName}</span>
                         {isCurrentUser && (
                           <span className="px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 text-[9px] font-black uppercase">
@@ -316,29 +320,43 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5 sm:gap-4 shrink-0 text-right">
-                    {activeTab === 'score' && (
-                      <div>
-                        <div className="text-[9px] uppercase font-black text-amber-400">Puan</div>
-                        <div className="text-xs sm:text-sm font-black text-emerald-400">{entry.score} p</div>
-                      </div>
-                    )}
+                  <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-4 shrink-0 text-right border-t sm:border-t-0 pt-1.5 sm:pt-0 border-white/5">
+                    {/* Score column */}
+                    <div>
+                      <div className="text-[9px] uppercase font-black text-amber-400">Puan</div>
+                      <div className="text-xs sm:text-sm font-black text-emerald-400">{entry.score} p</div>
+                    </div>
 
-                    {activeTab === 'duels' && (
-                      <div>
-                        <div className="text-[9px] uppercase font-black text-indigo-300">Düello Zaferi</div>
-                        <div className="text-xs sm:text-sm font-black text-indigo-300">{entry.duelWins} Zafer</div>
+                    {/* Duel Wins column */}
+                    <div>
+                      <div className="text-[9px] uppercase font-black text-indigo-300">Zaferler</div>
+                      <div className="text-xs sm:text-sm font-black text-indigo-200">
+                        ⚔️ {entry.duelWins}
+                        {entry.totalDuels > 0 && (
+                          <span className="text-[10px] text-indigo-400/80 font-normal ml-1">
+                            ({entry.totalDuels} maç)
+                          </span>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {activeTab === 'streak' && (
-                      <div>
-                        <div className="text-[9px] uppercase font-black text-orange-400">Doğru Serisi</div>
-                        <div className="text-xs sm:text-sm font-black text-orange-400">{entry.streak} 🔥</div>
+                    {/* Streak & Streak record column */}
+                    <div>
+                      <div className="text-[9px] uppercase font-black text-orange-400">Seri Zafer</div>
+                      <div className="text-xs sm:text-sm font-black text-orange-300">
+                        {entry.duelStreak > 0 ? (
+                          <span>🔥 {entry.duelStreak} Seri</span>
+                        ) : entry.bestDuelStreak > 0 ? (
+                          <span>⚡ {entry.bestDuelStreak} Rekor</span>
+                        ) : entry.streak > 0 ? (
+                          <span>⚡ {entry.streak} Soru</span>
+                        ) : (
+                          <span className="text-slate-500">0 Seri</span>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    <div className="hidden sm:block">
+                    <div className="hidden md:block">
                       <div className="text-[9px] uppercase font-black text-slate-400">Rozet</div>
                       <div className="text-xs font-bold text-slate-200">{entry.unlockedBadgesCount} adet</div>
                     </div>

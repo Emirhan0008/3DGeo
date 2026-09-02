@@ -578,7 +578,18 @@ export default function AuthUserButton() {
           currentPin={localPin || ''}
           onProfileUpdated={(newRumuz, newPin) => {
             setLocalRumuz(newRumuz);
-            if (newPin) setLocalPin(newPin);
+            setCustomName(newRumuz);
+            if (newPin) {
+              setLocalPin(newPin);
+              setCustomPin(newPin);
+            }
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('kpss3d_active_rumuz', newRumuz);
+              if (newPin) localStorage.setItem('kpss3d_active_pin', newPin);
+            }
+            if (firebaseUser) {
+              updateProfile(firebaseUser, { displayName: newRumuz }).catch(() => {});
+            }
           }}
           onProfileDeleted={() => {
             setLocalRumuz(null);

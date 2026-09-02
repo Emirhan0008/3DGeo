@@ -95,45 +95,53 @@ export default function ProfileEditModal({
     try {
       const trimmedNewRumuz = newRumuzInput.trim();
       const activePin = pinInput.trim() || currentPin.trim();
+      const updatedPin = newPinInput.trim();
 
       if (!activePin) {
-        setStatusMsg({ type: 'error', text: 'Değişiklikleri kaydetmek için lütfen 4 haneli PIN şifrenizi girin.' });
+        setStatusMsg({ type: 'error', text: 'Değişiklikleri kaydetmek için lütfen mevcut PIN şifrenizi girin.' });
         setIsSaving(false);
         return;
       }
 
       if (trimmedNewRumuz && trimmedNewRumuz !== currentRumuz) {
-        const renameRes = await changeRumuzNickname(currentRumuz, trimmedNewRumuz, activePin);
+        const renameRes = await changeRumuzNickname(currentRumuz, trimmedNewRumuz, activePin, updatedPin || undefined);
         if (!renameRes.success) {
           setStatusMsg({ type: 'error', text: renameRes.errorMsg || 'Rumuz değiştirilemedi.' });
           setIsSaving(false);
           return;
         }
 
-        if (newPinInput.trim()) {
-          await updateRumuzCustomization(trimmedNewRumuz, activePin, { pin: newPinInput.trim() });
+        const effectivePin = updatedPin || activePin;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kpss3d_active_rumuz', trimmedNewRumuz);
+          localStorage.setItem('kpss3d_active_pin', effectivePin);
         }
 
         if (onProfileUpdated) {
-          onProfileUpdated(trimmedNewRumuz, newPinInput.trim() || activePin);
+          onProfileUpdated(trimmedNewRumuz, effectivePin);
         }
 
-        setStatusMsg({ type: 'success', text: `✓ Rumuzunuz '${trimmedNewRumuz}' olarak güncellendi ve buluta kaydedildi!` });
+        setStatusMsg({ type: 'success', text: `✓ Rumuzunuz ve şifreniz '${trimmedNewRumuz}' olarak tek hesap altında güncellendi!` });
+        setNewPinInput('');
         setIsSaving(false);
         return;
       }
 
-      if (newPinInput.trim()) {
-        const pinRes = await updateRumuzCustomization(currentRumuz, activePin, { pin: newPinInput.trim() });
+      if (updatedPin) {
+        const pinRes = await updateRumuzCustomization(currentRumuz, activePin, { pin: updatedPin });
         if (!pinRes.success) {
           setStatusMsg({ type: 'error', text: pinRes.errorMsg || 'PIN güncellenemedi.' });
           setIsSaving(false);
           return;
         }
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kpss3d_active_pin', updatedPin);
+        }
         if (onProfileUpdated) {
-          onProfileUpdated(currentRumuz, newPinInput.trim());
+          onProfileUpdated(currentRumuz, updatedPin);
         }
         setStatusMsg({ type: 'success', text: '✓ PIN güvenlik şifreniz güncellendi!' });
+        setNewPinInput('');
       } else {
         setStatusMsg({ type: 'success', text: '✓ Profil bilgileriniz bulutta güncel.' });
       }

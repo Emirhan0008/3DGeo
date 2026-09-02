@@ -293,18 +293,25 @@ export default function DuelMode() {
           return;
         }
       } else {
+        const cur = useAppStore.getState();
         await saveRumuzProfile(rumuz, pin, {
-          score: 0,
-          streak: 0,
-          totalQuestionsAnswered: 0,
-          correctAnswersCount: 0,
-          totalDistanceErrorKm: 0,
-          pinGuessCount: 0,
-          unlockedBadges: ['3D Düellocu Adayı'],
-          isBlindMapMode: false,
-          regionalStats: {},
-          categoryStats: {},
-          missedItems: {}
+          score: cur.score || 0,
+          streak: cur.streak || 0,
+          avatarIcon: cur.avatarIcon || '⚔️',
+          avatarBg: cur.avatarBg || 'gold_glory',
+          equippedTitle: cur.equippedTitle || '3D Coğrafyacı Çırağı',
+          unlockedTitles: cur.unlockedTitles || ['3D Coğrafyacı Çırağı'],
+          totalQuestionsAnswered: cur.totalQuestionsAnswered || 0,
+          correctAnswersCount: cur.correctAnswersCount || 0,
+          totalDistanceErrorKm: cur.totalDistanceErrorKm || 0,
+          pinGuessCount: cur.pinGuessCount || 0,
+          unlockedBadges: cur.unlockedBadges?.length ? cur.unlockedBadges : ['3D Düellocu Adayı'],
+          duelStats: cur.duelStats,
+          botStats: cur.botStats,
+          isBlindMapMode: cur.isBlindMapMode,
+          regionalStats: cur.regionalStats || {},
+          categoryStats: cur.categoryStats || {},
+          missedItems: cur.missedItems || {}
         });
       }
 
