@@ -41,45 +41,45 @@ export interface AvatarThemeOption {
 }
 
 export const AVATAR_ICONS: AvatarIconOption[] = [
-  { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas', minBadgesRequired: 8, minDuelWinsRequired: 10 },
-  { id: 'crown', icon: '👑', label: 'Arena Kralı', minDuelWinsRequired: 10 },
-  { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu', minDuelWinsRequired: 5 },
-  { id: 'grad_cap', icon: '🎓', label: 'KPSS Üstadı', minBadgesRequired: 5 },
-  { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü', minDuelWinsRequired: 3 },
-  { id: 'target', icon: '🎯', label: 'Keskin Nişancı', minBadgesRequired: 3 },
-  { id: 'shield', icon: '🛡️', label: 'Muhafız Kalkanı', minBadgesRequired: 2 },
-  { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi', minDuelWinsRequired: 1 },
-  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin', minBadgesRequired: 0 }
+  { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas (Zirve)', minBadgesRequired: 8, minDuelWinsRequired: 10 },
+  { id: 'crown', icon: '👑', label: 'Arena Kralı (Elit)', minDuelWinsRequired: 10 },
+  { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu (Altın)', minDuelWinsRequired: 5 },
+  { id: 'grad_cap', icon: '🎓', label: 'KPSS Üstadı (Altın)', minBadgesRequired: 5 },
+  { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü (Gümüş)', minDuelWinsRequired: 3 },
+  { id: 'target', icon: '🎯', label: 'Keskin Nişancı (Gümüş)', minBadgesRequired: 3 },
+  { id: 'shield', icon: '🛡️', label: 'Muhafız Kalkanı (Bronz)', minBadgesRequired: 2 },
+  { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi (Bronz)', minDuelWinsRequired: 1 },
+  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin (Başlangıç)', minBadgesRequired: 0 }
 ];
 
 export const AVATAR_THEMES: AvatarThemeOption[] = [
   {
     id: 'cyan_mythic',
-    name: '💎 Elmas & Efsanevi Lig',
-    bgGradient: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
-    borderGlow: 'border-cyan-400 ring-2 ring-purple-500/80 shadow-[0_0_20px_rgba(6,182,212,0.6)]',
-    badgePinBg: 'bg-cyan-900 border-cyan-300'
+    name: '💎 4. Kademe: Elmas & Efsanevi Kozmik (Zirve)',
+    bgGradient: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
+    borderGlow: 'border-2 border-cyan-200 ring-4 ring-purple-500 shadow-[0_0_35px_rgba(6,182,212,1),0_0_20px_rgba(168,85,247,0.85)]',
+    badgePinBg: 'bg-slate-950 border-2 border-cyan-300 ring-2 ring-purple-400 text-cyan-200 shadow-xl shadow-cyan-500/80'
   },
   {
     id: 'gold_glory',
-    name: '👑 Altın & Şampiyon Lig',
+    name: '👑 3. Kademe: Altın & Şampiyon Aura',
     bgGradient: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-    borderGlow: 'border-amber-400 ring-2 ring-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.6)]',
-    badgePinBg: 'bg-amber-900 border-amber-300'
+    borderGlow: 'border-2 border-amber-300 ring-3 ring-amber-400/80 shadow-[0_0_22px_rgba(245,158,11,0.85)]',
+    badgePinBg: 'bg-amber-950 border-2 border-amber-300 ring-2 ring-yellow-400/80 text-amber-200 shadow-lg shadow-amber-500/50'
   },
   {
     id: 'indigo_midnight',
-    name: '🛡️ Gümüş & Uzman Lig',
+    name: '🛡️ 2. Kademe: Gümüş & Uzman Metalik',
     bgGradient: 'bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800',
-    borderGlow: 'border-slate-300 ring-1 ring-slate-400/50 shadow-[0_0_10px_rgba(203,213,225,0.4)]',
-    badgePinBg: 'bg-indigo-900 border-indigo-400'
+    borderGlow: 'border-2 border-slate-200 ring-2 ring-slate-400/60 shadow-[0_0_14px_rgba(203,213,225,0.45)]',
+    badgePinBg: 'bg-slate-900 border-2 border-slate-200 ring-1 ring-slate-300/60 text-slate-100 shadow-md'
   },
   {
     id: 'emerald_forest',
-    name: '🐣 Bronz & Çırak Lig',
-    bgGradient: 'bg-gradient-to-tr from-emerald-950 via-teal-950 to-slate-900',
-    borderGlow: 'border-emerald-500/50 ring-1 ring-emerald-500/30',
-    badgePinBg: 'bg-emerald-900 border-emerald-400'
+    name: '🐣 1. Kademe: Bronz & Çırak Sıcak Bakır',
+    bgGradient: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
+    borderGlow: 'border border-amber-700/70 ring-1 ring-amber-800/40 shadow-[0_0_8px_rgba(180,83,9,0.25)]',
+    badgePinBg: 'bg-amber-950 border border-amber-700 text-amber-300 shadow-sm'
   }
 ];
 
@@ -785,17 +785,91 @@ export const ALL_BADGES: Badge[] = [
   }
 ];
 
-export type BadgePrestigeTier = 'starter' | 'bronze_silver' | 'gold_champion' | 'diamond_mythic';
+export type BadgePrestigeTier = 'starter' | 'bronze' | 'silver' | 'gold' | 'diamond';
 
 export interface PrestigeTierInfo {
   tier: BadgePrestigeTier;
+  tierLevel: number; // 0: Başlangıç, 1: Bronz, 2: Gümüş, 3: Altın, 4: Elmas (Zirve)
+  tierLabel: string;
   title: string;
   badgeCount: number;
   frameBorderClass: string;
   glowClass: string;
   pinIcon: string;
   pinBadgeName: string;
+  pinBorderClass: string;
   gradientBg: string;
+  titleBadgeClass: string;
+  ringClass: string;
+  sparkleEffect: boolean;
+}
+
+/**
+ * Returns distinct hierarchical styles for titles and badges based on their tier.
+ * Diamond > Gold > Silver > Bronze > Starter
+ */
+export function getTitleTierStyle(tier: BadgeTier | 'starter'): {
+  badgeClass: string;
+  textClass: string;
+  borderClass: string;
+  bgClass: string;
+  tierName: string;
+  tierNumber: number;
+  glowShadow: string;
+} {
+  switch (tier) {
+    case 'diamond':
+      return {
+        badgeClass: 'bg-gradient-to-r from-cyan-500/20 via-purple-500/25 to-pink-500/20 border-2 border-cyan-400 ring-2 ring-purple-500/80 text-cyan-200 shadow-[0_0_18px_rgba(6,182,212,0.65)] font-black animate-pulse',
+        textClass: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-200 to-amber-200 font-black',
+        borderClass: 'border-2 border-cyan-400 ring-2 ring-purple-500/80 shadow-[0_0_20px_rgba(6,182,212,0.6)]',
+        bgClass: 'bg-gradient-to-tr from-cyan-950/80 via-purple-950/70 to-indigo-950/80',
+        tierName: '💎 4. Kademe: Elmas & Efsanevi Zirve',
+        tierNumber: 4,
+        glowShadow: 'shadow-[0_0_25px_rgba(6,182,212,0.7)]'
+      };
+    case 'gold':
+      return {
+        badgeClass: 'bg-amber-500/20 border-2 border-amber-400 ring-1 ring-amber-400/60 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.55)] font-black',
+        textClass: 'text-amber-300 font-black',
+        borderClass: 'border-2 border-amber-400 ring-1 ring-amber-400/60 shadow-[0_0_15px_rgba(245,158,11,0.5)]',
+        bgClass: 'bg-gradient-to-tr from-amber-950/70 via-yellow-950/60 to-slate-900',
+        tierName: '👑 3. Kademe: Altın & Şampiyon',
+        tierNumber: 3,
+        glowShadow: 'shadow-[0_0_18px_rgba(245,158,11,0.6)]'
+      };
+    case 'silver':
+      return {
+        badgeClass: 'bg-slate-800/80 border border-slate-300 ring-1 ring-slate-400/40 text-slate-200 shadow-[0_0_10px_rgba(203,213,225,0.35)] font-bold',
+        textClass: 'text-slate-200 font-bold',
+        borderClass: 'border border-slate-300 ring-1 ring-slate-400/40 shadow-[0_0_10px_rgba(203,213,225,0.3)]',
+        bgClass: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950/60',
+        tierName: '🛡️ 2. Kademe: Gümüş & Uzman',
+        tierNumber: 2,
+        glowShadow: 'shadow-[0_0_10px_rgba(203,213,225,0.35)]'
+      };
+    case 'bronze':
+      return {
+        badgeClass: 'bg-amber-950/60 border border-amber-700/60 text-amber-400 shadow-none font-semibold',
+        textClass: 'text-amber-400 font-semibold',
+        borderClass: 'border border-amber-700/60 shadow-none',
+        bgClass: 'bg-gradient-to-tr from-amber-950/50 to-slate-950',
+        tierName: '🐣 1. Kademe: Bronz & Çırak',
+        tierNumber: 1,
+        glowShadow: 'shadow-none'
+      };
+    case 'starter':
+    default:
+      return {
+        badgeClass: 'bg-slate-900/60 border border-slate-700/60 text-slate-400 shadow-none font-normal',
+        textClass: 'text-slate-400 font-normal',
+        borderClass: 'border border-slate-700/60 shadow-none',
+        bgClass: 'bg-slate-950',
+        tierName: '🌱 Başlangıç',
+        tierNumber: 0,
+        glowShadow: 'shadow-none'
+      };
+  }
 }
 
 /**
@@ -822,7 +896,7 @@ export function getAutoEquippedDuelTitle(duelWins = 0, duelStreak = 0, unlockedB
 
 /**
  * Calculates 1v1 duel exclusive prestige tier (borders, glow, top-right pin icon)
- * Only 1v1 duel achievements are counted.
+ * Strict hierarchy: Diamond (25+ wins or 10+ wins) > Gold (3+ wins or streak) > Silver (1+ win) > Starter (0 wins)
  */
 export function getDuelPrestigeTier(
   duelWins = 0,
@@ -831,73 +905,108 @@ export function getDuelPrestigeTier(
 ): PrestigeTierInfo {
   const duelTitle = getAutoEquippedDuelTitle(duelWins, duelStreak, unlockedBadges);
 
+  // 4. KADEME: ELMAS & EFSANEVİ ZİRVE (25+ Zafer veya Tahtın Sahibi)
   if (duelWins >= 25 || unlockedBadges.includes('Tahtın Sahibi')) {
     return {
-      tier: 'diamond_mythic',
+      tier: 'diamond',
+      tierLevel: 4,
+      tierLabel: '💎 Elmas Zirve',
       title: duelTitle,
       badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-amber-300 ring-2 ring-purple-500 shadow-[0_0_25px_rgba(234,179,8,0.8)] animate-pulse',
-      glowClass: 'from-amber-400 via-purple-500 to-cyan-400',
+      frameBorderClass: 'border-2 border-cyan-200 ring-4 ring-purple-500 shadow-[0_0_35px_rgba(6,182,212,1),0_0_20px_rgba(168,85,247,0.85)] animate-pulse',
+      glowClass: 'from-cyan-400 via-fuchsia-500 to-amber-300',
       pinIcon: '👑',
       pinBadgeName: 'Tahtın Sahibi',
-      gradientBg: 'bg-gradient-to-tr from-amber-950 via-purple-950 to-slate-900'
+      pinBorderClass: 'border-2 border-cyan-200 bg-slate-950 text-cyan-200 ring-2 ring-purple-400 shadow-xl shadow-cyan-500/80 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
+      titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-200 to-amber-200 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_18px_rgba(6,182,212,0.7)] font-black',
+      ringClass: 'ring-4 ring-purple-500',
+      sparkleEffect: true
     };
   }
 
+  // 4. KADEME: ELMAS LİG (10+ Zafer veya Düello Şampiyonu)
   if (duelWins >= 10 || unlockedBadges.includes('Düello Şampiyonu')) {
     return {
-      tier: 'diamond_mythic',
+      tier: 'diamond',
+      tierLevel: 4,
+      tierLabel: '💎 Elmas Lig',
       title: duelTitle,
       badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-cyan-400 ring-2 ring-indigo-500 shadow-[0_0_20px_rgba(6,182,212,0.7)] animate-pulse',
+      frameBorderClass: 'border-2 border-cyan-300 ring-3 ring-indigo-500 shadow-[0_0_28px_rgba(6,182,212,0.85)] animate-pulse',
       glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
       pinIcon: '🏆',
       pinBadgeName: 'Düello Şampiyonu',
-      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950'
+      pinBorderClass: 'border-2 border-cyan-300 bg-slate-950 text-cyan-200 ring-2 ring-indigo-400 shadow-lg shadow-cyan-500/60',
+      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
+      titleBadgeClass: 'text-cyan-200 border-2 border-cyan-400 ring-1 ring-indigo-400/80 shadow-[0_0_14px_rgba(6,182,212,0.6)] font-black',
+      ringClass: 'ring-3 ring-indigo-500',
+      sparkleEffect: true
     };
   }
 
+  // 3. KADEME: ALTIN & ŞAMPİYON LİG (3+ Zafer veya Seri veya Gladyatör)
   if (duelWins >= 3 || duelStreak >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('Yenilmez Fatih')) {
     return {
-      tier: 'gold_champion',
+      tier: 'gold',
+      tierLevel: 3,
+      tierLabel: '👑 Altın Şampiyon',
       title: duelTitle,
       badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-amber-400 ring-2 ring-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.6)]',
-      glowClass: 'from-amber-400 via-yellow-300 to-amber-600',
+      frameBorderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)] animate-pulse',
+      glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: duelStreak >= 3 ? '🔥' : '⚔️',
       pinBadgeName: '1v1 Gladyatör',
-      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900'
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-1 ring-yellow-400/80 shadow-md shadow-amber-500/50',
+      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
+      titleBadgeClass: 'text-amber-300 border border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
+      ringClass: 'ring-2 ring-amber-400',
+      sparkleEffect: false
     };
   }
 
+  // 2. KADEME: GÜMÜŞ & UZMAN LİG (1-2 Zafer veya Arena Çaylağı)
   if (duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı')) {
     return {
-      tier: 'bronze_silver',
+      tier: 'silver',
+      tierLevel: 2,
+      tierLabel: '🛡️ Gümüş Uzman',
       title: duelTitle,
       badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-slate-300 ring-1 ring-slate-400/50 shadow-[0_0_10px_rgba(203,213,225,0.4)]',
-      glowClass: 'from-slate-300 via-slate-100 to-slate-400',
+      frameBorderClass: 'border-2 border-slate-200 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.45)]',
+      glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: '🛡️',
       pinBadgeName: 'Arena Savaşçısı',
-      gradientBg: 'bg-gradient-to-tr from-slate-800 via-indigo-950 to-slate-900'
+      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-sm',
+      gradientBg: 'bg-gradient-to-tr from-slate-800 via-slate-900 to-indigo-950',
+      titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
+      ringClass: 'ring-1 ring-slate-400/50',
+      sparkleEffect: false
     };
   }
 
+  // 0. KADEME: BAŞLANGIÇ (0 Zafer)
   return {
     tier: 'starter',
+    tierLevel: 0,
+    tierLabel: '🌱 Başlangıç',
     title: duelTitle,
     badgeCount: duelWins,
-    frameBorderClass: 'border border-indigo-500/50 ring-1 ring-indigo-500/30',
-    glowClass: 'from-indigo-500 to-purple-500',
+    frameBorderClass: 'border border-slate-700/60 ring-0 shadow-none',
+    glowClass: 'from-transparent to-transparent opacity-0',
     pinIcon: '🎯',
     pinBadgeName: 'Arena Adayı',
-    gradientBg: 'bg-gradient-to-tr from-indigo-950 to-slate-900'
+    pinBorderClass: 'border border-slate-700 bg-slate-900 text-slate-400 shadow-none',
+    gradientBg: 'bg-gradient-to-tr from-slate-950 to-slate-900',
+    titleBadgeClass: 'text-slate-400 border border-slate-800 shadow-none font-normal',
+    ringClass: 'ring-0',
+    sparkleEffect: false
   };
 }
 
 /**
  * Calculates user's avatar frame prestige and crowning badge based on unlocked badges, duel wins, and equipped title.
- * The top-right pin emblem specifically inherits the equipped title's unique icon and prestige!
+ * Strict hierarchy enforced: Diamond (Tier 4) > Gold (Tier 3) > Silver (Tier 2) > Bronze (Tier 1) > Starter (Tier 0)
  */
 export function getPrestigeTier(
   unlockedBadges: string[] = [],
@@ -916,61 +1025,105 @@ export function getPrestigeTier(
   );
 
   const activeTitleName = matchedTitle?.name || customTitle || '3D Coğrafyacı Çırağı';
+  const titleTier = matchedTitle?.tier || (count >= 8 ? 'diamond' : count >= 5 ? 'gold' : count >= 2 ? 'silver' : count >= 1 ? 'bronze' : 'bronze');
   const activePinIcon = matchedTitle?.icon || (count >= 8 ? '💎' : count >= 5 ? '👑' : count >= 2 ? '🛡️' : '🐣');
-  const titleTier = matchedTitle?.tier || (count >= 8 ? 'diamond' : count >= 5 ? 'gold' : count >= 2 ? 'silver' : 'bronze');
 
-  // Diamond / Mythic Level
-  if (titleTier === 'diamond' || count >= 8 || duelWins >= 10 || unlockedBadges.includes('Efsanevi Coğrafyacı') || unlockedBadges.includes('Düello Şampiyonu')) {
+  // 4. KADEME: ELMAS & EFSANEVİ ZİRVE (En Yüksek ve En Belirgin Işıltı)
+  if (titleTier === 'diamond' || count >= 8 || duelWins >= 10 || unlockedBadges.includes('Efsanevi Coğrafyacı') || unlockedBadges.includes('Düello Şampiyonu') || unlockedBadges.includes('Tahtın Sahibi')) {
     return {
-      tier: 'diamond_mythic',
+      tier: 'diamond',
+      tierLevel: 4,
+      tierLabel: '💎 Elmas Zirve',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-cyan-400 ring-2 ring-purple-500/80 shadow-[0_0_20px_rgba(6,182,212,0.6)] animate-pulse',
-      glowClass: 'from-cyan-500 via-indigo-500 to-fuchsia-500',
+      frameBorderClass: 'border-2 border-cyan-200 ring-4 ring-purple-500 shadow-[0_0_35px_rgba(6,182,212,1),0_0_20px_rgba(168,85,247,0.85)] animate-pulse',
+      glowClass: 'from-cyan-400 via-fuchsia-500 to-amber-300',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950'
+      pinBorderClass: 'border-2 border-cyan-200 bg-slate-950 text-cyan-200 ring-2 ring-purple-400 shadow-xl shadow-cyan-500/80 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
+      titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-200 to-amber-200 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_18px_rgba(6,182,212,0.7)] font-black',
+      ringClass: 'ring-4 ring-purple-500',
+      sparkleEffect: true
     };
   }
 
-  // Gold Champion Level
+  // 3. KADEME: ALTIN & ŞAMPİYON LİG (Belirgin Altın Parıltısı)
   if (titleTier === 'gold' || count >= 5 || duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('KPSS Coğrafya Üstadı')) {
     return {
-      tier: 'gold_champion',
+      tier: 'gold',
+      tierLevel: 3,
+      tierLabel: '👑 Altın Şampiyon',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-amber-400 ring-2 ring-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.5)]',
-      glowClass: 'from-amber-400 via-yellow-300 to-amber-600',
+      frameBorderClass: 'border-2 border-amber-300 ring-3 ring-amber-400/80 shadow-[0_0_22px_rgba(245,158,11,0.85)] animate-pulse',
+      glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900'
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400/80 shadow-lg shadow-amber-500/50',
+      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
+      titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.5)] font-black',
+      ringClass: 'ring-3 ring-amber-400/80',
+      sparkleEffect: false
     };
   }
 
-  // Silver / Warrior Level
+  // 2. KADEME: GÜMÜŞ & UZMAN LİG (Temiz Metalik Işıltı)
   if (titleTier === 'silver' || count >= 2 || duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı') || unlockedBadges.includes('Tam İsabet Kaptan')) {
     return {
-      tier: 'bronze_silver',
+      tier: 'silver',
+      tierLevel: 2,
+      tierLabel: '🛡️ Gümüş Uzman',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-slate-300 ring-1 ring-slate-400/40 shadow-[0_0_10px_rgba(203,213,225,0.3)]',
-      glowClass: 'from-slate-300 via-slate-100 to-slate-400',
+      frameBorderClass: 'border-2 border-slate-200 ring-2 ring-slate-400/60 shadow-[0_0_14px_rgba(203,213,225,0.45)]',
+      glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      gradientBg: 'bg-gradient-to-tr from-slate-800 via-indigo-950 to-slate-900'
+      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-md',
+      gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
+      titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_8px_rgba(203,213,225,0.3)] font-bold',
+      ringClass: 'ring-2 ring-slate-400/60',
+      sparkleEffect: false
     };
   }
 
-  // Starter Level
+  // 1. KADEME: BRONZ & ÇIRAK (Sıcak Bakır - Mütevazı)
+  if (count >= 1 || customTitle === '3D Coğrafyacı Çırağı') {
+    return {
+      tier: 'bronze',
+      tierLevel: 1,
+      tierLabel: '🐣 Bronz Çırak',
+      title: activeTitleName,
+      badgeCount: count,
+      frameBorderClass: 'border border-amber-700/70 ring-1 ring-amber-800/40 shadow-[0_0_8px_rgba(180,83,9,0.25)]',
+      glowClass: 'from-amber-900/40 via-amber-800/30 to-amber-950/40',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitleName,
+      pinBorderClass: 'border border-amber-700 bg-amber-950 text-amber-300 shadow-sm',
+      gradientBg: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
+      titleBadgeClass: 'text-amber-400 border border-amber-800/60 shadow-none font-semibold',
+      ringClass: 'ring-1 ring-amber-800/40',
+      sparkleEffect: false
+    };
+  }
+
+  // 0. KADEME: BAŞLANGIÇ (Sade Mat)
   return {
     tier: 'starter',
+    tierLevel: 0,
+    tierLabel: '🌱 Başlangıç',
     title: activeTitleName,
     badgeCount: count,
-    frameBorderClass: 'border border-indigo-500/40 ring-1 ring-indigo-500/20',
-    glowClass: 'from-indigo-500 to-purple-500',
+    frameBorderClass: 'border border-slate-700/60 ring-0 shadow-none',
+    glowClass: 'from-transparent to-transparent opacity-0',
     pinIcon: activePinIcon,
     pinBadgeName: activeTitleName,
-    gradientBg: 'bg-gradient-to-tr from-indigo-950 to-slate-900'
+    pinBorderClass: 'border border-slate-700 bg-slate-900 text-slate-400 shadow-none',
+    gradientBg: 'bg-gradient-to-tr from-slate-950 to-slate-900',
+    titleBadgeClass: 'text-slate-400 border border-slate-800 shadow-none font-normal',
+    ringClass: 'ring-0',
+    sparkleEffect: false
   };
 }
 

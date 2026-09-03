@@ -74,17 +74,33 @@ export default function AvatarWithBadgeFrame({
 
   const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
 
+  // Strict Hierarchy Pin & Glow styles
+  const pinClass = themeObj?.badgePinBg || prestige.pinBorderClass;
+
   return (
     <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
       <div
-        className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-lg ${sizeClasses.container} ${borderClass} ${bgClass}`}
-        title={`${rumuz} • ${activeTitle} (${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
+        className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-md transition-all ${sizeClasses.container} ${borderClass} ${bgClass}`}
+        title={`${rumuz} • ${activeTitle} (${prestige.tierLabel} • ${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
       >
-        {/* Background radial glow */}
-        {prestige.tier !== 'starter' && (
+        {/* Tier-Hierarchical Radial Glow Layer (Strictly proportional to tier level) */}
+        {prestige.tierLevel > 0 && (
           <div
-            className={`absolute -inset-0.5 rounded-full bg-gradient-to-r ${prestige.glowClass} opacity-60 blur-[2px] -z-10 animate-pulse`}
+            className={`absolute rounded-full bg-gradient-to-r ${prestige.glowClass} -z-10 transition-all ${
+              prestige.tierLevel === 4
+                ? '-inset-1 opacity-95 blur-[6px] animate-pulse'
+                : prestige.tierLevel === 3
+                ? '-inset-0.5 opacity-75 blur-[4px] animate-pulse'
+                : prestige.tierLevel === 2
+                ? '-inset-0.5 opacity-55 blur-[3px]'
+                : '-inset-0.5 opacity-30 blur-[2px]'
+            }`}
           />
+        )}
+
+        {/* Diamond Mythic Tier 4 Outer Sparkle Halo */}
+        {prestige.tierLevel === 4 && (
+          <div className="absolute -inset-1.5 rounded-full border border-cyan-400/60 ring-1 ring-purple-400/50 animate-ping opacity-30 pointer-events-none -z-10" />
         )}
 
         {/* Center Icon / Initial */}
@@ -92,11 +108,11 @@ export default function AvatarWithBadgeFrame({
           {displayIcon}
         </span>
 
-        {/* Glorious Top-Right Title / Badge Pin Icon */}
+        {/* Glorious Top-Right Title / Badge Pin Icon (Strictly hierarchical frame) */}
         {showBadgePin && (
           <div
-            className={`absolute ${sizeClasses.pin} rounded-full bg-slate-950 border-2 border-amber-400 shadow-xl flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
-            title={`${prestige.pinBadgeName} • ${activeTitle}`}
+            className={`absolute ${sizeClasses.pin} rounded-full ${pinClass} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
+            title={`${prestige.pinBadgeName} • ${activeTitle} (${prestige.tierLabel})`}
           >
             <span className="leading-none">{prestige.pinIcon}</span>
           </div>
@@ -104,7 +120,7 @@ export default function AvatarWithBadgeFrame({
       </div>
 
       {showTitleBadge && (
-        <span className={`font-extrabold text-amber-300 truncate max-w-[120px] text-center px-1.5 py-0.5 rounded bg-black/70 border border-amber-400/40 shadow-sm ${sizeClasses.titleText}`}>
+        <span className={`truncate max-w-[130px] text-center px-1.5 py-0.5 rounded shadow-sm transition-all ${prestige.titleBadgeClass} ${sizeClasses.titleText}`}>
           {activeTitle}
         </span>
       )}

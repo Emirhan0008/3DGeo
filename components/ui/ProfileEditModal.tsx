@@ -9,6 +9,7 @@ import {
   AVATAR_THEMES, 
   getPrestigeTier,
   getTitleProgress,
+  getTitleTierStyle,
   BadgeTier
 } from '@/lib/data/badgesData';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
@@ -389,24 +390,32 @@ export default function ProfileEditModal({
                 );
                 const isUnlocked = prog.isUnlocked;
                 const isEquipped = equippedTitle === titleObj.name;
+                const tierStyle = getTitleTierStyle(titleObj.tier);
 
                 return (
                   <div
                     key={titleObj.id}
                     className={`p-2.5 rounded-xl border flex flex-col justify-between gap-1.5 transition-all ${
                       isEquipped
-                        ? 'bg-amber-500/20 border-amber-400 ring-2 ring-amber-400/50 shadow-md'
+                        ? `${tierStyle.bgClass} ${tierStyle.borderClass} ${tierStyle.glowShadow} scale-[1.01]`
                         : isUnlocked
-                        ? 'bg-white/5 hover:bg-white/10 border-white/10'
-                        : 'bg-black/40 border-white/5 opacity-75'
+                        ? `${tierStyle.bgClass} border-white/15 hover:border-white/30`
+                        : 'bg-black/40 border-white/5 opacity-65'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-base shrink-0">{titleObj.icon}</span>
                         <div className="min-w-0">
-                          <div className="font-black text-xs text-white truncate">{titleObj.name}</div>
-                          <p className="text-[10px] text-slate-300 truncate">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
+                              {titleObj.name}
+                            </span>
+                            <span className={`text-[8px] font-black px-1 rounded ${tierStyle.badgeClass}`}>
+                              {titleObj.tier === 'diamond' ? '💎 Elmas' : titleObj.tier === 'gold' ? '👑 Altın' : titleObj.tier === 'silver' ? '🛡️ Gümüş' : '🐣 Bronz'}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-300 truncate mt-0.5">
                             {isUnlocked ? titleObj.desc : titleObj.requiredMetricText}
                           </p>
                         </div>
@@ -417,7 +426,7 @@ export default function ProfileEditModal({
                           onClick={() => handleEquipTitle(titleObj.name)}
                           className={`px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all cursor-pointer ${
                             isEquipped
-                              ? 'bg-amber-400 text-slate-950 shadow'
+                              ? 'bg-amber-400 text-slate-950 shadow-md font-black'
                               : 'bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-200'
                           }`}
                         >
@@ -468,24 +477,12 @@ export default function ProfileEditModal({
                 const badgesInTier = tierBadges[tierKey];
                 if (badgesInTier.length === 0) return null;
 
-                const tierName = {
-                  diamond: '💎 Elmas & Efsanevi Seviye',
-                  gold: '👑 Altın & Şampiyon Seviye',
-                  silver: '🛡️ Gümüş & Uzman Seviye',
-                  bronze: '🐣 Bronz & Başlangıç Seviyesi'
-                }[tierKey];
-
-                const tierColor = {
-                  diamond: 'text-cyan-400 border-cyan-500/40 bg-cyan-950/20',
-                  gold: 'text-amber-400 border-amber-500/40 bg-amber-950/20',
-                  silver: 'text-slate-300 border-slate-400/40 bg-slate-900/40',
-                  bronze: 'text-orange-400 border-orange-500/40 bg-orange-950/20'
-                }[tierKey];
+                const tierStyle = getTitleTierStyle(tierKey);
 
                 return (
                   <div key={tierKey} className="space-y-1.5">
-                    <div className={`px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-wider ${tierColor}`}>
-                      {tierName}
+                    <div className={`px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-wider ${tierStyle.badgeClass}`}>
+                      {tierStyle.tierName}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -496,29 +493,53 @@ export default function ProfileEditModal({
                         const pct = Math.min(100, Math.round((currentProgress / target) * 100));
                         const remaining = Math.max(0, target - currentProgress);
 
+                        const unlockedCardStyle = tierKey === 'diamond'
+                          ? 'bg-gradient-to-r from-cyan-950/70 via-purple-950/50 to-slate-900 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_16px_rgba(6,182,212,0.55)]'
+                          : tierKey === 'gold'
+                          ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.45)]'
+                          : tierKey === 'silver'
+                          ? 'bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-800 border border-slate-300 shadow-[0_0_8px_rgba(203,213,225,0.3)]'
+                          : 'bg-gradient-to-r from-amber-950/30 to-slate-900 border border-amber-700/60 shadow-none';
+
+                        const iconBgStyle = isUnlocked
+                          ? tierKey === 'diamond'
+                            ? 'bg-gradient-to-tr from-cyan-400 to-purple-500 text-slate-950 font-black shadow-lg ring-1 ring-cyan-300'
+                            : tierKey === 'gold'
+                            ? 'bg-amber-400 text-slate-950 font-black shadow-md ring-1 ring-yellow-300'
+                            : tierKey === 'silver'
+                            ? 'bg-slate-200 text-slate-950 font-black shadow-sm ring-1 ring-slate-300'
+                            : 'bg-amber-800 text-amber-100 font-bold'
+                          : 'bg-white/10 text-slate-500';
+
                         return (
                           <div
                             key={badge.id}
                             className={`p-2 rounded-xl border flex flex-col justify-between transition-all ${
                               isUnlocked
-                                ? 'bg-gradient-to-r from-amber-950/40 to-slate-900 border-amber-500/50 shadow-sm'
-                                : 'bg-white/5 border-white/10 opacity-75'
+                                ? unlockedCardStyle
+                                : 'bg-white/5 border-white/10 opacity-70'
                             }`}
                           >
                             <div className="flex items-start gap-2">
-                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-base shrink-0 ${
-                                isUnlocked ? 'bg-amber-400 text-slate-950 font-black shadow' : 'bg-white/10 text-slate-500'
-                              }`}>
+                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-base shrink-0 ${iconBgStyle}`}>
                                 {badge.icon}
                               </div>
 
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
-                                  <span className={`font-black text-xs truncate ${isUnlocked ? 'text-amber-300' : 'text-slate-300'}`}>
+                                  <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
                                     {badge.name}
                                   </span>
                                   {isUnlocked && (
-                                    <span className="text-[8px] font-black px-1.5 py-0.2 rounded bg-emerald-500 text-slate-950">
+                                    <span className={`text-[8px] font-black px-1.5 py-0.2 rounded ${
+                                      tierKey === 'diamond'
+                                        ? 'bg-cyan-300 text-slate-950 ring-1 ring-purple-500'
+                                        : tierKey === 'gold'
+                                        ? 'bg-amber-400 text-slate-950'
+                                        : tierKey === 'silver'
+                                        ? 'bg-slate-200 text-slate-950'
+                                        : 'bg-amber-700 text-white'
+                                    }`}>
                                       KAZANILDI ✓
                                     </span>
                                   )}
