@@ -75,10 +75,22 @@ export default function AvatarWithBadgeFrame({
   const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
   const pinClass = themeObj?.badgePinBg || prestige.pinBorderClass;
 
+  const tierScaleClass = prestige.tierLevel === 5
+    ? 'scale-[1.08] ring-offset-1'
+    : prestige.tierLevel === 4
+    ? 'scale-[1.04]'
+    : prestige.tierLevel === 3
+    ? 'scale-[1.01]'
+    : prestige.tierLevel === 2
+    ? 'scale-[0.98]'
+    : prestige.tierLevel === 1
+    ? 'scale-[0.95]'
+    : 'scale-[0.92]';
+
   return (
     <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
       <div
-        className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-md transition-all ${sizeClasses.container} ${borderClass} ${bgClass}`}
+        className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-md transition-all ${sizeClasses.container} ${borderClass} ${bgClass} ${tierScaleClass}`}
         title={`${rumuz} • ${activeTitle} (${prestige.tierLabel} • ${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
       >
         {/* Tier-Hierarchical Radial Glow Layer (Strictly proportional to tier level: 5 > 4 > 3 > 2 > 1 > 0) */}

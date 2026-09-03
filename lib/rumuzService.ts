@@ -41,6 +41,11 @@ export interface LeaderboardEntry {
   avatarBg: string;
   equippedTitle: string;
   score: number; // Total overall combined score
+  rankingScore: number; // Weighted prestige ranking score (multipliers applied)
+  duelPowerScore: number;
+  kpssPowerScore: number;
+  badgePowerScore: number;
+  winRatePct: number;
   kpssScore: number; // KPSS test questions score
   streak: number; // KPSS questions streak
   correctAnswersCount: number;
@@ -62,6 +67,74 @@ export interface LeaderboardEntry {
 }
 
 export type LeaderboardSortTab = 'total' | 'score' | 'kpss_test' | 'duels' | 'streak';
+
+/**
+ * Calculates the multi-factored weighted ranking prestige score.
+ * Multipliers prioritize 1v1 live duel victories, win streaks, and win rates over offline tests/badges.
+ * Guarantees that active winners (e.g. 6 wins out of 6) rank significantly higher than non-winners with many matches.
+ */
+export function calculateRankingPower(stats: {
+  score: number;
+  kpssScore: number;
+  correctAnswersCount: number;
+  duelWins: number;
+  duelLosses: number;
+  duelDraws: number;
+  totalDuels: number;
+  duelStreak: number;
+  bestDuelStreak: number;
+  duelScore: number;
+  unlockedBadgesCount: number;
+  accuracyPct: number;
+}): {
+  rankingScore: number;
+  winRatePct: number;
+  duelPowerScore: number;
+  kpssPowerScore: number;
+  badgePowerScore: number;
+} {
+  const totalD = stats.totalDuels > 0 ? stats.totalDuels : (stats.duelWins + stats.duelLosses + stats.duelDraws);
+  const winRate = totalD > 0 ? (stats.duelWins / totalD) : 0;
+  const winRatePct = Math.round(winRate * 100);
+
+  // 1. DÜELLO VE ZAFER KAZANIMLARI (EN BÜYÜK ÇARPAN & ASAL SIRALAMA GÜCÜ)
+  // • Düello Galibiyeti: 200 Puan (Her zafer için devasa itibar)
+  // • Aktif Galibiyet Serisi: 100 Puan (Canlı momentum)
+  // • Kariyer En İyi Serisi: 50 Puan (Kayıtlı rekor)
+  // • Kazanma Oranı Bonusu: 300 * winRate (10 maçta 0 galibiyet = 0, 6/6 = 300 tam bonus)
+  // • Düello Maç Puanı: 1.0x çarpan
+  const duelWinsScore = stats.duelWins * 200;
+  const duelStreakScore = stats.duelStreak * 100;
+  const bestStreakScore = (stats.bestDuelStreak || stats.duelStreak) * 50;
+  const winRateBonus = Math.round(winRate * 300);
+  const duelMatchScore = Math.round((stats.duelScore || 0) * 1.0);
+
+  const duelPowerScore = duelWinsScore + duelStreakScore + bestStreakScore + winRateBonus + duelMatchScore;
+
+  // 2. ÇEVRİMDIŞI & TEST SORU KAZANIMLARI (DAHA DÜŞÜK KATSAYI)
+  // • Doğru Soru Sayısı: Soru başına 4 puan (0.4x katsayı)
+  // • Test Ham Puanı: 0.2x katsayı
+  // • Soru İsabet Oranı Bonusu: accuracyPct * 1.0 (maks 100)
+  const kpssPowerScore = Math.round(
+    (stats.correctAnswersCount * 4) +
+    (stats.kpssScore * 0.2) +
+    (stats.accuracyPct * 1.0)
+  );
+
+  // 3. ROZET VE KOLEKSİYON BAŞARIMLARI (MÜTEVAZI KATSAYI)
+  // • Rozet başına 15 puan
+  const badgePowerScore = (stats.unlockedBadgesCount || 0) * 15;
+
+  const rankingScore = duelPowerScore + kpssPowerScore + badgePowerScore;
+
+  return {
+    rankingScore,
+    winRatePct,
+    duelPowerScore,
+    kpssPowerScore,
+    badgePowerScore
+  };
+}
 
 export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total'): Promise<LeaderboardEntry[]> {
   try {
@@ -106,6 +179,21 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
 
         const key = d.rumuzKey || normalizeRumuzKey(d.rumuz) || docSnap.id;
 
+        const power = calculateRankingPower({
+          score: calculatedScore,
+          kpssScore,
+          correctAnswersCount: correct,
+          duelWins,
+          duelLosses,
+          duelDraws,
+          totalDuels,
+          duelStreak,
+          bestDuelStreak,
+          duelScore,
+          unlockedBadgesCount: (d.unlockedBadges || []).length,
+          accuracyPct
+        });
+
         resultsMap.set(key, {
           rank: 0,
           rumuz: d.rumuz,
@@ -114,6 +202,11 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
           avatarBg: d.avatarBg || 'indigo_midnight',
           equippedTitle: d.equippedTitle || '3D Coğrafyacı Çırağı',
           score: calculatedScore,
+          rankingScore: power.rankingScore,
+          duelPowerScore: power.duelPowerScore,
+          kpssPowerScore: power.kpssPowerScore,
+          badgePowerScore: power.badgePowerScore,
+          winRatePct: power.winRatePct,
           kpssScore,
           streak: d.streak || 0,
           correctAnswersCount: correct,
@@ -215,6 +308,22 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
               existing.statusText = 'Aktif Oyuncu';
             }
           } else {
+            const localAcc = localAnswers > 0 ? Math.round((localCorrect / localAnswers) * 100) : 0;
+            const power = calculateRankingPower({
+              score: localScore,
+              kpssScore: localKpssScore,
+              correctAnswersCount: localCorrect,
+              duelWins: localWins,
+              duelLosses: parsed.duelStats?.duelLosses || 0,
+              duelDraws: parsed.duelStats?.duelDraws || 0,
+              totalDuels: localTotal,
+              duelStreak: localStreak,
+              bestDuelStreak: localBestStreak,
+              duelScore: localDuelScore,
+              unlockedBadgesCount: (parsed.unlockedBadges || []).length,
+              accuracyPct: localAcc
+            });
+
             resultsMap.set(localKey, {
               rank: 0,
               rumuz: localRumuz,
@@ -223,6 +332,11 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
               avatarBg: parsed.avatarBg || 'indigo_midnight',
               equippedTitle: parsed.equippedTitle || '3D Coğrafyacı Çırağı',
               score: localScore,
+              rankingScore: power.rankingScore,
+              duelPowerScore: power.duelPowerScore,
+              kpssPowerScore: power.kpssPowerScore,
+              badgePowerScore: power.badgePowerScore,
+              winRatePct: power.winRatePct,
               kpssScore: localKpssScore,
               streak: parsed.streak || 0,
               correctAnswersCount: localCorrect,
@@ -235,7 +349,7 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
               bestDuelStreak: localBestStreak,
               duelScore: localDuelScore,
               unlockedBadgesCount: (parsed.unlockedBadges || []).length,
-              accuracyPct: localAnswers > 0 ? Math.round((localCorrect / localAnswers) * 100) : 0,
+              accuracyPct: localAcc,
               isAnonymous: localStorage.getItem('kpss3d_is_anonymous') === 'true',
               isUnranked: !hasLocalActivity,
               statusText: hasLocalActivity ? 'Aktif Oyuncu' : 'Sıralama Dışı (Henüz Aktif Değil)',
@@ -248,21 +362,49 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
       }
     }
 
-    const allEntries = Array.from(resultsMap.values());
+    // Ensure all entries have up-to-date ranking power recalculations
+    const allEntries = Array.from(resultsMap.values()).map(e => {
+      const recalculated = calculateRankingPower({
+        score: e.score,
+        kpssScore: e.kpssScore,
+        correctAnswersCount: e.correctAnswersCount,
+        duelWins: e.duelWins,
+        duelLosses: e.duelLosses,
+        duelDraws: e.duelDraws,
+        totalDuels: e.totalDuels,
+        duelStreak: e.duelStreak,
+        bestDuelStreak: e.bestDuelStreak,
+        duelScore: e.duelScore,
+        unlockedBadgesCount: e.unlockedBadgesCount,
+        accuracyPct: e.accuracyPct
+      });
+      return {
+        ...e,
+        rankingScore: recalculated.rankingScore,
+        duelPowerScore: recalculated.duelPowerScore,
+        kpssPowerScore: recalculated.kpssPowerScore,
+        badgePowerScore: recalculated.badgePowerScore,
+        winRatePct: recalculated.winRatePct
+      };
+    });
 
     // Separate into active ranked players and unranked/inactive players
     const rankedPlayers = allEntries.filter(e => !e.isUnranked);
     const unrankedPlayers = allEntries.filter(e => !!e.isUnranked);
 
-    // Sort active players based on selected tab
+    // Sort active players based on selected tab with strict weighted priorities
     rankedPlayers.sort((a, b) => {
       if (sortBy === 'duels') {
+        // Duel Tab: Wins first, then duel streak, then best duel streak, then win rate %, then duel score
         if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
         if (b.duelStreak !== a.duelStreak) return b.duelStreak - a.duelStreak;
-        if (b.totalDuels !== a.totalDuels) return b.totalDuels - a.totalDuels;
-        return b.score - a.score;
+        if (b.bestDuelStreak !== a.bestDuelStreak) return b.bestDuelStreak - a.bestDuelStreak;
+        if (b.winRatePct !== a.winRatePct) return b.winRatePct - a.winRatePct;
+        if (b.duelScore !== a.duelScore) return b.duelScore - a.duelScore;
+        return b.rankingScore - a.rankingScore;
       }
       if (sortBy === 'kpss_test') {
+        // KPSS Test Tab: Correct questions count, then kpss score, then streak, then accuracy %
         if (b.correctAnswersCount !== a.correctAnswersCount) return b.correctAnswersCount - a.correctAnswersCount;
         if (b.kpssScore !== a.kpssScore) return b.kpssScore - a.kpssScore;
         if (b.streak !== a.streak) return b.streak - a.streak;
@@ -270,16 +412,19 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
         return b.score - a.score;
       }
       if (sortBy === 'streak') {
+        // Streak Tab: Highest active or best streak, then duel wins, then ranking score
         const bMaxStreak = Math.max(b.duelStreak, b.streak, b.bestDuelStreak);
         const aMaxStreak = Math.max(a.duelStreak, a.streak, a.bestDuelStreak);
         if (bMaxStreak !== aMaxStreak) return bMaxStreak - aMaxStreak;
         if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
+        if (b.rankingScore !== a.rankingScore) return b.rankingScore - a.rankingScore;
         return b.score - a.score;
       }
-      // Default: 'total' or 'score'
-      if (b.score !== a.score) return b.score - a.score;
+      // Default: 'total' or 'score' - Uses weighted rankingScore (Duel Wins & Streak Carry Massive Weight)
+      if (b.rankingScore !== a.rankingScore) return b.rankingScore - a.rankingScore;
       if (b.duelWins !== a.duelWins) return b.duelWins - a.duelWins;
-      return b.duelStreak - a.duelStreak;
+      if (b.duelStreak !== a.duelStreak) return b.duelStreak - a.duelStreak;
+      return b.score - a.score;
     });
 
     // Assign 1-indexed ranks to active ranked players

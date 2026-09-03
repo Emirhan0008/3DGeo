@@ -257,6 +257,21 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
           </div>
         </div>
 
+        {/* Multiplier Info Banner */}
+        <div className="mx-3.5 sm:mx-4 mt-2 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between text-[10px] text-slate-300">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-300 font-bold border border-indigo-400/30">
+              ⚡ Ağırlıklı Katsayı Sistemi
+            </span>
+            <span>
+              Düello Zaferi (<strong>200x</strong>), Zafer Serisi (<strong>100x</strong>) ve Kazanma Oranı (<strong>300x</strong>) en yüksek ağırlığa sahiptir.
+            </span>
+          </div>
+          <span className="text-amber-300 font-bold hidden sm:inline-block shrink-0">
+            Adil &amp; Zafer Odaklı Sıralama
+          </span>
+        </div>
+
         {/* Filter Controls: Active vs Unranked */}
         <div className="px-3.5 sm:px-4 py-1.5 flex items-center justify-between text-xs bg-slate-950/60 border-b border-white/5">
           <div className="flex items-center gap-2">
@@ -364,22 +379,26 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               ) : activeTab === 'duels' ? (
                 <div>
                   <div className="text-xs sm:text-sm font-black text-indigo-300">
-                    {entry.duelScore || (entry.duelWins * 120)} p
+                    {entry.duelWins} Zafer
                   </div>
-                  <div className="text-[9px] text-indigo-300/80">
-                    {entry.duelWins} zafer
+                  <div className="text-[9px] text-indigo-300/80 font-bold">
+                    %{entry.winRatePct || 0} Oran
                   </div>
                 </div>
               ) : (
                 <div>
-                  <div className="text-xs sm:text-sm font-black text-emerald-400">
-                    {entry.score} p
+                  <div className="text-xs sm:text-sm font-black text-amber-400 flex items-center justify-end gap-1">
+                    <span>{entry.rankingScore || entry.score}</span>
+                    <span className="text-[9px] font-bold text-amber-300/80">güç</span>
                   </div>
-                  {entry.totalQuestionsAnswered > 0 && (
-                    <div className="text-[9px] text-slate-400">
-                      %{entry.accuracyPct} isabet
-                    </div>
-                  )}
+                  <div className="text-[9px] text-slate-300 flex items-center justify-end gap-1 font-semibold">
+                    <span>{entry.score} ham p</span>
+                    {entry.totalDuels > 0 && (
+                      <span className="px-1 rounded bg-indigo-500/30 text-indigo-300 text-[8px] font-bold">
+                        %{entry.winRatePct} WR
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
 

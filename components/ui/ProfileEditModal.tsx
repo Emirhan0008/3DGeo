@@ -75,6 +75,17 @@ export default function ProfileEditModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [inspectedItem, setInspectedItem] = useState<{
+    type: 'avatar' | 'title' | 'badge';
+    title: string;
+    icon: string;
+    tier: string;
+    tierLevel: number;
+    isUnlocked: boolean;
+    reqDescription: string;
+    howToUnlock: string;
+    currentProgress?: string;
+  } | null>(null);
 
   if (!isOpen) return null;
 
@@ -297,6 +308,64 @@ export default function ProfileEditModal({
         {/* ALL-IN-ONE COMPACT CONTENT */}
         <div className="space-y-4 text-xs">
 
+          {/* ITEM INSPECTOR DIALOG / BANNER (Reveals exactly how to unlock and current progress on click/hover) */}
+          {inspectedItem && (
+            <div className="p-3.5 rounded-xl border-2 border-amber-400/80 bg-gradient-to-r from-slate-900 via-indigo-950/80 to-slate-900 shadow-xl space-y-2 animate-in fade-in zoom-in-95 duration-150 relative">
+              <button
+                onClick={() => setInspectedItem(null)}
+                className="absolute top-2.5 right-2.5 p-1 rounded-lg bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-white"
+                title="Kapat"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="flex items-start gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${
+                  inspectedItem.tierLevel === 5 ? 'bg-gradient-to-tr from-fuchsia-500 to-cyan-400 text-slate-950 font-black ring-2 ring-amber-300 shadow-lg' :
+                  inspectedItem.tierLevel === 4 ? 'bg-gradient-to-tr from-cyan-400 to-purple-500 text-slate-950 font-black ring-1 ring-cyan-300' :
+                  inspectedItem.tierLevel === 3 ? 'bg-amber-400 text-slate-950 font-black' :
+                  inspectedItem.tierLevel === 2 ? 'bg-slate-200 text-slate-950 font-black' :
+                  'bg-amber-800 text-amber-100'
+                }`}>
+                  {inspectedItem.icon}
+                </div>
+
+                <div className="flex-1 min-w-0 pr-6">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-black text-sm text-white">{inspectedItem.title}</span>
+                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
+                      inspectedItem.tierLevel === 5 ? 'bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-400' :
+                      inspectedItem.tierLevel === 4 ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-400' :
+                      inspectedItem.tierLevel === 3 ? 'bg-amber-500/30 text-amber-300 border border-amber-400' :
+                      inspectedItem.tierLevel === 2 ? 'bg-slate-400/30 text-slate-300 border border-slate-400' :
+                      'bg-amber-900/40 text-amber-200 border border-amber-700'
+                    }`}>
+                      {inspectedItem.tier} (Kademe {inspectedItem.tierLevel})
+                    </span>
+                    <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded ${
+                      inspectedItem.isUnlocked ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/25 text-rose-300 border border-rose-500/40'
+                    }`}>
+                      {inspectedItem.isUnlocked ? '✓ Açık / Kullanılabilir' : '🔒 Kilitli'}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-slate-200 mt-1 font-medium">{inspectedItem.reqDescription}</p>
+
+                  <div className="mt-2 p-2 rounded-lg bg-black/40 border border-white/10 space-y-1">
+                    <div className="flex items-center gap-1.5 text-amber-300 font-bold text-[10px]">
+                      <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-400" />
+                      <span>Nasıl Elde Edilir?</span>
+                    </div>
+                    <p className="text-[10px] text-slate-300 leading-relaxed">{inspectedItem.howToUnlock}</p>
+                    {inspectedItem.currentProgress && (
+                      <p className="text-[10px] text-cyan-300 font-bold mt-1">{inspectedItem.currentProgress}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* 1. KUŞANILABİLİR AVATAR & ÇERÇEVE TEMASI */}
           <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
@@ -305,7 +374,7 @@ export default function ProfileEditModal({
                 <span>1. Karakter Avatarı &amp; Renk Teması Seçimi</span>
               </span>
               <span className="text-[10px] text-slate-400 font-bold">
-                Tıkla ve anında kuşan
+                Tıkla ve anında kuşan • Kilitliye tıkla şartını gör
               </span>
             </div>
 
@@ -314,27 +383,59 @@ export default function ProfileEditModal({
               {AVATAR_ICONS.map((item) => {
                 const isBadgesMet = !item.minBadgesRequired || unlockedBadges.length >= item.minBadgesRequired;
                 const isDuelMet = !item.minDuelWinsRequired || duelStats.duelWins >= item.minDuelWinsRequired;
-                const isUnlocked = isBadgesMet && isDuelMet;
+                const isScoreMet = !item.minScoreRequired || score >= item.minScoreRequired;
+                const isUnlocked = isBadgesMet && isDuelMet && isScoreMet;
                 const isSelected = avatarIcon === item.icon;
+
+                const reqList: string[] = [];
+                if (item.minBadgesRequired) reqList.push(`${item.minBadgesRequired} Rozet`);
+                if (item.minDuelWinsRequired) reqList.push(`${item.minDuelWinsRequired} Düello Zaferi`);
+                if (item.minScoreRequired) reqList.push(`${item.minScoreRequired} Puan`);
+                const reqString = reqList.join(' + ') || 'Başlangıçta Açık';
+
+                const howTo = item.minDuelWinsRequired
+                  ? `Canlı 1v1 Düello modunda en az ${item.minDuelWinsRequired} maç kazanın ve başarı rozetlerini toplayın.`
+                  : item.minBadgesRequired
+                  ? `Coğrafya harita testlerini çözerek ve düellolara katılarak en az ${item.minBadgesRequired} farklı başarı rozeti kazanın.`
+                  : 'Bu avatar başlangıç seviyesinde tüm kullanıcılara açıktır.';
 
                 return (
                   <button
                     key={item.id}
-                    disabled={!isUnlocked}
-                    onClick={() => handleSelectAvatarIcon(item.icon)}
-                    title={isUnlocked ? item.label : `Kilitli: ${item.minBadgesRequired ? `${item.minBadgesRequired} Rozet` : ''} ${item.minDuelWinsRequired ? `${item.minDuelWinsRequired} Zafer` : ''}`}
+                    onClick={() => {
+                      if (isUnlocked) {
+                        handleSelectAvatarIcon(item.icon);
+                      }
+                      setInspectedItem({
+                        type: 'avatar',
+                        title: item.label,
+                        icon: item.icon,
+                        tier: isUnlocked ? 'Açık Avatar' : 'Kilitli Avatar',
+                        tierLevel: item.minDuelWinsRequired ? 4 : item.minBadgesRequired ? 3 : 1,
+                        isUnlocked,
+                        reqDescription: isUnlocked ? `Bu avatar başarıyla kuşanıldı.` : `Kilit Açma Şartı: ${reqString}`,
+                        howToUnlock: howTo,
+                        currentProgress: `Mevcut Durumunuz: ${unlockedBadges.length} Rozet, ${duelStats.duelWins} Zafer, ${score} Puan`
+                      });
+                    }}
+                    title={isUnlocked ? `${item.label} (Kullanılabilir)` : `Kilitli: ${reqString} (Detay için tıkla)`}
                     className={`p-1.5 rounded-xl border flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-amber-500/25 border-amber-400 ring-2 ring-amber-400 shadow-md scale-105'
                         : isUnlocked
-                        ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white'
-                        : 'bg-black/40 border-white/5 opacity-40 grayscale cursor-not-allowed'
+                        ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white hover:scale-105'
+                        : 'bg-black/50 border-white/10 text-slate-400 hover:border-amber-400/50 hover:bg-white/5'
                     }`}
                   >
                     <span className="text-lg">{item.icon}</span>
                     <span className="text-[8px] font-bold truncate max-w-full text-center leading-tight">
                       {isUnlocked ? item.label : '🔒 Kilitli'}
                     </span>
+                    {!isUnlocked && (
+                      <span className="text-[7px] text-amber-400 font-extrabold truncate max-w-full">
+                        {reqList[0] || 'Kilitli'}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -367,7 +468,7 @@ export default function ProfileEditModal({
             </div>
           </div>
 
-          {/* 2. KUŞANILABİLİR RESMİ ÜNVANLAR (Hiyerarşik Sıralama & İlerleme Barları) */}
+          {/* 2. KUŞANILABİLİR RESMİ ÜNVANLAR (Hiyerarşik Sıralama & İlerleme Barları & Kademeler Arası Boyut Farkı) */}
           <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-black text-amber-300 flex items-center gap-1.5 text-xs">
@@ -379,7 +480,7 @@ export default function ProfileEditModal({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
               {ALL_TITLES.map((titleObj) => {
                 const prog = getTitleProgress(
                   titleObj,
@@ -393,38 +494,77 @@ export default function ProfileEditModal({
                 const isEquipped = equippedTitle === titleObj.name;
                 const tierStyle = getTitleTierStyle(titleObj.tier);
 
+                // Tier micro-scale differences (5. Kademe > 4. Kademe > 3. Kademe > 2. Kademe > 1. Kademe)
+                const tierScaleClass = titleObj.tier === 'mythic'
+                  ? 'scale-[1.03] p-3'
+                  : titleObj.tier === 'diamond'
+                  ? 'scale-[1.015] p-2.5'
+                  : titleObj.tier === 'gold'
+                  ? 'scale-[1.0] p-2.5'
+                  : titleObj.tier === 'silver'
+                  ? 'scale-[0.985] p-2'
+                  : 'scale-[0.97] p-2';
+
+                const tierLevel = titleObj.tier === 'mythic' ? 5 : titleObj.tier === 'diamond' ? 4 : titleObj.tier === 'gold' ? 3 : titleObj.tier === 'silver' ? 2 : 1;
+
+                const howTo = titleObj.tier === 'mythic'
+                  ? 'En az 30 başarı rozeti toplayın ve 1v1 canlı düellolarda 100 galibiyete ulaşarak coğrafya zirvesine çıkın.'
+                  : titleObj.tier === 'diamond'
+                  ? 'En az 20 rozet ve 50 düello galibiyetine ulaşın.'
+                  : titleObj.tier === 'gold'
+                  ? '10 rozet ve 20 düello galibiyeti kazanın.'
+                  : titleObj.tier === 'silver'
+                  ? '5 rozet veya 5 düello galibiyeti elde edin.'
+                  : 'Coğrafya testlerine başlayarak ilk sorularınızı doğru yanıtlayın.';
+
                 return (
                   <div
                     key={titleObj.id}
-                    className={`p-2.5 rounded-xl border flex flex-col justify-between gap-1.5 transition-all ${
+                    onClick={() => {
+                      setInspectedItem({
+                        type: 'title',
+                        title: titleObj.name,
+                        icon: titleObj.icon,
+                        tier: tierStyle.tierName,
+                        tierLevel,
+                        isUnlocked,
+                        reqDescription: titleObj.desc,
+                        howToUnlock: howTo,
+                        currentProgress: isUnlocked ? 'Şartlar sağlandı ve ünvan kuşanılmaya hazır!' : `${prog.remainingText} (${prog.currentValue}/${prog.targetValue} - %${prog.progressPct})`
+                      });
+                    }}
+                    className={`rounded-xl border flex flex-col justify-between gap-1.5 transition-all cursor-pointer ${tierScaleClass} ${
                       isEquipped
-                        ? `${tierStyle.bgClass} ${tierStyle.borderClass} ${tierStyle.glowShadow} scale-[1.01]`
+                        ? `${tierStyle.bgClass} ${tierStyle.borderClass} ${tierStyle.glowShadow} ring-2 ring-amber-400`
                         : isUnlocked
-                        ? `${tierStyle.bgClass} border-white/15 hover:border-white/30`
-                        : 'bg-black/40 border-white/5 opacity-65'
+                        ? `${tierStyle.bgClass} border-white/15 hover:border-white/30 hover:scale-[1.04]`
+                        : 'bg-black/40 border-white/5 opacity-75 hover:opacity-100 hover:border-amber-400/40'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-base shrink-0">{titleObj.icon}</span>
+                        <span className={`shrink-0 ${titleObj.tier === 'mythic' ? 'text-xl' : titleObj.tier === 'diamond' ? 'text-lg' : 'text-base'}`}>{titleObj.icon}</span>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
+                            <span className={`font-black truncate ${titleObj.tier === 'mythic' ? 'text-sm' : 'text-xs'} ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
                               {titleObj.name}
                             </span>
                             <span className={`text-[8px] font-black px-1 rounded ${tierStyle.badgeClass}`}>
-                              {titleObj.tier === 'mythic' ? '🌌 Mistik' : titleObj.tier === 'diamond' ? '💎 Elmas' : titleObj.tier === 'gold' ? '👑 Altın' : titleObj.tier === 'silver' ? '🛡️ Gümüş' : '🐣 Bronz'}
+                              {titleObj.tier === 'mythic' ? '🌌 5. Kademe (Mistik)' : titleObj.tier === 'diamond' ? '💎 4. Kademe (Elmas)' : titleObj.tier === 'gold' ? '👑 3. Kademe (Altın)' : titleObj.tier === 'silver' ? '🛡️ 2. Kademe (Gümüş)' : '🐣 1. Kademe (Bronz)'}
                             </span>
                           </div>
                           <p className="text-[10px] text-slate-300 truncate mt-0.5">
-                            {isUnlocked ? titleObj.desc : titleObj.requiredMetricText}
+                            {isUnlocked ? titleObj.desc : `🔒 Şart: ${titleObj.requiredMetricText}`}
                           </p>
                         </div>
                       </div>
 
                       {isUnlocked ? (
                         <button
-                          onClick={() => handleEquipTitle(titleObj.name)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEquipTitle(titleObj.name);
+                          }}
                           className={`px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all cursor-pointer ${
                             isEquipped
                               ? 'bg-amber-400 text-slate-950 shadow-md font-black'
@@ -434,8 +574,8 @@ export default function ProfileEditModal({
                           {isEquipped ? 'Kuşanıldı ✓' : 'Kuşan'}
                         </button>
                       ) : (
-                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-slate-400 shrink-0">
-                          Kilitli
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-amber-300 shrink-0">
+                          🔒 Detay Gör
                         </span>
                       )}
                     </div>
@@ -461,7 +601,7 @@ export default function ProfileEditModal({
             </div>
           </div>
 
-          {/* 3. KADEMELİ ROZETLER GALERİSİ */}
+          {/* 3. KADEMELİ ROZETLER GALERİSİ (Boyut Hiyerarşisi & Detaylı Kilit Açıklamaları) */}
           <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-black text-xs text-slate-200 flex items-center gap-1.5">
@@ -473,17 +613,40 @@ export default function ProfileEditModal({
               </span>
             </div>
 
-            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
               {(['mythic', 'diamond', 'gold', 'silver', 'bronze'] as BadgeTier[]).map((tierKey) => {
                 const badgesInTier = tierBadges[tierKey];
                 if (!badgesInTier || badgesInTier.length === 0) return null;
 
                 const tierStyle = getTitleTierStyle(tierKey);
+                const tierLevel = tierKey === 'mythic' ? 5 : tierKey === 'diamond' ? 4 : tierKey === 'gold' ? 3 : tierKey === 'silver' ? 2 : 1;
+
+                // Micro scale classes for badge tiers
+                const badgeCardScale = tierKey === 'mythic'
+                  ? 'scale-[1.03] p-3'
+                  : tierKey === 'diamond'
+                  ? 'scale-[1.015] p-2.5'
+                  : tierKey === 'gold'
+                  ? 'scale-[1.0] p-2.5'
+                  : tierKey === 'silver'
+                  ? 'scale-[0.985] p-2'
+                  : 'scale-[0.97] p-2';
+
+                const badgeIconSize = tierKey === 'mythic'
+                  ? 'w-9 h-9 text-xl'
+                  : tierKey === 'diamond'
+                  ? 'w-8 h-8 text-lg'
+                  : tierKey === 'gold'
+                  ? 'w-7.5 h-7.5 text-base'
+                  : tierKey === 'silver'
+                  ? 'w-7 h-7 text-sm'
+                  : 'w-6.5 h-6.5 text-xs';
 
                 return (
                   <div key={tierKey} className="space-y-1.5">
-                    <div className={`px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-wider ${tierStyle.badgeClass}`}>
-                      {tierStyle.tierName}
+                    <div className={`px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-wider flex items-center justify-between ${tierStyle.badgeClass}`}>
+                      <span>{tierStyle.tierName} • {tierLevel}. Kademe</span>
+                      <span className="text-[8px] opacity-80">Boyut Çarpanı: {tierLevel === 5 ? '1.03x' : tierLevel === 4 ? '1.015x' : tierLevel === 3 ? '1.0x' : tierLevel === 2 ? '0.985x' : '0.97x'}</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -495,7 +658,7 @@ export default function ProfileEditModal({
                         const remaining = Math.max(0, target - currentProgress);
 
                         const unlockedCardStyle = tierKey === 'mythic'
-                          ? 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_22px_rgba(217,70,239,0.7)] animate-pulse'
+                          ? 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_22px_rgba(217,70,239,0.7)]'
                           : tierKey === 'diamond'
                           ? 'bg-gradient-to-r from-cyan-950/70 via-purple-950/50 to-slate-900 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_16px_rgba(6,182,212,0.55)]'
                           : tierKey === 'gold'
@@ -516,17 +679,38 @@ export default function ProfileEditModal({
                             : 'bg-amber-800 text-amber-100 font-bold'
                           : 'bg-white/10 text-slate-500';
 
+                        const howToBadge = badge.category === 'duel'
+                          ? `Canlı 1v1 Düellolarda rakiplerinizi yenerek galibiyet ve galibiyet serisi hedefine ulaşın.`
+                          : badge.category === 'kpss'
+                          ? `3D Türkiye Haritası üzerinde ilgili coğrafya kategorisindeki KPSS sorularını doğru yanıtlayarak ilerleyin.`
+                          : `Tüm soru kategorilerini ve düelloları tamamlayarak büyük koleksiyonu açın.`;
+
                         return (
                           <div
                             key={badge.id}
-                            className={`p-2 rounded-xl border flex flex-col justify-between transition-all ${
+                            onClick={() => {
+                              setInspectedItem({
+                                type: 'badge',
+                                title: badge.name,
+                                icon: badge.icon,
+                                tier: tierStyle.tierName,
+                                tierLevel,
+                                isUnlocked,
+                                reqDescription: badge.desc,
+                                howToUnlock: howToBadge,
+                                currentProgress: isUnlocked
+                                  ? 'Tebrikler! Bu rozet kilidi açılmış ve koleksiyonunuza eklenmiştir.'
+                                  : `İlerleme: ${currentProgress}/${target} (%${pct}) • Kalan: ${remaining} adet/zafer`
+                              });
+                            }}
+                            className={`rounded-xl border flex flex-col justify-between transition-all cursor-pointer ${badgeCardScale} ${
                               isUnlocked
                                 ? unlockedCardStyle
-                                : 'bg-white/5 border-white/10 opacity-70'
+                                : 'bg-white/5 border-white/10 opacity-70 hover:opacity-100 hover:border-cyan-400/50'
                             }`}
                           >
                             <div className="flex items-start gap-2">
-                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-base shrink-0 ${iconBgStyle}`}>
+                              <div className={`rounded-lg flex items-center justify-center shrink-0 ${badgeIconSize} ${iconBgStyle}`}>
                                 {badge.icon}
                               </div>
 
@@ -535,7 +719,7 @@ export default function ProfileEditModal({
                                   <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
                                     {badge.name}
                                   </span>
-                                  {isUnlocked && (
+                                  {isUnlocked ? (
                                     <span className={`text-[8px] font-black px-1.5 py-0.2 rounded ${
                                       tierKey === 'mythic'
                                         ? 'bg-gradient-to-r from-fuchsia-400 to-cyan-400 text-slate-950 font-black ring-1 ring-amber-300'
@@ -549,6 +733,10 @@ export default function ProfileEditModal({
                                     }`}>
                                       KAZANILDI ✓
                                     </span>
+                                  ) : (
+                                    <span className="text-[8px] text-amber-300 font-bold px-1 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                                      🔒 Nasıl Alınır?
+                                    </span>
                                   )}
                                 </div>
                                 <p className="text-[10px] text-slate-300 leading-snug mt-0.5 truncate">{badge.desc}</p>
@@ -558,7 +746,7 @@ export default function ProfileEditModal({
                             {!isUnlocked && (
                               <div className="mt-1.5 pt-1 border-t border-white/10 space-y-0.5">
                                 <div className="flex justify-between items-center text-[9px] text-slate-400">
-                                  <span className="truncate">{badge.reqText}</span>
+                                  <span className="truncate text-amber-300/90 font-medium">{badge.reqText}</span>
                                   <span className="font-extrabold text-amber-400 shrink-0 ml-1">
                                     {currentProgress}/{target} (%{pct})
                                   </span>
