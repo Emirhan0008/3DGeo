@@ -90,7 +90,7 @@ export const AVATAR_THEMES: AvatarThemeOption[] = [
     name: '🌌 5. Kademe: Kozmik Mistik & Zirve Hükümdar (En Yüksek)',
     tierLevel: 5,
     bgGradient: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
-    borderGlow: 'border-2 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_45px_rgba(217,70,239,1),0_0_25px_rgba(6,182,212,0.9),0_0_35px_rgba(251,191,36,0.8)]',
+    borderGlow: 'border-3 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_50px_rgba(217,70,239,1),0_0_28px_rgba(6,182,212,0.9),0_0_36px_rgba(251,191,36,0.85)]',
     badgePinBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 border-2 border-amber-200 ring-2 ring-fuchsia-400 text-amber-200 shadow-2xl shadow-fuchsia-500'
   },
   {
@@ -98,7 +98,7 @@ export const AVATAR_THEMES: AvatarThemeOption[] = [
     name: '💎 4. Kademe: Elmas & Efsanevi Safir',
     tierLevel: 4,
     bgGradient: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
-    borderGlow: 'border-2 border-cyan-200 ring-3 ring-indigo-500 shadow-[0_0_30px_rgba(6,182,212,0.95),0_0_15px_rgba(168,85,247,0.7)]',
+    borderGlow: 'border-3 border-cyan-300 ring-3 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_35px_rgba(6,182,212,0.95),0_0_18px_rgba(168,85,247,0.8)]',
     badgePinBg: 'bg-slate-950 border-2 border-cyan-300 ring-2 ring-purple-400 text-cyan-200 shadow-xl shadow-cyan-500/80'
   },
   {
@@ -106,24 +106,24 @@ export const AVATAR_THEMES: AvatarThemeOption[] = [
     name: '👑 3. Kademe: Altın & Şampiyon Aura',
     tierLevel: 3,
     bgGradient: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-    borderGlow: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)]',
-    badgePinBg: 'bg-amber-950 border-2 border-amber-300 ring-2 ring-yellow-400/80 text-amber-200 shadow-lg shadow-amber-500/50'
+    borderGlow: 'border-3 border-amber-300 ring-3 ring-amber-400 ring-offset-1 ring-offset-slate-950 shadow-[0_0_26px_rgba(245,158,11,0.9)]',
+    badgePinBg: 'bg-amber-950 border-2 border-amber-300 ring-2 ring-yellow-400 text-amber-200 shadow-lg shadow-amber-500/60'
   },
   {
     id: 'indigo_midnight',
     name: '🛡️ 2. Kademe: Gümüş & Uzman Metalik',
     tierLevel: 2,
     bgGradient: 'bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800',
-    borderGlow: 'border-2 border-slate-300/90 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.4)]',
-    badgePinBg: 'bg-slate-900 border-2 border-slate-300 ring-1 ring-slate-300/60 text-slate-100 shadow-md'
+    borderGlow: 'border-2 border-slate-200 ring-2 ring-slate-300/80 ring-offset-1 ring-offset-slate-950 shadow-[0_0_16px_rgba(203,213,225,0.6)]',
+    badgePinBg: 'bg-slate-900 border-2 border-slate-200 ring-1 ring-slate-300/80 text-slate-100 shadow-md'
   },
   {
     id: 'emerald_forest',
     name: '🐣 1. Kademe: Bronz & Çırak Sıcak Bakır',
     tierLevel: 1,
     bgGradient: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
-    borderGlow: 'border border-amber-700/70 ring-1 ring-amber-800/30 shadow-[0_0_6px_rgba(180,83,9,0.25)]',
-    badgePinBg: 'bg-amber-950 border border-amber-700 text-amber-300 shadow-sm'
+    borderGlow: 'border-2 border-amber-500 ring-2 ring-amber-700/60 ring-offset-1 ring-offset-slate-950 shadow-[0_0_12px_rgba(180,83,9,0.45)]',
+    badgePinBg: 'bg-amber-950 border-2 border-amber-600 text-amber-300 shadow-sm'
   }
 ];
 
@@ -1101,50 +1101,50 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
       };
     case 'diamond':
       return {
-        badgeClass: 'bg-gradient-to-r from-cyan-950 via-indigo-950 to-purple-950 border-2 border-cyan-400 ring-1 ring-purple-500/70 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.6)] font-black',
+        badgeClass: 'bg-gradient-to-r from-cyan-950 via-indigo-950 to-purple-950 border-2 border-cyan-300 ring-2 ring-purple-400 text-cyan-200 shadow-[0_0_18px_rgba(6,182,212,0.7)] font-black',
         textClass: 'text-cyan-200 font-black',
-        borderClass: 'border-2 border-cyan-400 ring-1 ring-purple-500/70 shadow-[0_0_15px_rgba(6,182,212,0.6)]',
+        borderClass: 'border-2 border-cyan-300 ring-2 ring-purple-400 shadow-[0_0_18px_rgba(6,182,212,0.7)]',
         bgClass: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
         tierName: '💎 4. Kademe: Elmas & Efsanevi',
         tierNumber: 4,
-        glowShadow: 'shadow-[0_0_15px_rgba(6,182,212,0.6)]'
+        glowShadow: 'shadow-[0_0_18px_rgba(6,182,212,0.7)]'
       };
     case 'gold':
       return {
-        badgeClass: 'bg-amber-950/90 border-2 border-amber-400 ring-1 ring-amber-400/50 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-bold',
+        badgeClass: 'bg-amber-950/90 border-2 border-amber-300 ring-2 ring-amber-400/70 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.6)] font-bold',
         textClass: 'text-amber-300 font-bold',
-        borderClass: 'border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)]',
+        borderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/70 shadow-[0_0_14px_rgba(245,158,11,0.6)]',
         bgClass: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
         tierName: '👑 3. Kademe: Altın & Şampiyon',
         tierNumber: 3,
-        glowShadow: 'shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+        glowShadow: 'shadow-[0_0_14px_rgba(245,158,11,0.6)]'
       };
     case 'silver':
       return {
-        badgeClass: 'bg-slate-900/80 border border-slate-300/80 ring-1 ring-slate-400/40 text-slate-200 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
-        textClass: 'text-slate-200 font-bold',
-        borderClass: 'border border-slate-300/80 shadow-[0_0_6px_rgba(203,213,225,0.3)]',
+        badgeClass: 'bg-slate-900/80 border-2 border-slate-200 ring-1 ring-slate-300/70 text-slate-100 shadow-[0_0_10px_rgba(203,213,225,0.45)] font-bold',
+        textClass: 'text-slate-100 font-bold',
+        borderClass: 'border-2 border-slate-200 ring-1 ring-slate-300/70 shadow-[0_0_10px_rgba(203,213,225,0.45)]',
         bgClass: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
         tierName: '🛡️ 2. Kademe: Gümüş & Uzman',
         tierNumber: 2,
-        glowShadow: 'shadow-[0_0_6px_rgba(203,213,225,0.3)]'
+        glowShadow: 'shadow-[0_0_10px_rgba(203,213,225,0.45)]'
       };
     case 'bronze':
       return {
-        badgeClass: 'bg-amber-950/60 border border-amber-700/60 text-amber-400 shadow-none font-semibold',
-        textClass: 'text-amber-400 font-semibold',
-        borderClass: 'border border-amber-700/60 shadow-none',
+        badgeClass: 'bg-amber-950/60 border-2 border-amber-500 ring-1 ring-amber-700/60 text-amber-300 shadow-[0_0_8px_rgba(180,83,9,0.35)] font-semibold',
+        textClass: 'text-amber-300 font-semibold',
+        borderClass: 'border-2 border-amber-500 ring-1 ring-amber-700/60 shadow-[0_0_8px_rgba(180,83,9,0.35)]',
         bgClass: 'bg-gradient-to-tr from-amber-950/50 to-slate-950',
         tierName: '🐣 1. Kademe: Bronz & Çırak',
         tierNumber: 1,
-        glowShadow: 'shadow-none'
+        glowShadow: 'shadow-[0_0_8px_rgba(180,83,9,0.35)]'
       };
     case 'starter':
     default:
       return {
-        badgeClass: 'bg-slate-900/60 border border-slate-700/60 text-slate-400 shadow-none font-normal',
-        textClass: 'text-slate-400 font-normal',
-        borderClass: 'border border-slate-700/60 shadow-none',
+        badgeClass: 'bg-slate-900/60 border-2 border-slate-600/80 text-slate-300 shadow-none font-normal',
+        textClass: 'text-slate-300 font-normal',
+        borderClass: 'border-2 border-slate-600/80 shadow-none',
         bgClass: 'bg-slate-950',
         tierName: '🌱 Başlangıç',
         tierNumber: 0,
@@ -1254,7 +1254,7 @@ export function getDuelPrestigeTier(
       tierLabel: '💎 Elmas Zirve',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-2 border-cyan-200 ring-3 ring-indigo-500 shadow-[0_0_30px_rgba(6,182,212,0.95),0_0_15px_rgba(168,85,247,0.7)] animate-pulse',
+      frameBorderClass: 'border-3 border-cyan-300 ring-3 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_35px_rgba(6,182,212,0.95),0_0_18px_rgba(168,85,247,0.8)] animate-pulse',
       glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
       pinIcon: matchedTitle?.icon || (duelWins >= 50 ? '⚔️' : '🏆'),
       pinBadgeName: activeTitle,
@@ -1274,11 +1274,11 @@ export function getDuelPrestigeTier(
       tierLabel: '👑 Altın Şampiyon',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)] animate-pulse',
+      frameBorderClass: 'border-3 border-amber-300 ring-3 ring-amber-400 ring-offset-1 ring-offset-slate-950 shadow-[0_0_26px_rgba(245,158,11,0.9)] animate-pulse',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitle,
-      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400/80 shadow-md shadow-amber-500/50',
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400 text-amber-200 shadow-md shadow-amber-500/60',
       gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
       titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
       ringClass: 'ring-2 ring-amber-400',
@@ -1294,11 +1294,11 @@ export function getDuelPrestigeTier(
       tierLabel: '🛡️ Gümüş Uzman',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-2 border-slate-300/90 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.4)]',
+      frameBorderClass: 'border-2 border-slate-200 ring-2 ring-slate-300/80 ring-offset-1 ring-offset-slate-950 shadow-[0_0_16px_rgba(203,213,225,0.6)]',
       glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitle,
-      pinBorderClass: 'border-2 border-slate-300 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-sm',
+      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/80 shadow-sm',
       gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
       titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
       ringClass: 'ring-1 ring-slate-400/50',
@@ -1313,7 +1313,7 @@ export function getDuelPrestigeTier(
     tierLabel: '🌱 Başlangıç',
     title: activeTitle,
     badgeCount: duelWins,
-    frameBorderClass: 'border border-slate-700/60 ring-0 shadow-none',
+    frameBorderClass: 'border-2 border-slate-600 ring-1 ring-slate-700/50 shadow-sm',
     glowClass: 'from-transparent to-transparent opacity-0',
     pinIcon: activePinIcon,
     pinBadgeName: activeTitle,
@@ -1357,7 +1357,7 @@ export function getPrestigeTier(
       tierLabel: '🌌 Mistik Kozmik Zirve',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_45px_rgba(217,70,239,1),0_0_25px_rgba(6,182,212,0.9),0_0_35px_rgba(251,191,36,0.8)] animate-pulse',
+      frameBorderClass: 'border-3 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_50px_rgba(217,70,239,1),0_0_28px_rgba(6,182,212,0.9),0_0_36px_rgba(251,191,36,0.85)] animate-pulse',
       glowClass: 'from-fuchsia-500 via-cyan-400 to-amber-300',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
@@ -1378,7 +1378,7 @@ export function getPrestigeTier(
       tierLabel: '💎 Elmas Zirve',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-cyan-200 ring-3 ring-indigo-500 shadow-[0_0_30px_rgba(6,182,212,0.95),0_0_15px_rgba(168,85,247,0.7)] animate-pulse',
+      frameBorderClass: 'border-3 border-cyan-300 ring-3 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_35px_rgba(6,182,212,0.95),0_0_18px_rgba(168,85,247,0.8)] animate-pulse',
       glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
@@ -1398,11 +1398,11 @@ export function getPrestigeTier(
       tierLabel: '👑 Altın Şampiyon',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)] animate-pulse',
+      frameBorderClass: 'border-3 border-amber-300 ring-3 ring-amber-400 ring-offset-1 ring-offset-slate-950 shadow-[0_0_26px_rgba(245,158,11,0.9)] animate-pulse',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400/80 shadow-md shadow-amber-500/50',
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400 text-amber-200 shadow-md shadow-amber-500/60',
       gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
       titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
       ringClass: 'ring-2 ring-amber-400',
@@ -1418,11 +1418,11 @@ export function getPrestigeTier(
       tierLabel: '🛡️ Gümüş Uzman',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-slate-300/90 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.4)]',
+      frameBorderClass: 'border-2 border-slate-200 ring-2 ring-slate-300/80 ring-offset-1 ring-offset-slate-950 shadow-[0_0_16px_rgba(203,213,225,0.6)]',
       glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-slate-300 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-sm',
+      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/80 shadow-sm',
       gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
       titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
       ringClass: 'ring-1 ring-slate-400/50',
@@ -1438,11 +1438,11 @@ export function getPrestigeTier(
       tierLabel: '🐣 Bronz Çırak',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border border-amber-700/70 ring-1 ring-amber-800/30 shadow-[0_0_6px_rgba(180,83,9,0.25)]',
+      frameBorderClass: 'border-2 border-amber-500 ring-2 ring-amber-700/60 ring-offset-1 ring-offset-slate-950 shadow-[0_0_12px_rgba(180,83,9,0.45)]',
       glowClass: 'from-amber-900/40 via-amber-800/30 to-amber-950/40',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border border-amber-700 bg-amber-950 text-amber-300 shadow-sm',
+      pinBorderClass: 'border-2 border-amber-600 bg-amber-950 text-amber-300 shadow-sm',
       gradientBg: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
       titleBadgeClass: 'text-amber-400 border border-amber-800/60 shadow-none font-semibold',
       ringClass: 'ring-1 ring-amber-800/30',
@@ -1457,7 +1457,7 @@ export function getPrestigeTier(
     tierLabel: '🌱 Başlangıç',
     title: activeTitleName,
     badgeCount: count,
-    frameBorderClass: 'border border-slate-700/60 ring-0 shadow-none',
+    frameBorderClass: 'border-2 border-slate-600 ring-1 ring-slate-700/50 shadow-sm',
     glowClass: 'from-transparent to-transparent opacity-0',
     pinIcon: activePinIcon,
     pinBadgeName: activeTitleName,

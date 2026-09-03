@@ -418,20 +418,36 @@ export default function ProfileEditModal({
                         currentProgress: `Mevcut Durumunuz: ${unlockedBadges.length} Rozet, ${duelStats.duelWins} Zafer, ${score} Puan`
                       });
                     }}
-                    title={isUnlocked ? `${item.label} (Kullanılabilir)` : `Kilitli: ${reqString} (Detay için tıkla)`}
-                    className={`p-1.5 rounded-xl border flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                    title={isUnlocked ? (isSelected ? `${item.label} (Şu An Kuşanıldı)` : `${item.label} (Kuşanılabilir - Tıkla ve Kuşan)`) : `Kilitli: ${reqString} (Detay için tıkla)`}
+                    className={`relative p-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-amber-500/25 border-amber-400 ring-2 ring-amber-400 shadow-md scale-105'
+                        ? 'bg-gradient-to-b from-amber-500/35 via-yellow-500/20 to-amber-950/70 border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_24px_rgba(251,191,36,0.85)] scale-110 z-10'
                         : isUnlocked
-                        ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white hover:scale-105'
-                        : 'bg-black/50 border-white/10 text-slate-400 hover:border-amber-400/50 hover:bg-white/5'
+                        ? 'bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-950 border-2 border-emerald-400 hover:border-emerald-300 ring-2 ring-emerald-400/60 hover:ring-4 hover:ring-emerald-300 text-white hover:scale-110 shadow-[0_0_16px_rgba(16,185,129,0.45)]'
+                        : 'bg-black/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-85 hover:border-slate-500'
                     }`}
                   >
-                    <span className="text-lg">{item.icon}</span>
+                    {isSelected && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-400 text-slate-950 font-black text-[9px] flex items-center justify-center shadow-md ring-1 ring-white">
+                        ✓
+                      </span>
+                    )}
+                    {isUnlocked && !isSelected && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-950 animate-ping" />
+                    )}
+                    <span className="text-xl">{item.icon}</span>
                     <span className="text-[8px] font-bold truncate max-w-full text-center leading-tight">
                       {isUnlocked ? item.label : '🔒 Kilitli'}
                     </span>
-                    {!isUnlocked && (
+                    {isSelected ? (
+                      <span className="text-[7.5px] font-black text-amber-300 bg-amber-950/90 px-1 py-0.5 rounded border border-amber-400/60 leading-none">
+                        Kuşanıldı
+                      </span>
+                    ) : isUnlocked ? (
+                      <span className="text-[7.5px] font-black text-emerald-300 bg-emerald-950/90 px-1 py-0.5 rounded border border-emerald-400/70 leading-none">
+                        Kuşan
+                      </span>
+                    ) : (
                       <span className="text-[7px] text-amber-400 font-extrabold truncate max-w-full">
                         {reqList[0] || 'Kilitli'}
                       </span>
@@ -455,12 +471,21 @@ export default function ProfileEditModal({
                       onClick={() => handleSelectAvatarBg(theme.id)}
                       className={`p-2 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-amber-400 ring-2 ring-amber-400 bg-white/15 shadow-md'
-                          : 'border-white/10 hover:border-white/20 bg-white/5'
+                          ? 'border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950 bg-gradient-to-r from-amber-950/80 via-yellow-950/50 to-slate-900 shadow-[0_0_24px_rgba(251,191,36,0.7)] scale-[1.03] z-10 relative'
+                          : 'border-2 border-emerald-400/80 hover:border-emerald-300 ring-2 ring-emerald-500/30 hover:ring-emerald-400/70 bg-gradient-to-r from-emerald-950/30 via-slate-900/60 to-slate-900 hover:scale-[1.02] shadow-[0_0_12px_rgba(16,185,129,0.25)]'
                       }`}
                     >
-                      <div className={`w-4 h-4 rounded-full ${theme.bgGradient} border border-white/20 shadow shrink-0`} />
+                      <div className={`w-5 h-5 rounded-full ${theme.bgGradient} ${theme.borderGlow} shrink-0`} />
                       <span className="text-[10px] font-bold text-slate-200 truncate">{theme.name}</span>
+                      {isSelected ? (
+                        <span className="ml-auto text-[8px] font-black px-2 py-0.5 rounded bg-amber-400 text-slate-950 shadow border border-amber-200 shrink-0">
+                          KUŞANILDI ✓
+                        </span>
+                      ) : (
+                        <span className="ml-auto text-[8px] font-bold text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-400/60 shrink-0">
+                          Kuşan
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -535,10 +560,10 @@ export default function ProfileEditModal({
                     }}
                     className={`rounded-xl border flex flex-col justify-between gap-1.5 transition-all cursor-pointer ${tierScaleClass} ${
                       isEquipped
-                        ? `${tierStyle.bgClass} ${tierStyle.borderClass} ${tierStyle.glowShadow} ring-2 ring-amber-400`
+                        ? `border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950 ${tierStyle.bgClass} shadow-[0_0_30px_rgba(251,191,36,0.85)] scale-[1.03] relative z-10`
                         : isUnlocked
-                        ? `${tierStyle.bgClass} border-white/15 hover:border-white/30 hover:scale-[1.04]`
-                        : 'bg-black/40 border-white/5 opacity-75 hover:opacity-100 hover:border-amber-400/40'
+                        ? `border-2 border-emerald-400 hover:border-emerald-300 ring-2 ring-emerald-400/60 hover:ring-4 hover:ring-emerald-300 ${tierStyle.bgClass} shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:scale-[1.03] relative`
+                        : 'bg-black/50 border border-slate-700/50 opacity-65 hover:opacity-90 hover:border-slate-500'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -552,6 +577,11 @@ export default function ProfileEditModal({
                             <span className={`text-[8px] font-black px-1 rounded ${tierStyle.badgeClass}`}>
                               {titleObj.tier === 'mythic' ? '🌌 5. Kademe (Mistik)' : titleObj.tier === 'diamond' ? '💎 4. Kademe (Elmas)' : titleObj.tier === 'gold' ? '👑 3. Kademe (Altın)' : titleObj.tier === 'silver' ? '🛡️ 2. Kademe (Gümüş)' : '🐣 1. Kademe (Bronz)'}
                             </span>
+                            {isUnlocked && !isEquipped && (
+                              <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/60">
+                                ⚡ Kuşanılabilir
+                              </span>
+                            )}
                           </div>
                           <p className="text-[10px] text-slate-300 truncate mt-0.5">
                             {isUnlocked ? titleObj.desc : `🔒 Şart: ${titleObj.requiredMetricText}`}
@@ -565,13 +595,13 @@ export default function ProfileEditModal({
                             e.stopPropagation();
                             handleEquipTitle(titleObj.name);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all cursor-pointer ${
+                          className={`px-3 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all cursor-pointer ${
                             isEquipped
-                              ? 'bg-amber-400 text-slate-950 shadow-md font-black'
-                              : 'bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-200'
+                              ? 'bg-amber-400 text-slate-950 shadow-[0_0_14px_rgba(251,191,36,0.8)] border-2 border-amber-200'
+                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md border border-emerald-300 hover:scale-105'
                           }`}
                         >
-                          {isEquipped ? 'Kuşanıldı ✓' : 'Kuşan'}
+                          {isEquipped ? '👑 KUŞANILDI ✓' : 'Kuşan'}
                         </button>
                       ) : (
                         <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-amber-300 shrink-0">
@@ -658,14 +688,14 @@ export default function ProfileEditModal({
                         const remaining = Math.max(0, target - currentProgress);
 
                         const unlockedCardStyle = tierKey === 'mythic'
-                          ? 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_22px_rgba(217,70,239,0.7)]'
+                          ? 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-3 border-fuchsia-400 ring-3 ring-cyan-400 shadow-[0_0_26px_rgba(217,70,239,0.75)]'
                           : tierKey === 'diamond'
-                          ? 'bg-gradient-to-r from-cyan-950/70 via-purple-950/50 to-slate-900 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_16px_rgba(6,182,212,0.55)]'
+                          ? 'bg-gradient-to-r from-cyan-950/70 via-purple-950/50 to-slate-900 border-3 border-cyan-300 ring-2 ring-purple-400 shadow-[0_0_20px_rgba(6,182,212,0.65)]'
                           : tierKey === 'gold'
-                          ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.45)]'
+                          ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(245,158,11,0.6)]'
                           : tierKey === 'silver'
-                          ? 'bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-800 border border-slate-300 shadow-[0_0_8px_rgba(203,213,225,0.3)]'
-                          : 'bg-gradient-to-r from-amber-950/30 to-slate-900 border border-amber-700/60 shadow-none';
+                          ? 'bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-800 border-2 border-slate-200 ring-1 ring-slate-300/70 shadow-[0_0_12px_rgba(203,213,225,0.45)]'
+                          : 'bg-gradient-to-r from-amber-950/50 to-slate-900 border-2 border-amber-600 ring-1 ring-amber-700/60 shadow-[0_0_8px_rgba(180,83,9,0.35)]';
 
                         const iconBgStyle = isUnlocked
                           ? tierKey === 'mythic'

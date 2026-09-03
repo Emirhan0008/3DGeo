@@ -4,6 +4,34 @@
 
 ---
 
+## 📅 [2026-09-03] - Kuşanılabilen Öğelerin (Avatar, Tema, Ünvan, Rozet) Çerçevelerinin Belirginleştirilmesi
+- **Geliştirici**: AI Agent #1 (AI Studio Ortamı A)
+- **Kullanıcı Talebi**: "kuşanabilen şeylerin çerçevesi belirgin olsun"
+- **Etkilenen Dosyalar**:
+  - `/lib/data/badgesData.ts`
+  - `/components/ui/ProfileEditModal.tsx`
+- **Kök Neden & İhtiyaç**:
+  - Profil özelleştirme modalında (`ProfileEditModal.tsx`), kilidi açılmış ve kuşanılmaya hazır (equippable) olan unvanlar, avatarlar ve temalar; kilitli olanlarla veya standart arayüz elemanlarıyla benzer `border-white/10` gibi sönük kenarlıklara sahipti.
+  - Kullanıcının neyi kuşanabildiğini (hazır olanları) ve neyin kuşanıldığını (aktif seçili olanı) anında ayırt etmesi zordu.
+- **Yapılan İyileştirmeler**:
+  1. **Kuşanılabilir Avatarlar (Avatar Icons Grid)**:
+     - **Kuşanılmış Durum**: `border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950` ile amber altın ışıltısı, sağ üstte `✓` onay rozeti ve belirgin `Kuşanıldı` etiketi.
+     - **Kuşanılabilir Durum**: `border-2 border-emerald-400 hover:border-emerald-300 ring-2 ring-emerald-400/60 hover:ring-4 text-white shadow-[0_0_16px_rgba(16,185,129,0.45)]`, sağ üstte yeşil nabız (pulse) göstergesi ve `Kuşan` butonu.
+     - **Kilitli Durum**: Mat siyah arkaplan, silik slate kenarlık ve net kilitli durumu.
+  2. **Kuşanılabilir Çerçeve ve Temalar (Avatar Themes)**:
+     - `AVATAR_THEMES` içindeki `borderGlow` ve `badgePinBg` stilleri kalınlaştırıldı (`border-3`, `ring-3`/`ring-4`, `ring-offset-2 ring-offset-slate-950`).
+     - Seçili tema için altın çerçeve ve `KUŞANILDI ✓` rozeti; seçilebilir/kuşanılabilir temalar için zümrüt yeşili belirgin kenarlık ve `Kuşan` çağrısı eklendi.
+  3. **Kuşanılabilir Resmi Ünvanlar (All Titles)**:
+     - **Kuşanılmış Ünvan**: `border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950`, `👑 KUŞANILDI ✓` butonu ve güçlü altın parıltısı.
+     - **Kuşanılabilir Ünvan**: `border-2 border-emerald-400 hover:border-emerald-300 ring-2 ring-emerald-400/60 hover:ring-4 shadow-[0_0_20px_rgba(16,185,129,0.35)]`, `⚡ Kuşanılabilir` rozeti ve zümrüt yeşili `Kuşan` butonu.
+  4. **Kademeli Başarı Rozetleri & Prestij Kademeleri (`badgesData.ts`)**:
+     - `getTitleTierStyle`, `getDuelPrestigeTier` ve `getPrestigeTier` fonksiyonlarındaki tüm kademe çerçeveleri (Mistik, Elmas, Altın, Gümüş, Bronz) 2-3px kalınlık, canlı renk ringleri ve derin gölgelerle güncellendi.
+- **Doğrulama**:
+  - `lint_applet` çalıştırıldı: 0 hata (temiz).
+  - `compile_applet` çalıştırıldı: Derleme hatasız başarılı.
+
+---
+
 ## 📅 [2026-09-03] - 1v1 Düello Eşleşme Hatasının Çözümü & Veri Temizliği (Duel Matchmaking Fix)
 - **Geliştirici**: AI Agent #1 (AI Studio Ortamı A)
 - **Etkilenen Dosyalar**:
