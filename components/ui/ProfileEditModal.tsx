@@ -10,6 +10,7 @@ import {
   getPrestigeTier,
   getTitleProgress,
   getTitleTierStyle,
+  getAvatarOutlineFilter,
   BadgeTier
 } from '@/lib/data/badgesData';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
@@ -75,6 +76,7 @@ export default function ProfileEditModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [avatarTierFilter, setAvatarTierFilter] = useState<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze' | 'starter'>('all');
   const [inspectedItem, setInspectedItem] = useState<{
     type: 'avatar' | 'title' | 'badge';
     title: string;
@@ -378,14 +380,44 @@ export default function ProfileEditModal({
               </span>
             </div>
 
-            {/* Avatar Icons Grid */}
-            <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
-              {AVATAR_ICONS.map((item) => {
+            {/* Kademe Filtreleme Sekmeleri */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
+              {[
+                { id: 'all', label: `Tümü (${AVATAR_ICONS.length})` },
+                { id: 'mythic', label: '🌌 5. Kademe' },
+                { id: 'diamond', label: '💎 4. Kademe' },
+                { id: 'gold', label: '👑 3. Kademe' },
+                { id: 'silver', label: '🛡️ 2. Kademe' },
+                { id: 'bronze', label: '🐣 1. Kademe' },
+                { id: 'starter', label: '🌱 Başlangıç' }
+              ].map((tab) => {
+                const isActive = avatarTierFilter === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setAvatarTierFilter(tab.id as typeof avatarTierFilter)}
+                    className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-500/40'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Avatar Icons Grid (Kademelere göre filtrelenmiş ve büyüyen boyutlar) */}
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+              {AVATAR_ICONS.filter((item) => avatarTierFilter === 'all' || item.tier === avatarTierFilter).map((item) => {
                 const isBadgesMet = !item.minBadgesRequired || unlockedBadges.length >= item.minBadgesRequired;
                 const isDuelMet = !item.minDuelWinsRequired || duelStats.duelWins >= item.minDuelWinsRequired;
                 const isScoreMet = !item.minScoreRequired || score >= item.minScoreRequired;
                 const isUnlocked = isBadgesMet && isDuelMet && isScoreMet;
                 const isSelected = avatarIcon === item.icon;
+
+                const itemTierLevel = item.tier === 'mythic' ? 5 : item.tier === 'diamond' ? 4 : item.tier === 'gold' ? 3 : item.tier === 'silver' ? 2 : item.tier === 'bronze' ? 1 : 0;
 
                 const reqList: string[] = [];
                 if (item.minBadgesRequired) reqList.push(`${item.minBadgesRequired} Rozet`);
@@ -399,6 +431,19 @@ export default function ProfileEditModal({
                   ? `Coğrafya harita testlerini çözerek ve düellolara katılarak en az ${item.minBadgesRequired} farklı başarı rozeti kazanın.`
                   : 'Bu avatar başlangıç seviyesinde tüm kullanıcılara açıktır.';
 
+                // Kademe bazlı dengeli nesne boyutu ve ölçeklendirme
+                const iconScaleClass = itemTierLevel === 5
+                  ? 'text-2xl sm:text-3xl scale-105'
+                  : itemTierLevel === 4
+                  ? 'text-xl sm:text-2xl scale-100'
+                  : itemTierLevel === 3
+                  ? 'text-xl sm:text-2xl scale-100'
+                  : itemTierLevel === 2
+                  ? 'text-lg sm:text-xl scale-95'
+                  : itemTierLevel === 1
+                  ? 'text-lg sm:text-xl scale-95'
+                  : 'text-base sm:text-lg scale-90';
+
                 return (
                   <button
                     key={item.id}
@@ -410,8 +455,8 @@ export default function ProfileEditModal({
                         type: 'avatar',
                         title: item.label,
                         icon: item.icon,
-                        tier: isUnlocked ? 'Açık Avatar' : 'Kilitli Avatar',
-                        tierLevel: item.minDuelWinsRequired ? 4 : item.minBadgesRequired ? 3 : 1,
+                        tier: `${itemTierLevel}. Kademe (${item.tier.toUpperCase()})`,
+                        tierLevel: itemTierLevel,
                         isUnlocked,
                         reqDescription: isUnlocked ? `Bu avatar başarıyla kuşanıldı.` : `Kilit Açma Şartı: ${reqString}`,
                         howToUnlock: howTo,
@@ -419,23 +464,28 @@ export default function ProfileEditModal({
                       });
                     }}
                     title={isUnlocked ? (isSelected ? `${item.label} (Şu An Kuşanıldı)` : `${item.label} (Kuşanılabilir - Tıkla ve Kuşan)`) : `Kilitli: ${reqString} (Detay için tıkla)`}
-                    className={`relative p-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                    className={`relative p-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer min-h-[70px] ${
                       isSelected
-                        ? 'bg-gradient-to-b from-amber-500/35 via-yellow-500/20 to-amber-950/70 border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_24px_rgba(251,191,36,0.85)] scale-110 z-10'
+                        ? 'bg-gradient-to-b from-amber-500/35 via-yellow-500/20 to-amber-950/70 outline outline-2 outline-offset-2 outline-amber-400 border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_24px_rgba(251,191,36,0.85)] scale-105 z-10'
                         : isUnlocked
-                        ? 'bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-950 border-2 border-emerald-400 hover:border-emerald-300 ring-2 ring-emerald-400/60 hover:ring-4 hover:ring-emerald-300 text-white hover:scale-110 shadow-[0_0_16px_rgba(16,185,129,0.45)]'
-                        : 'bg-black/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-85 hover:border-slate-500'
+                        ? 'bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-950 outline outline-2 outline-offset-1 outline-emerald-400/80 border-2 border-emerald-400 hover:border-emerald-300 text-white hover:scale-105 shadow-[0_0_16px_rgba(16,185,129,0.35)]'
+                        : 'bg-black/60 outline outline-1 outline-slate-700/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-85 hover:border-slate-500'
                     }`}
                   >
                     {isSelected && (
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-400 text-slate-950 font-black text-[9px] flex items-center justify-center shadow-md ring-1 ring-white">
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-md bg-amber-400 text-slate-950 font-black text-[9px] flex items-center justify-center shadow-md ring-1 ring-white">
                         ✓
                       </span>
                     )}
                     {isUnlocked && !isSelected && (
-                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-950 animate-ping" />
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-md bg-emerald-400 ring-2 ring-slate-950 animate-ping" />
                     )}
-                    <span className="text-xl">{item.icon}</span>
+                    <span
+                      className={`my-0.5 leading-none select-none transition-transform hover:scale-125 ${iconScaleClass}`}
+                      style={{ filter: getAvatarOutlineFilter(avatarBg, isUnlocked ? itemTierLevel : 0) }}
+                    >
+                      {item.icon}
+                    </span>
                     <span className="text-[8px] font-bold truncate max-w-full text-center leading-tight">
                       {isUnlocked ? item.label : '🔒 Kilitli'}
                     </span>
@@ -457,26 +507,35 @@ export default function ProfileEditModal({
               })}
             </div>
 
-            {/* Avatar Theme Color Palettes */}
+            {/* Avatar Outline Çizgisi & Parıltı Efekti */}
             <div className="pt-2 border-t border-white/10">
               <span className="text-[11px] font-bold text-slate-300 block mb-1.5">
-                Çerçeve Parıltısı &amp; Arka Plan:
+                Transparan Avatar Outline Çizgisi:
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
                 {AVATAR_THEMES.map((theme) => {
                   const isSelected = avatarBg === theme.id;
                   return (
                     <button
                       key={theme.id}
                       onClick={() => handleSelectAvatarBg(theme.id)}
-                      className={`p-2 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
+                      className={`p-2 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950 bg-gradient-to-r from-amber-950/80 via-yellow-950/50 to-slate-900 shadow-[0_0_24px_rgba(251,191,36,0.7)] scale-[1.03] z-10 relative'
-                          : 'border-2 border-emerald-400/80 hover:border-emerald-300 ring-2 ring-emerald-500/30 hover:ring-emerald-400/70 bg-gradient-to-r from-emerald-950/30 via-slate-900/60 to-slate-900 hover:scale-[1.02] shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                          ? 'outline outline-2 outline-offset-2 outline-amber-400 border-2 border-amber-300 ring-2 ring-amber-400/70 bg-white/10 shadow-[0_0_24px_rgba(251,191,36,0.7)] scale-[1.02] z-10 relative'
+                          : 'outline outline-1 outline-emerald-400/60 border-2 border-emerald-400/80 hover:border-emerald-300 bg-white/5 hover:scale-[1.01] shadow-[0_0_12px_rgba(16,185,129,0.25)]'
                       }`}
                     >
-                      <div className={`w-5 h-5 rounded-full ${theme.bgGradient} ${theme.borderGlow} shrink-0`} />
-                      <span className="text-[10px] font-bold text-slate-200 truncate">{theme.name}</span>
+                      {/* Canlı Avatar Objesi + Outline Önizlemesi */}
+                      <span
+                        className="text-xl leading-none shrink-0 select-none"
+                        style={{ filter: theme.outlineFilter }}
+                      >
+                        {avatarIcon || '🦁'}
+                      </span>
+                      <div className="min-w-0 text-left">
+                        <span className="text-[10px] font-bold text-slate-200 block truncate">{theme.name}</span>
+                        <span className="text-[8px] text-slate-400 font-medium">{theme.outlineLabel}</span>
+                      </div>
                       {isSelected ? (
                         <span className="ml-auto text-[8px] font-black px-2 py-0.5 rounded bg-amber-400 text-slate-950 shadow border border-amber-200 shrink-0">
                           KUŞANILDI ✓

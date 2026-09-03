@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getPrestigeTier, getDuelPrestigeTier, AVATAR_THEMES } from '@/lib/data/badgesData';
+import { getPrestigeTier, getDuelPrestigeTier, getAvatarOutlineFilter } from '@/lib/data/badgesData';
 
 interface AvatarWithBadgeFrameProps {
   rumuz: string;
@@ -39,108 +39,98 @@ export default function AvatarWithBadgeFrame({
   const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
   const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
 
-  // Custom or theme background
-  const themeObj = AVATAR_THEMES.find(t => t.id === avatarBg);
-  const bgClass = themeObj?.bgGradient || prestige.gradientBg;
-  const borderClass = themeObj?.borderGlow || prestige.frameBorderClass;
+  // Transparent object sticker outline filter (No rectangular or circular box)
+  const activeOutlineFilter = getAvatarOutlineFilter(avatarBg, prestige.tierLevel);
 
   const sizeClasses = {
     xs: {
-      container: 'w-6 h-6 text-[10px]',
-      pin: '-top-1 -right-1 w-3.5 h-3.5 text-[8px]',
+      container: 'w-5 h-5',
+      avatarText: 'text-xs',
+      emojiScale: 'scale-100',
+      pin: '-top-1 -right-1 text-[8px]',
       titleText: 'text-[9px]'
     },
     sm: {
-      container: 'w-7.5 h-7.5 sm:w-8 sm:h-8 text-xs font-black',
-      pin: '-top-1 -right-1 w-4 h-4 text-[9px]',
+      container: 'w-7 h-7 sm:w-8 sm:h-8',
+      avatarText: 'text-base sm:text-lg',
+      emojiScale: 'scale-105',
+      pin: '-top-1 -right-1 text-[10px]',
       titleText: 'text-[10px]'
     },
     md: {
-      container: 'w-9 h-9 sm:w-10 sm:h-10 text-sm font-black',
-      pin: '-top-1.5 -right-1.5 w-4.5 h-4.5 sm:w-5 sm:h-5 text-[10px] sm:text-[11px]',
+      container: 'w-10 h-10',
+      avatarText: 'text-xl sm:text-2xl',
+      emojiScale: 'scale-105',
+      pin: '-top-1.5 -right-1.5 text-xs',
       titleText: 'text-[10px] sm:text-[11px]'
     },
     lg: {
-      container: 'w-12 h-12 sm:w-14 sm:h-14 text-base sm:text-lg font-black',
-      pin: '-top-2 -right-2 w-5.5 h-5.5 sm:w-6 sm:h-6 text-xs',
+      container: 'w-13 h-13 sm:w-14 sm:h-14',
+      avatarText: 'text-2xl sm:text-3xl',
+      emojiScale: 'scale-110',
+      pin: '-top-1.5 -right-1.5 text-sm',
       titleText: 'text-xs'
     },
     xl: {
-      container: 'w-16 h-16 sm:w-20 sm:h-20 text-xl sm:text-2xl font-black',
-      pin: '-top-2.5 -right-2.5 w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm',
+      container: 'w-16 h-16 sm:w-20 sm:h-20',
+      avatarText: 'text-4xl sm:text-5xl',
+      emojiScale: 'scale-115',
+      pin: '-top-2 -right-2 text-base',
       titleText: 'text-xs sm:text-sm'
     }
   }[size];
 
   const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
-  const pinClass = themeObj?.badgePinBg || prestige.pinBorderClass;
 
   const tierScaleClass = prestige.tierLevel === 5
-    ? 'scale-[1.08] ring-offset-1'
+    ? 'scale-110'
     : prestige.tierLevel === 4
-    ? 'scale-[1.04]'
+    ? 'scale-105'
     : prestige.tierLevel === 3
-    ? 'scale-[1.01]'
+    ? 'scale-100'
     : prestige.tierLevel === 2
-    ? 'scale-[0.98]'
+    ? 'scale-[0.96]'
     : prestige.tierLevel === 1
-    ? 'scale-[0.95]'
-    : 'scale-[0.92]';
+    ? 'scale-[0.92]'
+    : 'scale-[0.88] opacity-90';
 
   return (
-    <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
+    <div className={`inline-flex flex-col items-center justify-center p-0.5 ${className}`}>
+      {/* 
+        SADECE OBJE & TRANSPARAN ARKAPLAN (Kutulanma/Dörtgen/Daire Çerçeve Yok)
+        Kademeye göre zarif ölçeklenen, dış hatları net outline çizgili transparan obje
+      */}
       <div
-        className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-md transition-all ${sizeClasses.container} ${borderClass} ${bgClass} ${tierScaleClass}`}
+        className={`relative inline-flex items-center justify-center flex-shrink-0 select-none bg-transparent transition-transform duration-200 ${sizeClasses.container} ${tierScaleClass}`}
         title={`${rumuz} • ${activeTitle} (${prestige.tierLabel} • ${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
       >
-        {/* Tier-Hierarchical Radial Glow Layer (Strictly proportional to tier level: 5 > 4 > 3 > 2 > 1 > 0) */}
-        {prestige.tierLevel > 0 && (
-          <div
-            className={`absolute rounded-full bg-gradient-to-r ${prestige.glowClass} -z-10 transition-all ${
-              prestige.tierLevel === 5
-                ? '-inset-1.5 opacity-100 blur-[8px] animate-pulse'
-                : prestige.tierLevel === 4
-                ? '-inset-1 opacity-90 blur-[6px] animate-pulse'
-                : prestige.tierLevel === 3
-                ? '-inset-0.5 opacity-75 blur-[4px] animate-pulse'
-                : prestige.tierLevel === 2
-                ? '-inset-0.5 opacity-45 blur-[3px]'
-                : '-inset-0.5 opacity-25 blur-[2px]'
-            }`}
-          />
-        )}
-
-        {/* Level 5 Cosmic Mythic Orbital Halo Effect */}
-        {prestige.tierLevel === 5 && (
-          <>
-            <div className="absolute -inset-2 rounded-full border-2 border-fuchsia-400/80 ring-2 ring-cyan-400/70 animate-ping opacity-40 pointer-events-none -z-10" />
-            <div className="absolute -inset-1 rounded-full border border-amber-300/60 animate-spin opacity-50 pointer-events-none -z-10" style={{ animationDuration: '6s' }} />
-          </>
-        )}
-
-        {/* Level 4 Diamond Sparkle Halo */}
-        {prestige.tierLevel === 4 && (
-          <div className="absolute -inset-1.5 rounded-full border border-cyan-400/60 ring-1 ring-purple-400/50 animate-ping opacity-30 pointer-events-none -z-10" />
-        )}
-
-        {/* Center Icon / Initial */}
-        <span className={`text-white drop-shadow-md font-black tracking-tight ${isEmojiIcon ? 'scale-110' : ''}`}>
+        {/* Merkez Obje / Avatar İkonu (Transparan, Kenarlarını Zengin Saran Outline Çizgili) */}
+        <span
+          className={`leading-none flex items-center justify-center select-none font-black tracking-tight transition-all ${sizeClasses.avatarText} ${isEmojiIcon ? sizeClasses.emojiScale : 'text-white'}`}
+          style={{
+            filter: activeOutlineFilter,
+            WebkitTextStroke: isEmojiIcon ? undefined : '1px #ffffff'
+          }}
+        >
           {displayIcon}
         </span>
 
-        {/* Glorious Top-Right Title / Badge Pin Icon (Strictly hierarchical frame) */}
+        {/* Sağ Üst Başlık / Rozet İğnesi (Transparan Sticker Tarzı İnce Beyaz Outline Çizgili) */}
         {showBadgePin && (
-          <div
-            className={`absolute ${sizeClasses.pin} rounded-full ${pinClass} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
+          <span
+            className={`absolute ${sizeClasses.pin} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10 leading-none select-none`}
+            style={{
+              filter: 'drop-shadow(1px 0 0 #ffffff) drop-shadow(-1px 0 0 #ffffff) drop-shadow(0 1px 0 #ffffff) drop-shadow(0 -1px 0 #ffffff) drop-shadow(0 0 2px rgba(0,0,0,0.8))'
+            }}
             title={`${prestige.pinBadgeName} • ${activeTitle} (${prestige.tierLabel})`}
           >
-            <span className="leading-none">{prestige.pinIcon}</span>
-          </div>
+            {prestige.pinIcon}
+          </span>
         )}
       </div>
 
       {showTitleBadge && (
-        <span className={`truncate max-w-[130px] text-center px-1.5 py-0.5 rounded shadow-sm transition-all ${prestige.titleBadgeClass} ${sizeClasses.titleText}`}>
+        <span className={`truncate max-w-[130px] text-center px-1.5 py-0.5 rounded shadow-sm transition-all mt-0.5 ${prestige.titleBadgeClass} ${sizeClasses.titleText}`}>
           {activeTitle}
         </span>
       )}

@@ -90,3 +90,82 @@
 - **Test ve Doğrulama**: [lint / compile sonuçları]
 - **Sonraki Adımlar / Notlar**: [Diğer AI'a veya projeye notlar]
 ```
+
+---
+
+## 📅 [2026-09-03] - Kuşanılabilir Eşya ve Avatar Çerçevelerinin Outline Tasarıma Geçirilmesi
+- **Geliştirici**: AI Agent
+- **Etkilenen Dosyalar**:
+  - `lib/data/badgesData.ts`
+  - `components/ui/AvatarWithBadgeFrame.tsx`
+  - `components/ui/ProfileEditModal.tsx`
+- **Yapılan İşlemler**:
+  1. **Yuvarlak Çerçeve Kısıtlamasının Kaldırılması**: Avatarların yuvarlak (`rounded-full`) çerçeve içinde sıkışıp küçük kalmasını önlemek amacıyla yuvarlak yapı iptal edilerek modern ve ferah köşe yumuşatmalı (`rounded-2xl` / `rounded-xl`) outline çerçeve yapısına geçildi.
+  2. **Görsel Outline Çerçeveleri**: `badgesData.ts` içerisindeki tüm avatar tema ve kademe (prestige) sınırları `outline` utility sınıflarıyla donatıldı; ışık süzmesi ve parıltı efektleri outline katmanlarıyla yeniden ölçeklendirildi.
+  3. **Avatar İkonlarının Büyütülmesi & Öne Çıkarılması**: `AvatarWithBadgeFrame.tsx` ve `ProfileEditModal.tsx` içindeki avatar ikon puntoları (xs'den xl'e kadar) büyütüldü (`scale-125` / `scale-130`, `text-2xl` - `text-6xl`), avatarların çerçeve içinde belirgin, canlı ve baskın görünmesi sağlandı.
+  4. **Kuşanılabilir Eşya Görünürlüğü**: Kuşanılmış ve kuşanılabilir durumdaki tüm avatar butonları ile tema renk paletleri dikkat çeken outline parıltıları ve kuşanılma durum rozetleriyle belirginleştirildi.
+- **Test ve Doğrulama**:
+  - `lint_applet` çalıştırıldı: 0 hata ile başarıyla geçti.
+
+---
+
+## 📅 [2026-09-03] - Transparan (Kutusuz) & Çıkartma Tarzı Outline Avatar Sistemine Geçiş
+- **Geliştirici**: AI Agent
+- **Etkilenen Dosyalar**:
+  - `components/ui/AvatarWithBadgeFrame.tsx`
+  - `lib/data/badgesData.ts`
+  - `components/ui/ProfileEditModal.tsx`
+- **Yapılan İşlemler**:
+  1. **Tüm Dörtgen/Yuvarlak Kutu ve Çerçevelerin İptali**: Kullanıcı talebine istinaden tüm dairesel ve dikdörtgensel arkaplan kutuları (`bgGradient`, `borderGlow`, `rounded-full`, `rounded-2xl` ve dış çerçeve `div` kaplamaları) tamamen kaldırıldı.
+  2. **Transparan PNG / Obje Çıkartması Mimarisi**: Avatarlar artık arka planı olmayan saf birer obje (ikon/glif/emoji) olarak render edilmekte; doğrudan objenin kenar hatlarını saran çok katmanlı `drop-shadow` tabanlı sticker contour outline filtresi uygulandı.
+  3. **Kademelere & Temalara Özel Outline Filtreleri**:
+     - 🌌 *Kozmik Mistik (5. Kademe)*: Çift tonlu neon fuşya ve camgöbeği dış hat parıltısı.
+     - 💎 *Elmas Safir (4. Kademe)*: Camgöbeği ve mor kristal dış hat çizgisi.
+     - 👑 *Altın Şampiyon (3. Kademe)*: Sıcak şampiyon altını dış hat çizgisi.
+     - 🛡️ *Gümüş Metalik (2. Kademe)*: Parlak krom çelik beyaz/gümüş dış hat çizgisi.
+     - 🐣 *Bronz Çırak (1. Kademe)*: Sıcak bakır/kehribar dış hat çizgisi.
+  4. **Profil Düzenleme ve Önizleme Entegrasyonu**: Profil düzenleme modalindeki ikon seçim ızgarası ve tema paletleri doğrudan transparan nesne ve outline efektini yansıtacak şekilde dinamikleştirildi.
+---
+
+## 📅 [2026-09-03] - Kademelere Göre Avatar Çeşitlendirmesi, Boyut Büyümesi & Zenginleştirilmiş Outline Çerçeveleri
+- **Geliştirici**: AI Agent
+- **Etkilenen Dosyalar**:
+  - `lib/data/badgesData.ts`
+  - `components/ui/AvatarWithBadgeFrame.tsx`
+  - `components/ui/ProfileEditModal.tsx`
+- **Yapılan İşlemler**:
+  1. **Her Kademe İçin Zenginleştirilmiş Avatar Koleksiyonu**:
+     - Başlangıçtan en tepeye 60 adet tematik avatar (Coğrafya, Anadolu yaban hayatı, mitoloji, astronomi ve gladyatör simgeleri).
+     - 🌌 *5. Kademe (Kozmik Mistik Zirve)*: 10 adet efsanevi zirve avatarı.
+     - 💎 *4. Kademe (Elmas & Efsanevi)*: 12 adet elit avatar.
+     - 👑 *3. Kademe (Altın & Şampiyon)*: 12 adet şampiyon avatarı.
+     - 🛡️ *2. Kademe (Gümüş & Uzman)*: 12 adet uzman avatarı.
+     - 🐣 *1. Kademe (Bronz & Çırak)*: 10 adet çırak kaşif avatarı.
+     - 🌱 *0. Kademe (Başlangıç)*: 8 adet herkese anında açık başlangıç avatarı.
+  2. **Kademeye Göre Hissedilir Boyut Büyümesi**:
+     - `AvatarWithBadgeFrame.tsx` içinde kademe yükseldikçe avatarın heybeti ve boyutu açıkça artacak şekilde ölçeklendirildi: Kademe 0 (`scale-[0.88]`), Kademe 1 (`scale-[1.00]`), Kademe 2 (`scale-[1.16]`), Kademe 3 (`scale-[1.32]`), Kademe 4 (`scale-[1.50]`), Kademe 5 (`scale-[1.72]`).
+  3. **Çerçevenin (Sticker Outline & Parıltı Aurasının) Güzelleştirilmesi**:
+     - Kutusuz transparan mimari korunarak, doğrudan objenin hatlarını saran çok katmanlı `drop-shadow` filtreleri zenginleştirildi.
+     - Üst kademeler için nesnenin etrafında süzülen ışıltı parçacıkları ve canlı kozmik/elmas parıltıları eklendi.
+  4. **Profil Düzenleme Modalında Kademe Filtreleme Sekmeleri**:
+     - Profil düzenleme modalinde 60 avatarın rahatça incelenmesi ve seçilebilmesi için kademe sekmeleri eklendi (`Tümü`, `5. Kademe`, `4. Kademe`, `3. Kademe`, `2. Kademe`, `1. Kademe`, `Başlangıç`).
+- **Test ve Doğrulama**:
+  - `lint_applet` ile linter doğrulaması yapıldı (0 hata).
+
+---
+
+## 📅 [2026-09-03] - Avatar Boyutlarının & Outline Işıltılarının Dengelenmesi (Normalizasyon)
+- **Geliştirici**: AI Agent
+- **Etkilenen Dosyalar**:
+  - `components/ui/AvatarWithBadgeFrame.tsx`
+  - `lib/data/badgesData.ts`
+  - `components/ui/ProfileEditModal.tsx`
+- **Yapılan İşlemler**:
+  1. **Aşırı Boyut Büyümesinin & Taşmaların Düzeltilmesi**: Liderlik tablosu ve profil satırlarında metinlerin üzerine binen devasa `scale-[1.72]` ve `text-3xl` boyutları dengelendi. Satır içine tam oturan zarif kademe farkları tanımlandı (Kademe 0: `0.88x`, Kademe 1: `0.92x`, Kademe 2: `0.96x`, Kademe 3: `1.00x`, Kademe 4: `1.05x`, Kademe 5: `1.10x`).
+  2. **Gereksiz Sis/Parıltı ve Parçacıkların Temizlenmesi**: 30-45px'lik aşırı blur'lu sis efekti kaldırıldı; yalnızca 1.5px net çıkartma kontur çizgisi ve 3-5px mikro parıltı bırakıldı.
+  3. **Satır & UI Uyumunun Sağlanması**: Tablo satırları, modal gridleri ve düello kartlarında avatar nesneleri hizalanarak estetik bir görsel denge sağlandı.
+- **Test ve Doğrulama**:
+  - `lint_applet` ve `compile_applet` ile doğrulandı.
+
+
+

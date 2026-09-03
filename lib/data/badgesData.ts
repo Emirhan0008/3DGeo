@@ -42,14 +42,23 @@ export interface AvatarThemeOption {
   bgGradient: string;
   borderGlow: string;
   badgePinBg: string;
+  outlineFilter: string;
+  outlineColor: string;
+  outlineLabel: string;
 }
 
 export const AVATAR_ICONS: AvatarIconOption[] = [
-  // --- 🌌 5. KADEME: KOZMİK & MİSTİK (Aylar Sürecek En Zor Hedefler) ---
+  // --- 🌌 5. KADEME: KOZMİK & MİSTİK (Aylar Sürecek En Prestijli Zirve Hedefler) ---
   { id: 'cosmic_master', icon: '🌌', label: 'Kozmik Kozmograf (Zirve)', tier: 'mythic', minBadgesRequired: 30, minDuelWinsRequired: 50 },
   { id: 'trident_god', icon: '🔱', label: 'Karalar & Denizler Lordu', tier: 'mythic', minDuelWinsRequired: 100 },
   { id: 'galaxy_explorer', icon: '🪐', label: 'Galaksi Kaşifi', tier: 'mythic', minScoreRequired: 5000 },
   { id: 'sun_emperor', icon: '☀️', label: 'Güneş Hükümdarı', tier: 'mythic', minDuelWinsRequired: 75 },
+  { id: 'time_oracle', icon: '🔮', label: 'Zaman Kahini', tier: 'mythic', minBadgesRequired: 35, minDuelWinsRequired: 50 },
+  { id: 'falling_star', icon: '🌠', label: 'Kayan Yıldız Tanrısı', tier: 'mythic', minBadgesRequired: 30, minDuelWinsRequired: 60 },
+  { id: 'all_seeing_eye', icon: '👁️', label: 'Kadim Coğrafya Gözü', tier: 'mythic', minBadgesRequired: 40 },
+  { id: 'cosmic_wings', icon: '🪽', label: 'Altın Kanatlı Kozmik Anka', tier: 'mythic', minDuelWinsRequired: 80 },
+  { id: 'ufo_traveler', icon: '🛸', label: 'Yıldızlararası Seyyah', tier: 'mythic', minScoreRequired: 6000 },
+  { id: 'cosmic_infinity', icon: '♾️', label: 'Sonsuzluk Hükümdarı', tier: 'mythic', minDuelWinsRequired: 120, minBadgesRequired: 45 },
 
   // --- 💎 4. KADEME: ELMAS & EFSANE (Çok Zor Uzun Vadeli Hedefler) ---
   { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas (Elit)', tier: 'diamond', minBadgesRequired: 20, minDuelWinsRequired: 25 },
@@ -57,6 +66,13 @@ export const AVATAR_ICONS: AvatarIconOption[] = [
   { id: 'lightning_lord', icon: '⚡', label: 'Yıldırım Lordu', tier: 'diamond', minBadgesRequired: 15 },
   { id: 'north_star', icon: '🌟', label: 'Kutup Yıldızı', tier: 'diamond', minDuelWinsRequired: 20 },
   { id: 'wisdom_monument', icon: '🏛️', label: 'Bilgelik Anıtı', tier: 'diamond', minScoreRequired: 2500 },
+  { id: 'phoenix_bird', icon: '🦚', label: 'Zümrüdüanka (Simurg)', tier: 'diamond', minBadgesRequired: 22, minDuelWinsRequired: 20 },
+  { id: 'red_dragon', icon: '🐉', label: 'Kızıl Ejderha', tier: 'diamond', minDuelWinsRequired: 30 },
+  { id: 'magic_sword', icon: '🗡️', label: 'Efsanevi Kılıç', tier: 'diamond', minBadgesRequired: 18, minDuelWinsRequired: 20 },
+  { id: 'storm_cloud', icon: '⛈️', label: 'Kasırga Efendisi', tier: 'diamond', minBadgesRequired: 25 },
+  { id: 'evil_eye_amulet', icon: '🧿', label: 'Kadim Nazar Zırhı', tier: 'diamond', minBadgesRequired: 22 },
+  { id: 'meteor_comet', icon: '☄️', label: 'Göktaşı Fatihi', tier: 'diamond', minScoreRequired: 3000 },
+  { id: 'sparkles_gem', icon: '✨', label: 'Safir Parıltısı', tier: 'diamond', minDuelWinsRequired: 22 },
 
   // --- 👑 3. KADEME: ALTIN & ŞAMPİYON ---
   { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu', tier: 'gold', minDuelWinsRequired: 10 },
@@ -65,6 +81,12 @@ export const AVATAR_ICONS: AvatarIconOption[] = [
   { id: 'flame_dragon', icon: '🔥', label: 'Yenilmez Ejder', tier: 'gold', minDuelWinsRequired: 10 },
   { id: 'brain_master', icon: '🧠', label: 'Turing Başmühendisi', tier: 'gold', minBadgesRequired: 8 },
   { id: 'castle_conqueror', icon: '🏰', label: 'Kale Fatihi', tier: 'gold', minScoreRequired: 1000 },
+  { id: 'leopard', icon: '🐆', label: 'Anadolu Parsı', tier: 'gold', minBadgesRequired: 12, minDuelWinsRequired: 8 },
+  { id: 'volcano', icon: '🌋', label: 'Ağrı Volkanı', tier: 'gold', minBadgesRequired: 10, minScoreRequired: 1500 },
+  { id: 'double_swords', icon: '⚔️', label: 'Çift Pala Ustası', tier: 'gold', minDuelWinsRequired: 12 },
+  { id: 'seljuk_eagle', icon: '🦅', label: 'Çift Başlı Selçuklu Kartalı', tier: 'gold', minBadgesRequired: 14 },
+  { id: 'lightning_rider', icon: '⚡', label: 'Şimşek Süvarisi', tier: 'gold', minDuelWinsRequired: 10, minScoreRequired: 1000 },
+  { id: 'golden_crown', icon: '👑', label: 'Taht Varisi', tier: 'gold', minDuelWinsRequired: 15 },
 
   // --- 🛡️ 2. KADEME: GÜMÜŞ & UZMAN ---
   { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü', tier: 'silver', minDuelWinsRequired: 3 },
@@ -73,59 +95,123 @@ export const AVATAR_ICONS: AvatarIconOption[] = [
   { id: 'steppe_eagle', icon: '🦅', label: 'Bozkır Kartalı', tier: 'silver', minBadgesRequired: 5 },
   { id: 'sea_wave', icon: '🌊', label: 'Karadeniz Fırtınası', tier: 'silver', minBadgesRequired: 4 },
   { id: 'cavalry', icon: '🐎', label: 'Akıncı Süvari', tier: 'silver', minDuelWinsRequired: 2 },
+  { id: 'grey_wolf', icon: '🐺', label: 'Anadolu Bozkurdu', tier: 'silver', minBadgesRequired: 5, minDuelWinsRequired: 3 },
+  { id: 'archery_bow', icon: '🏹', label: 'Kemankeş Yayı', tier: 'silver', minBadgesRequired: 4, minDuelWinsRequired: 2 },
+  { id: 'anchor', icon: '⚓', label: 'Pruva Çapası', tier: 'silver', minBadgesRequired: 3, minScoreRequired: 500 },
+  { id: 'ancient_temple', icon: '🏛️', label: 'Efes Sütunu', tier: 'silver', minBadgesRequired: 5 },
+  { id: 'wild_horse', icon: '🐴', label: 'Yılkı Atı', tier: 'silver', minBadgesRequired: 4 },
+  { id: 'waterfall', icon: '💧', label: 'Düden Şelalesi', tier: 'silver', minBadgesRequired: 5 },
 
   // --- 🐣 1. KADEME: BRONZ & ÇIRAK ---
   { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi', tier: 'bronze', minBadgesRequired: 2 },
   { id: 'compass', icon: '🧭', label: 'Pusula Rehberi', tier: 'bronze', minBadgesRequired: 1 },
   { id: 'backpack', icon: '🎒', label: 'Gezgin Çantası', tier: 'bronze', minBadgesRequired: 1 },
   { id: 'camp_tent', icon: '⛺', label: 'Kampçı Çırak', tier: 'bronze', minBadgesRequired: 1 },
+  { id: 'pine_tree', icon: '🌲', label: 'Toros Çamı', tier: 'bronze', minBadgesRequired: 2 },
+  { id: 'mountain_peak', icon: '⛰️', label: 'Dağ Zirvesi', tier: 'bronze', minBadgesRequired: 1, minDuelWinsRequired: 1 },
+  { id: 'river_canoe', icon: '🛶', label: 'Nehir Kanosu', tier: 'bronze', minBadgesRequired: 1 },
+  { id: 'binocular', icon: '🔭', label: 'Dürbün Gözcüsü', tier: 'bronze', minBadgesRequired: 2 },
+  { id: 'sunrise', icon: '🌄', label: 'Doğu Şafağı', tier: 'bronze', minBadgesRequired: 1, minScoreRequired: 250 },
+  { id: 'hot_balloon', icon: '🎈', label: 'Kapadokya Balonu', tier: 'bronze', minBadgesRequired: 2 },
 
-  // --- 🌱 0. KADEME: BAŞLANGIÇ ---
-  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin', tier: 'starter', minBadgesRequired: 0 }
+  // --- 🌱 0. KADEME: BAŞLANGIÇ (Herkes İçin Açık) ---
+  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'novice_compass', icon: '🧭', label: 'Acemi Pusula', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'green_sprout', icon: '🌱', label: 'Yeşil Filiz', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'camp_fire', icon: '🔥', label: 'Çoban Ateşi', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'pin_marker', icon: '📍', label: 'Rota İğnesi', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'walking_traveler', icon: '🚶', label: 'Gezgin Seyyah', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'tea_glass', icon: '🫖', label: 'Demli Çay', tier: 'starter', minBadgesRequired: 0 },
+  { id: 'clover', icon: '🍀', label: 'Şanslı Dört Yaprak', tier: 'starter', minBadgesRequired: 0 }
 ];
 
 export const AVATAR_THEMES: AvatarThemeOption[] = [
   {
     id: 'cosmic_mythic',
-    name: '🌌 5. Kademe: Kozmik Mistik & Zirve Hükümdar (En Yüksek)',
+    name: '🌌 5. Kademe: Kozmik Mistik & Zirve Neon (En Yüksek)',
     tierLevel: 5,
-    bgGradient: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
-    borderGlow: 'border-3 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_50px_rgba(217,70,239,1),0_0_28px_rgba(6,182,212,0.9),0_0_36px_rgba(251,191,36,0.85)]',
-    badgePinBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 border-2 border-amber-200 ring-2 ring-fuchsia-400 text-amber-200 shadow-2xl shadow-fuchsia-500'
+    bgGradient: 'bg-transparent',
+    borderGlow: 'border-0',
+    badgePinBg: 'text-amber-300',
+    outlineFilter: 'drop-shadow(1.5px 0 0 #f472b6) drop-shadow(-1.5px 0 0 #f472b6) drop-shadow(0 1.5px 0 #22d3ee) drop-shadow(0 -1.5px 0 #22d3ee) drop-shadow(0 0 5px rgba(217,70,239,0.75))',
+    outlineColor: '#f472b6',
+    outlineLabel: 'Kozmik Neon (Zirve)'
   },
   {
     id: 'cyan_mythic',
-    name: '💎 4. Kademe: Elmas & Efsanevi Safir',
+    name: '💎 4. Kademe: Elmas Safir & Mor Parıltı',
     tierLevel: 4,
-    bgGradient: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
-    borderGlow: 'border-3 border-cyan-300 ring-3 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_35px_rgba(6,182,212,0.95),0_0_18px_rgba(168,85,247,0.8)]',
-    badgePinBg: 'bg-slate-950 border-2 border-cyan-300 ring-2 ring-purple-400 text-cyan-200 shadow-xl shadow-cyan-500/80'
+    bgGradient: 'bg-transparent',
+    borderGlow: 'border-0',
+    badgePinBg: 'text-cyan-300',
+    outlineFilter: 'drop-shadow(1.5px 0 0 #38bdf8) drop-shadow(-1.5px 0 0 #38bdf8) drop-shadow(0 1.5px 0 #c084fc) drop-shadow(0 -1.5px 0 #c084fc) drop-shadow(0 0 4px rgba(56,189,248,0.75))',
+    outlineColor: '#38bdf8',
+    outlineLabel: 'Elmas Safir'
   },
   {
     id: 'gold_glory',
-    name: '👑 3. Kademe: Altın & Şampiyon Aura',
+    name: '👑 3. Kademe: Altın & Şampiyon Işıltısı',
     tierLevel: 3,
-    bgGradient: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-    borderGlow: 'border-3 border-amber-300 ring-3 ring-amber-400 ring-offset-1 ring-offset-slate-950 shadow-[0_0_26px_rgba(245,158,11,0.9)]',
-    badgePinBg: 'bg-amber-950 border-2 border-amber-300 ring-2 ring-yellow-400 text-amber-200 shadow-lg shadow-amber-500/60'
+    bgGradient: 'bg-transparent',
+    borderGlow: 'border-0',
+    badgePinBg: 'text-amber-300',
+    outlineFilter: 'drop-shadow(1.5px 0 0 #fde047) drop-shadow(-1.5px 0 0 #fde047) drop-shadow(0 1.5px 0 #f59e0b) drop-shadow(0 -1.5px 0 #f59e0b) drop-shadow(0 0 4px rgba(245,158,11,0.65))',
+    outlineColor: '#fde047',
+    outlineLabel: 'Şampiyon Altını'
   },
   {
     id: 'indigo_midnight',
-    name: '🛡️ 2. Kademe: Gümüş & Uzman Metalik',
+    name: '🛡️ 2. Kademe: Gümüş & Metalik Çelik',
     tierLevel: 2,
-    bgGradient: 'bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800',
-    borderGlow: 'border-2 border-slate-200 ring-2 ring-slate-300/80 ring-offset-1 ring-offset-slate-950 shadow-[0_0_16px_rgba(203,213,225,0.6)]',
-    badgePinBg: 'bg-slate-900 border-2 border-slate-200 ring-1 ring-slate-300/80 text-slate-100 shadow-md'
+    bgGradient: 'bg-transparent',
+    borderGlow: 'border-0',
+    badgePinBg: 'text-slate-100',
+    outlineFilter: 'drop-shadow(1.5px 0 0 #ffffff) drop-shadow(-1.5px 0 0 #ffffff) drop-shadow(0 1.5px 0 #94a3b8) drop-shadow(0 -1.5px 0 #94a3b8) drop-shadow(0 0 3px rgba(226,232,240,0.6))',
+    outlineColor: '#ffffff',
+    outlineLabel: 'Parlak Gümüş'
   },
   {
     id: 'emerald_forest',
-    name: '🐣 1. Kademe: Bronz & Çırak Sıcak Bakır',
+    name: '🐣 1. Kademe: Bronz & Bakır Sıcak Çırak',
     tierLevel: 1,
-    bgGradient: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
-    borderGlow: 'border-2 border-amber-500 ring-2 ring-amber-700/60 ring-offset-1 ring-offset-slate-950 shadow-[0_0_12px_rgba(180,83,9,0.45)]',
-    badgePinBg: 'bg-amber-950 border-2 border-amber-600 text-amber-300 shadow-sm'
+    bgGradient: 'bg-transparent',
+    borderGlow: 'border-0',
+    badgePinBg: 'text-amber-300',
+    outlineFilter: 'drop-shadow(1.5px 0 0 #fed7aa) drop-shadow(-1.5px 0 0 #fed7aa) drop-shadow(0 1.5px 0 #ea580c) drop-shadow(0 -1.5px 0 #ea580c) drop-shadow(0 0 3px rgba(234,88,12,0.5))',
+    outlineColor: '#fed7aa',
+    outlineLabel: 'Sıcak Bronz'
   }
 ];
+
+/**
+ * Returns sticker contour outline filter string for transparent avatars (PNG / Emoji / Glyph)
+ * Purely outlines the object itself without any rectangular or circular bounding box!
+ */
+export function getAvatarOutlineFilter(themeId?: string, tierLevel = 0): string {
+  if (themeId) {
+    const matched = AVATAR_THEMES.find(t => t.id === themeId);
+    if (matched && matched.outlineFilter) {
+      return matched.outlineFilter;
+    }
+  }
+
+  if (tierLevel >= 5) {
+    return 'drop-shadow(1.5px 0 0 #f472b6) drop-shadow(-1.5px 0 0 #f472b6) drop-shadow(0 1.5px 0 #22d3ee) drop-shadow(0 -1.5px 0 #22d3ee) drop-shadow(0 0 5px rgba(217,70,239,0.75))';
+  }
+  if (tierLevel === 4) {
+    return 'drop-shadow(1.5px 0 0 #38bdf8) drop-shadow(-1.5px 0 0 #38bdf8) drop-shadow(0 1.5px 0 #c084fc) drop-shadow(0 -1.5px 0 #c084fc) drop-shadow(0 0 4px rgba(56,189,248,0.75))';
+  }
+  if (tierLevel === 3) {
+    return 'drop-shadow(1.5px 0 0 #fde047) drop-shadow(-1.5px 0 0 #fde047) drop-shadow(0 1.5px 0 #f59e0b) drop-shadow(0 -1.5px 0 #f59e0b) drop-shadow(0 0 4px rgba(245,158,11,0.65))';
+  }
+  if (tierLevel === 2) {
+    return 'drop-shadow(1.5px 0 0 #ffffff) drop-shadow(-1.5px 0 0 #ffffff) drop-shadow(0 1.5px 0 #94a3b8) drop-shadow(0 -1.5px 0 #94a3b8) drop-shadow(0 0 3px rgba(226,232,240,0.6))';
+  }
+  if (tierLevel === 1) {
+    return 'drop-shadow(1.5px 0 0 #fed7aa) drop-shadow(-1.5px 0 0 #fed7aa) drop-shadow(0 1.5px 0 #ea580c) drop-shadow(0 -1.5px 0 #ea580c) drop-shadow(0 0 3px rgba(234,88,12,0.5))';
+  }
+  return 'drop-shadow(1px 0 0 #ffffff) drop-shadow(-1px 0 0 #ffffff) drop-shadow(0 1px 0 #ffffff) drop-shadow(0 -1px 0 #ffffff) drop-shadow(0 1px 2px rgba(0,0,0,0.4))';
+}
 
 export const ALL_TITLES: UserTitle[] = [
   // --- 🌌 5. KADEME: MİSTİK KOZMİK & ZİRVE HÜKÜMDAR (EN ÜSTTE) ---
@@ -1233,12 +1319,12 @@ export function getDuelPrestigeTier(
       tierLabel: '🌌 Mistik Kozmik Zirve',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-2 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_45px_rgba(217,70,239,1),0_0_25px_rgba(6,182,212,0.9),0_0_35px_rgba(251,191,36,0.8)] animate-pulse',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-fuchsia-400 border-2 border-cyan-300 shadow-[0_0_35px_rgba(217,70,239,0.85),0_0_18px_rgba(6,182,212,0.7)] animate-pulse',
       glowClass: 'from-fuchsia-500 via-cyan-400 to-amber-300',
       pinIcon: matchedTitle?.icon || '🔱',
       pinBadgeName: activeTitle,
-      pinBorderClass: 'border-2 border-amber-200 bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 text-amber-200 ring-2 ring-fuchsia-400 shadow-2xl shadow-fuchsia-500 animate-bounce',
-      gradientBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
+      pinBorderClass: 'border-2 border-amber-300 bg-slate-950 text-amber-200 outline outline-1 outline-fuchsia-400 shadow-xl shadow-fuchsia-500/70 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-purple-950/80 via-slate-950/90 to-cyan-950/80',
       titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_24px_rgba(217,70,239,0.8)] font-black',
       ringClass: 'ring-4 ring-cyan-400',
       sparkleEffect: true,
@@ -1254,12 +1340,12 @@ export function getDuelPrestigeTier(
       tierLabel: '💎 Elmas Zirve',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-3 border-cyan-300 ring-3 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_35px_rgba(6,182,212,0.95),0_0_18px_rgba(168,85,247,0.8)] animate-pulse',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-cyan-400 border-2 border-indigo-400 shadow-[0_0_28px_rgba(6,182,212,0.85),0_0_14px_rgba(168,85,247,0.6)] animate-pulse',
       glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
       pinIcon: matchedTitle?.icon || (duelWins >= 50 ? '⚔️' : '🏆'),
       pinBadgeName: activeTitle,
-      pinBorderClass: 'border-2 border-cyan-200 bg-slate-950 text-cyan-200 ring-2 ring-purple-400 shadow-xl shadow-cyan-500/80 animate-bounce',
-      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
+      pinBorderClass: 'border-2 border-cyan-300 bg-slate-950 text-cyan-200 outline outline-1 outline-purple-400 shadow-lg shadow-cyan-500/80 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-cyan-950/80 via-purple-950/80 to-indigo-950/80',
       titleBadgeClass: 'text-cyan-200 border-2 border-cyan-400 ring-1 ring-purple-500/70 shadow-[0_0_15px_rgba(6,182,212,0.6)] font-black',
       ringClass: 'ring-3 ring-indigo-500',
       sparkleEffect: true
@@ -1274,12 +1360,12 @@ export function getDuelPrestigeTier(
       tierLabel: '👑 Altın Şampiyon',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-3 border-amber-300 ring-3 ring-amber-400 ring-offset-1 ring-offset-slate-950 shadow-[0_0_26px_rgba(245,158,11,0.9)] animate-pulse',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-amber-400 border-2 border-yellow-300 shadow-[0_0_22px_rgba(245,158,11,0.8)] animate-pulse',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitle,
-      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400 text-amber-200 shadow-md shadow-amber-500/60',
-      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 outline outline-1 outline-yellow-400 shadow-md shadow-amber-500/60',
+      gradientBg: 'bg-gradient-to-tr from-amber-950/80 via-yellow-950/80 to-slate-900/90',
       titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
       ringClass: 'ring-2 ring-amber-400',
       sparkleEffect: false
@@ -1294,12 +1380,12 @@ export function getDuelPrestigeTier(
       tierLabel: '🛡️ Gümüş Uzman',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
-      frameBorderClass: 'border-2 border-slate-200 ring-2 ring-slate-300/80 ring-offset-1 ring-offset-slate-950 shadow-[0_0_16px_rgba(203,213,225,0.6)]',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-slate-300 border-2 border-slate-400 shadow-[0_0_14px_rgba(203,213,225,0.6)]',
       glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitle,
-      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/80 shadow-sm',
-      gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
+      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 outline outline-1 outline-slate-300 shadow-sm',
+      gradientBg: 'bg-gradient-to-tr from-slate-900/90 via-slate-800 to-indigo-950/90',
       titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
       ringClass: 'ring-1 ring-slate-400/50',
       sparkleEffect: false
@@ -1313,7 +1399,7 @@ export function getDuelPrestigeTier(
     tierLabel: '🌱 Başlangıç',
     title: activeTitle,
     badgeCount: duelWins,
-    frameBorderClass: 'border-2 border-slate-600 ring-1 ring-slate-700/50 shadow-sm',
+    frameBorderClass: 'outline outline-1 outline-offset-1 outline-slate-600 border border-slate-700 shadow-sm',
     glowClass: 'from-transparent to-transparent opacity-0',
     pinIcon: activePinIcon,
     pinBadgeName: activeTitle,
@@ -1357,12 +1443,12 @@ export function getPrestigeTier(
       tierLabel: '🌌 Mistik Kozmik Zirve',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-3 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_50px_rgba(217,70,239,1),0_0_28px_rgba(6,182,212,0.9),0_0_36px_rgba(251,191,36,0.85)] animate-pulse',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-fuchsia-400 border-2 border-cyan-300 shadow-[0_0_35px_rgba(217,70,239,0.85),0_0_18px_rgba(6,182,212,0.7)] animate-pulse',
       glowClass: 'from-fuchsia-500 via-cyan-400 to-amber-300',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-amber-200 bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 text-amber-200 ring-2 ring-fuchsia-400 shadow-2xl shadow-fuchsia-500 animate-bounce',
-      gradientBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
+      pinBorderClass: 'border-2 border-amber-300 bg-slate-950 text-amber-200 outline outline-1 outline-fuchsia-400 shadow-xl shadow-fuchsia-500/70 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-purple-950/80 via-slate-950/90 to-cyan-950/80',
       titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_24px_rgba(217,70,239,0.8)] font-black',
       ringClass: 'ring-4 ring-cyan-400',
       sparkleEffect: true,
@@ -1378,12 +1464,12 @@ export function getPrestigeTier(
       tierLabel: '💎 Elmas Zirve',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-3 border-cyan-300 ring-3 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_35px_rgba(6,182,212,0.95),0_0_18px_rgba(168,85,247,0.8)] animate-pulse',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-cyan-400 border-2 border-indigo-400 shadow-[0_0_28px_rgba(6,182,212,0.85),0_0_14px_rgba(168,85,247,0.6)] animate-pulse',
       glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-cyan-200 bg-slate-950 text-cyan-200 ring-2 ring-purple-400 shadow-xl shadow-cyan-500/80 animate-bounce',
-      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
+      pinBorderClass: 'border-2 border-cyan-300 bg-slate-950 text-cyan-200 outline outline-1 outline-purple-400 shadow-lg shadow-cyan-500/80 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-cyan-950/80 via-purple-950/80 to-indigo-950/80',
       titleBadgeClass: 'text-cyan-200 border-2 border-cyan-400 ring-1 ring-purple-500/70 shadow-[0_0_15px_rgba(6,182,212,0.6)] font-black',
       ringClass: 'ring-3 ring-indigo-500',
       sparkleEffect: true
@@ -1398,12 +1484,12 @@ export function getPrestigeTier(
       tierLabel: '👑 Altın Şampiyon',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-3 border-amber-300 ring-3 ring-amber-400 ring-offset-1 ring-offset-slate-950 shadow-[0_0_26px_rgba(245,158,11,0.9)] animate-pulse',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-amber-400 border-2 border-yellow-300 shadow-[0_0_22px_rgba(245,158,11,0.8)] animate-pulse',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400 text-amber-200 shadow-md shadow-amber-500/60',
-      gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 outline outline-1 outline-yellow-400 shadow-md shadow-amber-500/60',
+      gradientBg: 'bg-gradient-to-tr from-amber-950/80 via-yellow-950/80 to-slate-900/90',
       titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
       ringClass: 'ring-2 ring-amber-400',
       sparkleEffect: false
@@ -1418,12 +1504,12 @@ export function getPrestigeTier(
       tierLabel: '🛡️ Gümüş Uzman',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-slate-200 ring-2 ring-slate-300/80 ring-offset-1 ring-offset-slate-950 shadow-[0_0_16px_rgba(203,213,225,0.6)]',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-slate-300 border-2 border-slate-400 shadow-[0_0_14px_rgba(203,213,225,0.6)]',
       glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/80 shadow-sm',
-      gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
+      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 outline outline-1 outline-slate-300 shadow-sm',
+      gradientBg: 'bg-gradient-to-tr from-slate-900/90 via-slate-800 to-indigo-950/90',
       titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
       ringClass: 'ring-1 ring-slate-400/50',
       sparkleEffect: false
@@ -1438,12 +1524,12 @@ export function getPrestigeTier(
       tierLabel: '🐣 Bronz Çırak',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-amber-500 ring-2 ring-amber-700/60 ring-offset-1 ring-offset-slate-950 shadow-[0_0_12px_rgba(180,83,9,0.45)]',
+      frameBorderClass: 'outline outline-2 outline-offset-2 outline-amber-600 border-2 border-amber-700 shadow-[0_0_10px_rgba(180,83,9,0.45)]',
       glowClass: 'from-amber-900/40 via-amber-800/30 to-amber-950/40',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-amber-600 bg-amber-950 text-amber-300 shadow-sm',
-      gradientBg: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
+      pinBorderClass: 'border-2 border-amber-600 bg-amber-950 text-amber-300 outline outline-1 outline-amber-700 shadow-sm',
+      gradientBg: 'bg-gradient-to-tr from-amber-950/70 via-stone-900/90 to-slate-950/90',
       titleBadgeClass: 'text-amber-400 border border-amber-800/60 shadow-none font-semibold',
       ringClass: 'ring-1 ring-amber-800/30',
       sparkleEffect: false
@@ -1457,7 +1543,7 @@ export function getPrestigeTier(
     tierLabel: '🌱 Başlangıç',
     title: activeTitleName,
     badgeCount: count,
-    frameBorderClass: 'border-2 border-slate-600 ring-1 ring-slate-700/50 shadow-sm',
+    frameBorderClass: 'outline outline-1 outline-offset-1 outline-slate-600 border border-slate-700 shadow-sm',
     glowClass: 'from-transparent to-transparent opacity-0',
     pinIcon: activePinIcon,
     pinBadgeName: activeTitleName,
