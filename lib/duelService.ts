@@ -296,6 +296,56 @@ export function getQuizQuestionsByIds(questionIds: string[]): MultipleChoiceQues
 }
 
 /**
+ * Deep sanitization for Firestore payloads to prevent "Unsupported field value: undefined" crashes.
+ */
+export function sanitizeForFirestore<T>(obj: T): T {
+  if (obj === undefined || obj === null) {
+    return null as unknown as T;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => sanitizeForFirestore(item)) as unknown as T;
+  }
+  if (typeof obj === 'object' && !(obj instanceof Date)) {
+    const cleaned: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (value !== undefined) {
+        cleaned[key] = sanitizeForFirestore(value);
+      }
+    }
+    return cleaned as T;
+  }
+  return obj;
+}
+
+/**
+ * Sanitizes and normalizes player profile input, ensuring no undefined fields.
+ */
+export function sanitizePlayer(player: PlayerProfileInput, isHost: boolean): DuelPlayer {
+  const safeId = player.id || 'oyuncu_' + Math.random().toString(36).substring(2, 8);
+  const safeRumuz = player.rumuz?.trim() || 'Oyuncu';
+  return {
+    id: safeId,
+    rumuz: safeRumuz,
+    rumuzKey: player.rumuzKey || safeId,
+    avatarIcon: player.avatarIcon || '⚔️',
+    avatarBg: player.avatarBg || 'gold_glory',
+    equippedTitle: player.equippedTitle || '3D Coğrafyacı Çırağı',
+    unlockedBadges: Array.isArray(player.unlockedBadges) && player.unlockedBadges.length > 0 
+      ? player.unlockedBadges 
+      : ['3D Coğrafyacı Çırağı'],
+    duelWins: typeof player.duelWins === 'number' ? player.duelWins : 0,
+    duelStreak: typeof player.duelStreak === 'number' ? player.duelStreak : 0,
+    isHost,
+    score: 0,
+    totalDistanceKm: 0,
+    currentGuess: null,
+    currentOptionAnswer: null,
+    isReady: true,
+    pingMs: 0
+  };
+}
+
+/**
  * Creates a new Duel Room (either Quick Match or Private with Code & PIN)
  */
 export async function createDuelRoom(
@@ -313,24 +363,7 @@ export async function createDuelRoom(
   const roomCode = generateRoomCode();
   const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount, duelType);
 
-  const initialPlayer: DuelPlayer = {
-    id: player.id,
-    rumuz: player.rumuz,
-    rumuzKey: player.rumuzKey,
-    avatarIcon: player.avatarIcon,
-    avatarBg: player.avatarBg,
-    equippedTitle: player.equippedTitle,
-    unlockedBadges: player.unlockedBadges || [],
-    duelWins: player.duelWins || 0,
-    duelStreak: player.duelStreak || 0,
-    isHost: true,
-    score: 0,
-    totalDistanceKm: 0,
-    currentGuess: null,
-    currentOptionAnswer: null,
-    isReady: true,
-    pingMs: 0
-  };
+  const initialPlayer: DuelPlayer = sanitizePlayer(player, true);
 
   const now = Date.now();
   const payload: DuelSession = {
@@ -341,7 +374,7 @@ export async function createDuelRoom(
     duelType,
     status: 'waiting',
     questionCount: options.questionCount,
-    categoryFilter: options.categoryFilter,
+    categoryFilter: options.categoryFilter || 'Genel',
     questionIds,
     player1: initialPlayer,
     player2: null,
@@ -356,7 +389,8 @@ export async function createDuelRoom(
   };
 
   try {
-    await setDoc(doc(db, 'duels', duelId), payload);
+    const cleaned = sanitizeForFirestore(payload);
+    await setDoc(doc(db, 'duels', duelId), cleaned);
     return payload;
   } catch (error) {
     console.error('Create duel room error:', error);
@@ -383,7 +417,8 @@ export async function sendDuelHeartbeat(duelId: string): Promise<void> {
 
 /**
  * Searches for an open Quick Match lobby matching filters, or creates one.
- * Actively purges stale/dead rooms (> 25 seconds inactive) to prevent phantom matchups.
+ * Uses index-free simple queries with in-memory filtering to prevent composite index errors.
+ * Actively purges stale/dead rooms (> 35 seconds inactive) to prevent phantom matchups.
  */
 export async function findOrCreateQuickMatch(
   player: PlayerProfileInput,
@@ -395,88 +430,86 @@ export async function findOrCreateQuickMatch(
 ): Promise<{ duel: DuelSession; isNew: boolean }> {
   const duelType = options.duelType || 'pin_map';
   try {
-    // 1. Clean up any prior waiting rooms created by the current player to avoid ghost lobbies
-    try {
-      const myOldRoomsQuery = query(
-        collection(db, 'duels'),
-        where('player1.id', '==', player.id),
-        where('status', '==', 'waiting'),
-        limit(5)
-      );
-      const myOldSnaps = await getDocs(myOldRoomsQuery);
-      for (const oldDoc of myOldSnaps.docs) {
-        deleteDoc(doc(db, 'duels', oldDoc.id)).catch(() => {});
-      }
-    } catch {
-      // ignore cleanup error
-    }
-
-    // 2. Query available open rooms matching exact duel parameters
+    // Simple 2-field query on status & mode that NEVER requires composite indexes in Firestore
     const q = query(
       collection(db, 'duels'),
       where('mode', '==', 'quick'),
       where('status', '==', 'waiting'),
-      where('duelType', '==', duelType),
-      where('questionCount', '==', options.questionCount),
-      where('categoryFilter', '==', options.categoryFilter),
-      limit(10)
+      limit(25)
     );
 
     const snap = await getDocs(q);
     const now = Date.now();
-    
-    // Find an active open room where player is not already player1
+    let exactMatchRoom: DuelSession | null = null;
+    let compatibleMatchRoom: DuelSession | null = null;
+
     for (const docSnap of snap.docs) {
       const duelData = docSnap.data() as DuelSession;
-      
-      // Calculate age of last activity (heartbeat or updatedAt or createdAt)
+      if (!duelData || !duelData.id) continue;
+
+      // 1. If player previously created this room and was left waiting, delete it
+      if (duelData.player1?.id === player.id) {
+        deleteDoc(doc(db, 'duels', duelData.id)).catch(() => {});
+        continue;
+      }
+
+      // 2. Check heartbeat age
       const lastActiveTime = duelData.lastHeartbeat || 
         (duelData.updatedAt ? new Date(duelData.updatedAt).getTime() : 0) || 
         (duelData.createdAt ? new Date(duelData.createdAt).getTime() : 0);
       const ageSec = (now - lastActiveTime) / 1000;
 
-      // If room is older than 25 seconds without heartbeat, host is disconnected/left! Purge stale room.
-      if (ageSec > 25) {
+      // If room is older than 35 seconds without heartbeat, host is disconnected/left! Purge stale room.
+      if (ageSec > 35) {
         deleteDoc(doc(db, 'duels', duelData.id)).catch(() => {});
         continue;
       }
 
-      if (duelData.player1.id !== player.id && !duelData.player2) {
-        // Valid active room found! Join this room
-        const joiningPlayer: DuelPlayer = {
-          id: player.id,
-          rumuz: player.rumuz,
-          rumuzKey: player.rumuzKey,
-          avatarIcon: player.avatarIcon,
-          avatarBg: player.avatarBg,
-          equippedTitle: player.equippedTitle,
-          unlockedBadges: player.unlockedBadges || [],
-          duelWins: player.duelWins || 0,
-          duelStreak: player.duelStreak || 0,
-          isHost: false,
-          score: 0,
-          totalDistanceKm: 0,
-          currentGuess: null,
-          currentOptionAnswer: null,
-          isReady: true,
-          pingMs: 0
-        };
+      // 3. Match checking
+      if (!duelData.player2) {
+        // Exact match
+        if (
+          duelData.duelType === duelType &&
+          duelData.questionCount === options.questionCount &&
+          duelData.categoryFilter === options.categoryFilter
+        ) {
+          exactMatchRoom = duelData;
+          break;
+        }
 
-        // 10-second countdown before 1st question starts
-        const updatedFields = {
-          player2: joiningPlayer,
-          status: 'starting',
-          roundStartTime: now + 10000,
-          lastHeartbeat: now,
-          updatedAt: new Date(now).toISOString()
-        };
-
-        await updateDoc(doc(db, 'duels', duelData.id), updatedFields);
-        return {
-          duel: { ...duelData, ...updatedFields } as DuelSession,
-          isNew: false
-        };
+        // Compatible match: same duelType & same question count
+        if (
+          !compatibleMatchRoom &&
+          duelData.duelType === duelType &&
+          duelData.questionCount === options.questionCount
+        ) {
+          compatibleMatchRoom = duelData;
+        }
       }
+    }
+
+    const roomToJoin = exactMatchRoom || compatibleMatchRoom;
+
+    if (roomToJoin) {
+      // Valid active room found! Join this room
+      const joiningPlayer = sanitizePlayer(player, false);
+
+      // 10-second countdown before 1st question starts
+      const updatedFields = {
+        player2: joiningPlayer,
+        status: 'starting',
+        roundStartTime: now + 10000,
+        lastHeartbeat: now,
+        updatedAt: new Date(now).toISOString()
+      };
+
+      const cleanedUpdates = sanitizeForFirestore(updatedFields);
+      await updateDoc(doc(db, 'duels', roomToJoin.id), cleanedUpdates);
+
+      return {
+        duel: { ...roomToJoin, ...updatedFields } as DuelSession,
+        isNew: false
+      };
     }
 
     // No active room found, create new quick match lobby
@@ -538,24 +571,7 @@ export async function joinPrivateDuelRoom(
       return { success: true, duel: duelData };
     }
 
-    const joiningPlayer: DuelPlayer = {
-      id: player.id,
-      rumuz: player.rumuz,
-      rumuzKey: player.rumuzKey,
-      avatarIcon: player.avatarIcon,
-      avatarBg: player.avatarBg,
-      equippedTitle: player.equippedTitle,
-      unlockedBadges: player.unlockedBadges || [],
-      duelWins: player.duelWins || 0,
-      duelStreak: player.duelStreak || 0,
-      isHost: false,
-      score: 0,
-      totalDistanceKm: 0,
-      currentGuess: null,
-      currentOptionAnswer: null,
-      isReady: true,
-      pingMs: 0
-    };
+    const joiningPlayer: DuelPlayer = sanitizePlayer(player, false);
 
     // 10-second countdown before 1st question starts
     const updatedFields = {
@@ -566,7 +582,8 @@ export async function joinPrivateDuelRoom(
       updatedAt: new Date(now).toISOString()
     };
 
-    await updateDoc(doc(db, 'duels', duelData.id), updatedFields);
+    const cleanedUpdates = sanitizeForFirestore(updatedFields);
+    await updateDoc(doc(db, 'duels', duelData.id), cleanedUpdates);
     return {
       success: true,
       duel: { ...duelData, ...updatedFields } as DuelSession
@@ -611,7 +628,7 @@ export async function findCrossModeWaitingRooms(
 
     for (const docSnap of snap.docs) {
       const data = docSnap.data() as DuelSession;
-      if (!data || data.player1.id === excludePlayerId || data.player2) continue;
+      if (!data || !data.player1 || data.player1.id === excludePlayerId || data.player2) continue;
 
       const lastHeartbeatTime = data.lastHeartbeat || (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
       const ageSec = (now - lastHeartbeatTime) / 1000;
@@ -627,7 +644,7 @@ export async function findCrossModeWaitingRooms(
       suggestions.push({
         id: data.id,
         roomCode: data.roomCode,
-        hostRumuz: data.player1.rumuz,
+        hostRumuz: data.player1.rumuz || 'Oyuncu',
         hostId: data.player1.id,
         duelType: data.duelType || 'pin_map',
         questionCount: data.questionCount || 10,
@@ -665,24 +682,7 @@ export async function joinSuggestedDuelRoom(
     }
 
     const now = Date.now();
-    const joiningPlayer: DuelPlayer = {
-      id: player.id,
-      rumuz: player.rumuz,
-      rumuzKey: player.rumuzKey,
-      avatarIcon: player.avatarIcon,
-      avatarBg: player.avatarBg,
-      equippedTitle: player.equippedTitle,
-      unlockedBadges: player.unlockedBadges || [],
-      duelWins: player.duelWins || 0,
-      duelStreak: player.duelStreak || 0,
-      isHost: false,
-      score: 0,
-      totalDistanceKm: 0,
-      currentGuess: null,
-      currentOptionAnswer: null,
-      isReady: true,
-      pingMs: 0
-    };
+    const joiningPlayer: DuelPlayer = sanitizePlayer(player, false);
 
     const updatedFields = {
       player2: joiningPlayer,
@@ -692,7 +692,8 @@ export async function joinSuggestedDuelRoom(
       updatedAt: new Date(now).toISOString()
     };
 
-    await updateDoc(duelRef, updatedFields);
+    const cleanedUpdates = sanitizeForFirestore(updatedFields);
+    await updateDoc(duelRef, cleanedUpdates);
     return {
       success: true,
       duel: { ...duelData, ...updatedFields } as DuelSession
@@ -719,26 +720,10 @@ export async function startBotDuel(
   const roomCode = 'BOT-3D';
   const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount, duelType);
 
-  const initialPlayer: DuelPlayer = {
-    id: player.id,
-    rumuz: player.rumuz,
-    rumuzKey: player.rumuzKey,
-    avatarIcon: player.avatarIcon,
-    avatarBg: player.avatarBg,
-    equippedTitle: player.equippedTitle,
-    unlockedBadges: player.unlockedBadges || [],
-    duelWins: player.duelWins || 0,
-    duelStreak: player.duelStreak || 0,
-    isHost: true,
-    score: 0,
-    totalDistanceKm: 0,
-    currentGuess: null,
-    currentOptionAnswer: null,
-    isReady: true,
-    pingMs: 15
-  };
+  const initialPlayer: DuelPlayer = sanitizePlayer(player, true);
+  initialPlayer.pingMs = 15;
 
-  const botPlayer: DuelPlayer = {
+  const botPlayer: DuelPlayer = sanitizePlayer({
     id: 'kpss_ai_bot',
     rumuz: 'Coğrafya Yapay Zeka 🤖',
     rumuzKey: 'cografya_ai_bot',
@@ -747,16 +732,10 @@ export async function startBotDuel(
     equippedTitle: 'Turing Başmühendisi',
     unlockedBadges: ['Yapay Zeka Mat Eden', 'Turing Ustası'],
     duelWins: 50,
-    duelStreak: 3,
-    isHost: false,
-    score: 0,
-    totalDistanceKm: 0,
-    currentGuess: null,
-    currentOptionAnswer: null,
-    isReady: true,
-    pingMs: 10,
-    isBot: true
-  };
+    duelStreak: 3
+  }, false);
+  botPlayer.isBot = true;
+  botPlayer.pingMs = 10;
 
   const now = Date.now();
   const payload: DuelSession = {
@@ -766,7 +745,7 @@ export async function startBotDuel(
     duelType,
     status: 'in_progress', // Starts immediately for AI Practice!
     questionCount: options.questionCount,
-    categoryFilter: options.categoryFilter,
+    categoryFilter: options.categoryFilter || 'Genel',
     questionIds,
     player1: initialPlayer,
     player2: botPlayer,
@@ -780,7 +759,8 @@ export async function startBotDuel(
   };
 
   try {
-    await setDoc(doc(db, 'duels', duelId), payload);
+    const cleaned = sanitizeForFirestore(payload);
+    await setDoc(doc(db, 'duels', duelId), cleaned);
     return payload;
   } catch (error) {
     console.error('Start bot duel error:', error);

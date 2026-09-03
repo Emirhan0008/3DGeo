@@ -22,7 +22,8 @@ import {
   DuelType,
   findCrossModeWaitingRooms,
   joinSuggestedDuelRoom,
-  WaitingRoomSuggestion
+  WaitingRoomSuggestion,
+  PlayerProfileInput
 } from '@/lib/duelService';
 import { checkRumuzExists, saveRumuzProfile, normalizeRumuzKey } from '@/lib/rumuzService';
 import { 
@@ -550,6 +551,22 @@ export default function DuelMode() {
     recordDuelFinish
   ]);
 
+  // Helper to construct complete and safe player profile input
+  const getPlayerProfile = (): PlayerProfileInput => {
+    const myId = normalizeRumuzKey(rumuz);
+    return {
+      id: myId,
+      rumuz: rumuz.trim() || 'Oyuncu',
+      rumuzKey: myId,
+      avatarIcon: avatarIcon || '⚔️',
+      avatarBg: avatarBg || 'gold_glory',
+      equippedTitle: equippedTitle || '3D Coğrafyacı Çırağı',
+      unlockedBadges: Array.isArray(unlockedBadges) && unlockedBadges.length > 0 ? unlockedBadges : ['3D Coğrafyacı Çırağı'],
+      duelWins: duelStats?.duelWins || 0,
+      duelStreak: duelStats?.duelStreak || 0
+    };
+  };
+
   // Handle Quick Match Finding
   const handleStartQuickMatch = async () => {
     if (activeDuelSession) {
@@ -559,9 +576,9 @@ export default function DuelMode() {
     setActionLoading(true);
     setLobbyError(null);
     try {
-      const myId = normalizeRumuzKey(rumuz);
+      const playerProfile = getPlayerProfile();
       const res = await findOrCreateQuickMatch(
-        { id: myId, rumuz, rumuzKey: myId },
+        playerProfile,
         { 
           questionCount: selectedQuestionCount, 
           categoryFilter: selectedCategory,
@@ -569,8 +586,10 @@ export default function DuelMode() {
         }
       );
       setActiveDuelSession(res.duel);
-    } catch {
-      setLobbyError('Hızlı eşleşme aranırken bağlantı hatası oluştu.');
+    } catch (err: unknown) {
+      console.error('Quick match error in UI:', err);
+      const msg = err instanceof Error ? err.message : 'Hızlı eşleşme aranırken bağlantı hatası oluştu.';
+      setLobbyError(msg.includes('index') ? 'Eşleşme sunucusu güncelleniyor, lütfen tekrar deneyin.' : 'Hızlı eşleşme aranırken bağlantı hatası oluştu.');
     } finally {
       setActionLoading(false);
     }
@@ -585,9 +604,9 @@ export default function DuelMode() {
     setActionLoading(true);
     setLobbyError(null);
     try {
-      const myId = normalizeRumuzKey(rumuz);
+      const playerProfile = getPlayerProfile();
       const session = await createDuelRoom(
-        { id: myId, rumuz, rumuzKey: myId },
+        playerProfile,
         {
           mode: 'private',
           duelType: selectedDuelType,
@@ -597,7 +616,8 @@ export default function DuelMode() {
         }
       );
       setActiveDuelSession(session);
-    } catch {
+    } catch (err: unknown) {
+      console.error('Create room error in UI:', err);
       setLobbyError('Özel oda kurulurken hata oluştu.');
     } finally {
       setActionLoading(false);
@@ -617,10 +637,10 @@ export default function DuelMode() {
     setActionLoading(true);
     setLobbyError(null);
     try {
-      const myId = normalizeRumuzKey(rumuz);
+      const playerProfile = getPlayerProfile();
       const res = await joinPrivateDuelRoom(
         joinRoomCodeInput,
-        { id: myId, rumuz, rumuzKey: myId },
+        playerProfile,
         joinRoomPinInput
       );
       if (!res.success || !res.duel) {
@@ -628,7 +648,8 @@ export default function DuelMode() {
       } else {
         setActiveDuelSession(res.duel);
       }
-    } catch {
+    } catch (err: unknown) {
+      console.error('Join private room error in UI:', err);
       setLobbyError('Odaya katılırken hata oluştu.');
     } finally {
       setActionLoading(false);
@@ -644,9 +665,9 @@ export default function DuelMode() {
     setActionLoading(true);
     setLobbyError(null);
     try {
-      const myId = normalizeRumuzKey(rumuz);
+      const playerProfile = getPlayerProfile();
       const session = await startBotDuel(
-        { id: myId, rumuz, rumuzKey: myId },
+        playerProfile,
         { 
           questionCount: selectedQuestionCount, 
           categoryFilter: selectedCategory,
@@ -654,7 +675,8 @@ export default function DuelMode() {
         }
       );
       setActiveDuelSession(session);
-    } catch {
+    } catch (err: unknown) {
+      console.error('Start bot duel error in UI:', err);
       setLobbyError('Antrenman modu başlatılamadı.');
     } finally {
       setActionLoading(false);
@@ -666,16 +688,17 @@ export default function DuelMode() {
     if (!activeDuelSession) return;
     setJoiningSuggestionId(suggestion.id);
     try {
-      const myId = normalizeRumuzKey(rumuz);
+      const playerProfile = getPlayerProfile();
       // Leave current waiting lobby first
       await leaveOrCancelDuel(activeDuelSession.id);
-      const res = await joinSuggestedDuelRoom(suggestion.id, { id: myId, rumuz, rumuzKey: myId });
+      const res = await joinSuggestedDuelRoom(suggestion.id, playerProfile);
       if (res.success && res.duel) {
         setActiveDuelSession(res.duel);
       } else {
         setLobbyError(res.errorMsg || 'Önerilen maça bağlanılamadı.');
       }
-    } catch {
+    } catch (err: unknown) {
+      console.error('Accept suggestion error in UI:', err);
       setLobbyError('Önerilen maça geçilirken hata oluştu.');
     } finally {
       setJoiningSuggestionId(null);
