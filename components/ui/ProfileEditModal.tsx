@@ -82,6 +82,7 @@ export default function ProfileEditModal({
 
   // Filter badges by tier
   const tierBadges = {
+    mythic: ALL_BADGES.filter(b => b.tier === 'mythic'),
     diamond: ALL_BADGES.filter(b => b.tier === 'diamond'),
     gold: ALL_BADGES.filter(b => b.tier === 'gold'),
     silver: ALL_BADGES.filter(b => b.tier === 'silver'),
@@ -412,7 +413,7 @@ export default function ProfileEditModal({
                               {titleObj.name}
                             </span>
                             <span className={`text-[8px] font-black px-1 rounded ${tierStyle.badgeClass}`}>
-                              {titleObj.tier === 'diamond' ? '💎 Elmas' : titleObj.tier === 'gold' ? '👑 Altın' : titleObj.tier === 'silver' ? '🛡️ Gümüş' : '🐣 Bronz'}
+                              {titleObj.tier === 'mythic' ? '🌌 Mistik' : titleObj.tier === 'diamond' ? '💎 Elmas' : titleObj.tier === 'gold' ? '👑 Altın' : titleObj.tier === 'silver' ? '🛡️ Gümüş' : '🐣 Bronz'}
                             </span>
                           </div>
                           <p className="text-[10px] text-slate-300 truncate mt-0.5">
@@ -473,9 +474,9 @@ export default function ProfileEditModal({
             </div>
 
             <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-              {(['diamond', 'gold', 'silver', 'bronze'] as BadgeTier[]).map((tierKey) => {
+              {(['mythic', 'diamond', 'gold', 'silver', 'bronze'] as BadgeTier[]).map((tierKey) => {
                 const badgesInTier = tierBadges[tierKey];
-                if (badgesInTier.length === 0) return null;
+                if (!badgesInTier || badgesInTier.length === 0) return null;
 
                 const tierStyle = getTitleTierStyle(tierKey);
 
@@ -493,7 +494,9 @@ export default function ProfileEditModal({
                         const pct = Math.min(100, Math.round((currentProgress / target) * 100));
                         const remaining = Math.max(0, target - currentProgress);
 
-                        const unlockedCardStyle = tierKey === 'diamond'
+                        const unlockedCardStyle = tierKey === 'mythic'
+                          ? 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_22px_rgba(217,70,239,0.7)] animate-pulse'
+                          : tierKey === 'diamond'
                           ? 'bg-gradient-to-r from-cyan-950/70 via-purple-950/50 to-slate-900 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_16px_rgba(6,182,212,0.55)]'
                           : tierKey === 'gold'
                           ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.45)]'
@@ -502,7 +505,9 @@ export default function ProfileEditModal({
                           : 'bg-gradient-to-r from-amber-950/30 to-slate-900 border border-amber-700/60 shadow-none';
 
                         const iconBgStyle = isUnlocked
-                          ? tierKey === 'diamond'
+                          ? tierKey === 'mythic'
+                            ? 'bg-gradient-to-tr from-fuchsia-500 via-cyan-400 to-amber-300 text-slate-950 font-black shadow-xl ring-2 ring-fuchsia-300'
+                            : tierKey === 'diamond'
                             ? 'bg-gradient-to-tr from-cyan-400 to-purple-500 text-slate-950 font-black shadow-lg ring-1 ring-cyan-300'
                             : tierKey === 'gold'
                             ? 'bg-amber-400 text-slate-950 font-black shadow-md ring-1 ring-yellow-300'
@@ -532,7 +537,9 @@ export default function ProfileEditModal({
                                   </span>
                                   {isUnlocked && (
                                     <span className={`text-[8px] font-black px-1.5 py-0.2 rounded ${
-                                      tierKey === 'diamond'
+                                      tierKey === 'mythic'
+                                        ? 'bg-gradient-to-r from-fuchsia-400 to-cyan-400 text-slate-950 font-black ring-1 ring-amber-300'
+                                        : tierKey === 'diamond'
                                         ? 'bg-cyan-300 text-slate-950 ring-1 ring-purple-500'
                                         : tierKey === 'gold'
                                         ? 'bg-amber-400 text-slate-950'

@@ -1,4 +1,5 @@
-export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'diamond';
+export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'diamond' | 'mythic';
+export type BadgePrestigeTier = 'starter' | 'bronze' | 'silver' | 'gold' | 'diamond' | 'mythic';
 
 export interface Badge {
   id: string;
@@ -6,7 +7,7 @@ export interface Badge {
   icon: string;
   category: string;
   tier: BadgeTier;
-  tierLevel: number; // 1: Bronz, 2: Gümüş, 3: Altın, 4: Elmas
+  tierLevel: number; // 1: Bronz, 2: Gümüş, 3: Altın, 4: Elmas, 5: Mistik Kozmik
   desc: string;
   targetCount: number;
   reqText: string;
@@ -28,78 +29,168 @@ export interface AvatarIconOption {
   id: string;
   icon: string;
   label: string;
+  tier: BadgePrestigeTier;
   minBadgesRequired?: number;
   minDuelWinsRequired?: number;
+  minScoreRequired?: number;
 }
 
 export interface AvatarThemeOption {
   id: string;
   name: string;
+  tierLevel: number;
   bgGradient: string;
   borderGlow: string;
   badgePinBg: string;
 }
 
 export const AVATAR_ICONS: AvatarIconOption[] = [
-  { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas (Zirve)', minBadgesRequired: 8, minDuelWinsRequired: 10 },
-  { id: 'crown', icon: '👑', label: 'Arena Kralı (Elit)', minDuelWinsRequired: 10 },
-  { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu (Altın)', minDuelWinsRequired: 5 },
-  { id: 'grad_cap', icon: '🎓', label: 'KPSS Üstadı (Altın)', minBadgesRequired: 5 },
-  { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü (Gümüş)', minDuelWinsRequired: 3 },
-  { id: 'target', icon: '🎯', label: 'Keskin Nişancı (Gümüş)', minBadgesRequired: 3 },
-  { id: 'shield', icon: '🛡️', label: 'Muhafız Kalkanı (Bronz)', minBadgesRequired: 2 },
-  { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi (Bronz)', minDuelWinsRequired: 1 },
-  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin (Başlangıç)', minBadgesRequired: 0 }
+  // --- 🌌 5. KADEME: KOZMİK & MİSTİK (Aylar Sürecek En Zor Hedefler) ---
+  { id: 'cosmic_master', icon: '🌌', label: 'Kozmik Kozmograf (Zirve)', tier: 'mythic', minBadgesRequired: 30, minDuelWinsRequired: 50 },
+  { id: 'trident_god', icon: '🔱', label: 'Karalar & Denizler Lordu', tier: 'mythic', minDuelWinsRequired: 100 },
+  { id: 'galaxy_explorer', icon: '🪐', label: 'Galaksi Kaşifi', tier: 'mythic', minScoreRequired: 5000 },
+  { id: 'sun_emperor', icon: '☀️', label: 'Güneş Hükümdarı', tier: 'mythic', minDuelWinsRequired: 75 },
+
+  // --- 💎 4. KADEME: ELMAS & EFSANE (Çok Zor Uzun Vadeli Hedefler) ---
+  { id: 'diamond', icon: '💎', label: 'Efsanevi Elmas (Elit)', tier: 'diamond', minBadgesRequired: 20, minDuelWinsRequired: 25 },
+  { id: 'crown', icon: '👑', label: 'Arena Kralı', tier: 'diamond', minDuelWinsRequired: 25 },
+  { id: 'lightning_lord', icon: '⚡', label: 'Yıldırım Lordu', tier: 'diamond', minBadgesRequired: 15 },
+  { id: 'north_star', icon: '🌟', label: 'Kutup Yıldızı', tier: 'diamond', minDuelWinsRequired: 20 },
+  { id: 'wisdom_monument', icon: '🏛️', label: 'Bilgelik Anıtı', tier: 'diamond', minScoreRequired: 2500 },
+
+  // --- 👑 3. KADEME: ALTIN & ŞAMPİYON ---
+  { id: 'trophy', icon: '🏆', label: 'Kupa Şampiyonu', tier: 'gold', minDuelWinsRequired: 10 },
+  { id: 'grad_cap', icon: '🎓', label: 'KPSS Üstadı', tier: 'gold', minBadgesRequired: 10 },
+  { id: 'lion_anatolian', icon: '🦁', label: 'Anadolu Aslanı', tier: 'gold', minBadgesRequired: 12 },
+  { id: 'flame_dragon', icon: '🔥', label: 'Yenilmez Ejder', tier: 'gold', minDuelWinsRequired: 10 },
+  { id: 'brain_master', icon: '🧠', label: 'Turing Başmühendisi', tier: 'gold', minBadgesRequired: 8 },
+  { id: 'castle_conqueror', icon: '🏰', label: 'Kale Fatihi', tier: 'gold', minScoreRequired: 1000 },
+
+  // --- 🛡️ 2. KADEME: GÜMÜŞ & UZMAN ---
+  { id: 'swords', icon: '⚔️', label: 'Düello Gladyatörü', tier: 'silver', minDuelWinsRequired: 3 },
+  { id: 'target', icon: '🎯', label: 'Keskin Nişancı', tier: 'silver', minBadgesRequired: 4 },
+  { id: 'shield', icon: '🛡️', label: 'Muhafız Kalkanı', tier: 'silver', minBadgesRequired: 3 },
+  { id: 'steppe_eagle', icon: '🦅', label: 'Bozkır Kartalı', tier: 'silver', minBadgesRequired: 5 },
+  { id: 'sea_wave', icon: '🌊', label: 'Karadeniz Fırtınası', tier: 'silver', minBadgesRequired: 4 },
+  { id: 'cavalry', icon: '🐎', label: 'Akıncı Süvari', tier: 'silver', minDuelWinsRequired: 2 },
+
+  // --- 🐣 1. KADEME: BRONZ & ÇIRAK ---
+  { id: 'map', icon: '🗺️', label: 'Atlas Kaşifi', tier: 'bronze', minBadgesRequired: 2 },
+  { id: 'compass', icon: '🧭', label: 'Pusula Rehberi', tier: 'bronze', minBadgesRequired: 1 },
+  { id: 'backpack', icon: '🎒', label: 'Gezgin Çantası', tier: 'bronze', minBadgesRequired: 1 },
+  { id: 'camp_tent', icon: '⛺', label: 'Kampçı Çırak', tier: 'bronze', minBadgesRequired: 1 },
+
+  // --- 🌱 0. KADEME: BAŞLANGIÇ ---
+  { id: 'apprentice', icon: '🐣', label: 'Çırak Gezgin', tier: 'starter', minBadgesRequired: 0 }
 ];
 
 export const AVATAR_THEMES: AvatarThemeOption[] = [
   {
+    id: 'cosmic_mythic',
+    name: '🌌 5. Kademe: Kozmik Mistik & Zirve Hükümdar (En Yüksek)',
+    tierLevel: 5,
+    bgGradient: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
+    borderGlow: 'border-2 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_45px_rgba(217,70,239,1),0_0_25px_rgba(6,182,212,0.9),0_0_35px_rgba(251,191,36,0.8)]',
+    badgePinBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 border-2 border-amber-200 ring-2 ring-fuchsia-400 text-amber-200 shadow-2xl shadow-fuchsia-500'
+  },
+  {
     id: 'cyan_mythic',
-    name: '💎 4. Kademe: Elmas & Efsanevi Kozmik (Zirve)',
+    name: '💎 4. Kademe: Elmas & Efsanevi Safir',
+    tierLevel: 4,
     bgGradient: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
-    borderGlow: 'border-2 border-cyan-200 ring-4 ring-purple-500 shadow-[0_0_35px_rgba(6,182,212,1),0_0_20px_rgba(168,85,247,0.85)]',
+    borderGlow: 'border-2 border-cyan-200 ring-3 ring-indigo-500 shadow-[0_0_30px_rgba(6,182,212,0.95),0_0_15px_rgba(168,85,247,0.7)]',
     badgePinBg: 'bg-slate-950 border-2 border-cyan-300 ring-2 ring-purple-400 text-cyan-200 shadow-xl shadow-cyan-500/80'
   },
   {
     id: 'gold_glory',
     name: '👑 3. Kademe: Altın & Şampiyon Aura',
+    tierLevel: 3,
     bgGradient: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-    borderGlow: 'border-2 border-amber-300 ring-3 ring-amber-400/80 shadow-[0_0_22px_rgba(245,158,11,0.85)]',
+    borderGlow: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)]',
     badgePinBg: 'bg-amber-950 border-2 border-amber-300 ring-2 ring-yellow-400/80 text-amber-200 shadow-lg shadow-amber-500/50'
   },
   {
     id: 'indigo_midnight',
     name: '🛡️ 2. Kademe: Gümüş & Uzman Metalik',
+    tierLevel: 2,
     bgGradient: 'bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800',
-    borderGlow: 'border-2 border-slate-200 ring-2 ring-slate-400/60 shadow-[0_0_14px_rgba(203,213,225,0.45)]',
-    badgePinBg: 'bg-slate-900 border-2 border-slate-200 ring-1 ring-slate-300/60 text-slate-100 shadow-md'
+    borderGlow: 'border-2 border-slate-300/90 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.4)]',
+    badgePinBg: 'bg-slate-900 border-2 border-slate-300 ring-1 ring-slate-300/60 text-slate-100 shadow-md'
   },
   {
     id: 'emerald_forest',
     name: '🐣 1. Kademe: Bronz & Çırak Sıcak Bakır',
+    tierLevel: 1,
     bgGradient: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
-    borderGlow: 'border border-amber-700/70 ring-1 ring-amber-800/40 shadow-[0_0_8px_rgba(180,83,9,0.25)]',
+    borderGlow: 'border border-amber-700/70 ring-1 ring-amber-800/30 shadow-[0_0_6px_rgba(180,83,9,0.25)]',
     badgePinBg: 'bg-amber-950 border border-amber-700 text-amber-300 shadow-sm'
   }
 ];
 
 export const ALL_TITLES: UserTitle[] = [
-  // --- 💎 ELMAS & EFSANEVİ KADEME (EN YÜKSEK VE EN ZOR ÜNVANLAR EN ÜSTTE) ---
+  // --- 🌌 5. KADEME: MİSTİK KOZMİK & ZİRVE HÜKÜMDAR (EN ÜSTTE) ---
+  {
+    id: 'kozmik_cografya_efendisi',
+    name: 'Kozmik Coğrafya Hükümdarı',
+    icon: '🌌',
+    tier: 'mythic',
+    desc: '30\'dan fazla rozet ve mutlak bilgi birikimiyle evrensel zirveye ulaşan efsane.',
+    requiredBadge: 'Kozmik Coğrafya Hükümdarı',
+    requiredMetricText: '30 veya daha fazla rozet kazan'
+  },
+  {
+    id: 'mutlak_taht_efendisi',
+    name: 'Mutlak Tahtın Sahibi',
+    icon: '🔱',
+    tier: 'mythic',
+    desc: '100 canlı 1v1 PvP düello zaferiyle kırılması imkansız bir efsane yazan hükümdar.',
+    requiredBadge: 'Mutlak Tahtın Sahibi',
+    requiredMetricText: '100 Canlı Düello zaferi kazan'
+  },
+  {
+    id: 'kpss_ordinaryusu',
+    name: 'KPSS Coğrafya Ordinaryüsü',
+    icon: '🪐',
+    tier: 'mythic',
+    desc: '5000 test puanına ulaşarak Türkiye coğrafyasının en büyük otoritesi haline gelen bilgin.',
+    requiredBadge: 'KPSS Coğrafya Ordinaryüsü',
+    requiredMetricText: '5000 toplam test puanına ulaş'
+  },
+  {
+    id: 'namaGlup_fatih_lord',
+    name: 'Efsanevi Seri Fatihi',
+    icon: '☀️',
+    tier: 'mythic',
+    desc: 'Canlı düellolarda üst üste 10 maç sıfır mağlubiyetle seriyi tamamlayan yenilmez.',
+    requiredBadge: '10\'lu Yenilmez Seri',
+    requiredMetricText: 'Üst üste 10 canlı düello kazan'
+  },
+
+  // --- 💎 4. KADEME: ELMAS & EFSANE ---
   {
     id: 'efsanevi_elmas_deha',
     name: 'Efsanevi Harita Dehası',
     icon: '💎',
     tier: 'diamond',
-    desc: 'Tüm kademeli rozetleri toplayarak efsane mertebesine yükselen elit üstat.',
+    desc: '20 kademeli rozeti toplayarak elmas mertebesine yükselen elit üstat.',
     requiredBadge: 'Efsanevi Coğrafyacı',
-    requiredMetricText: '8 veya daha fazla rozet kazan'
+    requiredMetricText: '20 veya daha fazla rozet kazan'
   },
   {
-    id: 'tahtin_sahibi',
+    id: 'arena_tanrisi',
     name: 'Arena Efsanesi',
     icon: '⚔️',
     tier: 'diamond',
-    desc: '25 canlı PVP düello zaferiyle kırılması güç bir rekor kıran efsane.',
+    desc: '50 canlı PVP düello zaferiyle arena tarihine adını altın harflerle kazıyan savaşçı.',
+    requiredBadge: '50 Düello Zaferi',
+    requiredMetricText: '50 Canlı Düello zaferi kazan'
+  },
+  {
+    id: 'tahtin_sahibi',
+    name: 'Tahtın Sahibi',
+    icon: '🏆',
+    tier: 'diamond',
+    desc: '25 canlı PVP düello zaferiyle mutlak arena şampiyonu olan usta.',
     requiredBadge: 'Tahtın Sahibi',
     requiredMetricText: '25 Canlı Düello zaferi kazan'
   },
@@ -108,7 +199,7 @@ export const ALL_TITLES: UserTitle[] = [
     name: 'Arena Şampiyonu',
     icon: '👑',
     tier: 'diamond',
-    desc: '10 canlı düello zaferiyle KPSS coğrafya arenasında tahta oturan hükümdar.',
+    desc: '10 canlı düello zaferiyle KPSS coğrafya arenasında zirveye oturan gladyatör.',
     requiredBadge: 'Düello Şampiyonu',
     requiredMetricText: '10 Canlı Düello zaferi kazan'
   },
@@ -117,45 +208,72 @@ export const ALL_TITLES: UserTitle[] = [
     name: 'KPSS Coğrafya Şampiyonu',
     icon: '🎓',
     tier: 'diamond',
-    desc: 'KPSS Coğrafya test havuzunu domine eden ve dereceye koşan üstat.',
+    desc: 'Testlerde 1500 puan barajını aşarak coğrafya sorularını altüst eden usta.',
     requiredBadge: 'KPSS Coğrafya Üstadı',
-    requiredMetricText: '300 toplam test puanına ulaş'
+    requiredMetricText: '1500 toplam test puanına ulaş'
+  },
+  {
+    id: 'turing_basmuhendisi',
+    name: 'Turing Başmühendisi',
+    icon: '🧠',
+    tier: 'diamond',
+    desc: 'Yapay zeka botuna karşı 25 galibiyet alarak siber arenayı fethetti.',
+    requiredBadge: 'Siber Antrenör',
+    requiredMetricText: 'Yapay zekaya karşı 25 galibiyet al'
+  },
+  {
+    id: 'milimetrik_kartograf',
+    name: 'Milimetrik Kartograf',
+    icon: '🎯',
+    tier: 'diamond',
+    desc: 'Harita testlerinde 20 kez 5km altı kusursuz tam isabet gerçekleştirdi.',
+    requiredBadge: 'Milimetrik Kartograf',
+    requiredMetricText: '20 kez 5km altı tam isabet yap'
+  },
+  {
+    id: 'dilsiz_harita_efendisi',
+    name: 'Dilsiz Harita Efendisi',
+    icon: '🙈',
+    tier: 'diamond',
+    desc: 'Dilsiz harita modunda 20 doğru tahmin yaparak haritayı hafızasına kazıdı.',
+    requiredBadge: 'Dilsiz Harita Efendisi',
+    requiredMetricText: 'Dilsiz modda 20 doğru yap'
   },
 
-  // --- 👑 ALTIN & ŞAMPİYON KADEME ---
+  // --- 👑 3. KADEME: ALTIN & ŞAMPİYON ---
   {
     id: 'il_81_fatihi',
     name: '81 İl Fatihi',
     icon: '🇹🇷',
     tier: 'gold',
     desc: 'Türkiye\'nin 81 ilinin yerini ve coğrafi özelliklerini ezbere bilen usta.',
-    requiredBadge: '81 İl Kaşifi',
-    requiredMetricText: '81 İl Şehir Bulmaca modunda başarı elde et'
+    requiredBadge: '81 İl Fatihi',
+    requiredMetricText: '81 İl test modunda başarı elde et'
   },
   {
     id: 'kusursuz_nisanci',
     name: 'Kusursuz Nişancı',
     icon: '🎯',
     tier: 'gold',
-    desc: 'Harita testlerinde 10km altı milimetrik tam isabetler tutturan usta.',
+    desc: 'Harita testlerinde 5 kez 10km altı milimetrik tam isabetler tutturan usta.',
     requiredBadge: 'Tam İsabet Kaptan',
-    requiredMetricText: '10km altı tam isabet yap'
+    requiredMetricText: '10km altı 5 tam isabet yap'
   },
   {
     id: 'seri_canavari_unvan',
     name: 'Yenilmez Seri Canavarı',
     icon: '🔥',
     tier: 'gold',
-    desc: 'Ardı ardına sıfır hatayla soru zincirleri kuran coğrafya makinesi.',
-    requiredBadge: '5\'li Seri Canavarı',
-    requiredMetricText: '5 üst üste doğru cevap ver'
+    desc: 'Ardı ardına sıfır hatayla 10 soru zincirleri kuran coğrafya makinesi.',
+    requiredBadge: '10\'lu Seri Canavarı',
+    requiredMetricText: 'Üst üste 10 doğru cevap ver'
   },
   {
     id: 'arena_gladyatoru',
     name: '1v1 Gladyatör',
-    icon: '🛡️',
+    icon: '⚔️',
     tier: 'gold',
-    desc: 'Canlı 1v1 coğrafya düellolarında rakiplerini alt eden savaşçı.',
+    desc: 'Canlı 1v1 düellolarda 3 maç kazanarak gerçek rakiplere üstünlük sağlayan yarışmacı.',
     requiredBadge: '1v1 Gladyatör',
     requiredMetricText: '3 Canlı Düello zaferi kazan'
   },
@@ -164,83 +282,83 @@ export const ALL_TITLES: UserTitle[] = [
     name: 'Dilsiz Harita Dehası',
     icon: '🙈',
     tier: 'gold',
-    desc: 'Harita yazıları ve sınır çizgileri olmadan yer şekillerini gözü kapalı bulan dahi.',
+    desc: 'Harita yazıları olmadan yer şekillerini ve illeri hatasız bulan usta.',
     requiredBadge: '3D Dilsiz Harita Kasırgası',
-    requiredMetricText: 'Dilsiz modda 3 doğru tahmin'
+    requiredMetricText: 'Dilsiz haritada 5 doğru tahmin yap'
   },
+  {
+    id: 'volkan_avcisi',
+    name: 'Volkan & Bozkır Bilgesi',
+    icon: '🌋',
+    tier: 'gold',
+    desc: 'Türkiye volkan konileri, kalderaları ve İç Anadolu jeomorfolojisine hakim uzman.',
+    requiredBadge: 'Volkanizma & Buzul Bilgesi',
+    requiredMetricText: 'Volkanizma sorularında 5 doğru cevap'
+  },
+  {
+    id: 'bot_avcisi_unvan',
+    name: 'Yapay Zeka Mat Eden',
+    icon: '⚡',
+    tier: 'gold',
+    desc: 'Yapay zeka botuna karşı 10 galibiyet alarak yapay zekayı dize getiren oyuncu.',
+    requiredBadge: 'Yapay Zeka Mat Eden',
+    requiredMetricText: 'Yapay zekaya karşı 10 galibiyet al'
+  },
+
+  // --- 🛡️ 2. KADEME: GÜMÜŞ & UZMAN ---
   {
     id: 'turing_ustasi_unvan',
     name: 'Turing Fatihi',
     icon: '🧠',
-    tier: 'gold',
-    desc: 'Algoritmik hız ve bilgi refleksinde yapay zekayı geride bırakan dahi.',
+    tier: 'silver',
+    desc: 'Yapay zeka antrenman botuna karşı 5 galibiyet kazanan öğrenci.',
     requiredBadge: 'Turing Ustası',
-    requiredMetricText: 'Bot Arenasında 5 Zafer Kazan'
-  },
-
-  // --- 🛡️ GÜMÜŞ & UZMAN KADEME ---
-  {
-    id: 'bot_avcisi_unvan',
-    name: 'Yapay Zeka Mat Eden',
-    icon: '🤖',
-    tier: 'silver',
-    desc: 'Yapay Zeka Coğrafya Botunu antrenman arenasında defalarca alt eden usta.',
-    requiredBadge: 'Yapay Zeka Mat Eden',
-    requiredMetricText: 'Bot Arenasında 10 Zafer Kazan'
-  },
-  {
-    id: 'sinir_bekcisi',
-    name: 'Sınır & Geçit Bekçisi',
-    icon: '🚪',
-    tier: 'silver',
-    desc: 'Türkiye\'nin tüm stratejik sınır kapılarını ve dağ geçitlerini ezberleyen muhafız.',
-    requiredBadge: 'Türkiye Sınır Kapıları & Geçit Muhafızı',
-    requiredMetricText: 'Sınır Kapıları & Geçitlerde 3 doğru'
-  },
-  {
-    id: 'bogazlar_hakimi',
-    name: 'Boğazlar & Marmara Hakimi',
-    icon: '🌉',
-    tier: 'silver',
-    desc: 'Marmara iklim geçişleri, boğazlar ve sanayi-tarım coğrafyası uzmanı.',
-    requiredBadge: 'Marmara İklim & Coğrafya Uzmanı',
-    requiredMetricText: 'Marmara testlerinde 3 doğru'
+    requiredMetricText: 'Yapay zekaya karşı 5 galibiyet al'
   },
   {
     id: 'karadeniz_kaplani',
     name: 'Karadeniz Kıvrım Kaplanı',
     icon: '⛰️',
     tier: 'silver',
-    desc: 'Karadeniz kıvrım dağları, boyuna kıyıları ve dik geçitlerinin fatihi.',
+    desc: 'Kuzey Anadolu dağları, boyuna kıyı tipi ve Zigana/Kop geçitlerini çözen usta.',
     requiredBadge: 'Karadeniz Dağları & Geçitleri Kaplanı',
-    requiredMetricText: 'Karadeniz testlerinde 3 doğru'
-  },
-  {
-    id: 'dogu_kalesi',
-    name: 'Doğu Anadolu Kalesi',
-    icon: '🌊',
-    tier: 'silver',
-    desc: 'Doğu Anadolu yüksek platoları, gölleri ve akarsularının ustası.',
-    requiredBadge: 'Doğu Anadolu Akarsuları Uzmanı',
-    requiredMetricText: 'Doğu Anadolu akarsu ve göllerinde 3 doğru'
-  },
-  {
-    id: 'volkan_avcisi',
-    name: 'Volkan & Bozkır Bilgesi',
-    icon: '🌋',
-    tier: 'silver',
-    desc: 'İç Anadolu platoları ve sönmüş volkan dizilimini eksiksiz bilen bilge.',
-    requiredBadge: 'İç Anadolu Platoları & Volkanları Üstadı',
-    requiredMetricText: 'İç Anadolu testlerinde 3 doğru'
+    requiredMetricText: 'Karadeniz Bölgesi testlerinde 5 doğru'
   },
   {
     id: 'gap_muhafizi',
     name: 'GAP & Fırat Muhafızı',
     icon: '🌾',
     tier: 'silver',
-    desc: 'Güneydoğu Anadolu ovaları, barajları ve Fırat-Dicle havzası hakimi.',
+    desc: 'Güneydoğu Anadolu ovaları, Fırat-Dicle havzası ve hidroelektrik santralleri uzmanı.',
     requiredBadge: 'Güneydoğu Anadolu Baraj & Ovalar Şampiyonu',
-    requiredMetricText: 'Güneydoğu testlerinde 3 doğru'
+    requiredMetricText: 'Güneydoğu Anadolu testlerinde 5 doğru'
+  },
+  {
+    id: 'dogu_kalesi',
+    name: 'Doğu Anadolu Kalesi',
+    icon: '🌊',
+    tier: 'silver',
+    desc: 'Doğu Anadolu yüksek platoları, tektonik-volkanik gölleri ve akarsularına hakim usta.',
+    requiredBadge: 'Doğu Anadolu Akarsuları Uzmanı',
+    requiredMetricText: 'Doğu Anadolu Bölgesi testlerinde 5 doğru'
+  },
+  {
+    id: 'bogazlar_hakimi',
+    name: 'Boğazlar & Marmara Hakimi',
+    icon: '🌉',
+    tier: 'silver',
+    desc: 'Marmara geçiş iklimleri, boğaz akıntıları, ria kıyıları ve sanayi coğrafyası uzmanı.',
+    requiredBadge: 'Marmara İklim & Coğrafya Uzmanı',
+    requiredMetricText: 'Marmara Bölgesi testlerinde 5 doğru'
+  },
+  {
+    id: 'sinir_bekcisi',
+    name: 'Sınır & Geçit Bekçisi',
+    icon: '🚪',
+    tier: 'silver',
+    desc: 'Türkiye\'nin tüm demiryolu ve karayolu sınır kapıları ile dağ geçitlerini ezberleyen.',
+    requiredBadge: 'Türkiye Sınır Kapıları & Geçit Muhafızı',
+    requiredMetricText: 'Sınır Kapıları testlerinde 5 doğru'
   },
   {
     id: 'horst_graben_ustasi',
@@ -249,7 +367,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'silver',
     desc: 'Ege kırık dağları ve enine kıyı yapısına bütünüyle hakim usta.',
     requiredBadge: 'Ege Kıyı & Horst-Graben Fatihi',
-    requiredMetricText: 'Ege Bölgesi testlerinde 3 doğru'
+    requiredMetricText: 'Ege Bölgesi testlerinde 5 doğru'
   },
   {
     id: 'toroslar_fatihi',
@@ -258,10 +376,10 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'silver',
     desc: 'Akdeniz karstik şekilleri, polye ve Toros dağ sisteminin uzmanı.',
     requiredBadge: 'Akdeniz Karstik Şekiller & Toroslar Kaptanı',
-    requiredMetricText: 'Akdeniz Bölgesi testlerinde 3 doğru'
+    requiredMetricText: 'Akdeniz Bölgesi testlerinde 5 doğru'
   },
 
-  // --- 🐣 BRONZ & ÇIRAK KADEME ---
+  // --- 🐣 1. KADEME: BRONZ & ÇIRAK ---
   {
     id: 'harita_kasifi',
     name: 'Harita Kaşifi',
@@ -312,12 +430,36 @@ export function getTitleProgress(
     };
   }
 
-  // Calculate granular progress based on specific title targets
   let current = 0;
   let target = 1;
   let unit = '';
 
   switch (title.id) {
+    case 'kozmik_cografya_efendisi':
+      current = unlockedBadges.length;
+      target = 30;
+      unit = 'rozet';
+      break;
+    case 'mutlak_taht_efendisi':
+      current = duelWins;
+      target = 100;
+      unit = 'zafer';
+      break;
+    case 'kpss_ordinaryusu':
+      current = score;
+      target = 5000;
+      unit = 'puan';
+      break;
+    case 'namaGlup_fatih_lord':
+      current = categoryMasteryProgress['max_duel_streak'] || 0;
+      target = 10;
+      unit = 'seri zafer';
+      break;
+    case 'arena_tanrisi':
+      current = duelWins;
+      target = 50;
+      unit = 'zafer';
+      break;
     case 'tahtin_sahibi':
       current = duelWins;
       target = 25;
@@ -335,17 +477,17 @@ export function getTitleProgress(
       break;
     case 'efsanevi_elmas_deha':
       current = unlockedBadges.length;
-      target = 8;
+      target = 20;
       unit = 'rozet';
       break;
     case 'kpss_sampiyonu':
       current = score;
-      target = 300;
+      target = 1500;
       unit = 'puan';
       break;
-    case 'turing_ustasi_unvan':
+    case 'turing_basmuhendisi':
       current = botWins;
-      target = 5;
+      target = 25;
       unit = 'bot zaferi';
       break;
     case 'bot_avcisi_unvan':
@@ -353,54 +495,74 @@ export function getTitleProgress(
       target = 10;
       unit = 'bot zaferi';
       break;
+    case 'turing_ustasi_unvan':
+      current = botWins;
+      target = 5;
+      unit = 'bot zaferi';
+      break;
     case 'seri_canavari_unvan':
       current = categoryMasteryProgress['max_streak'] || 0;
-      target = 5;
+      target = 10;
       unit = 'seri doğru';
+      break;
+    case 'dilsiz_harita_efendisi':
+      current = categoryMasteryProgress['dilsiz_harita'] || 0;
+      target = 20;
+      unit = 'doğru';
       break;
     case 'dilsiz_harita_dehasi':
       current = categoryMasteryProgress['dilsiz_harita'] || 0;
-      target = 3;
+      target = 5;
       unit = 'doğru';
       break;
+    case 'milimetrik_kartograf':
+      current = categoryMasteryProgress['kusursuz_isabet_5km'] || 0;
+      target = 20;
+      unit = 'tam isabet';
+      break;
+    case 'kusursuz_nisanci':
+      current = categoryMasteryProgress['kusursuz_isabet_10km'] || 0;
+      target = 5;
+      unit = 'tam isabet';
+      break;
     case 'toroslar_fatihi':
-      current = categoryMasteryProgress['Akdeniz_Karstik'] || 0;
-      target = 3;
+      current = categoryMasteryProgress['Akdeniz_Karstik'] || categoryMasteryProgress['Akdeniz_Genel'] || 0;
+      target = 5;
       unit = 'doğru';
       break;
     case 'horst_graben_ustasi':
       current = categoryMasteryProgress['Ege_Genel'] || 0;
-      target = 3;
+      target = 5;
       unit = 'doğru';
       break;
     case 'gap_muhafizi':
-      current = categoryMasteryProgress['Güneydoğu_Barajlar'] || 0;
-      target = 3;
+      current = categoryMasteryProgress['Güneydoğu_Barajlar'] || categoryMasteryProgress['Güneydoğu Anadolu_Genel'] || 0;
+      target = 5;
       unit = 'doğru';
       break;
     case 'volkan_avcisi':
-      current = categoryMasteryProgress['İç Anadolu_Volkanlar'] || 0;
-      target = 3;
+      current = categoryMasteryProgress['İç Anadolu_Volkanlar'] || categoryMasteryProgress['İç Anadolu_Genel'] || 0;
+      target = 5;
       unit = 'doğru';
       break;
     case 'karadeniz_kaplani':
       current = categoryMasteryProgress['Karadeniz_Genel'] || 0;
-      target = 3;
+      target = 5;
       unit = 'doğru';
       break;
     case 'dogu_kalesi':
-      current = categoryMasteryProgress['Doğu Anadolu_Akarsular'] || 0;
-      target = 3;
+      current = categoryMasteryProgress['Doğu Anadolu_Akarsular'] || categoryMasteryProgress['Doğu Anadolu_Genel'] || 0;
+      target = 5;
       unit = 'doğru';
       break;
     case 'bogazlar_hakimi':
       current = categoryMasteryProgress['Marmara_Genel'] || 0;
-      target = 3;
+      target = 5;
       unit = 'doğru';
       break;
     case 'sinir_bekcisi':
-      current = categoryMasteryProgress['Sınır Kapıları_Geçitler'] || 0;
-      target = 3;
+      current = categoryMasteryProgress['Sınır Kapıları_Geçitler'] || categoryMasteryProgress['PassesAndGates'] || 0;
+      target = 5;
       unit = 'doğru';
       break;
     case 'il_81_fatihi':
@@ -430,7 +592,279 @@ export function getTitleProgress(
 }
 
 export const ALL_BADGES: Badge[] = [
-  // --- KADEMELİ BÖLGE UZMANLIKLARI (SEVİYE 1 - 2) ---
+  // ==========================================
+  // --- 🌌 5. KADEME: MİSTİK & KOZMİK BAŞARIMLAR (Aylar Süren Hedefler) ---
+  // ==========================================
+  {
+    id: 'kozmik_cografya_hakimi',
+    name: 'Kozmik Coğrafya Hükümdarı',
+    icon: '🌌',
+    category: 'Efsanevi Prestij',
+    tier: 'mythic',
+    tierLevel: 5,
+    desc: '30 veya daha fazla başarı rozeti toplayarak Türkiye coğrafyasında mutlak zirveye ulaştın.',
+    targetCount: 30,
+    reqText: 'Toplam 30 rozet kilidi aç.',
+    trackerKey: 'BadgesCount30',
+    associatedTitle: 'Kozmik Coğrafya Hükümdarı'
+  },
+  {
+    id: 'mutlak_taht_sahibi',
+    name: 'Mutlak Tahtın Sahibi',
+    icon: '🔱',
+    category: 'Canlı 1v1 Düello',
+    tier: 'mythic',
+    tierLevel: 5,
+    desc: 'Canlı 1v1 düellolarda 100 gerçek zafer kazanarak mutlak arena tahtına adını kazıdın.',
+    targetCount: 100,
+    reqText: 'Canlı düellolarda 100 maç kazan.',
+    trackerKey: 'DuelWins100',
+    associatedTitle: 'Mutlak Tahtın Sahibi'
+  },
+  {
+    id: 'kpss_ordinaryus_rozet',
+    name: 'KPSS Coğrafya Ordinaryüsü',
+    icon: '🪐',
+    category: 'Skor Başarımı',
+    tier: 'mythic',
+    tierLevel: 5,
+    desc: 'Testlerde toplam 5000 puan barajını aşarak coğrafya ansiklopedisi unvanını aldın.',
+    targetCount: 5000,
+    reqText: 'Testlerde 5000 toplam puana ulaş.',
+    trackerKey: 'Score5000',
+    associatedTitle: 'KPSS Coğrafya Ordinaryüsü'
+  },
+  {
+    id: 'namaglup_seri_10',
+    name: '10\'lu Yenilmez Seri',
+    icon: '☀️',
+    category: 'Canlı 1v1 Düello',
+    tier: 'mythic',
+    tierLevel: 5,
+    desc: 'Canlı 1v1 düellolarda üst üste 10 maç sıfır mağlubiyetle namağlup seri yakaladın.',
+    targetCount: 10,
+    reqText: 'Üst üste 10 canlı düello kazan.',
+    trackerKey: 'DuelStreak10',
+    associatedTitle: 'Efsanevi Seri Fatihi'
+  },
+
+  // ==========================================
+  // --- 💎 4. KADEME: ELMAS & EFSANE BAŞARIMLARI ---
+  // ==========================================
+  {
+    id: 'tahtin_sahibi',
+    name: 'Tahtın Sahibi',
+    icon: '🏆',
+    category: 'Canlı 1v1 Düello',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Canlı 1v1 düellolarda 25 zafer kazanarak mutlak arena efsanesi oldun.',
+    targetCount: 25,
+    reqText: 'Canlı düellolarda 25 maç kazan.',
+    trackerKey: 'DuelWins25',
+    associatedTitle: 'Tahtın Sahibi'
+  },
+  {
+    id: 'duello_50_zafer',
+    name: '50 Düello Zaferi',
+    icon: '⚔️',
+    category: 'Canlı 1v1 Düello',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 50 galibiyet kazandın.',
+    targetCount: 50,
+    reqText: 'Canlı düellolarda 50 maç kazan.',
+    trackerKey: 'DuelWins50',
+    associatedTitle: 'Arena Efsanesi'
+  },
+  {
+    id: 'duello_sampiyonu',
+    name: 'Düello Şampiyonu',
+    icon: '👑',
+    category: 'Canlı 1v1 Düello',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Canlı 1v1 düellolarda 10 zaferle arenada zirveye oturdun.',
+    targetCount: 10,
+    reqText: 'Canlı düellolarda 10 maç kazan.',
+    trackerKey: 'DuelWins10',
+    associatedTitle: 'Arena Şampiyonu'
+  },
+  {
+    id: 'efsane_cografyaci',
+    name: 'Efsanevi Coğrafyacı',
+    icon: '💎',
+    category: 'Efsanevi Prestij',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Toplam 20 veya daha fazla rozet kazanarak elit elmas seviyeye ulaştın.',
+    targetCount: 20,
+    reqText: 'Toplam 20 rozet kilidi aç.',
+    trackerKey: 'BadgesCount20',
+    associatedTitle: 'Efsanevi Harita Dehası'
+  },
+  {
+    id: 'kpss_ustadi',
+    name: 'KPSS Coğrafya Üstadı',
+    icon: '🎓',
+    category: 'Skor Başarımı',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Test modunda 1500 puan barajını aştın.',
+    targetCount: 1500,
+    reqText: 'Testlerde 1500 toplam puana ulaş.',
+    trackerKey: 'Score1500',
+    associatedTitle: 'KPSS Coğrafya Şampiyonu'
+  },
+  {
+    id: 'siber_antrenor',
+    name: 'Siber Antrenör',
+    icon: '🚀',
+    category: 'Yapay Zeka Arenası',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Yapay zeka botuna karşı 25 maç kazanarak kusursuz antrenman seviyesine ulaştın.',
+    targetCount: 25,
+    reqText: 'Yapay zekaya karşı 25 galibiyet al.',
+    trackerKey: 'BotWins25',
+    associatedTitle: 'Turing Başmühendisi'
+  },
+  {
+    id: 'milimetrik_kartograf_rozet',
+    name: 'Milimetrik Kartograf',
+    icon: '🎯',
+    category: 'Pim Tahmin',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Harita testinde 20 kez 5 km altında kusursuz tam isabet yaptın.',
+    targetCount: 20,
+    reqText: '20 kez 5 km altında tam isabet yap.',
+    trackerKey: 'TamIsabet5km_20',
+    associatedTitle: 'Milimetrik Kartograf'
+  },
+  {
+    id: 'dilsiz_harita_efendisi_rozet',
+    name: 'Dilsiz Harita Efendisi',
+    icon: '🙈',
+    category: 'Zorlu Mod',
+    tier: 'diamond',
+    tierLevel: 4,
+    desc: 'Dilsiz harita modunda 20 doğru tahmin yaparak haritayı zihnine kazıdın.',
+    targetCount: 20,
+    reqText: 'Dilsiz modda 20 doğru tahmin yap.',
+    trackerKey: 'BlindMap20',
+    associatedTitle: 'Dilsiz Harita Efendisi'
+  },
+
+  // ==========================================
+  // --- 👑 3. KADEME: ALTIN & ŞAMPİYON BAŞARIMLARI ---
+  // ==========================================
+  {
+    id: 'duello_gladyatoru',
+    name: '1v1 Gladyatör',
+    icon: '🛡️',
+    category: 'Canlı 1v1 Düello',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 3 zafer kazandın.',
+    targetCount: 3,
+    reqText: 'Canlı düellolarda 3 maç kazan.',
+    trackerKey: 'DuelWins3',
+    associatedTitle: '1v1 Gladyatör'
+  },
+  {
+    id: 'yenilmez_fatih',
+    name: 'Yenilmez Fatih',
+    icon: '🔥',
+    category: 'Canlı 1v1 Düello',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın.',
+    targetCount: 3,
+    reqText: 'Üst üste 3 canlı düello maçı kazan.',
+    trackerKey: 'DuelStreak3'
+  },
+  {
+    id: 'seri_canavari',
+    name: '10\'lu Seri Canavarı',
+    icon: '🔥',
+    category: 'Seri Başarımı',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Üst üste 10 doğru cevap verdin.',
+    targetCount: 10,
+    reqText: 'Üst üste 10 doğru cevap ver.',
+    trackerKey: 'Streak10',
+    associatedTitle: 'Yenilmez Seri Canavarı'
+  },
+  {
+    id: 'bot_mat_eden',
+    name: 'Yapay Zeka Mat Eden',
+    icon: '⚡',
+    category: 'Yapay Zeka Arenası',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Yapay zeka botuna karşı 10 galibiyetle antrenman arenasını fethettin.',
+    targetCount: 10,
+    reqText: 'Yapay zekaya karşı 10 galibiyet al.',
+    trackerKey: 'BotWins10',
+    associatedTitle: 'Yapay Zeka Mat Eden'
+  },
+  {
+    id: 'dilsiz_harita_kasirgasi',
+    name: '3D Dilsiz Harita Kasırgası',
+    icon: '🙈',
+    category: 'Zorlu Mod',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Şehir isimleri ve harita yazıları olmadan dilsiz modda 5 doğru yaptın.',
+    targetCount: 5,
+    reqText: 'Dilsiz Harita Modunda 5 doğru tahmin yap.',
+    trackerKey: 'BlindMapCorrect',
+    associatedTitle: 'Dilsiz Harita Dehası'
+  },
+  {
+    id: 'volkanik_sekiller_ustasi',
+    name: 'Volkanizma & Buzul Bilgesi',
+    icon: '🌋',
+    category: 'Jeomorfoloji',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Maarlar, kalderalar, genç volkan konileri ve aktüel/sirk buzullarını çözdün.',
+    targetCount: 5,
+    reqText: 'Volkanik & Buzul oluşum sorularında 5 doğru cevap ver.',
+    trackerKey: 'VolcanicGlacial',
+    associatedTitle: 'Volkan & Bozkır Bilgesi'
+  },
+  {
+    id: 'il_81_kasifi',
+    name: '81 İl Fatihi',
+    icon: '🇹🇷',
+    category: 'Şehir Uzmanlığı',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: '81 il bulmaca modunu başarıyla tamamlayıp Türkiye mülki haritasına hakim oldun.',
+    targetCount: 1,
+    reqText: '81 İl harita bulmacasını tamamla.',
+    trackerKey: 'Provinces81',
+    associatedTitle: '81 İl Fatihi'
+  },
+  {
+    id: 'kpss_puan_500',
+    name: 'KPSS 500 Puan Barajı',
+    icon: '🏅',
+    category: 'Skor Başarımı',
+    tier: 'gold',
+    tierLevel: 3,
+    desc: 'Testlerde 500 toplam puan barajını aştın.',
+    targetCount: 500,
+    reqText: 'Testlerde 500 puana ulaş.',
+    trackerKey: 'Score500'
+  },
+
+  // ==========================================
+  // --- 🛡️ 2. KADEME: GÜMÜŞ & UZMAN BAŞARIMLARI ---
+  // ==========================================
   {
     id: 'dogu_anadolu_akarsu',
     name: 'Doğu Anadolu Akarsuları Uzmanı',
@@ -438,9 +872,9 @@ export const ALL_BADGES: Badge[] = [
     category: 'Bölge Uzmanlığı',
     tier: 'silver',
     tierLevel: 2,
-    desc: 'Doğu Anadolu Bölgesi akarsularını (Fırat, Dicle, Aras, Kura, Çoruh) ve göllerini çözdün.',
-    targetCount: 3,
-    reqText: 'Doğu Anadolu Akarsu & Göllerinde 3 doğru cevap ver.',
+    desc: 'Doğu Anadolu akarsuları (Fırat, Dicle, Aras, Kura, Çoruh) ve göllerini çözdün.',
+    targetCount: 5,
+    reqText: 'Doğu Anadolu sorularında 5 doğru cevap ver.',
     trackerKey: 'Doğu Anadolu_Akarsular',
     associatedTitle: 'Doğu Anadolu Kalesi'
   },
@@ -452,8 +886,8 @@ export const ALL_BADGES: Badge[] = [
     tier: 'silver',
     tierLevel: 2,
     desc: 'Marmara Bölgesi yer şekilleri, iklim geçişleri ve boğaz sistemlerini kavradın.',
-    targetCount: 3,
-    reqText: 'Marmara Bölgesi sorularında 3 doğru cevap ver.',
+    targetCount: 5,
+    reqText: 'Marmara Bölgesi sorularında 5 doğru cevap ver.',
     trackerKey: 'Marmara_Genel',
     associatedTitle: 'Boğazlar & Marmara Hakimi'
   },
@@ -464,9 +898,9 @@ export const ALL_BADGES: Badge[] = [
     category: 'Bölge Uzmanlığı',
     tier: 'silver',
     tierLevel: 2,
-    desc: 'Ege Kıyı tipleri, enine kıyı yapısı ve Kırık Dağları (Horst-Graben) eksiksiz bildin.',
-    targetCount: 3,
-    reqText: 'Ege Bölgesi sorularında 3 doğru cevap ver.',
+    desc: 'Ege Kıyı tipleri, enine kıyı yapısı ve Kırık Dağları eksiksiz bildin.',
+    targetCount: 5,
+    reqText: 'Ege Bölgesi sorularında 5 doğru cevap ver.',
     trackerKey: 'Ege_Genel',
     associatedTitle: 'Horst-Graben Ustası'
   },
@@ -478,8 +912,8 @@ export const ALL_BADGES: Badge[] = [
     tier: 'silver',
     tierLevel: 2,
     desc: 'Karadeniz Kıvrım Dağları, boyuna kıyı yapısı ve Zigana/Kop geçitlerine hakimsin.',
-    targetCount: 3,
-    reqText: 'Karadeniz Bölgesi sorularında 3 doğru cevap ver.',
+    targetCount: 5,
+    reqText: 'Karadeniz Bölgesi sorularında 5 doğru cevap ver.',
     trackerKey: 'Karadeniz_Genel',
     associatedTitle: 'Karadeniz Kıvrım Kaplanı'
   },
@@ -491,8 +925,8 @@ export const ALL_BADGES: Badge[] = [
     tier: 'silver',
     tierLevel: 2,
     desc: 'İç Anadolu platoları, sönmüş volkan dizilimi ve kapalı havzalarını bildin.',
-    targetCount: 3,
-    reqText: 'İç Anadolu sorularında 3 doğru cevap ver.',
+    targetCount: 5,
+    reqText: 'İç Anadolu sorularında 5 doğru cevap ver.',
     trackerKey: 'İç Anadolu_Genel',
     associatedTitle: 'Volkan & Bozkır Bilgesi'
   },
@@ -503,9 +937,9 @@ export const ALL_BADGES: Badge[] = [
     category: 'Bölge Uzmanlığı',
     tier: 'silver',
     tierLevel: 2,
-    desc: 'Akdeniz karstik platoları (Teke-Taşeli), lapya/düden/polye ve Toros dağ sistemini çözdün.',
-    targetCount: 3,
-    reqText: 'Akdeniz sorularında 3 doğru cevap ver.',
+    desc: 'Akdeniz karstik platoları (Teke-Taşeli), polye ve Toros dağ sistemini çözdün.',
+    targetCount: 5,
+    reqText: 'Akdeniz sorularında 5 doğru cevap ver.',
     trackerKey: 'Akdeniz_Genel',
     associatedTitle: 'Toroslar Fatihi'
   },
@@ -517,8 +951,8 @@ export const ALL_BADGES: Badge[] = [
     tier: 'silver',
     tierLevel: 2,
     desc: 'GAP kapsamındaki barajlar, Fırat-Dicle havzası ve düz kütle yapısını bildin.',
-    targetCount: 3,
-    reqText: 'Güneydoğu Anadolu sorularında 3 doğru cevap ver.',
+    targetCount: 5,
+    reqText: 'Güneydoğu Anadolu sorularında 5 doğru cevap ver.',
     trackerKey: 'Güneydoğu Anadolu_Genel',
     associatedTitle: 'GAP & Fırat Muhafızı'
   },
@@ -530,13 +964,11 @@ export const ALL_BADGES: Badge[] = [
     tier: 'silver',
     tierLevel: 2,
     desc: 'Tüm stratejik sınır kapıları ve dağ geçitlerini ezberledin.',
-    targetCount: 3,
-    reqText: 'Sınır Kapıları veya Geçitler kategorisinde 3 doğru cevap ver.',
+    targetCount: 5,
+    reqText: 'Sınır Kapıları veya Geçitler kategorisinde 5 doğru cevap ver.',
     trackerKey: 'PassesAndGates',
     associatedTitle: 'Sınır & Geçit Bekçisi'
   },
-
-  // --- JEOMORFOLOJİ & YER ŞEKİLLERİ ÖZEL ROZETLERİ ---
   {
     id: 'plato_ova_fatihi',
     name: 'Platolar & Ovalar Hakimi',
@@ -544,9 +976,9 @@ export const ALL_BADGES: Badge[] = [
     category: 'Jeomorfoloji',
     tier: 'silver',
     tierLevel: 2,
-    desc: 'Tabaka düzlüğü, karstik, lav ve aşınım platoları ile delta ve tektonik ovaları eksiksiz bildin.',
-    targetCount: 3,
-    reqText: 'Platolar & Ovalar sorularında 3 doğru cevap ver.',
+    desc: 'Tabaka düzlüğü, karstik, lav ve aşınım platoları ile deltaları bildin.',
+    targetCount: 5,
+    reqText: 'Platolar & Ovalar sorularında 5 doğru cevap ver.',
     trackerKey: 'PlateausPlains'
   },
   {
@@ -556,39 +988,40 @@ export const ALL_BADGES: Badge[] = [
     category: 'Jeomorfoloji',
     tier: 'silver',
     tierLevel: 2,
-    desc: 'Lapya-dolin-polye dizilimi, obruklar, mağaralar, travertenler ve falez/tombolo yapılarını bildin.',
-    targetCount: 3,
-    reqText: 'Karstik & Kıyı kategorisinde 3 doğru cevap ver.',
+    desc: 'Lapya-dolin-polye, obruklar, mağaralar, travertenler ve falez/tomboloları çözdün.',
+    targetCount: 5,
+    reqText: 'Karstik & Kıyı kategorisinde 5 doğru cevap ver.',
     trackerKey: 'KarsticCoastal'
   },
   {
-    id: 'volkanik_sekiller_ustasi',
-    name: 'Volkanizma & Buzul Bilgesi',
-    icon: '🌋',
-    category: 'Jeomorfoloji',
-    tier: 'gold',
-    tierLevel: 3,
-    desc: 'Maarlar, kalderalar, genç volkan konileri ve yüksek dağlardaki aktüel/sirk buzullarını çözdün.',
-    targetCount: 3,
-    reqText: 'Volkanik & Buzul oluşum sorularında 3 doğru cevap ver.',
-    trackerKey: 'VolcanicGlacial'
+    id: 'bot_kiran',
+    name: 'Turing Ustası',
+    icon: '🧠',
+    category: 'Yapay Zeka Arenası',
+    tier: 'silver',
+    tierLevel: 2,
+    desc: 'Yapay zeka botuna karşı 5 maç kazanarak hızını ve bilgini kanıtladın.',
+    targetCount: 5,
+    reqText: 'Yapay zekaya karşı 5 galibiyet al.',
+    trackerKey: 'BotWins5',
+    associatedTitle: 'Turing Fatihi'
   },
-
   {
-    id: 'dilsiz_harita_kasirgasi',
-    name: '3D Dilsiz Harita Kasırgası',
-    icon: '🙈',
-    category: 'Zorlu Mod',
-    tier: 'gold',
-    tierLevel: 3,
-    desc: 'Şehir isimleri ve harita yazıları olmadan dilsiz modda ustalaştın.',
-    targetCount: 3,
-    reqText: 'Dilsiz Harita Modunda 3 doğru tahmin yap.',
-    trackerKey: 'BlindMapCorrect',
-    associatedTitle: 'Dilsiz Harita Dehası'
+    id: 'simsek_refleks',
+    name: 'Şimşek Refleks',
+    icon: '⚡',
+    category: 'Hız & Refleks',
+    tier: 'silver',
+    tierLevel: 2,
+    desc: '3 saniye içinde nokta atışı veya doğru test cevabı verdin.',
+    targetCount: 1,
+    reqText: '3 saniyenin altında doğru cevap ver.',
+    trackerKey: 'SpeedReflex'
   },
 
-  // --- GENEL GAMIFICATION ROZETLERİ (BRONZ - GÜMÜŞ - ALTIN) ---
+  // ==========================================
+  // --- 🐣 1. KADEME: BRONZ & ÇIRAK BAŞARIMLARI ---
+  // ==========================================
   {
     id: 'cografyaci_ciragi',
     name: '3D Coğrafyacı Çırağı',
@@ -596,7 +1029,7 @@ export const ALL_BADGES: Badge[] = [
     category: 'Başlangıç',
     tier: 'bronze',
     tierLevel: 1,
-    desc: 'Uygulamaya ilk adım attın.',
+    desc: 'Uygulamaya ilk adım attın ve keşfe başladın.',
     targetCount: 1,
     reqText: 'İlk harita keşfini yap.',
     trackerKey: 'InitialStep',
@@ -616,85 +1049,17 @@ export const ALL_BADGES: Badge[] = [
     associatedTitle: 'Harita Kaşifi'
   },
   {
-    id: 'seri_canavari',
-    name: '5\'li Seri Canavarı',
-    icon: '🔥',
-    category: 'Seri Başarımı',
-    tier: 'gold',
-    tierLevel: 3,
-    desc: 'Üst üste 5 doğru cevap verdin.',
-    targetCount: 5,
-    reqText: 'Üst üste 5 doğru cevap ver.',
-    trackerKey: 'Streak5',
-    associatedTitle: 'Yenilmez Seri Canavarı'
-  },
-  {
-    id: 'kpss_ustadi',
-    name: 'KPSS Coğrafya Üstadı',
-    icon: '🎓',
-    category: 'Skor Başarımı',
-    tier: 'diamond',
-    tierLevel: 4,
-    desc: 'Test modunda 300 puan barajını aştın.',
-    targetCount: 300,
-    reqText: 'Testlerde 300 toplam puana ulaş.',
-    trackerKey: 'Score300',
-    associatedTitle: 'KPSS Coğrafya Şampiyonu'
-  },
-
-  // --- YAPAY ZEKA (BOT) ANTRENMAN ARENASI BAŞARIMLARI (ÖZEL) ---
-  {
     id: 'bot_caylagi',
     name: 'Yapay Zeka Çırağı',
     icon: '🤖',
     category: 'Yapay Zeka Arenası',
     tier: 'bronze',
     tierLevel: 1,
-    desc: 'Yapay zeka antrenman modunda ilk maçını tamamlayıp galibiyet kazandın.',
+    desc: 'Yapay zeka antrenman modunda ilk maçını kazanıp galibiyet aldın.',
     targetCount: 1,
     reqText: 'Yapay zekaya karşı 1 galibiyet al.',
     trackerKey: 'BotWins1'
   },
-  {
-    id: 'bot_kiran',
-    name: 'Turing Ustası',
-    icon: '🧠',
-    category: 'Yapay Zeka Arenası',
-    tier: 'silver',
-    tierLevel: 2,
-    desc: 'Yapay zeka botuna karşı 5 maç kazanarak hızını ve bilgini kanıtladın.',
-    targetCount: 5,
-    reqText: 'Yapay zekaya karşı 5 galibiyet al.',
-    trackerKey: 'BotWins5',
-    associatedTitle: 'Turing Fatihi'
-  },
-  {
-    id: 'bot_mat_eden',
-    name: 'Yapay Zeka Mat Eden',
-    icon: '⚡',
-    category: 'Yapay Zeka Arenası',
-    tier: 'gold',
-    tierLevel: 3,
-    desc: 'Yapay zeka botuna karşı 10 galibiyetle antrenman arenasını fethettin.',
-    targetCount: 10,
-    reqText: 'Yapay zekaya karşı 10 galibiyet al.',
-    trackerKey: 'BotWins10',
-    associatedTitle: 'Yapay Zeka Mat Eden'
-  },
-  {
-    id: 'siber_antrenor',
-    name: 'Siber Antrenör',
-    icon: '🚀',
-    category: 'Yapay Zeka Arenası',
-    tier: 'diamond',
-    tierLevel: 4,
-    desc: 'Yapay zeka botuna karşı 20 maç kazanarak kusursuz antrenman seviyesine ulaştın.',
-    targetCount: 20,
-    reqText: 'Yapay zekaya karşı 20 galibiyet al.',
-    trackerKey: 'BotWins20'
-  },
-
-  // --- 1v1 CANLI GERÇEK OYUNCU DÜELLO ROZETLERİ (KADEMELİ 1-4) ---
   {
     id: 'arena_caylagi',
     name: 'Arena Çaylağı',
@@ -706,109 +1071,10 @@ export const ALL_BADGES: Badge[] = [
     targetCount: 1,
     reqText: 'En az 1 canlı düelloyu tamamla.',
     trackerKey: 'DuelPlayed1'
-  },
-  {
-    id: 'duello_gladyatoru',
-    name: '1v1 Gladyatör',
-    icon: '🛡️',
-    category: 'Canlı 1v1 Düello',
-    tier: 'gold',
-    tierLevel: 3,
-    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 3 zafer kazandın.',
-    targetCount: 3,
-    reqText: 'Canlı düellolarda 3 maç kazan.',
-    trackerKey: 'DuelWins3',
-    associatedTitle: '1v1 Gladyatör'
-  },
-  {
-    id: 'duello_sampiyonu',
-    name: 'Düello Şampiyonu',
-    icon: '👑',
-    category: 'Canlı 1v1 Düello',
-    tier: 'diamond',
-    tierLevel: 4,
-    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 10 zaferle arenada tahta oturdun.',
-    targetCount: 10,
-    reqText: 'Canlı düellolarda 10 maç kazan.',
-    trackerKey: 'DuelWins10',
-    associatedTitle: 'Arena Şampiyonu'
-  },
-  {
-    id: 'tahtin_sahibi',
-    name: 'Tahtın Sahibi',
-    icon: '🏆',
-    category: 'Canlı 1v1 Düello',
-    tier: 'diamond',
-    tierLevel: 4,
-    desc: 'Canlı 1v1 düellolarda 25 zafer kazanarak mutlak arena efsanesi oldun.',
-    targetCount: 25,
-    reqText: 'Canlı düellolarda 25 maç kazan.',
-    trackerKey: 'DuelWins25',
-    associatedTitle: 'Arena Efsanesi'
-  },
-  {
-    id: 'simsek_refleks',
-    name: 'Şimşek Refleks',
-    icon: '⚡',
-    category: 'Hız & Refleks',
-    tier: 'silver',
-    tierLevel: 2,
-    desc: '3 saniye içinde nokta atışı veya doğru test cevabı verdin.',
-    targetCount: 1,
-    reqText: '3 saniyenin altında doğru cevap ver.',
-    trackerKey: 'SpeedReflex'
-  },
-  {
-    id: 'yenilmez_fatih',
-    name: 'Yenilmez Fatih',
-    icon: '🔥',
-    category: 'Canlı 1v1 Düello',
-    tier: 'gold',
-    tierLevel: 3,
-    desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın.',
-    targetCount: 3,
-    reqText: 'Üst üste 3 canlı düello maçı kazan.',
-    trackerKey: 'DuelStreak3'
-  },
-  {
-    id: 'efsane_cografyaci',
-    name: 'Efsanevi Coğrafyacı',
-    icon: '💎',
-    category: 'Efsanevi Prestij',
-    tier: 'diamond',
-    tierLevel: 4,
-    desc: 'Toplam 8 veya daha fazla rozet kazanarak elit seviyeye ulaştın.',
-    targetCount: 8,
-    reqText: 'Toplam 8 rozet kilidi aç.',
-    trackerKey: 'BadgesCount8',
-    associatedTitle: 'Efsanevi Harita Dehası'
   }
 ];
 
-export type BadgePrestigeTier = 'starter' | 'bronze' | 'silver' | 'gold' | 'diamond';
-
-export interface PrestigeTierInfo {
-  tier: BadgePrestigeTier;
-  tierLevel: number; // 0: Başlangıç, 1: Bronz, 2: Gümüş, 3: Altın, 4: Elmas (Zirve)
-  tierLabel: string;
-  title: string;
-  badgeCount: number;
-  frameBorderClass: string;
-  glowClass: string;
-  pinIcon: string;
-  pinBadgeName: string;
-  pinBorderClass: string;
-  gradientBg: string;
-  titleBadgeClass: string;
-  ringClass: string;
-  sparkleEffect: boolean;
-}
-
-/**
- * Returns distinct hierarchical styles for titles and badges based on their tier.
- * Diamond > Gold > Silver > Bronze > Starter
- */
-export function getTitleTierStyle(tier: BadgeTier | 'starter'): {
+export interface TitleTierStyleInfo {
   badgeClass: string;
   textClass: string;
   borderClass: string;
@@ -816,37 +1082,52 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): {
   tierName: string;
   tierNumber: number;
   glowShadow: string;
-} {
+}
+
+/**
+ * Returns distinct, strictly hierarchical visual styling for titles
+ */
+export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleInfo {
   switch (tier) {
+    case 'mythic':
+      return {
+        badgeClass: 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-2 border-fuchsia-400 ring-2 ring-cyan-400 text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 shadow-[0_0_24px_rgba(217,70,239,0.8)] font-black animate-pulse',
+        textClass: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 font-black',
+        borderClass: 'border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_24px_rgba(217,70,239,0.8)]',
+        bgClass: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
+        tierName: '🌌 5. Kademe: Mistik Kozmik (Zirve)',
+        tierNumber: 5,
+        glowShadow: 'shadow-[0_0_24px_rgba(217,70,239,0.8)]'
+      };
     case 'diamond':
       return {
-        badgeClass: 'bg-gradient-to-r from-cyan-500/20 via-purple-500/25 to-pink-500/20 border-2 border-cyan-400 ring-2 ring-purple-500/80 text-cyan-200 shadow-[0_0_18px_rgba(6,182,212,0.65)] font-black animate-pulse',
-        textClass: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-200 to-amber-200 font-black',
-        borderClass: 'border-2 border-cyan-400 ring-2 ring-purple-500/80 shadow-[0_0_20px_rgba(6,182,212,0.6)]',
-        bgClass: 'bg-gradient-to-tr from-cyan-950/80 via-purple-950/70 to-indigo-950/80',
-        tierName: '💎 4. Kademe: Elmas & Efsanevi Zirve',
+        badgeClass: 'bg-gradient-to-r from-cyan-950 via-indigo-950 to-purple-950 border-2 border-cyan-400 ring-1 ring-purple-500/70 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.6)] font-black',
+        textClass: 'text-cyan-200 font-black',
+        borderClass: 'border-2 border-cyan-400 ring-1 ring-purple-500/70 shadow-[0_0_15px_rgba(6,182,212,0.6)]',
+        bgClass: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
+        tierName: '💎 4. Kademe: Elmas & Efsanevi',
         tierNumber: 4,
-        glowShadow: 'shadow-[0_0_25px_rgba(6,182,212,0.7)]'
+        glowShadow: 'shadow-[0_0_15px_rgba(6,182,212,0.6)]'
       };
     case 'gold':
       return {
-        badgeClass: 'bg-amber-500/20 border-2 border-amber-400 ring-1 ring-amber-400/60 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.55)] font-black',
-        textClass: 'text-amber-300 font-black',
-        borderClass: 'border-2 border-amber-400 ring-1 ring-amber-400/60 shadow-[0_0_15px_rgba(245,158,11,0.5)]',
-        bgClass: 'bg-gradient-to-tr from-amber-950/70 via-yellow-950/60 to-slate-900',
+        badgeClass: 'bg-amber-950/90 border-2 border-amber-400 ring-1 ring-amber-400/50 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-bold',
+        textClass: 'text-amber-300 font-bold',
+        borderClass: 'border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)]',
+        bgClass: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
         tierName: '👑 3. Kademe: Altın & Şampiyon',
         tierNumber: 3,
-        glowShadow: 'shadow-[0_0_18px_rgba(245,158,11,0.6)]'
+        glowShadow: 'shadow-[0_0_10px_rgba(245,158,11,0.5)]'
       };
     case 'silver':
       return {
-        badgeClass: 'bg-slate-800/80 border border-slate-300 ring-1 ring-slate-400/40 text-slate-200 shadow-[0_0_10px_rgba(203,213,225,0.35)] font-bold',
+        badgeClass: 'bg-slate-900/80 border border-slate-300/80 ring-1 ring-slate-400/40 text-slate-200 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
         textClass: 'text-slate-200 font-bold',
-        borderClass: 'border border-slate-300 ring-1 ring-slate-400/40 shadow-[0_0_10px_rgba(203,213,225,0.3)]',
-        bgClass: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950/60',
+        borderClass: 'border border-slate-300/80 shadow-[0_0_6px_rgba(203,213,225,0.3)]',
+        bgClass: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
         tierName: '🛡️ 2. Kademe: Gümüş & Uzman',
         tierNumber: 2,
-        glowShadow: 'shadow-[0_0_10px_rgba(203,213,225,0.35)]'
+        glowShadow: 'shadow-[0_0_6px_rgba(203,213,225,0.3)]'
       };
     case 'bronze':
       return {
@@ -872,113 +1153,153 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): {
   }
 }
 
+export interface PrestigeTierInfo {
+  tier: BadgePrestigeTier;
+  tierLevel: number; // 0: Başlangıç, 1: Bronz, 2: Gümüş, 3: Altın, 4: Elmas, 5: Mistik Kozmik
+  tierLabel: string;
+  title: string;
+  badgeCount: number;
+  frameBorderClass: string;
+  glowClass: string;
+  pinIcon: string;
+  pinBadgeName: string;
+  pinBorderClass: string;
+  gradientBg: string;
+  titleBadgeClass: string;
+  ringClass: string;
+  sparkleEffect: boolean;
+  orbitalEffect?: boolean;
+}
+
 /**
- * Returns the most glorious auto-equipped title specifically for 1v1 duels based on duel wins/streaks
+ * Returns auto-equipped title specifically for 1v1 duels based on duel wins/streaks
  */
 export function getAutoEquippedDuelTitle(duelWins = 0, duelStreak = 0, unlockedBadges: string[] = []): string {
+  if (duelWins >= 100 || unlockedBadges.includes('Mutlak Tahtın Sahibi')) {
+    return '🔱 Mutlak Tahtın Sahibi';
+  }
+  if (duelWins >= 50 || unlockedBadges.includes('50 Düello Zaferi')) {
+    return '⚔️ Arena Efsanesi';
+  }
   if (duelWins >= 25 || unlockedBadges.includes('Tahtın Sahibi')) {
-    return '👑 Arena Efsanesi';
+    return '🏆 Tahtın Sahibi';
   }
   if (duelWins >= 10 || unlockedBadges.includes('Düello Şampiyonu')) {
-    return '🏆 Düello Şampiyonu';
+    return '👑 Arena Şampiyonu';
   }
   if (duelStreak >= 3 || unlockedBadges.includes('Yenilmez Fatih')) {
     return '🔥 Yenilmez Fatih';
   }
   if (duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör')) {
-    return '⚔️ 1v1 Gladyatör';
+    return '🛡️ 1v1 Gladyatör';
   }
   if (duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı')) {
-    return '🛡️ Arena Savaşçısı';
+    return '⚔️ Arena Savaşçısı';
   }
   return '🎯 Arena Adayı';
 }
 
 /**
  * Calculates 1v1 duel exclusive prestige tier (borders, glow, top-right pin icon)
- * Strict hierarchy: Diamond (25+ wins or 10+ wins) > Gold (3+ wins or streak) > Silver (1+ win) > Starter (0 wins)
+ * Strict hierarchy: Mythic (100+ wins) > Diamond (25+ wins) > Gold (3+ wins or streak) > Silver (1+ win) > Starter (0 wins)
  */
 export function getDuelPrestigeTier(
   duelWins = 0,
   duelStreak = 0,
-  unlockedBadges: string[] = []
+  unlockedBadges: string[] = [],
+  customTitle?: string
 ): PrestigeTierInfo {
   const duelTitle = getAutoEquippedDuelTitle(duelWins, duelStreak, unlockedBadges);
 
-  // 4. KADEME: ELMAS & EFSANEVİ ZİRVE (25+ Zafer veya Tahtın Sahibi)
-  if (duelWins >= 25 || unlockedBadges.includes('Tahtın Sahibi')) {
+  // Check if custom title is equipped and its tier
+  const cleanTitleName = (customTitle || '').replace(/^[^\w\s\u00C0-\u017F]+/i, '').trim();
+  const matchedTitle = ALL_TITLES.find(t => 
+    t.name === customTitle || 
+    t.id === customTitle || 
+    t.name.toLowerCase() === cleanTitleName.toLowerCase() ||
+    (customTitle && customTitle.includes(t.name))
+  );
+
+  const activeTitle = customTitle && customTitle !== '3D Coğrafyacı Çırağı' ? customTitle : duelTitle;
+  const activePinIcon = matchedTitle?.icon || (duelWins >= 100 ? '🔱' : duelWins >= 50 ? '⚔️' : duelWins >= 25 ? '🏆' : duelStreak >= 3 ? '🔥' : duelWins >= 10 ? '👑' : duelWins >= 3 ? '🛡️' : duelWins >= 1 ? '⚔️' : '🎯');
+  const isCustomMythic = matchedTitle?.tier === 'mythic';
+  const isCustomDiamond = matchedTitle?.tier === 'diamond';
+
+  // 5. KADEME: MİSTİK KOZMİK ZİRVE (100+ Zafer veya Mutlak Tahtın Sahibi veya Mistik Ünvan)
+  if (isCustomMythic || duelWins >= 100 || unlockedBadges.includes('Mutlak Tahtın Sahibi') || unlockedBadges.includes('Kozmik Coğrafya Hükümdarı')) {
+    return {
+      tier: 'mythic',
+      tierLevel: 5,
+      tierLabel: '🌌 Mistik Kozmik Zirve',
+      title: activeTitle,
+      badgeCount: Math.max(duelWins, unlockedBadges.length),
+      frameBorderClass: 'border-2 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_45px_rgba(217,70,239,1),0_0_25px_rgba(6,182,212,0.9),0_0_35px_rgba(251,191,36,0.8)] animate-pulse',
+      glowClass: 'from-fuchsia-500 via-cyan-400 to-amber-300',
+      pinIcon: matchedTitle?.icon || '🔱',
+      pinBadgeName: activeTitle,
+      pinBorderClass: 'border-2 border-amber-200 bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 text-amber-200 ring-2 ring-fuchsia-400 shadow-2xl shadow-fuchsia-500 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
+      titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_24px_rgba(217,70,239,0.8)] font-black',
+      ringClass: 'ring-4 ring-cyan-400',
+      sparkleEffect: true,
+      orbitalEffect: true
+    };
+  }
+
+  // 4. KADEME: ELMAS LİG (25+ Zafer veya Tahtın Sahibi veya Elmas Ünvan)
+  if (isCustomDiamond || duelWins >= 25 || unlockedBadges.includes('Tahtın Sahibi') || unlockedBadges.includes('50 Düello Zaferi') || unlockedBadges.includes('Efsanevi Coğrafyacı')) {
     return {
       tier: 'diamond',
       tierLevel: 4,
       tierLabel: '💎 Elmas Zirve',
-      title: duelTitle,
-      badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-cyan-200 ring-4 ring-purple-500 shadow-[0_0_35px_rgba(6,182,212,1),0_0_20px_rgba(168,85,247,0.85)] animate-pulse',
-      glowClass: 'from-cyan-400 via-fuchsia-500 to-amber-300',
-      pinIcon: '👑',
-      pinBadgeName: 'Tahtın Sahibi',
+      title: activeTitle,
+      badgeCount: Math.max(duelWins, unlockedBadges.length),
+      frameBorderClass: 'border-2 border-cyan-200 ring-3 ring-indigo-500 shadow-[0_0_30px_rgba(6,182,212,0.95),0_0_15px_rgba(168,85,247,0.7)] animate-pulse',
+      glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
+      pinIcon: matchedTitle?.icon || (duelWins >= 50 ? '⚔️' : '🏆'),
+      pinBadgeName: activeTitle,
       pinBorderClass: 'border-2 border-cyan-200 bg-slate-950 text-cyan-200 ring-2 ring-purple-400 shadow-xl shadow-cyan-500/80 animate-bounce',
       gradientBg: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
-      titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-200 to-amber-200 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_18px_rgba(6,182,212,0.7)] font-black',
-      ringClass: 'ring-4 ring-purple-500',
-      sparkleEffect: true
-    };
-  }
-
-  // 4. KADEME: ELMAS LİG (10+ Zafer veya Düello Şampiyonu)
-  if (duelWins >= 10 || unlockedBadges.includes('Düello Şampiyonu')) {
-    return {
-      tier: 'diamond',
-      tierLevel: 4,
-      tierLabel: '💎 Elmas Lig',
-      title: duelTitle,
-      badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-cyan-300 ring-3 ring-indigo-500 shadow-[0_0_28px_rgba(6,182,212,0.85)] animate-pulse',
-      glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
-      pinIcon: '🏆',
-      pinBadgeName: 'Düello Şampiyonu',
-      pinBorderClass: 'border-2 border-cyan-300 bg-slate-950 text-cyan-200 ring-2 ring-indigo-400 shadow-lg shadow-cyan-500/60',
-      gradientBg: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
-      titleBadgeClass: 'text-cyan-200 border-2 border-cyan-400 ring-1 ring-indigo-400/80 shadow-[0_0_14px_rgba(6,182,212,0.6)] font-black',
+      titleBadgeClass: 'text-cyan-200 border-2 border-cyan-400 ring-1 ring-purple-500/70 shadow-[0_0_15px_rgba(6,182,212,0.6)] font-black',
       ringClass: 'ring-3 ring-indigo-500',
       sparkleEffect: true
     };
   }
 
-  // 3. KADEME: ALTIN & ŞAMPİYON LİG (3+ Zafer veya Seri veya Gladyatör)
-  if (duelWins >= 3 || duelStreak >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('Yenilmez Fatih')) {
+  // 3. KADEME: ALTIN & ŞAMPİYON LİG (3+ Zafer veya Seri veya Gladyatör veya Altın Ünvan)
+  if (matchedTitle?.tier === 'gold' || duelWins >= 3 || duelStreak >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('Yenilmez Fatih') || unlockedBadges.includes('Düello Şampiyonu')) {
     return {
       tier: 'gold',
       tierLevel: 3,
       tierLabel: '👑 Altın Şampiyon',
-      title: duelTitle,
-      badgeCount: duelWins,
+      title: activeTitle,
+      badgeCount: Math.max(duelWins, unlockedBadges.length),
       frameBorderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)] animate-pulse',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
-      pinIcon: duelStreak >= 3 ? '🔥' : '⚔️',
-      pinBadgeName: '1v1 Gladyatör',
-      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-1 ring-yellow-400/80 shadow-md shadow-amber-500/50',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitle,
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400/80 shadow-md shadow-amber-500/50',
       gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-      titleBadgeClass: 'text-amber-300 border border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
+      titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
       ringClass: 'ring-2 ring-amber-400',
       sparkleEffect: false
     };
   }
 
-  // 2. KADEME: GÜMÜŞ & UZMAN LİG (1-2 Zafer veya Arena Çaylağı)
-  if (duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı')) {
+  // 2. KADEME: GÜMÜŞ & UZMAN LİG (1-2 Zafer veya Arena Çaylağı veya Gümüş Ünvan)
+  if (matchedTitle?.tier === 'silver' || duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı')) {
     return {
       tier: 'silver',
       tierLevel: 2,
       tierLabel: '🛡️ Gümüş Uzman',
-      title: duelTitle,
-      badgeCount: duelWins,
-      frameBorderClass: 'border-2 border-slate-200 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.45)]',
+      title: activeTitle,
+      badgeCount: Math.max(duelWins, unlockedBadges.length),
+      frameBorderClass: 'border-2 border-slate-300/90 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.4)]',
       glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
-      pinIcon: '🛡️',
-      pinBadgeName: 'Arena Savaşçısı',
-      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-sm',
-      gradientBg: 'bg-gradient-to-tr from-slate-800 via-slate-900 to-indigo-950',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitle,
+      pinBorderClass: 'border-2 border-slate-300 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-sm',
+      gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
       titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
       ringClass: 'ring-1 ring-slate-400/50',
       sparkleEffect: false
@@ -990,12 +1311,12 @@ export function getDuelPrestigeTier(
     tier: 'starter',
     tierLevel: 0,
     tierLabel: '🌱 Başlangıç',
-    title: duelTitle,
+    title: activeTitle,
     badgeCount: duelWins,
     frameBorderClass: 'border border-slate-700/60 ring-0 shadow-none',
     glowClass: 'from-transparent to-transparent opacity-0',
-    pinIcon: '🎯',
-    pinBadgeName: 'Arena Adayı',
+    pinIcon: activePinIcon,
+    pinBadgeName: activeTitle,
     pinBorderClass: 'border border-slate-700 bg-slate-900 text-slate-400 shadow-none',
     gradientBg: 'bg-gradient-to-tr from-slate-950 to-slate-900',
     titleBadgeClass: 'text-slate-400 border border-slate-800 shadow-none font-normal',
@@ -1006,7 +1327,7 @@ export function getDuelPrestigeTier(
 
 /**
  * Calculates user's avatar frame prestige and crowning badge based on unlocked badges, duel wins, and equipped title.
- * Strict hierarchy enforced: Diamond (Tier 4) > Gold (Tier 3) > Silver (Tier 2) > Bronze (Tier 1) > Starter (Tier 0)
+ * Strict hierarchy enforced: Mythic (Tier 5) > Diamond (Tier 4) > Gold (Tier 3) > Silver (Tier 2) > Bronze (Tier 1) > Starter (Tier 0)
  */
 export function getPrestigeTier(
   unlockedBadges: string[] = [],
@@ -1025,65 +1346,86 @@ export function getPrestigeTier(
   );
 
   const activeTitleName = matchedTitle?.name || customTitle || '3D Coğrafyacı Çırağı';
-  const titleTier = matchedTitle?.tier || (count >= 8 ? 'diamond' : count >= 5 ? 'gold' : count >= 2 ? 'silver' : count >= 1 ? 'bronze' : 'bronze');
-  const activePinIcon = matchedTitle?.icon || (count >= 8 ? '💎' : count >= 5 ? '👑' : count >= 2 ? '🛡️' : '🐣');
+  const titleTier = matchedTitle?.tier || (count >= 30 ? 'mythic' : count >= 20 ? 'diamond' : count >= 10 ? 'gold' : count >= 5 ? 'silver' : count >= 1 ? 'bronze' : 'bronze');
+  const activePinIcon = matchedTitle?.icon || (count >= 30 ? '🌌' : count >= 20 ? '💎' : count >= 10 ? '👑' : count >= 5 ? '🛡️' : '🐣');
 
-  // 4. KADEME: ELMAS & EFSANEVİ ZİRVE (En Yüksek ve En Belirgin Işıltı)
-  if (titleTier === 'diamond' || count >= 8 || duelWins >= 10 || unlockedBadges.includes('Efsanevi Coğrafyacı') || unlockedBadges.includes('Düello Şampiyonu') || unlockedBadges.includes('Tahtın Sahibi')) {
+  // 5. KADEME: MİSTİK KOZMİK ZİRVE (En Yüksek ve En Belirgin Kozmik Işıltı)
+  if (titleTier === 'mythic' || count >= 30 || duelWins >= 100 || unlockedBadges.includes('Kozmik Coğrafya Hükümdarı') || unlockedBadges.includes('Mutlak Tahtın Sahibi')) {
+    return {
+      tier: 'mythic',
+      tierLevel: 5,
+      tierLabel: '🌌 Mistik Kozmik Zirve',
+      title: activeTitleName,
+      badgeCount: count,
+      frameBorderClass: 'border-2 border-fuchsia-300 ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_45px_rgba(217,70,239,1),0_0_25px_rgba(6,182,212,0.9),0_0_35px_rgba(251,191,36,0.8)] animate-pulse',
+      glowClass: 'from-fuchsia-500 via-cyan-400 to-amber-300',
+      pinIcon: activePinIcon,
+      pinBadgeName: activeTitleName,
+      pinBorderClass: 'border-2 border-amber-200 bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950 text-amber-200 ring-2 ring-fuchsia-400 shadow-2xl shadow-fuchsia-500 animate-bounce',
+      gradientBg: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
+      titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_24px_rgba(217,70,239,0.8)] font-black',
+      ringClass: 'ring-4 ring-cyan-400',
+      sparkleEffect: true,
+      orbitalEffect: true
+    };
+  }
+
+  // 4. KADEME: ELMAS & EFSANEVİ ZİRVE
+  if (titleTier === 'diamond' || count >= 20 || duelWins >= 25 || unlockedBadges.includes('Efsanevi Coğrafyacı') || unlockedBadges.includes('Tahtın Sahibi')) {
     return {
       tier: 'diamond',
       tierLevel: 4,
       tierLabel: '💎 Elmas Zirve',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-cyan-200 ring-4 ring-purple-500 shadow-[0_0_35px_rgba(6,182,212,1),0_0_20px_rgba(168,85,247,0.85)] animate-pulse',
-      glowClass: 'from-cyan-400 via-fuchsia-500 to-amber-300',
+      frameBorderClass: 'border-2 border-cyan-200 ring-3 ring-indigo-500 shadow-[0_0_30px_rgba(6,182,212,0.95),0_0_15px_rgba(168,85,247,0.7)] animate-pulse',
+      glowClass: 'from-cyan-400 via-indigo-500 to-fuchsia-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
       pinBorderClass: 'border-2 border-cyan-200 bg-slate-950 text-cyan-200 ring-2 ring-purple-400 shadow-xl shadow-cyan-500/80 animate-bounce',
       gradientBg: 'bg-gradient-to-tr from-cyan-950 via-purple-950 to-indigo-950',
-      titleBadgeClass: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-200 to-amber-200 border-2 border-cyan-400 ring-2 ring-purple-500/70 shadow-[0_0_18px_rgba(6,182,212,0.7)] font-black',
-      ringClass: 'ring-4 ring-purple-500',
+      titleBadgeClass: 'text-cyan-200 border-2 border-cyan-400 ring-1 ring-purple-500/70 shadow-[0_0_15px_rgba(6,182,212,0.6)] font-black',
+      ringClass: 'ring-3 ring-indigo-500',
       sparkleEffect: true
     };
   }
 
   // 3. KADEME: ALTIN & ŞAMPİYON LİG (Belirgin Altın Parıltısı)
-  if (titleTier === 'gold' || count >= 5 || duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('KPSS Coğrafya Üstadı')) {
+  if (titleTier === 'gold' || count >= 10 || duelWins >= 3 || unlockedBadges.includes('1v1 Gladyatör') || unlockedBadges.includes('KPSS Coğrafya Üstadı') || unlockedBadges.includes('Düello Şampiyonu')) {
     return {
       tier: 'gold',
       tierLevel: 3,
       tierLabel: '👑 Altın Şampiyon',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-amber-300 ring-3 ring-amber-400/80 shadow-[0_0_22px_rgba(245,158,11,0.85)] animate-pulse',
+      frameBorderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.8)] animate-pulse',
       glowClass: 'from-amber-400 via-yellow-300 to-amber-500',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400/80 shadow-lg shadow-amber-500/50',
+      pinBorderClass: 'border-2 border-amber-300 bg-amber-950 text-amber-200 ring-2 ring-yellow-400/80 shadow-md shadow-amber-500/50',
       gradientBg: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-      titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.5)] font-black',
-      ringClass: 'ring-3 ring-amber-400/80',
+      titleBadgeClass: 'text-amber-300 border-2 border-amber-400 ring-1 ring-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.5)] font-black',
+      ringClass: 'ring-2 ring-amber-400',
       sparkleEffect: false
     };
   }
 
   // 2. KADEME: GÜMÜŞ & UZMAN LİG (Temiz Metalik Işıltı)
-  if (titleTier === 'silver' || count >= 2 || duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı') || unlockedBadges.includes('Tam İsabet Kaptan')) {
+  if (titleTier === 'silver' || count >= 5 || duelWins >= 1 || unlockedBadges.includes('Arena Çaylağı') || unlockedBadges.includes('Tam İsabet Kaptan')) {
     return {
       tier: 'silver',
       tierLevel: 2,
       tierLabel: '🛡️ Gümüş Uzman',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border-2 border-slate-200 ring-2 ring-slate-400/60 shadow-[0_0_14px_rgba(203,213,225,0.45)]',
+      frameBorderClass: 'border-2 border-slate-300/90 ring-1 ring-slate-400/50 shadow-[0_0_12px_rgba(203,213,225,0.4)]',
       glowClass: 'from-slate-300 via-sky-200/50 to-slate-400',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
-      pinBorderClass: 'border-2 border-slate-200 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-md',
+      pinBorderClass: 'border-2 border-slate-300 bg-slate-900 text-slate-100 ring-1 ring-slate-300/60 shadow-sm',
       gradientBg: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
-      titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_8px_rgba(203,213,225,0.3)] font-bold',
-      ringClass: 'ring-2 ring-slate-400/60',
+      titleBadgeClass: 'text-slate-200 border border-slate-300/70 shadow-[0_0_6px_rgba(203,213,225,0.3)] font-bold',
+      ringClass: 'ring-1 ring-slate-400/50',
       sparkleEffect: false
     };
   }
@@ -1096,14 +1438,14 @@ export function getPrestigeTier(
       tierLabel: '🐣 Bronz Çırak',
       title: activeTitleName,
       badgeCount: count,
-      frameBorderClass: 'border border-amber-700/70 ring-1 ring-amber-800/40 shadow-[0_0_8px_rgba(180,83,9,0.25)]',
+      frameBorderClass: 'border border-amber-700/70 ring-1 ring-amber-800/30 shadow-[0_0_6px_rgba(180,83,9,0.25)]',
       glowClass: 'from-amber-900/40 via-amber-800/30 to-amber-950/40',
       pinIcon: activePinIcon,
       pinBadgeName: activeTitleName,
       pinBorderClass: 'border border-amber-700 bg-amber-950 text-amber-300 shadow-sm',
       gradientBg: 'bg-gradient-to-tr from-amber-950/70 via-stone-900 to-slate-950',
       titleBadgeClass: 'text-amber-400 border border-amber-800/60 shadow-none font-semibold',
-      ringClass: 'ring-1 ring-amber-800/40',
+      ringClass: 'ring-1 ring-amber-800/30',
       sparkleEffect: false
     };
   }

@@ -33,7 +33,7 @@ export default function AvatarWithBadgeFrame({
   className = ''
 }: AvatarWithBadgeFrameProps) {
   const prestige = isDuelMode 
-    ? getDuelPrestigeTier(duelWins, duelStreak, unlockedBadges)
+    ? getDuelPrestigeTier(duelWins, duelStreak, unlockedBadges, equippedTitle)
     : getPrestigeTier(unlockedBadges, duelWins, equippedTitle);
 
   const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
@@ -51,30 +51,28 @@ export default function AvatarWithBadgeFrame({
       titleText: 'text-[9px]'
     },
     sm: {
-      container: 'w-8 h-8 text-xs font-black',
+      container: 'w-7.5 h-7.5 sm:w-8 sm:h-8 text-xs font-black',
       pin: '-top-1 -right-1 w-4 h-4 text-[9px]',
       titleText: 'text-[10px]'
     },
     md: {
-      container: 'w-10 h-10 text-sm font-black',
-      pin: '-top-1.5 -right-1.5 w-5 h-5 text-[11px]',
-      titleText: 'text-[11px]'
+      container: 'w-9 h-9 sm:w-10 sm:h-10 text-sm font-black',
+      pin: '-top-1.5 -right-1.5 w-4.5 h-4.5 sm:w-5 sm:h-5 text-[10px] sm:text-[11px]',
+      titleText: 'text-[10px] sm:text-[11px]'
     },
     lg: {
-      container: 'w-14 h-14 text-lg font-black',
-      pin: '-top-2 -right-2 w-6 h-6 text-xs',
+      container: 'w-12 h-12 sm:w-14 sm:h-14 text-base sm:text-lg font-black',
+      pin: '-top-2 -right-2 w-5.5 h-5.5 sm:w-6 sm:h-6 text-xs',
       titleText: 'text-xs'
     },
     xl: {
-      container: 'w-20 h-20 text-2xl font-black',
-      pin: '-top-2.5 -right-2.5 w-8 h-8 text-sm',
-      titleText: 'text-sm'
+      container: 'w-16 h-16 sm:w-20 sm:h-20 text-xl sm:text-2xl font-black',
+      pin: '-top-2.5 -right-2.5 w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm',
+      titleText: 'text-xs sm:text-sm'
     }
   }[size];
 
   const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
-
-  // Strict Hierarchy Pin & Glow styles
   const pinClass = themeObj?.badgePinBg || prestige.pinBorderClass;
 
   return (
@@ -83,22 +81,32 @@ export default function AvatarWithBadgeFrame({
         className={`relative inline-flex items-center justify-center rounded-full flex-shrink-0 select-none shadow-md transition-all ${sizeClasses.container} ${borderClass} ${bgClass}`}
         title={`${rumuz} • ${activeTitle} (${prestige.tierLabel} • ${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
       >
-        {/* Tier-Hierarchical Radial Glow Layer (Strictly proportional to tier level) */}
+        {/* Tier-Hierarchical Radial Glow Layer (Strictly proportional to tier level: 5 > 4 > 3 > 2 > 1 > 0) */}
         {prestige.tierLevel > 0 && (
           <div
             className={`absolute rounded-full bg-gradient-to-r ${prestige.glowClass} -z-10 transition-all ${
-              prestige.tierLevel === 4
-                ? '-inset-1 opacity-95 blur-[6px] animate-pulse'
+              prestige.tierLevel === 5
+                ? '-inset-1.5 opacity-100 blur-[8px] animate-pulse'
+                : prestige.tierLevel === 4
+                ? '-inset-1 opacity-90 blur-[6px] animate-pulse'
                 : prestige.tierLevel === 3
                 ? '-inset-0.5 opacity-75 blur-[4px] animate-pulse'
                 : prestige.tierLevel === 2
-                ? '-inset-0.5 opacity-55 blur-[3px]'
-                : '-inset-0.5 opacity-30 blur-[2px]'
+                ? '-inset-0.5 opacity-45 blur-[3px]'
+                : '-inset-0.5 opacity-25 blur-[2px]'
             }`}
           />
         )}
 
-        {/* Diamond Mythic Tier 4 Outer Sparkle Halo */}
+        {/* Level 5 Cosmic Mythic Orbital Halo Effect */}
+        {prestige.tierLevel === 5 && (
+          <>
+            <div className="absolute -inset-2 rounded-full border-2 border-fuchsia-400/80 ring-2 ring-cyan-400/70 animate-ping opacity-40 pointer-events-none -z-10" />
+            <div className="absolute -inset-1 rounded-full border border-amber-300/60 animate-spin opacity-50 pointer-events-none -z-10" style={{ animationDuration: '6s' }} />
+          </>
+        )}
+
+        {/* Level 4 Diamond Sparkle Halo */}
         {prestige.tierLevel === 4 && (
           <div className="absolute -inset-1.5 rounded-full border border-cyan-400/60 ring-1 ring-purple-400/50 animate-ping opacity-30 pointer-events-none -z-10" />
         )}

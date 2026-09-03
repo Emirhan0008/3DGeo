@@ -1,5 +1,5 @@
 import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, limit, query } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, limit, query, where } from 'firebase/firestore';
 
 export interface DuelSessionData {
   id?: string;
@@ -137,10 +137,10 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
       console.warn('Rumuzes query notice:', e);
     }
 
-    // 2. Scan matches from 'duels' collection to capture all duel participants
+    // 2. Scan matches from 'duels' collection ONLY to enrich existing registered users (NEVER resurrect deleted users or create 100-pt ghost entries)
     try {
       const duelsRef = collection(db, 'duels');
-      const duelSnap = await getDocs(query(duelsRef, limit(100)));
+      const duelSnap = await getDocs(query(duelsRef, limit(50)));
       duelSnap.forEach((dDoc) => {
         const data = dDoc.data() as DuelSessionData;
         if (!data) return;
@@ -151,38 +151,9 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
           if (!p || !p.rumuz || p.isBot) return;
           const pKey = p.rumuzKey || normalizeRumuzKey(p.rumuz);
           const isWinner = data.winnerId === p.id;
-          const matchScore = p.score || 100;
           
-          if (!resultsMap.has(pKey)) {
-            // New player discovered from past duel history!
-            resultsMap.set(pKey, {
-              rank: 0,
-              rumuz: p.rumuz,
-              rumuzKey: pKey,
-              avatarIcon: '⚔️',
-              avatarBg: 'gold_glory',
-              equippedTitle: isWinner ? '1v1 Gladyatör' : '3D Coğrafyacı Çırağı',
-              score: matchScore,
-              kpssScore: 0,
-              streak: isWinner ? 1 : 0,
-              correctAnswersCount: 0,
-              totalQuestionsAnswered: 0,
-              duelWins: isWinner ? 1 : 0,
-              duelLosses: !isWinner && data.winnerId !== 'draw' ? 1 : 0,
-              duelDraws: data.winnerId === 'draw' ? 1 : 0,
-              totalDuels: 1,
-              duelStreak: isWinner ? 1 : 0,
-              bestDuelStreak: isWinner ? 1 : 0,
-              duelScore: matchScore,
-              unlockedBadgesCount: 1,
-              accuracyPct: 80,
-              isAnonymous: false,
-              isUnranked: false,
-              statusText: 'Aktif Düellocu',
-              updatedAt: data.updatedAt || data.createdAt
-            });
-          } else {
-            // Ensure duel count, score and win streak are properly merged
+          // STRICT RULE: ONLY update if the user already exists in 'rumuzes' collection!
+          if (resultsMap.has(pKey)) {
             const existing = resultsMap.get(pKey)!;
             if (data.status === 'finished') {
               if (isWinner && existing.duelWins === 0) {
@@ -192,11 +163,6 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
               if (existing.totalDuels === 0) {
                 existing.totalDuels += 1;
               }
-            }
-            if (existing.score === 0 && matchScore > 0) {
-              existing.score = matchScore;
-              existing.isUnranked = false;
-              existing.statusText = 'Aktif Düellocu';
             }
           }
         });
@@ -375,32 +341,8 @@ export async function recordFinishedDuelToRumuzes(duel: DuelSessionData): Promis
             },
             updatedAt: new Date().toISOString()
           }, { merge: true });
-        } else {
-          // Create baseline profile for new duel player
-          await setDoc(ref, {
-            rumuz: player.rumuz,
-            rumuzKey: key,
-            pin: '1234',
-            score: player.score || 100,
-            streak: isWinner ? 1 : 0,
-            avatarIcon: '⚔️',
-            avatarBg: 'gold_glory',
-            equippedTitle: isWinner ? '1v1 Gladyatör' : '3D Coğrafyacı Çırağı',
-            unlockedBadges: ['3D Düellocu Adayı'],
-            totalQuestionsAnswered: duel.questionCount || 10,
-            correctAnswersCount: Math.round((duel.questionCount || 10) * 0.7),
-            duelStats: {
-              duelWins: isWinner ? 1 : 0,
-              duelLosses: !isWinner && !isDraw ? 1 : 0,
-              duelDraws: isDraw ? 1 : 0,
-              totalDuelsPlayed: 1,
-              duelScore: player.score || 0,
-              duelStreak: isWinner ? 1 : 0,
-              bestDuelStreak: isWinner ? 1 : 0
-            },
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
         }
+        // If snap does NOT exist, profile has been deleted or not registered yet. Do NOT create phantom 100-pt ghost records.
       } catch (err) {
         console.warn(`Error updating rumuz ${key} for duel finish:`, err);
       }
@@ -750,8 +692,43 @@ export async function deleteRumuzProfile(
     return { success: false, errorMsg: verifyRes.errorMsg || 'Silme onayı için doğru şifre girilmelidir.' };
   }
 
+  // 2. Cancel any pending auto sync
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+    syncTimeout = null;
+  }
+
   try {
+    // Delete profile doc
     await deleteDoc(doc(db, 'rumuzes', key));
+
+    // Delete any active, waiting or finished duel rooms associated with this user
+    try {
+      const duelsRef = collection(db, 'duels');
+      const s1 = await getDocs(query(duelsRef, where('player1.id', '==', key), limit(50)));
+      s1.forEach(d => deleteDoc(doc(db, 'duels', d.id)).catch(() => {}));
+
+      const s2 = await getDocs(query(duelsRef, where('player2.id', '==', key), limit(50)));
+      s2.forEach(d => deleteDoc(doc(db, 'duels', d.id)).catch(() => {}));
+
+      const s3 = await getDocs(query(duelsRef, where('player1.rumuz', '==', rumuz), limit(50)));
+      s3.forEach(d => deleteDoc(doc(db, 'duels', d.id)).catch(() => {}));
+
+      const s4 = await getDocs(query(duelsRef, where('player2.rumuz', '==', rumuz), limit(50)));
+      s4.forEach(d => deleteDoc(doc(db, 'duels', d.id)).catch(() => {}));
+    } catch {
+      // duel purge notice ignored
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('kpss3d_active_rumuz');
+      localStorage.removeItem('kpss3d_active_pin');
+      localStorage.removeItem('kpss3d_user_stats');
+      localStorage.removeItem('kpss3d_stats_' + rumuz);
+      localStorage.removeItem('kpss3d_stats_' + key);
+      localStorage.removeItem('kpss3d_is_anonymous');
+    }
+
     return { success: true };
   } catch (error) {
     console.error('Rumuz delete error:', error);
@@ -828,7 +805,16 @@ export function autoSyncStoreToCloud(stateData: {
 }) {
   if (typeof window === 'undefined') return;
 
-  const activeRumuz = localStorage.getItem('kpss3d_active_rumuz') || 'KPSS Gezgini';
+  const activeRumuz = localStorage.getItem('kpss3d_active_rumuz');
+  // If account was deleted or not configured, DO NOT auto sync or resurrect!
+  if (!activeRumuz || !activeRumuz.trim()) {
+    if (syncTimeout) {
+      clearTimeout(syncTimeout);
+      syncTimeout = null;
+    }
+    return;
+  }
+
   const activePin = localStorage.getItem('kpss3d_active_pin') || '1234';
   const isAnon = localStorage.getItem('kpss3d_is_anonymous') === 'true';
   const key = normalizeRumuzKey(activeRumuz);

@@ -53,10 +53,28 @@ export interface DuelRoundHistory {
   player2IsCorrect?: boolean;
 }
 
+export interface PlayerProfileInput {
+  id: string;
+  rumuz: string;
+  rumuzKey: string;
+  avatarIcon?: string;
+  avatarBg?: string;
+  equippedTitle?: string;
+  unlockedBadges?: string[];
+  duelWins?: number;
+  duelStreak?: number;
+}
+
 export interface DuelPlayer {
   id: string;
   rumuz: string;
   rumuzKey: string;
+  avatarIcon?: string;
+  avatarBg?: string;
+  equippedTitle?: string;
+  unlockedBadges?: string[];
+  duelWins?: number;
+  duelStreak?: number;
   isHost: boolean;
   score: number;
   totalDistanceKm: number;
@@ -281,7 +299,7 @@ export function getQuizQuestionsByIds(questionIds: string[]): MultipleChoiceQues
  * Creates a new Duel Room (either Quick Match or Private with Code & PIN)
  */
 export async function createDuelRoom(
-  player: { id: string; rumuz: string; rumuzKey: string },
+  player: PlayerProfileInput,
   options: {
     mode: 'quick' | 'private';
     duelType?: DuelType;
@@ -299,6 +317,12 @@ export async function createDuelRoom(
     id: player.id,
     rumuz: player.rumuz,
     rumuzKey: player.rumuzKey,
+    avatarIcon: player.avatarIcon,
+    avatarBg: player.avatarBg,
+    equippedTitle: player.equippedTitle,
+    unlockedBadges: player.unlockedBadges || [],
+    duelWins: player.duelWins || 0,
+    duelStreak: player.duelStreak || 0,
     isHost: true,
     score: 0,
     totalDistanceKm: 0,
@@ -362,7 +386,7 @@ export async function sendDuelHeartbeat(duelId: string): Promise<void> {
  * Actively purges stale/dead rooms (> 25 seconds inactive) to prevent phantom matchups.
  */
 export async function findOrCreateQuickMatch(
-  player: { id: string; rumuz: string; rumuzKey: string },
+  player: PlayerProfileInput,
   options: {
     duelType?: DuelType;
     questionCount: 10 | 20 | 30;
@@ -423,6 +447,12 @@ export async function findOrCreateQuickMatch(
           id: player.id,
           rumuz: player.rumuz,
           rumuzKey: player.rumuzKey,
+          avatarIcon: player.avatarIcon,
+          avatarBg: player.avatarBg,
+          equippedTitle: player.equippedTitle,
+          unlockedBadges: player.unlockedBadges || [],
+          duelWins: player.duelWins || 0,
+          duelStreak: player.duelStreak || 0,
           isHost: false,
           score: 0,
           totalDistanceKm: 0,
@@ -469,7 +499,7 @@ export async function findOrCreateQuickMatch(
  */
 export async function joinPrivateDuelRoom(
   roomCode: string,
-  player: { id: string; rumuz: string; rumuzKey: string },
+  player: PlayerProfileInput,
   roomPin?: string
 ): Promise<{ success: boolean; duel?: DuelSession; errorMsg?: string }> {
   try {
@@ -512,6 +542,12 @@ export async function joinPrivateDuelRoom(
       id: player.id,
       rumuz: player.rumuz,
       rumuzKey: player.rumuzKey,
+      avatarIcon: player.avatarIcon,
+      avatarBg: player.avatarBg,
+      equippedTitle: player.equippedTitle,
+      unlockedBadges: player.unlockedBadges || [],
+      duelWins: player.duelWins || 0,
+      duelStreak: player.duelStreak || 0,
       isHost: false,
       score: 0,
       totalDistanceKm: 0,
@@ -538,7 +574,7 @@ export async function joinPrivateDuelRoom(
   } catch (error) {
     console.error('Join duel room error:', error);
     handleFirestoreError(error, OperationType.GET, 'duels');
-    return { success: false, errorMsg: 'Odaya bağlanırken veritabanı hatası oluştu.' };
+    return { success: false, errorMsg: 'Odaya bağlanırken bağlantı hatası oluştu.' };
   }
 }
 
@@ -614,7 +650,7 @@ export async function findCrossModeWaitingRooms(
  */
 export async function joinSuggestedDuelRoom(
   duelId: string,
-  player: { id: string; rumuz: string; rumuzKey: string }
+  player: PlayerProfileInput
 ): Promise<{ success: boolean; duel?: DuelSession; errorMsg?: string }> {
   try {
     const duelRef = doc(db, 'duels', duelId);
@@ -633,6 +669,12 @@ export async function joinSuggestedDuelRoom(
       id: player.id,
       rumuz: player.rumuz,
       rumuzKey: player.rumuzKey,
+      avatarIcon: player.avatarIcon,
+      avatarBg: player.avatarBg,
+      equippedTitle: player.equippedTitle,
+      unlockedBadges: player.unlockedBadges || [],
+      duelWins: player.duelWins || 0,
+      duelStreak: player.duelStreak || 0,
       isHost: false,
       score: 0,
       totalDistanceKm: 0,
@@ -665,7 +707,7 @@ export async function joinSuggestedDuelRoom(
  * Starts a practice match against the AI / Bot opponent instantly
  */
 export async function startBotDuel(
-  player: { id: string; rumuz: string; rumuzKey: string },
+  player: PlayerProfileInput,
   options: {
     duelType?: DuelType;
     questionCount: 10 | 20 | 30;
@@ -681,6 +723,12 @@ export async function startBotDuel(
     id: player.id,
     rumuz: player.rumuz,
     rumuzKey: player.rumuzKey,
+    avatarIcon: player.avatarIcon,
+    avatarBg: player.avatarBg,
+    equippedTitle: player.equippedTitle,
+    unlockedBadges: player.unlockedBadges || [],
+    duelWins: player.duelWins || 0,
+    duelStreak: player.duelStreak || 0,
     isHost: true,
     score: 0,
     totalDistanceKm: 0,
@@ -694,6 +742,12 @@ export async function startBotDuel(
     id: 'kpss_ai_bot',
     rumuz: 'Coğrafya Yapay Zeka 🤖',
     rumuzKey: 'cografya_ai_bot',
+    avatarIcon: '🤖',
+    avatarBg: 'indigo_midnight',
+    equippedTitle: 'Turing Başmühendisi',
+    unlockedBadges: ['Yapay Zeka Mat Eden', 'Turing Ustası'],
+    duelWins: 50,
+    duelStreak: 3,
     isHost: false,
     score: 0,
     totalDistanceKm: 0,

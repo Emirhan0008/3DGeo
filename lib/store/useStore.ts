@@ -306,7 +306,12 @@ function processBadgeEvaluation(
         let isUnlocked = false;
         if (b.trackerKey === 'TamIsabet' && points === 100) isUnlocked = true;
         else if (b.trackerKey === 'Streak5' && currentStreak >= 5) isUnlocked = true;
+        else if (b.trackerKey === 'Streak10' && currentStreak >= 10) isUnlocked = true;
         else if (b.trackerKey === 'Score300' && currentScore >= 300) isUnlocked = true;
+        else if (b.trackerKey === 'Score1500' && currentScore >= 1500) isUnlocked = true;
+        else if (b.trackerKey === 'Score5000' && currentScore >= 5000) isUnlocked = true;
+        else if (b.trackerKey === 'BadgesCount20' && newBadges.length >= 20) isUnlocked = true;
+        else if (b.trackerKey === 'BadgesCount30' && newBadges.length >= 30) isUnlocked = true;
         else if (b.trackerKey === 'InitialStep') isUnlocked = true;
         else if ((newProgress[b.trackerKey] || 0) >= b.targetCount) isUnlocked = true;
 
@@ -726,13 +731,17 @@ export const useAppStore = create<AppState>((set, get) => ({
         newBadges.push('Yapay Zeka Mat Eden');
         newlyUnlockedBadge = { name: 'Yapay Zeka Mat Eden', icon: '⚡', desc: 'Yapay zekayı 10 kez mat ettin!' };
       }
-      if (!newBadges.includes('Siber Antrenör') && newWins >= 20) {
+      if (!newBadges.includes('Siber Antrenör') && newWins >= 25) {
         newBadges.push('Siber Antrenör');
-        newlyUnlockedBadge = { name: 'Siber Antrenör', icon: '🚀', desc: 'Yapay zekaya karşı 20 zaferle antrenman ustası oldun!' };
+        newlyUnlockedBadge = { name: 'Siber Antrenör', icon: '🚀', desc: 'Yapay zekaya karşı 25 zaferle antrenman ustası oldun!' };
       }
-      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 8) {
+      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 20) {
         newBadges.push('Efsanevi Coğrafyacı');
-        newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '8 rozetle efsanevi prestij seviyesine ulaştın!' };
+        newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '20 rozetle efsanevi elmas prestij seviyesine ulaştın!' };
+      }
+      if (!newBadges.includes('Kozmik Coğrafya Hükümdarı') && newBadges.length >= 30) {
+        newBadges.push('Kozmik Coğrafya Hükümdarı');
+        newlyUnlockedBadge = { name: 'Kozmik Coğrafya Hükümdarı', icon: '🌌', desc: '30 rozetle mistik kozmik zirveye ulaştın!' };
       }
 
       set({
@@ -776,13 +785,29 @@ export const useAppStore = create<AppState>((set, get) => ({
         newBadges.push('Tahtın Sahibi');
         newlyUnlockedBadge = { name: 'Tahtın Sahibi', icon: '🏆', desc: '25 canlı düello zaferiyle mutlak arena efsanesi oldun!' };
       }
+      if (!newBadges.includes('50 Düello Zaferi') && newWins >= 50) {
+        newBadges.push('50 Düello Zaferi');
+        newlyUnlockedBadge = { name: '50 Düello Zaferi', icon: '⚔️', desc: 'Canlı düellolarda 50 zaferle arena efsanelerine katıldın!' };
+      }
+      if (!newBadges.includes('Mutlak Tahtın Sahibi') && newWins >= 100) {
+        newBadges.push('Mutlak Tahtın Sahibi');
+        newlyUnlockedBadge = { name: 'Mutlak Tahtın Sahibi', icon: '🔱', desc: '100 canlı düello zaferiyle mutlak arena tahtına oturdun!' };
+      }
       if (!newBadges.includes('Yenilmez Fatih') && newStreak >= 3) {
         newBadges.push('Yenilmez Fatih');
         newlyUnlockedBadge = { name: 'Yenilmez Fatih', icon: '🔥', desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın!' };
       }
-      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 8) {
+      if (!newBadges.includes("10'lu Yenilmez Seri") && newStreak >= 10) {
+        newBadges.push("10'lu Yenilmez Seri");
+        newlyUnlockedBadge = { name: "10'lu Yenilmez Seri", icon: '☀️', desc: 'Canlı düellolarda üst üste 10 maç kazanarak efsanevi namağlup seri yakaladın!' };
+      }
+      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 20) {
         newBadges.push('Efsanevi Coğrafyacı');
-        newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '8 rozetle efsanevi prestij seviyesine ulaştın!' };
+        newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '20 rozetle efsanevi elmas prestij seviyesine ulaştın!' };
+      }
+      if (!newBadges.includes('Kozmik Coğrafya Hükümdarı') && newBadges.length >= 30) {
+        newBadges.push('Kozmik Coğrafya Hükümdarı');
+        newlyUnlockedBadge = { name: 'Kozmik Coğrafya Hükümdarı', icon: '🌌', desc: '30 rozetle mistik kozmik zirveye ulaştın!' };
       }
 
       set({

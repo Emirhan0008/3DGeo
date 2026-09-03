@@ -1317,13 +1317,13 @@ export default function DuelMode() {
             <div className="flex flex-col items-center">
               <AvatarWithBadgeFrame 
                 rumuz={activeDuelSession.player1.rumuz}
-                unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : ['3D Coğrafyacı']}
-                duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : 1}
-                duelStreak={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : 0}
+                unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player1.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
+                duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player1.duelWins || 1)}
+                duelStreak={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player1.duelStreak || 0)}
                 isDuelMode={true}
-                avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : '⚔️'}
-                avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : 'night_blue'}
-                equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : 'KPSS Adayı'}
+                avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player1.avatarIcon || '⚔️')}
+                avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player1.avatarBg || 'night_blue')}
+                equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player1.equippedTitle || '3D Coğrafyacı Çırağı')}
                 size="lg"
               />
               <span className="text-sm font-black text-indigo-300 max-w-[120px] truncate mt-2">
@@ -1345,10 +1345,13 @@ export default function DuelMode() {
             <div className="flex flex-col items-center">
               <AvatarWithBadgeFrame 
                 rumuz={activeDuelSession.player2?.rumuz || 'Rakip'}
-                unlockedBadges={activeDuelSession.player2?.isBot ? ['KPSS Yapay Zeka'] : ['1v1 Gladyatör']}
-                duelWins={activeDuelSession.player2?.isBot ? 99 : 3}
-                duelStreak={activeDuelSession.player2?.isBot ? 5 : 1}
+                unlockedBadges={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player2?.unlockedBadges || (activeDuelSession.player2?.isBot ? ['Turing Ustası'] : ['1v1 Gladyatör']))}
+                duelWins={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player2?.duelWins ?? (activeDuelSession.player2?.isBot ? 50 : 3))}
+                duelStreak={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player2?.duelStreak ?? (activeDuelSession.player2?.isBot ? 3 : 1))}
                 isDuelMode={true}
+                avatarIcon={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player2?.avatarIcon || (activeDuelSession.player2?.isBot ? '🤖' : '⚔️'))}
+                avatarBg={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player2?.avatarBg || (activeDuelSession.player2?.isBot ? 'indigo_midnight' : 'gold_glory'))}
+                equippedTitle={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player2?.equippedTitle || (activeDuelSession.player2?.isBot ? 'Turing Başmühendisi' : '1v1 Gladyatör'))}
                 size="lg"
               />
               <span className="text-sm font-black text-rose-300 max-w-[120px] truncate mt-2">
@@ -1408,13 +1411,13 @@ export default function DuelMode() {
               <div className="flex items-center justify-center gap-1.5 mb-0.5">
                 <AvatarWithBadgeFrame 
                   rumuz={activeDuelSession.player1.rumuz}
-                  unlockedBadges={unlockedBadges}
-                  duelWins={duelStats.duelWins}
-                  duelStreak={duelStats.duelStreak}
+                  unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player1.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
+                  duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player1.duelWins || 1)}
+                  duelStreak={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player1.duelStreak || 0)}
                   isDuelMode={true}
-                  avatarIcon={avatarIcon}
-                  avatarBg={avatarBg}
-                  equippedTitle={equippedTitle}
+                  avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player1.avatarIcon || '⚔️')}
+                  avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player1.avatarBg || 'night_blue')}
+                  equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player1.equippedTitle || '3D Coğrafyacı Çırağı')}
                   size="sm"
                 />
                 <span className="text-xs font-bold text-slate-200 truncate">
@@ -1436,10 +1439,13 @@ export default function DuelMode() {
               <div className="flex items-center justify-center gap-1.5 mb-0.5">
                 <AvatarWithBadgeFrame 
                   rumuz={activeDuelSession.player2?.rumuz || 'Rakip'}
-                  unlockedBadges={activeDuelSession.player2?.isBot ? ['KPSS Yapay Zeka'] : ['Düello Yarışçısı']}
-                  duelWins={activeDuelSession.player2?.isBot ? 50 : 2}
-                  duelStreak={activeDuelSession.player2?.isBot ? 2 : 0}
+                  unlockedBadges={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player2?.unlockedBadges || (activeDuelSession.player2?.isBot ? ['Turing Ustası'] : ['1v1 Gladyatör']))}
+                  duelWins={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player2?.duelWins ?? (activeDuelSession.player2?.isBot ? 50 : 2))}
+                  duelStreak={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player2?.duelStreak ?? (activeDuelSession.player2?.isBot ? 3 : 0))}
                   isDuelMode={true}
+                  avatarIcon={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player2?.avatarIcon || (activeDuelSession.player2?.isBot ? '🤖' : '⚔️'))}
+                  avatarBg={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player2?.avatarBg || (activeDuelSession.player2?.isBot ? 'indigo_midnight' : 'gold_glory'))}
+                  equippedTitle={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player2?.equippedTitle || (activeDuelSession.player2?.isBot ? 'Turing Başmühendisi' : '1v1 Gladyatör'))}
                   size="sm"
                 />
                 <span className="text-xs font-bold text-slate-200 truncate">
@@ -1733,10 +1739,13 @@ export default function DuelMode() {
               </div>
               <AvatarWithBadgeFrame 
                 rumuz={otherPlayer?.rumuz || 'Rakip'}
-                unlockedBadges={otherPlayer?.isBot ? ['KPSS Yapay Zeka'] : ['Düello Yarışçısı']}
-                duelWins={otherPlayer?.isBot ? 50 : 2}
-                duelStreak={otherPlayer?.isBot ? 2 : 0}
+                unlockedBadges={otherPlayer?.unlockedBadges || (otherPlayer?.isBot ? ['Turing Ustası'] : ['Düello Yarışçısı'])}
+                duelWins={otherPlayer?.duelWins ?? (otherPlayer?.isBot ? 50 : 2)}
+                duelStreak={otherPlayer?.duelStreak ?? (otherPlayer?.isBot ? 3 : 0)}
                 isDuelMode={true}
+                avatarIcon={otherPlayer?.avatarIcon || (otherPlayer?.isBot ? '🤖' : '⚔️')}
+                avatarBg={otherPlayer?.avatarBg || (otherPlayer?.isBot ? 'indigo_midnight' : 'gold_glory')}
+                equippedTitle={otherPlayer?.equippedTitle || (otherPlayer?.isBot ? 'Turing Başmühendisi' : 'Düello Yarışçısı')}
                 size="sm"
               />
             </div>
@@ -1989,10 +1998,13 @@ export default function DuelMode() {
             </div>
             <AvatarWithBadgeFrame 
               rumuz={otherPlayer?.rumuz || 'Rakip'}
-              unlockedBadges={otherPlayer?.isBot ? ['KPSS Yapay Zeka'] : ['Düello Yarışçısı']}
-              duelWins={otherPlayer?.isBot ? 50 : 2}
-              duelStreak={otherPlayer?.isBot ? 2 : 0}
+              unlockedBadges={otherPlayer?.unlockedBadges || (otherPlayer?.isBot ? ['Turing Ustası'] : ['Düello Yarışçısı'])}
+              duelWins={otherPlayer?.duelWins ?? (otherPlayer?.isBot ? 50 : 2)}
+              duelStreak={otherPlayer?.duelStreak ?? (otherPlayer?.isBot ? 3 : 0)}
               isDuelMode={true}
+              avatarIcon={otherPlayer?.avatarIcon || (otherPlayer?.isBot ? '🤖' : '⚔️')}
+              avatarBg={otherPlayer?.avatarBg || (otherPlayer?.isBot ? 'indigo_midnight' : 'gold_glory')}
+              equippedTitle={otherPlayer?.equippedTitle || (otherPlayer?.isBot ? 'Turing Başmühendisi' : 'Düello Yarışçısı')}
               size="sm"
             />
           </div>
