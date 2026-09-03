@@ -22,6 +22,7 @@ const MAP_STYLES: { id: MapStyleType; label: string; icon: string }[] = [
 export default function LayerSidebar() {
   const { isFullscreen } = useAppFullscreen();
   const {
+    activeTab,
     isSidebarOpen,
     setSidebarOpen,
     layers,
@@ -64,7 +65,8 @@ export default function LayerSidebar() {
   const activeLayersCount = Object.values(layers).filter(Boolean).length;
   const totalLayersCount = Object.keys(layers).length;
 
-  if (isFullscreen && !isExpanded) {
+  // In fullscreen mode, or when active tab is not exploration map, hide the collapsed edge strip so it NEVER overlaps games or modals
+  if ((isFullscreen || activeTab !== 'map') && !isExpanded) {
     return null;
   }
 
@@ -73,17 +75,19 @@ export default function LayerSidebar() {
       id="kpss-layer-sidebar"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute left-2 top-2 bottom-2 z-40 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-1rem)] max-h-full ${
+      className={`absolute left-1 sm:left-2 top-1 sm:top-2 bottom-1 sm:bottom-2 backdrop-blur-2xl border border-white/15 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] max-h-full ${
+        isExpanded ? 'z-45' : 'z-20'
+      } ${
         isExpanded
           ? isHovered || isPinned
-            ? 'w-72 sm:w-80 bg-slate-950/95 opacity-100'
-            : 'w-72 sm:w-80 bg-slate-950/80 opacity-90 hover:opacity-100'
+            ? 'w-[85vw] max-w-xs sm:w-80 bg-slate-950/95 opacity-100'
+            : 'w-[85vw] max-w-xs sm:w-80 bg-slate-950/85 opacity-90 hover:opacity-100'
           : isHovered
-          ? 'w-11 sm:w-12 bg-slate-950/95 opacity-100'
-          : 'w-11 sm:w-12 bg-slate-950/65 opacity-70 hover:opacity-100'
+          ? 'w-7 sm:w-9 bg-slate-950/95 opacity-100'
+          : 'w-7 sm:w-9 bg-slate-950/65 opacity-70 hover:opacity-100'
       }`}
     >
-      {/* Collapsed Compact State */}
+      {/* Collapsed Ultra-Slim State */}
       {!isExpanded ? (
         <div 
           onClick={() => {
@@ -95,27 +99,27 @@ export default function LayerSidebar() {
             setSidebarOpen(true);
             setIsPinned(true);
           }}
-          className="w-full h-full flex flex-col items-center justify-between py-3.5 cursor-pointer hover:bg-white/5 active:bg-white/10 transition-all select-none touch-manipulation"
+          className="w-full h-full flex flex-col items-center justify-between py-2 sm:py-3 cursor-pointer hover:bg-white/5 active:bg-white/10 transition-all select-none touch-manipulation"
         >
-          <div className="flex flex-col items-center gap-2 pointer-events-none">
-            <div className="relative p-2 bg-indigo-600/25 border border-indigo-500/40 rounded-xl text-indigo-400">
-              <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="flex flex-col items-center gap-1.5 pointer-events-none">
+            <div className="relative p-1 sm:p-1.5 bg-indigo-600/25 border border-indigo-500/40 rounded-lg text-indigo-400">
+              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {activeLayersCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 px-1 min-w-[16px] h-4 bg-indigo-500 text-white font-black text-[9px] rounded-full flex items-center justify-center border border-slate-950">
+                <span className="absolute -top-1 -right-1 px-1 min-w-[14px] h-3.5 bg-indigo-500 text-white font-black text-[8px] rounded-full flex items-center justify-center border border-slate-950">
                   {activeLayersCount}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-2 pointer-events-none">
-            <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-extrabold tracking-widest uppercase text-slate-400 hover:text-indigo-300 transition-colors whitespace-nowrap">
-              KATMANLAR ({activeLayersCount})
+          <div className="flex-1 flex items-center justify-center my-1 pointer-events-none overflow-hidden">
+            <span className="[writing-mode:vertical-rl] rotate-180 text-[8px] sm:text-[9px] font-black tracking-wider uppercase text-slate-400 hover:text-indigo-300 transition-colors whitespace-nowrap">
+              KATMANLAR {activeLayersCount > 0 ? `(${activeLayersCount})` : ''}
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-1.5 pointer-events-none">
-            <ChevronRight className="w-4 h-4 text-indigo-400" />
+          <div className="flex flex-col items-center gap-1 pointer-events-none">
+            <ChevronRight className="w-3 h-3 text-indigo-400" />
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -123,15 +127,15 @@ export default function LayerSidebar() {
                 setIsPinned(true);
               }}
               title="Sabitle"
-              className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all pointer-events-auto"
+              className="p-0.5 rounded hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all pointer-events-auto"
             >
-              <Pin className="w-3.5 h-3.5" />
+              <Pin className="w-3 h-3" />
             </button>
           </div>
         </div>
       ) : (
         /* Expanded Full Smooth Scrolling State */
-        <div className="w-72 sm:w-80 h-full flex flex-col">
+        <div className="w-full h-full flex flex-col">
           {/* Header Bar */}
           <div className="p-3 border-b border-white/10 flex items-center justify-between bg-white/[0.03] shrink-0">
             <div className="flex items-center gap-2">

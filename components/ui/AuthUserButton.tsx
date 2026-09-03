@@ -523,17 +523,18 @@ export default function AuthUserButton() {
       {!activeDisplayName ? (
         <button
           onClick={() => setShowAuthModal(true)}
-          className="px-3 py-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-500/20 border border-amber-300/50 flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black rounded-lg sm:rounded-xl text-[10px] sm:text-xs shadow-lg shadow-indigo-500/20 border border-amber-300/50 flex items-center gap-1 sm:gap-1.5 transition-all active:scale-95 shrink-0 cursor-pointer"
           title="Rumuz Gir veya Geçmiş Yükle"
         >
-          <LogIn className="w-4 h-4 text-amber-300" />
-          <span>Rumuz Gir / Giriş Yap</span>
+          <LogIn className="w-3.5 h-3.5 text-amber-300" />
+          <span className="hidden xs:inline">Rumuz Gir</span>
+          <span className="xs:hidden">Giriş</span>
         </button>
       ) : (
-        <div className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border-2 border-amber-400/70 rounded-xl p-1 text-xs font-black shrink-0 shadow-lg">
+        <div className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border border-amber-400/70 rounded-lg sm:rounded-xl p-0.5 sm:p-1 text-xs font-black shrink-0 shadow-lg">
           <button
             onClick={() => setShowProfileEditModal(true)}
-            className="flex items-center gap-2 px-1.5 py-0.5 hover:bg-white/10 rounded-lg transition-all text-left"
+            className="flex items-center gap-1.5 sm:gap-2 px-1 sm:px-1.5 py-0.5 hover:bg-white/10 rounded-md sm:rounded-lg transition-all text-left"
             title="Profili Düzenle, Avatarını Değiştir veya Hesabı Yönet"
           >
             <AvatarWithBadgeFrame
@@ -546,25 +547,25 @@ export default function AuthUserButton() {
               size="sm"
             />
             <div className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <span className="text-amber-300 font-black truncate max-w-[90px] leading-tight">
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                <span className="text-amber-300 font-black truncate max-w-[55px] xs:max-w-[75px] sm:max-w-[100px] text-[10px] sm:text-xs leading-tight">
                   {activeDisplayName}
                 </span>
-                <Settings className="w-3 h-3 text-slate-400 hover:text-amber-300 transition-colors" />
+                <Settings className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 hover:text-amber-300 transition-colors" />
               </div>
-              <span className="text-[9px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5">
-                <CloudCheck className="w-2.5 h-2.5 text-emerald-300" />
-                {equippedTitle}
+              <span className="text-[8px] sm:text-[9px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5 truncate max-w-[65px] sm:max-w-[100px]">
+                <CloudCheck className="w-2 h-2 text-emerald-300 shrink-0" />
+                <span className="truncate">{equippedTitle}</span>
               </span>
             </div>
           </button>
 
           <button
             onClick={handleSignOut}
-            className="p-1 text-slate-400 hover:text-rose-400 transition-colors border-l border-white/10 pl-1.5 pr-1"
+            className="p-1 text-slate-400 hover:text-rose-400 transition-colors border-l border-white/10 pl-1 sm:pl-1.5 pr-0.5 sm:pr-1"
             title="Oturumu Kapat / Rumuz Değiştir"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </button>
         </div>
       )}
@@ -604,11 +605,11 @@ export default function AuthUserButton() {
       {/* Auth Selector Modal */}
       {showAuthModal && mounted && createPortal(
         <div 
-          className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setShowAuthModal(false)}
         >
           <div 
-            className="bg-[#09090b] border-2 border-amber-400/80 rounded-2xl max-w-md w-full p-5 text-slate-100 shadow-2xl relative space-y-4"
+            className="bg-[#09090b] border-2 border-amber-400/80 rounded-2xl max-w-md w-full p-4 sm:p-5 text-slate-100 shadow-2xl relative space-y-3 sm:space-y-4 max-h-[95vh] overflow-y-auto my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <button

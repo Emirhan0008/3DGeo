@@ -152,10 +152,10 @@ export default function StatsModal() {
   };
 
   return (
-    <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 w-[95%] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden text-slate-100 p-4 transition-all max-h-[88vh] overflow-y-auto">
+    <div className="absolute top-11 sm:top-4 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-[95%] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl text-slate-100 p-3 sm:p-4 transition-all max-h-[88vh] overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-2.5">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <AvatarWithBadgeFrame 
             rumuz="Sen"
             unlockedBadges={unlockedBadges}
@@ -165,11 +165,11 @@ export default function StatsModal() {
             equippedTitle={equippedTitle}
             size="md"
           />
-          <div>
-            <h2 className="font-black text-sm sm:text-base text-white tracking-wide">
+          <div className="min-w-0">
+            <h2 className="font-black text-xs sm:text-base text-white tracking-wide truncate">
               AKILLI KPSS COĞRAFYA TEŞHİS &amp; ANALİZ PANOSU
             </h2>
-            <p className="text-[10px] text-slate-400 font-medium">
+            <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium truncate">
               Soru, harita ve 1v1 canlı düello testlerinizden elde edilen kişisel gelişim verileri
             </p>
           </div>

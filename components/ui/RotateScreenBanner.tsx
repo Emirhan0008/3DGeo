@@ -59,7 +59,7 @@ export default function RotateScreenBanner() {
   if (!isVisible || isFullscreen) return null;
 
   return (
-    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[94vw] max-w-lg bg-gradient-to-r from-amber-500 via-indigo-600 to-amber-500 text-slate-950 p-0.5 rounded-2xl shadow-2xl animate-bounce">
+    <div className="fixed bottom-16 sm:bottom-3 left-1/2 -translate-x-1/2 z-50 w-[94vw] max-w-lg bg-gradient-to-r from-amber-500 via-indigo-600 to-amber-500 text-slate-950 p-0.5 rounded-2xl shadow-2xl animate-bounce">
       <div className="bg-[#09090b]/95 backdrop-blur-2xl rounded-[14px] p-2.5 sm:p-3 flex items-center justify-between gap-2 text-white border border-amber-400/60 shadow-inner">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="p-1.5 sm:p-2 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40 animate-pulse shrink-0">

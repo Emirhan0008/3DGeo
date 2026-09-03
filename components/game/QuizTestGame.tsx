@@ -183,7 +183,7 @@ export default function QuizTestGame() {
   }
 
   // Card classes (compact floating card over map)
-  const containerClasses = "absolute top-11 sm:top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all";
+  const containerClasses = "absolute top-11 sm:top-2 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[85vw] md:w-[520px] lg:w-[560px] max-w-2xl max-h-[88vh] overflow-y-auto bg-[#09090b]/95 backdrop-blur-2xl border border-emerald-500/40 rounded-xl shadow-2xl overflow-hidden text-slate-100 p-1.5 transition-all";
 
   return (
     <DraggableCard

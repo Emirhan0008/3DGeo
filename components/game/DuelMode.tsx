@@ -714,16 +714,16 @@ export default function DuelMode() {
     return (
       <div 
         onClick={(e) => { if (e.target === e.currentTarget) setActiveTab('map'); }}
-        className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+        className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
       >
-        <div className="w-full max-w-md bg-[#09090b]/95 border border-amber-500/40 rounded-2xl shadow-2xl p-6 text-white animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-md max-h-[92vh] overflow-y-auto bg-[#09090b]/95 border border-amber-500/40 rounded-2xl shadow-2xl p-4 sm:p-6 text-white animate-in zoom-in-95 duration-200 my-auto">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <Swords className="w-6 h-6 text-slate-950" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+              <Swords className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-amber-400">1v1 Canlı KPSS Düellosu</h2>
-              <p className="text-xs text-slate-300">Rumuz ve şifrenizi belirleyerek arenaya adım atın</p>
+              <h2 className="text-base sm:text-xl font-black text-amber-400">1v1 Canlı KPSS Düellosu</h2>
+              <p className="text-[11px] sm:text-xs text-slate-300">Rumuz ve şifrenizi belirleyerek arenaya adım atın</p>
             </div>
           </div>
 
@@ -815,7 +815,7 @@ export default function DuelMode() {
       >
         <div 
           onClick={(e) => e.stopPropagation()} 
-          className="w-full max-w-2xl bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-4 sm:p-5 text-white my-auto cursor-default animate-in zoom-in-95 duration-150"
+          className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-3 sm:p-5 text-white my-auto cursor-default animate-in zoom-in-95 duration-150"
         >
           {/* Header with Avatar and Frame */}
           <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">

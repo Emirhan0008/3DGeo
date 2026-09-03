@@ -67,12 +67,12 @@ export default function Navbar() {
   // Render Inner Content of Navbar (Used in both standard and fullscreen drawer modes)
   const renderNavbarContent = () => (
     <>
-      <div className="flex items-center justify-between gap-1.5 sm:gap-2 w-full">
+      <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
         {/* Left: Brand & Sidebar Toggle */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <button
             onClick={toggleSidebar}
-            className={`p-1 sm:p-1.5 border rounded-xl text-indigo-200 transition-all flex items-center gap-1.5 text-xs font-bold active:scale-95 shrink-0 shadow-sm ${
+            className={`p-1 sm:p-1.5 border rounded-lg sm:rounded-xl text-indigo-200 transition-all flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-bold active:scale-95 shrink-0 shadow-sm cursor-pointer ${
               activeLayersCount > 0
                 ? 'bg-indigo-600/30 hover:bg-indigo-600/45 border-indigo-400/80 text-white shadow-indigo-500/20'
                 : 'bg-indigo-500/20 hover:bg-indigo-500/35 border-indigo-400/60'
@@ -85,29 +85,29 @@ export default function Navbar() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400"></span>
               </span>
             ) : (
-              <span className="px-1 py-0.2 text-[10px] font-black bg-indigo-500 text-white rounded-md">
+              <span className="px-1 py-0.2 text-[9px] sm:text-[10px] font-black bg-indigo-500 text-white rounded-md">
                 {activeLayersCount}
               </span>
             )}
-            <Sliders className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-300" />
-            <span className="text-xs">Katmanlar</span>
+            <Sliders className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-300" />
+            <span className="hidden xs:inline text-[11px] sm:text-xs">Katmanlar</span>
           </button>
 
           <div 
             className="flex items-center gap-1 cursor-pointer shrink-0" 
             onClick={() => handleTabChange('map')}
           >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md border border-white/20 shrink-0">
-              <Mountain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-500 rounded-lg flex items-center justify-center shadow-md border border-white/20 shrink-0">
+              <Mountain className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-xs sm:text-sm font-black tracking-tight text-white hidden xs:inline">
+            <span className="text-xs sm:text-sm font-black tracking-tight text-white hidden md:inline">
               COĞRAFYA <span className="text-amber-400">3D</span>
             </span>
           </div>
         </div>
 
-        {/* Center: Navigation Tabs */}
-        <nav className="hidden lg:flex max-h-[550px]:flex items-center gap-1 bg-[#09090b]/80 p-0.5 sm:p-1 rounded-xl border border-white/15 shadow-inner overflow-x-auto scrollbar-none shrink">
+        {/* Center: Navigation Tabs (Desktop & Wide Landscape View) */}
+        <nav className="hidden lg:flex items-center gap-1 bg-[#09090b]/80 p-0.5 sm:p-1 rounded-xl border border-white/15 shadow-inner overflow-x-auto scrollbar-none shrink">
           <button
             onClick={() => handleTabChange('map')}
             className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap border shrink-0 ${
@@ -191,18 +191,18 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {/* Global Leaderboard Button (Replaces Score and Category) */}
+          {/* Global Leaderboard Button */}
           <button
             onClick={() => setIsLeaderboardOpen(true)}
-            className="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/10 hover:from-amber-500 hover:to-yellow-500 hover:text-slate-950 text-amber-300 border border-amber-400/50 hover:border-amber-300 text-[10px] sm:text-xs font-black flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
+            className="px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/10 hover:from-amber-500 hover:to-yellow-500 hover:text-slate-950 text-amber-300 border border-amber-400/50 hover:border-amber-300 text-[10px] sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
             title="Global Sıralama ve Canlı Liderlik Tablosunu Aç"
           >
-            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 group-hover:text-slate-950" />
-            <span className="font-extrabold tracking-tight">Sıralama</span>
+            <Trophy className="w-3.5 h-3.5 text-amber-400 group-hover:text-slate-950" />
+            <span className="font-extrabold tracking-tight hidden xs:inline">Sıralama</span>
           </button>
 
           {/* Search Bar */}
-          <div className="relative w-16 xs:w-20 sm:w-28 md:w-36">
+          <div className="relative w-14 xs:w-20 sm:w-28 md:w-36">
             <div className="relative flex items-center">
               <Search className="absolute left-1.5 sm:left-2 w-3 h-3 text-slate-400" />
               <input
@@ -220,7 +220,7 @@ export default function Navbar() {
 
             {/* Search Dropdown */}
             {showSearchResults && filteredSearchItems.length > 0 && (
-              <div className="absolute top-full right-0 mt-1.5 w-52 sm:w-56 bg-[#09090b] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+              <div className="absolute top-full right-0 mt-1.5 w-48 sm:w-56 bg-[#09090b] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
                 {filteredSearchItems.map((item) => (
                   <button
                     key={item.id}
@@ -237,14 +237,14 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Fullscreen Button - Highlighted & Pulsing on Harita Testi if not fullscreen */}
+          {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl border transition-all text-[9px] sm:text-xs font-black flex items-center gap-1 active:scale-95 shadow-md shrink-0 ${
+            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl border transition-all text-[9px] sm:text-xs font-black flex items-center gap-1 active:scale-95 shadow-md shrink-0 cursor-pointer ${
               isFullscreen
                 ? 'bg-slate-800 text-amber-300 border-amber-400/60 shadow-amber-500/20'
                 : activeTab === 'pin_game'
-                ? 'animate-bounce ring-4 ring-amber-400 bg-amber-400 text-slate-950 font-black shadow-xl shadow-amber-500/60 border-amber-200'
+                ? 'ring-2 ring-amber-400 bg-amber-400 text-slate-950 font-black shadow-lg border-amber-200'
                 : 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 border-amber-200 ring-1 ring-amber-400/40 shadow-amber-500/30 hover:brightness-110'
             }`}
             title={isFullscreen ? 'Tam Ekrandan Çık' : 'Uygulamayı Tam Ekran Yap (Haritayı Büyüt)'}
@@ -254,7 +254,7 @@ export default function Navbar() {
             ) : (
               <Maximize2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-950 font-black" />
             )}
-            <span className="font-black uppercase tracking-tight hidden xs:inline">
+            <span className="font-black uppercase tracking-tight hidden md:inline">
               {isFullscreen ? 'Çık' : 'Tam Ekran'}
             </span>
           </button>
@@ -288,12 +288,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Bottom Mobile Scrollable Navigation Tabs (Only shown in Portrait Mobile when height > 550px) */}
-      <div className="flex lg:hidden max-h-[550px]:hidden items-center justify-between gap-1 mt-1 pt-1 border-t border-white/10 overflow-x-auto scrollbar-none">
-        <nav className="flex items-center gap-1.5 w-full overflow-x-auto py-0.5 scrollbar-none">
+      {/* Bottom Mobile Scrollable Navigation Tabs (Only shown on small screens) */}
+      <div className="flex lg:hidden items-center justify-between gap-1 mt-1 pt-1 border-t border-white/10 overflow-x-auto scrollbar-none">
+        <nav className="flex items-center gap-1 w-full overflow-x-auto py-0.5 scrollbar-none">
           <button
             onClick={() => handleTabChange('map')}
-            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'map'
                 ? 'bg-indigo-600 text-white border-indigo-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
@@ -305,7 +305,7 @@ export default function Navbar() {
 
           <button
             onClick={() => handleTabChange('pin_game')}
-            className={`relative px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
+            className={`relative px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
               activeTab === 'pin_game'
                 ? 'bg-amber-500 text-slate-950 border-amber-200 shadow-md'
                 : 'bg-amber-500/15 text-amber-300 border-amber-400/60 hover:bg-amber-500/25'
@@ -321,7 +321,7 @@ export default function Navbar() {
 
           <button
             onClick={() => handleTabChange('duel')}
-            className={`relative px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
+            className={`relative px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 whitespace-nowrap border-2 shrink-0 ${
               activeTab === 'duel'
                 ? 'bg-gradient-to-r from-red-600 to-amber-500 text-slate-950 border-amber-300 shadow-md'
                 : 'bg-red-500/20 text-amber-300 border-red-400/60 hover:bg-red-500/30'
@@ -337,7 +337,7 @@ export default function Navbar() {
 
           <button
             onClick={() => handleTabChange('quiz_test')}
-            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'quiz_test'
                 ? 'bg-emerald-600 text-white border-emerald-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
@@ -349,7 +349,7 @@ export default function Navbar() {
 
           <button
             onClick={() => handleTabChange('flashcards')}
-            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'flashcards'
                 ? 'bg-purple-600 text-white border-purple-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
@@ -361,7 +361,7 @@ export default function Navbar() {
 
           <button
             onClick={() => handleTabChange('stats')}
-            className={`px-2.5 py-0.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
+            className={`px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all flex items-center gap-1 whitespace-nowrap border shrink-0 ${
               activeTab === 'stats'
                 ? 'bg-cyan-600 text-white border-cyan-300 shadow-md'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
