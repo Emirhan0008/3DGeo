@@ -705,10 +705,6 @@ export default function MapContainer() {
     const map = mapRef.current;
     const lineSourceId = 'pin-guess-line-src';
     const lineLayerId = 'pin-guess-line-lyr';
-    const duelLine1Src = 'duel-line1-src';
-    const duelLine1Lyr = 'duel-line1-lyr';
-    const duelLine2Src = 'duel-line2-src';
-    const duelLine2Lyr = 'duel-line2-lyr';
 
     if (guessMarkerRef.current) {
       guessMarkerRef.current.remove();

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { useAppStore } from '@/lib/store/useStore';
 import { 
   findOrCreateQuickMatch, 
@@ -19,14 +19,12 @@ import {
   getQuizQuestionsByIds,
   handleRoundTimeout,
   calculateDuelScore,
-  DistanceScoreBreakdown,
   DuelType,
   findCrossModeWaitingRooms,
   joinSuggestedDuelRoom,
   WaitingRoomSuggestion,
   PlayerProfileInput,
   getAllSessionPlayers,
-  getPlayerKeyById,
   forceStartWaitingDuel
 } from '@/lib/duelService';
 import { checkRumuzExists, saveRumuzProfile, normalizeRumuzKey } from '@/lib/rumuzService';
@@ -58,9 +56,7 @@ import {
   MapPin,
   HelpCircle,
   CheckCircle2,
-  XCircle,
-  Crown,
-  Play
+  XCircle
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -118,8 +114,6 @@ export default function DuelMode() {
   const [roundTestQuestions, setRoundTestQuestions] = useState<MultipleChoiceQuestion[]>([]);
   const [countdownNum, setCountdownNum] = useState<number | null>(null);
   const [revealCountdown, setRevealCountdown] = useState<number>(7);
-  const [lastRoundScore, setLastRoundScore] = useState<DistanceScoreBreakdown | null>(null);
-  const [opponentRoundScore, setOpponentRoundScore] = useState<DistanceScoreBreakdown | null>(null);
   const [recordedFinishedId, setRecordedFinishedId] = useState<string | null>(null);
 
   // Cross-mode matchmaking suggestions & 1-min waiting tracker
@@ -1334,8 +1328,9 @@ export default function DuelMode() {
               {isHost && allJoinedPlayers.length >= 2 && allJoinedPlayers.length < maxCapacity && (
                 <div className="mt-3 pt-2.5 border-t border-white/10">
                   <button
-                    onClick={() => forceStartWaitingDuel(activeDuelSession)}
-                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    onClick={handleForceStartDuel}
+                    disabled={actionLoading}
+                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
                     <Zap className="w-4 h-4" />
                     <span>Daha Fazla Bekleme, {allJoinedPlayers.length} Kişiyle Hemen Başlat!</span>

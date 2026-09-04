@@ -61,8 +61,6 @@ export default function ProfileEditModal({
     duelStats,
     botStats,
     score,
-    quizScore,
-    totalQuestionsAnswered,
     correctAnswersCount,
     categoryMasteryProgress,
     setAvatarIcon,
