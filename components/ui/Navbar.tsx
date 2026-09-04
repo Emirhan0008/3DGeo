@@ -149,7 +149,7 @@ export default function Navbar() {
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-amber-400"></span>
             </span>
             <Swords className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 stroke-[2.5]" />
-            <span>1v1 Düello</span>
+            <span>Düello</span>
           </button>
 
           <button
@@ -332,7 +332,7 @@ export default function Navbar() {
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400"></span>
             </span>
             <Swords className="w-3 h-3 text-amber-300 stroke-[2.5]" />
-            <span>1v1 Düello</span>
+            <span>Düello</span>
           </button>
 
           <button

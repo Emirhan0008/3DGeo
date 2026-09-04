@@ -903,74 +903,110 @@ export default function DuelMode() {
               </button>
             </div>
 
-            {/* DÜELLO MODU SEKMELERİ: Harita İşaretleme Düellosu vs KPSS Test Düellosu */}
-            <div className="grid grid-cols-2 gap-2 mb-3 bg-white/5 p-1 rounded-xl border border-white/10">
-              <button
-                onClick={() => setSelectedDuelType('pin_map')}
-                className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                  selectedDuelType === 'pin_map'
-                    ? 'bg-amber-500 text-slate-950 shadow-md scale-[1.01]'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <MapPin className="w-4 h-4 text-slate-950 shrink-0" />
-                <div className="text-left leading-tight">
-                  <div>Harita İşaretleme</div>
-                  <div className="text-[9px] opacity-80 font-normal">15 sn • Mesafe & Hız Puanı</div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => setSelectedDuelType('kpss_test')}
-                className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                  selectedDuelType === 'kpss_test'
-                    ? 'bg-indigo-600 text-white shadow-md scale-[1.01]'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <HelpCircle className="w-4 h-4 text-white shrink-0" />
-                <div className="text-left leading-tight">
-                  <div>KPSS Test Yarışması</div>
-                  <div className="text-[9px] opacity-80 font-normal">40 sn • Çoktan Seçmeli Test</div>
-                </div>
-              </button>
-            </div>
-
-            {/* Ayarlar Grid'i: Oyuncu Sayısı, Soru Sayısı & Kategori Seçimi */}
-            <div className="space-y-3 mb-4">
-              {/* Oyuncu Kapasitesi (2, 3 veya 4 Kişi) */}
-              <div>
-                <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider flex items-center justify-between">
-                  <span>1. Oyuncu Kapasitesi</span>
-                  <span className="text-amber-400 text-[10px] font-bold lowercase">2, 3 veya 4 kişi aynı maçta</span>
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {([2, 3, 4] as const).map((pCount) => (
-                    <button
-                      key={pCount}
-                      onClick={() => setSelectedMaxPlayers(pCount)}
-                      className={`py-1.5 px-3 rounded-xl font-black text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                        selectedMaxPlayers === pCount
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
-                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
-                      }`}
-                    >
-                      <Users className="w-3.5 h-3.5" />
-                      <span>{pCount === 2 ? '2 Kişi (1v1)' : pCount === 3 ? '3 Kişi (1v1v1)' : '4 Kişi (Kral)'}</span>
-                    </button>
-                  ))}
-                </div>
+            {/* ANA DÜELLO OYUNCU KAPASİTESİ SEKMELERİ (2, 3, 4 Kişilik Modlar) */}
+            <div className="mb-3.5">
+              <div className="flex items-center justify-between mb-1.5 px-0.5">
+                <span className="text-[11px] font-black text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Düello Oyuncu Sayısı Modu</span>
+                </span>
+                <span className="text-[10px] font-extrabold text-slate-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
+                  {selectedMaxPlayers === 2 ? '⚔️ 1v1 Teke Tek' : selectedMaxPlayers === 3 ? '⚡ 3 Kişilik Kapışma' : '👑 4 Kişilik Arenanın Kralı'}
+                </span>
               </div>
 
+              <div className="grid grid-cols-3 gap-2 bg-[#0d1117] p-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
+                {([2, 3, 4] as const).map((pCount) => {
+                  const isSelected = selectedMaxPlayers === pCount;
+                  return (
+                    <button
+                      key={pCount}
+                      type="button"
+                      onClick={() => setSelectedMaxPlayers(pCount)}
+                      className={`relative py-2.5 px-2 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer border ${
+                        isSelected
+                          ? 'bg-gradient-to-b from-amber-500 via-amber-400 to-orange-500 text-slate-950 border-amber-200 shadow-lg shadow-amber-500/30 scale-[1.02] ring-2 ring-amber-300'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-amber-400/40 hover:text-white'
+                      }`}
+                    >
+                      {/* Active Indicator Pulse */}
+                      {isSelected && (
+                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-slate-950 border-2 border-amber-300"></span>
+                        </span>
+                      )}
+
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm">
+                          {pCount === 2 ? '⚔️' : pCount === 3 ? '⚡' : '👑'}
+                        </span>
+                        <span className={`text-xs sm:text-sm font-black tracking-tight ${isSelected ? 'text-slate-950' : 'text-amber-300'}`}>
+                          {pCount} Kişilik
+                        </span>
+                      </div>
+
+                      <span className={`text-[9px] sm:text-[10px] font-extrabold leading-none ${isSelected ? 'text-slate-900' : 'text-slate-400'}`}>
+                        {pCount === 2 ? '1v1 Düello' : pCount === 3 ? '1v1v1 Kapışma' : '4 Oyunculu Kral'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* DÜELLO FORMATI SEKMELERİ: Harita İşaretleme Düellosu vs KPSS Test Düellosu */}
+            <div className="mb-3">
+              <div className="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1.5 px-0.5">
+                Düello Formatı
+              </div>
+              <div className="grid grid-cols-2 gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDuelType('pin_map')}
+                  className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    selectedDuelType === 'pin_map'
+                      ? 'bg-amber-500 text-slate-950 shadow-md scale-[1.01]'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <MapPin className="w-4 h-4 text-slate-950 shrink-0" />
+                  <div className="text-left leading-tight">
+                    <div>Harita İşaretleme</div>
+                    <div className="text-[9px] opacity-80 font-normal">15 sn • Mesafe & Hız Puanı</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDuelType('kpss_test')}
+                  className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    selectedDuelType === 'kpss_test'
+                      ? 'bg-indigo-600 text-white shadow-md scale-[1.01]'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <HelpCircle className="w-4 h-4 text-white shrink-0" />
+                  <div className="text-left leading-tight">
+                    <div>KPSS Test Yarışması</div>
+                    <div className="text-[9px] opacity-80 font-normal">40 sn • Çoktan Seçmeli Test</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Ayarlar Grid'i: Soru Sayısı & Kategori Seçimi */}
+            <div className="space-y-3 mb-4">
               {/* Soru Sayısı */}
               <div>
                 <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider">
-                  2. Soru Sayısı
+                  Soru Sayısı
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {([10, 20, 30] as const).map((count) => (
                     <button
                       key={count}
+                      type="button"
                       onClick={() => setSelectedQuestionCount(count)}
                       className={`py-1.5 px-3 rounded-xl font-black text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                         selectedQuestionCount === count
@@ -988,12 +1024,13 @@ export default function DuelMode() {
               {/* Kategori / Soru Havuzu */}
               <div>
                 <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider">
-                  3. KPSS Konu Havuzu
+                  KPSS Konu Havuzu
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-28 overflow-y-auto pr-1">
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat.id}
+                      type="button"
                       onClick={() => setSelectedCategory(cat.id)}
                       className={`p-1.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center gap-1.5 truncate cursor-pointer ${
                         selectedCategory === cat.id
@@ -1170,9 +1207,10 @@ export default function DuelMode() {
               {lobbyTab === 'bot' && (
                 <div className="space-y-2.5">
                   <div className="p-2.5 bg-indigo-500/10 border border-indigo-400/30 rounded-xl text-xs text-indigo-200">
-                    🤖 <strong>Antrenman Arenası</strong>: {selectedDuelType === 'kpss_test' ? 'KPSS test' : 'Harita'} yapay zekasına karşı refleks ve bilgilerinizi geliştirin.
+                    🤖 <strong>{selectedMaxPlayers} Kişilik Bot Arenası</strong>: {selectedMaxPlayers === 2 ? '1 yapay zeka botuna karşı teke tek maç.' : `${selectedMaxPlayers - 1} yapay zeka botuna karşı ${selectedMaxPlayers} kişilik büyük antrenman maçı.`}
                   </div>
                   <button
+                    type="button"
                     onClick={handleStartBotDuel}
                     disabled={actionLoading}
                     className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
@@ -1182,7 +1220,11 @@ export default function DuelMode() {
                     ) : (
                       <>
                         <Bot className="w-4 h-4" />
-                        <span>Yapay Zekaya Karşı Başla</span>
+                        <span>
+                          {selectedMaxPlayers === 2 
+                            ? '1 Bot ile 2 Kişilik (1v1) Başlat' 
+                            : `${selectedMaxPlayers - 1} Bot ile ${selectedMaxPlayers} Kişilik Başlat`}
+                        </span>
                       </>
                     )}
                   </button>

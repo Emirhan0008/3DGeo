@@ -4,6 +4,27 @@
 
 ---
 
+## 📅 [2026-09-04] - Düello Butonu İsimlendirmesi ve 2, 3, 4 Kişilik Modların Belirgin Sekmelere Dönüştürülmesi
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "belirsiz olmuş, 1v1 düello butonunu Düello olarak değiştir ve 2,3,4 kişilik modları sekme olarak göster böylece daha belirgin olsun"
+- **Etkilenen Dosyalar**:
+  - `/components/ui/Navbar.tsx`
+  - `/components/game/DuelMode.tsx`
+- **Yapılan İyileştirmeler**:
+  1. **Navigasyon Menüsü Güncellemesi (`Navbar.tsx`)**:
+     - Masaüstü ve mobil navbar butonlarında yer alan `1v1 Düello` ifadesi sade ve kapsayıcı `Düello` olarak değiştirildi.
+  2. **Lobi Oyuncu Kapasitesi Sekmeleri (`DuelMode.tsx`)**:
+     - Lobi ekranında 2, 3 ve 4 kişilik seçenekler en üste taşınarak büyük, kart tipi ve aktif göstergeli belirgin bir **Mod Sekmesi Grubu** haline getirildi.
+     - **2 Kişilik**: `⚔️ 2 Kişilik (1v1 Düello)`
+     - **3 Kişilik**: `⚡ 3 Kişilik (1v1v1 Kapışma)`
+     - **4 Kişilik**: `👑 4 Kişilik (Arenanın Kralı)`
+     - Seçilen kişi sayısına göre canlı maç, özel oda ve yapay zeka bot antrenmanı buton metinleri dinamik olarak güncellenmektedir.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - `compile_applet`: Next.js derlemesi hatasız ve başarılı.
+
+---
+
 ## 📅 [2026-09-04] - 2-4 Kişilik Çok Oyunculu Düello & Çoklu Bot Simülasyonunun Tamamlanması
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "çoklu düello modunu yapmadın hala?"
