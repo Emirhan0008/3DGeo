@@ -4,6 +4,32 @@
 
 ---
 
+## 📅 [2026-09-04] - 2-4 Kişilik Çok Oyunculu Düello & Çoklu Bot Simülasyonunun Tamamlanması
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "çoklu düello modunu yapmadın hala?"
+- **Etkilenen Dosyalar**:
+  - `/lib/duelService.ts`
+  - `/components/game/DuelMode.tsx`
+  - `/components/map/MapContainer.tsx`
+- **Kök Neden & İhtiyaç**:
+  - Çok oyunculu odalarda (3 veya 4 kişilik) botlu antrenman ve çoklu oyuncu turlarında botların sadece 1 tanesi cevap üretiyordu.
+  - `startBotDuel` fonksiyonu `maxPlayers` parametresini almıyordu (yalnızca 1v1 bot başlatıyordu).
+  - İstemci tarafında `myPlayer` tespiti ve round reveal geçişlerinde 3. ve 4. oyuncu slotları (`player3`, `player4`) için senkronizasyon eksiklikleri giderildi.
+- **Yapılan İyileştirmeler**:
+  1. **Dinamik Çoklu Bot Üretimi (`startBotDuel`)**:
+     - `startBotDuel` artık `maxPlayers` (2, 3 veya 4) parametresini destekliyor.
+     - 3 kişilik bot maçında 2 bot (`Coğrafya Yapay Zeka 🤖` ve `Pîrî Reis AI 🗺️`), 4 kişilik bot maçında 3 bot (`Coğrafya Yapay Zeka 🤖`, `Pîrî Reis AI 🗺️` ve `Evliya Çelebi AI 📜`) otomatik spawn edilerek oyuncu listesine atanıyor.
+  2. **Tüm Botlar İçin Eş Zamanlı Tahmin & Test Cevaplama**:
+     - `submitPlayerGuess` ve `submitPlayerTestAnswer` fonksiyonları tüm cevapsız botları filtreleyerek her biri için bağımsız, gerçekçi ve koordinat bazlı cevaplar üretiyor.
+  3. **Lobi & Oyun Arayüzü Entegrasyonu**:
+     - `handleStartBotDuel` içinde kullanıcının seçtiği kişi sayısı (`selectedMaxPlayers`) parametresi bağlandı.
+     - `MapContainer.tsx` üzerinde 2-4 kişilik tüm oyuncuların tahminleri ve renkli çizgi katmanları sorunsuz çiziliyor.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - `compile_applet`: Next.js derlemesi hatasız ve başarılı.
+
+---
+
 ## 📅 [2026-09-03] - Kuşanılabilen Öğelerin (Avatar, Tema, Ünvan, Rozet) Çerçevelerinin Belirginleştirilmesi
 - **Geliştirici**: AI Agent #1 (AI Studio Ortamı A)
 - **Kullanıcı Talebi**: "kuşanabilen şeylerin çerçevesi belirgin olsun"

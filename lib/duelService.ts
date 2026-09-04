@@ -863,7 +863,7 @@ export async function joinSuggestedDuelRoom(
 }
 
 /**
- * Starts a practice match against the AI / Bot opponent instantly
+ * Starts a practice match against the AI / Bot opponents instantly (2-4 Players)
  */
 export async function startBotDuel(
   player: PlayerProfileInput,
@@ -871,9 +871,11 @@ export async function startBotDuel(
     duelType?: DuelType;
     questionCount: 10 | 20 | 30;
     categoryFilter: string;
+    maxPlayers?: 2 | 3 | 4;
   }
 ): Promise<DuelSession> {
   const duelType = options.duelType || 'pin_map';
+  const targetMaxPlayers: 2 | 3 | 4 = options.maxPlayers || 2;
   const duelId = `duel_bot_${Date.now()}`;
   const roomCode = 'BOT-3D';
   const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount, duelType);
@@ -882,7 +884,7 @@ export async function startBotDuel(
   initialPlayer.playerSlot = 'player1';
   initialPlayer.pingMs = 15;
 
-  const botPlayer: DuelPlayer = sanitizePlayer({
+  const botPlayer1: DuelPlayer = sanitizePlayer({
     id: 'kpss_ai_bot',
     rumuz: 'Coğrafya Yapay Zeka 🤖',
     rumuzKey: 'cografya_ai_bot',
@@ -893,9 +895,47 @@ export async function startBotDuel(
     duelWins: 50,
     duelStreak: 3
   }, false);
-  botPlayer.playerSlot = 'player2';
-  botPlayer.isBot = true;
-  botPlayer.pingMs = 10;
+  botPlayer1.playerSlot = 'player2';
+  botPlayer1.isBot = true;
+  botPlayer1.pingMs = 10;
+
+  const botPlayer2: DuelPlayer | null = targetMaxPlayers >= 3 ? sanitizePlayer({
+    id: 'piri_reis_bot',
+    rumuz: 'Pîrî Reis AI 🗺️',
+    rumuzKey: 'piri_reis_bot',
+    avatarIcon: '🗺️',
+    avatarBg: 'emerald_forest',
+    equippedTitle: 'Büyük Kartograf',
+    unlockedBadges: ['81 İl Fatihi', 'Harita Dehası'],
+    duelWins: 42,
+    duelStreak: 2
+  }, false) : null;
+  if (botPlayer2) {
+    botPlayer2.playerSlot = 'player3';
+    botPlayer2.isBot = true;
+    botPlayer2.pingMs = 12;
+  }
+
+  const botPlayer3: DuelPlayer | null = targetMaxPlayers >= 4 ? sanitizePlayer({
+    id: 'evliya_celebi_bot',
+    rumuz: 'Evliya Çelebi AI 📜',
+    rumuzKey: 'evliya_celebi_bot',
+    avatarIcon: '📜',
+    avatarBg: 'crimson_dominance',
+    equippedTitle: 'Seyyah-ı Âlem',
+    unlockedBadges: ['Seyyah Ruhlu', 'Milli Park Bekçisi'],
+    duelWins: 38,
+    duelStreak: 1
+  }, false) : null;
+  if (botPlayer3) {
+    botPlayer3.playerSlot = 'player4';
+    botPlayer3.isBot = true;
+    botPlayer3.pingMs = 14;
+  }
+
+  const activePlayersList: DuelPlayer[] = [initialPlayer, botPlayer1];
+  if (botPlayer2) activePlayersList.push(botPlayer2);
+  if (botPlayer3) activePlayersList.push(botPlayer3);
 
   const now = Date.now();
   const payload: DuelSession = {
@@ -906,13 +946,13 @@ export async function startBotDuel(
     status: 'in_progress', // Starts immediately for AI Practice!
     questionCount: options.questionCount,
     categoryFilter: options.categoryFilter || 'Genel',
-    maxPlayers: 2,
-    players: [initialPlayer, botPlayer],
+    maxPlayers: targetMaxPlayers,
+    players: activePlayersList,
     questionIds,
     player1: initialPlayer,
-    player2: botPlayer,
-    player3: null,
-    player4: null,
+    player2: botPlayer1,
+    player3: botPlayer2,
+    player4: botPlayer3,
     currentRound: 0,
     roundStartTime: now, // Zero delay, instant start
     roundTimeLimit: duelType === 'kpss_test' ? 40 : 15,
@@ -1028,9 +1068,9 @@ export async function submitPlayerGuess(
     updatedAt: new Date().toISOString()
   };
 
-  // Check if AI Bot is in this room and hasn't answered yet
-  const botPlayer = updatedPlayers.find(p => p.isBot && !p.currentGuess);
-  if (botPlayer) {
+  // Check if AI Bots are in this room and haven't answered yet
+  const unAnsweredBots = updatedPlayers.filter(p => p.isBot && !p.currentGuess);
+  for (const botPlayer of unAnsweredBots) {
     const scatterLat = (Math.random() - 0.5) * 0.7;
     const scatterLng = (Math.random() - 0.5) * 1.0;
     const botLat = targetCoords[1] + scatterLat;
@@ -1056,7 +1096,7 @@ export async function submitPlayerGuess(
       submittedAt: Date.now()
     };
 
-    const botSlotKey = getPlayerKeyById(duel, botPlayer.id) || 'player2';
+    const botSlotKey = getPlayerKeyById(duel, botPlayer.id) || (botPlayer.playerSlot || 'player2');
     const botNewScore = (botPlayer.score || 0) + botScoreResult.totalPoints;
     const botNewDist = (botPlayer.totalDistanceKm || 0) + botScoreResult.distanceKm;
 
@@ -1132,9 +1172,9 @@ export async function submitPlayerTestAnswer(
     updatedAt: new Date().toISOString()
   };
 
-  // Check if AI Bot is in this room and hasn't answered yet
-  const botPlayer = updatedPlayers.find(p => p.isBot && (p.currentOptionAnswer === null || p.currentOptionAnswer === undefined));
-  if (botPlayer) {
+  // Check if AI Bots are in this room and haven't answered yet
+  const unAnsweredBots = updatedPlayers.filter(p => p.isBot && (p.currentOptionAnswer === null || p.currentOptionAnswer === undefined));
+  for (const botPlayer of unAnsweredBots) {
     const isBotCorrect = Math.random() < 0.75;
     const optionsCount = 5;
     const botPickedOption = isBotCorrect
@@ -1144,7 +1184,7 @@ export async function submitPlayerTestAnswer(
     const botTimeSec = Math.min(38, Math.max(1.2, timeTakenSec + (Math.random() * 1.5 - 0.5)));
     const botScoreResult = calculateTestDuelScore(isBotCorrect, botTimeSec, duel.roundTimeLimit || 40);
 
-    const botSlotKey = getPlayerKeyById(duel, botPlayer.id) || 'player2';
+    const botSlotKey = getPlayerKeyById(duel, botPlayer.id) || (botPlayer.playerSlot || 'player2');
     const botNewScore = (botPlayer.score || 0) + botScoreResult.pointsEarned;
 
     updates[`${botSlotKey}.currentOptionAnswer`] = botPickedOption;

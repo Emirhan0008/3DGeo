@@ -18,7 +18,6 @@ import {
   getQuestionsByIds,
   getQuizQuestionsByIds,
   handleRoundTimeout,
-  calculateDuelScore,
   DuelType,
   findCrossModeWaitingRooms,
   joinSuggestedDuelRoom,
@@ -477,19 +476,9 @@ export default function DuelMode() {
     // 3. Round reveal phase (7 seconds display, auto advance, camera zoom to target and then zoom out)
     if (activeDuelSession.status === 'round_reveal') {
       const isTestDuel = activeDuelSession.duelType === 'kpss_test';
-      const myPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1 : activeDuelSession.player2;
-      const otherPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player2 : activeDuelSession.player1;
+      const sessionPlayers = getAllSessionPlayers(activeDuelSession);
 
       if (!isTestDuel) {
-        if (myPlayer?.currentGuess) {
-          const breakdown = calculateDuelScore(myPlayer.currentGuess.distanceKm, myPlayer.currentGuess.timeTakenSec);
-          setLastRoundScore(breakdown);
-        }
-        if (otherPlayer?.currentGuess) {
-          const breakdown = calculateDuelScore(otherPlayer.currentGuess.distanceKm, otherPlayer.currentGuess.timeTakenSec);
-          setOpponentRoundScore(breakdown);
-        }
-
         // Camera focus on target coords during reveal
         const currentQ = roundQuestions[activeDuelSession.currentRound];
         if (currentQ) {
@@ -515,7 +504,8 @@ export default function DuelMode() {
           clearInterval(revealTicker);
           // Zoom out map fully back to Turkey overview for next question!
           flyToCoords([35.243, 38.963], 0, 0, 5.0);
-          if (activeDuelPlayerKey === 'player1' || activeDuelSession.player2?.isBot) {
+          const hasBots = sessionPlayers.some(p => p.isBot);
+          if (activeDuelPlayerKey === 'player1' || hasBots) {
             advanceDuelRound(activeDuelSession);
           }
         }
@@ -529,7 +519,10 @@ export default function DuelMode() {
     // 4. Finished phase: record duel stats once
     if (activeDuelSession.status === 'finished' && activeDuelSession.id !== recordedFinishedId) {
       setRecordedFinishedId(activeDuelSession.id);
-      const myPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1 : activeDuelSession.player2;
+      const sessionPlayers = getAllSessionPlayers(activeDuelSession);
+      const myPlayer = (activeDuelPlayerKey && activeDuelSession[activeDuelPlayerKey]) || 
+        sessionPlayers.find(p => p.id === normalizeRumuzKey(rumuz)) || 
+        activeDuelSession.player1;
       const myId = myPlayer?.id || normalizeRumuzKey(rumuz);
       const myScore = myPlayer?.score || 0;
       recordDuelFinish(activeDuelSession.winnerId || 'draw', myId, myScore);
@@ -687,7 +680,8 @@ export default function DuelMode() {
         { 
           questionCount: selectedQuestionCount, 
           categoryFilter: selectedCategory,
-          duelType: selectedDuelType
+          duelType: selectedDuelType,
+          maxPlayers: selectedMaxPlayers
         }
       );
       setActiveDuelSession(session);
@@ -731,8 +725,6 @@ export default function DuelMode() {
     setActiveDuelPlayerKey(null);
     setRoundQuestions([]);
     setRoundTestQuestions([]);
-    setLastRoundScore(null);
-    setOpponentRoundScore(null);
     setRecordedFinishedId(null);
     flyToCoords([35.243, 38.963], 0, 0, 5.0);
   };

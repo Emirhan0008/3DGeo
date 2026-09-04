@@ -825,7 +825,7 @@ export default function MapContainer() {
 
       // If player placed guess during in_progress (show only own guess)
       if (session.status === 'in_progress') {
-        const myPlayer = allPlayers.find(p => p?.id === normalizeRumuzKey(rumuz)) || session.player1;
+        const myPlayer = (activeDuelPlayerKey && session[activeDuelPlayerKey]) || session.player1;
         if (myPlayer?.currentGuess) {
           const el = document.createElement('div');
           el.className = 'relative flex items-center justify-center';
