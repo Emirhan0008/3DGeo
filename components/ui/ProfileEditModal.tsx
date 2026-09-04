@@ -61,12 +61,21 @@ export default function ProfileEditModal({
     duelStats,
     botStats,
     score,
+    quizScore,
+    totalQuestionsAnswered,
+    correctAnswersCount,
     categoryMasteryProgress,
     setAvatarIcon,
     setAvatarBg,
     setEquippedTitle,
     clearAllUserData
   } = useAppStore();
+
+  // Calculate cumulative career points across all modes (Duels + KPSS Questions + Pin Games)
+  const duelPts = duelStats?.duelScore || (duelStats?.duelWins || 0) * 120;
+  const kpssPts = (correctAnswersCount || 0) * 10;
+  const sessionScore = score || 0;
+  const totalCareerScore = Math.max(sessionScore, duelPts + kpssPts + sessionScore);
 
   const [newRumuzInput, setNewRumuzInput] = useState(currentRumuz);
   const [pinInput, setPinInput] = useState(currentPin);
@@ -273,8 +282,8 @@ export default function ProfileEditModal({
 
           <div className="flex items-center gap-3 shrink-0 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-center self-stretch sm:self-auto justify-around sm:justify-start">
             <div>
-              <div className="text-[9px] uppercase font-black text-amber-400">Puan</div>
-              <div className="text-xs font-black text-emerald-400">{score} p</div>
+              <div className="text-[9px] uppercase font-black text-amber-400">Toplam Puan</div>
+              <div className="text-xs font-black text-emerald-400">{totalCareerScore} p</div>
             </div>
             <div className="w-px h-6 bg-white/10" />
             <div>
@@ -413,7 +422,7 @@ export default function ProfileEditModal({
               {AVATAR_ICONS.filter((item) => avatarTierFilter === 'all' || item.tier === avatarTierFilter).map((item) => {
                 const isBadgesMet = !item.minBadgesRequired || unlockedBadges.length >= item.minBadgesRequired;
                 const isDuelMet = !item.minDuelWinsRequired || duelStats.duelWins >= item.minDuelWinsRequired;
-                const isScoreMet = !item.minScoreRequired || score >= item.minScoreRequired;
+                const isScoreMet = !item.minScoreRequired || totalCareerScore >= item.minScoreRequired;
                 const isUnlocked = isBadgesMet && isDuelMet && isScoreMet;
                 const isSelected = avatarIcon === item.icon;
 
@@ -460,7 +469,7 @@ export default function ProfileEditModal({
                         isUnlocked,
                         reqDescription: isUnlocked ? `Bu avatar başarıyla kuşanıldı.` : `Kilit Açma Şartı: ${reqString}`,
                         howToUnlock: howTo,
-                        currentProgress: `Mevcut Durumunuz: ${unlockedBadges.length} Rozet, ${duelStats.duelWins} Zafer, ${score} Puan`
+                        currentProgress: `Mevcut Durumunuz: ${unlockedBadges.length} Rozet, ${duelStats.duelWins} Zafer, ${totalCareerScore} Puan`
                       });
                     }}
                     title={isUnlocked ? (isSelected ? `${item.label} (Şu An Kuşanıldı)` : `${item.label} (Kuşanılabilir - Tıkla ve Kuşan)`) : `Kilitli: ${reqString} (Detay için tıkla)`}

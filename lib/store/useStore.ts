@@ -120,11 +120,11 @@ export interface AppState {
   resetQuizTest: () => void;
   shuffleQuizQuestions: () => void;
 
-  // Real-time 1v1 Duel State
+  // Real-time Multiplayer Duel State (2-4 Players)
   activeDuelSession: DuelSession | null;
   setActiveDuelSession: (session: DuelSession | null) => void;
-  activeDuelPlayerKey: 'player1' | 'player2' | null;
-  setActiveDuelPlayerKey: (key: 'player1' | 'player2' | null) => void;
+  activeDuelPlayerKey: 'player1' | 'player2' | 'player3' | 'player4' | null;
+  setActiveDuelPlayerKey: (key: 'player1' | 'player2' | 'player3' | 'player4' | null) => void;
   duelPinCoords: [number, number] | null;
   setDuelPinCoords: (coords: [number, number] | null) => void;
   duelStats: DuelStats;
@@ -170,9 +170,15 @@ export interface AppState {
 function saveStatsToLocalStorage(state: AppState) {
   if (typeof window === 'undefined') return;
   try {
+    const duelScore = state.duelStats?.duelScore || (state.duelStats?.duelWins || 0) * 120;
+    const kpssScore = state.quizScore || (state.correctAnswersCount || 0) * 10;
+    const pinScore = state.score || 0;
+    const cumulativeScore = Math.max(pinScore, pinScore + kpssScore + duelScore);
+
     const payload = {
       score: state.score,
       quizScore: state.quizScore,
+      totalCareerScore: cumulativeScore,
       totalQuestionsAnswered: state.totalQuestionsAnswered,
       correctAnswersCount: state.correctAnswersCount,
       regionalStats: state.regionalStats,
@@ -193,7 +199,7 @@ function saveStatsToLocalStorage(state: AppState) {
     
     // Automatically replicate to Cloud Firestore in the background
     autoSyncStoreToCloud({
-      score: state.score,
+      score: cumulativeScore,
       streak: state.streak,
       avatarIcon: state.avatarIcon,
       avatarBg: state.avatarBg,

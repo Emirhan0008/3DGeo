@@ -28,6 +28,8 @@ interface GlobalLeaderboardModalProps {
 export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeaderboardModalProps) {
   const {
     score,
+    quizScore,
+    correctAnswersCount,
     streak,
     duelStats,
     unlockedBadges,
@@ -35,6 +37,11 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
     avatarIcon,
     avatarBg
   } = useAppStore();
+
+  const myTotalCareerScore = Math.max(
+    score || 0,
+    (score || 0) + (quizScore || (correctAnswersCount || 0) * 10) + (duelStats?.duelScore || (duelStats?.duelWins || 0) * 120)
+  );
 
   const [activeTab, setActiveTab] = useState<LeaderboardSortTab>('total');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -240,7 +247,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
           <div className="grid grid-cols-4 sm:flex items-center gap-2 sm:gap-3 w-full sm:w-auto text-center sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-white/10">
             <div className="bg-black/30 sm:bg-transparent p-1 sm:p-0 rounded-lg">
               <div className="text-[9px] uppercase font-black text-amber-400">Toplam Skor</div>
-              <div className="text-xs font-black text-emerald-400">{score} p</div>
+              <div className="text-xs font-black text-emerald-400">{myTotalCareerScore} P</div>
             </div>
             <div className="bg-black/30 sm:bg-transparent p-1 sm:p-0 rounded-lg">
               <div className="text-[9px] uppercase font-black text-indigo-300">Zaferler</div>
@@ -264,7 +271,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               ⚡ Ağırlıklı Katsayı Sistemi
             </span>
             <span>
-              Düello Zaferi (<strong>200x</strong>), Zafer Serisi (<strong>100x</strong>) ve Kazanma Oranı (<strong>300x</strong>) en yüksek ağırlığa sahiptir.
+              Düello Zaferi (<strong>500x</strong>), Zafer Serisi (<strong>250x</strong>), Rekor Seri (<strong>150x</strong>) ve Kazanma Oranı (<strong>1000x</strong>) en yüksek katsayıya sahiptir.
             </span>
           </div>
           <span className="text-amber-300 font-bold hidden sm:inline-block shrink-0">

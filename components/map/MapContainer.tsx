@@ -312,10 +312,8 @@ export default function MapContainer() {
   const guessMarkerRef = useRef<maplibregl.Marker | null>(null);
   const targetMarkerRef = useRef<maplibregl.Marker | null>(null);
   const distanceMarkerRef = useRef<maplibregl.Marker | null>(null);
-  const duelP1MarkerRef = useRef<maplibregl.Marker | null>(null);
-  const duelP2MarkerRef = useRef<maplibregl.Marker | null>(null);
-  const duelDist1MarkerRef = useRef<maplibregl.Marker | null>(null);
-  const duelDist2MarkerRef = useRef<maplibregl.Marker | null>(null);
+  const duelPlayerMarkersRef = useRef<maplibregl.Marker[]>([]);
+  const duelTargetMarkerRef = useRef<maplibregl.Marker | null>(null);
 
   const {
     mapStyle,
@@ -724,30 +722,24 @@ export default function MapContainer() {
       distanceMarkerRef.current.remove();
       distanceMarkerRef.current = null;
     }
-    if (duelP1MarkerRef.current) {
-      duelP1MarkerRef.current.remove();
-      duelP1MarkerRef.current = null;
+    if (duelTargetMarkerRef.current) {
+      duelTargetMarkerRef.current.remove();
+      duelTargetMarkerRef.current = null;
     }
-    if (duelP2MarkerRef.current) {
-      duelP2MarkerRef.current.remove();
-      duelP2MarkerRef.current = null;
-    }
-    if (duelDist1MarkerRef.current) {
-      duelDist1MarkerRef.current.remove();
-      duelDist1MarkerRef.current = null;
-    }
-    if (duelDist2MarkerRef.current) {
-      duelDist2MarkerRef.current.remove();
-      duelDist2MarkerRef.current = null;
-    }
+    duelPlayerMarkersRef.current.forEach(m => m.remove());
+    duelPlayerMarkersRef.current = [];
 
     // Clean previous line layers if exist
     if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
     if (map.getSource(lineSourceId)) map.removeSource(lineSourceId);
-    if (map.getLayer(duelLine1Lyr)) map.removeLayer(duelLine1Lyr);
-    if (map.getSource(duelLine1Src)) map.removeSource(duelLine1Src);
-    if (map.getLayer(duelLine2Lyr)) map.removeLayer(duelLine2Lyr);
-    if (map.getSource(duelLine2Src)) map.removeSource(duelLine2Src);
+    
+    // Remove all possible duel line layers (up to 4 players)
+    [1, 2, 3, 4].forEach(pNum => {
+      const lyr = `duel-line${pNum}-lyr`;
+      const src = `duel-line${pNum}-src`;
+      if (map.getLayer(lyr)) map.removeLayer(lyr);
+      if (map.getSource(src)) map.removeSource(src);
+    });
 
     // 1. Single Player Pin Guess Mode
     if (activeTab === 'pin_game' && isPinGuessed && pinGuessCoords) {
@@ -821,15 +813,23 @@ export default function MapContainer() {
         }
       }
     } 
-    // 2. 1v1 Real-time Duel Mode
+    // 2. Real-time Duel Mode (2-4 Players)
     else if (activeTab === 'duel' && activeDuelSession) {
       const session = activeDuelSession;
       const questions = getQuestionsByIds(session.questionIds);
       const currentQ = questions[session.currentRound];
+      const allPlayers = [session.player1, session.player2, session.player3, session.player4].filter(Boolean);
+
+      const playerColorConfig = [
+        { name: 'p1', bg: 'bg-indigo-600', hex: '#6366f1', emoji: '🔵' },
+        { name: 'p2', bg: 'bg-rose-600', hex: '#f43f5e', emoji: '🔴' },
+        { name: 'p3', bg: 'bg-emerald-600', hex: '#10b981', emoji: '🟢' },
+        { name: 'p4', bg: 'bg-amber-600', hex: '#f59e0b', emoji: '🟡' },
+      ];
 
       // If player placed guess during in_progress (show only own guess)
       if (session.status === 'in_progress') {
-        const myPlayer = activeDuelPlayerKey === 'player1' ? session.player1 : session.player2;
+        const myPlayer = allPlayers.find(p => p?.id === normalizeRumuzKey(rumuz)) || session.player1;
         if (myPlayer?.currentGuess) {
           const el = document.createElement('div');
           el.className = 'relative flex items-center justify-center';
@@ -839,12 +839,13 @@ export default function MapContainer() {
               📍 ${myPlayer.rumuz}
             </div>
           `;
-          duelP1MarkerRef.current = new maplibregl.Marker({ element: el })
+          const marker = new maplibregl.Marker({ element: el })
             .setLngLat([myPlayer.currentGuess.lng, myPlayer.currentGuess.lat])
             .addTo(map);
+          duelPlayerMarkersRef.current.push(marker);
         }
       }
-      // If round is in reveal or finished phase (show both guesses, target, and comparison lines)
+      // If round is in reveal or finished phase (show all player guesses, target, and comparison lines)
       else if ((session.status === 'round_reveal' || session.status === 'finished') && currentQ) {
         const cityName = getFeatureCityName(currentQ, currentQ.title, currentQ.region);
         const cityLabel = cityName ? ` • ${cityName}` : '';
@@ -857,79 +858,51 @@ export default function MapContainer() {
             ⭐ DOĞRU YER: ${currentQ.title}${cityLabel}
           </div>
         `;
-        targetMarkerRef.current = new maplibregl.Marker({ element: targetEl })
+        duelTargetMarkerRef.current = new maplibregl.Marker({ element: targetEl })
           .setLngLat(currentQ.targetCoords)
           .addTo(map);
 
-        // Player 1 Guess Marker & Line
-        if (session.player1.currentGuess) {
-          const p1Coords: [number, number] = [session.player1.currentGuess.lng, session.player1.currentGuess.lat];
-          const p1El = document.createElement('div');
-          p1El.className = 'relative flex items-center justify-center';
-          p1El.innerHTML = `
-            <div class="px-2.5 py-1 bg-indigo-600 border-2 border-white text-white font-extrabold text-[11px] rounded-full shadow-2xl flex items-center gap-1">
-              🔵 ${session.player1.rumuz} (${session.player1.currentGuess.distanceKm} km)
+        // Draw each player's guess marker and distance line
+        allPlayers.forEach((player, idx) => {
+          if (!player?.currentGuess) return;
+          const pCoords: [number, number] = [player.currentGuess.lng, player.currentGuess.lat];
+          const cfg = playerColorConfig[idx % playerColorConfig.length];
+
+          const pEl = document.createElement('div');
+          pEl.className = 'relative flex items-center justify-center';
+          pEl.innerHTML = `
+            <div class="px-2.5 py-1 ${cfg.bg} border-2 border-white text-white font-extrabold text-[11px] rounded-full shadow-2xl flex items-center gap-1">
+              ${cfg.emoji} ${player.rumuz} (${player.currentGuess.distanceKm} km)
             </div>
           `;
-          duelP1MarkerRef.current = new maplibregl.Marker({ element: p1El })
-            .setLngLat(p1Coords)
+          const marker = new maplibregl.Marker({ element: pEl })
+            .setLngLat(pCoords)
             .addTo(map);
+          duelPlayerMarkersRef.current.push(marker);
 
-          // P1 Line
-          map.addSource(duelLine1Src, {
+          const srcId = `duel-line${idx + 1}-src`;
+          const lyrId = `duel-line${idx + 1}-lyr`;
+
+          map.addSource(srcId, {
             type: 'geojson',
             data: {
               type: 'Feature',
               properties: {},
               geometry: {
                 type: 'LineString',
-                coordinates: [p1Coords, currentQ.targetCoords]
+                coordinates: [pCoords, currentQ.targetCoords]
               }
             }
           });
-          map.addLayer({
-            id: duelLine1Lyr,
-            type: 'line',
-            source: duelLine1Src,
-            layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': '#6366f1', 'line-width': 3, 'line-dasharray': [2, 2] }
-          });
-        }
 
-        // Player 2 Guess Marker & Line
-        if (session.player2?.currentGuess) {
-          const p2Coords: [number, number] = [session.player2.currentGuess.lng, session.player2.currentGuess.lat];
-          const p2El = document.createElement('div');
-          p2El.className = 'relative flex items-center justify-center';
-          p2El.innerHTML = `
-            <div class="px-2.5 py-1 bg-rose-600 border-2 border-white text-white font-extrabold text-[11px] rounded-full shadow-2xl flex items-center gap-1">
-              🔴 ${session.player2.rumuz} (${session.player2.currentGuess.distanceKm} km)
-            </div>
-          `;
-          duelP2MarkerRef.current = new maplibregl.Marker({ element: p2El })
-            .setLngLat(p2Coords)
-            .addTo(map);
-
-          // P2 Line
-          map.addSource(duelLine2Src, {
-            type: 'geojson',
-            data: {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'LineString',
-                coordinates: [p2Coords, currentQ.targetCoords]
-              }
-            }
-          });
           map.addLayer({
-            id: duelLine2Lyr,
+            id: lyrId,
             type: 'line',
-            source: duelLine2Src,
+            source: srcId,
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': '#f43f5e', 'line-width': 3, 'line-dasharray': [2, 2] }
+            paint: { 'line-color': cfg.hex, 'line-width': 3, 'line-dasharray': [2, 2] }
           });
-        }
+        });
       }
     } 
     // 3. Quiz Mode

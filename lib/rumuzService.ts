@@ -6,6 +6,18 @@ export interface DuelSessionData {
   status?: string;
   winnerId?: string | 'draw' | null;
   questionCount?: number;
+  maxPlayers?: 2 | 3 | 4;
+  players?: Array<{
+    id: string;
+    rumuz: string;
+    rumuzKey?: string;
+    score: number;
+    isBot?: boolean;
+    isHost?: boolean;
+    totalDistanceKm?: number;
+    isReady?: boolean;
+    pingMs?: number;
+  }>;
   player1: {
     id: string;
     rumuz: string;
@@ -18,6 +30,28 @@ export interface DuelSessionData {
     pingMs?: number;
   };
   player2?: {
+    id: string;
+    rumuz: string;
+    rumuzKey?: string;
+    score: number;
+    isBot?: boolean;
+    isHost?: boolean;
+    totalDistanceKm?: number;
+    isReady?: boolean;
+    pingMs?: number;
+  } | null;
+  player3?: {
+    id: string;
+    rumuz: string;
+    rumuzKey?: string;
+    score: number;
+    isBot?: boolean;
+    isHost?: boolean;
+    totalDistanceKm?: number;
+    isReady?: boolean;
+    pingMs?: number;
+  } | null;
+  player4?: {
     id: string;
     rumuz: string;
     rumuzKey?: string;
@@ -98,32 +132,32 @@ export function calculateRankingPower(stats: {
   const winRatePct = Math.round(winRate * 100);
 
   // 1. DÜELLO VE ZAFER KAZANIMLARI (EN BÜYÜK ÇARPAN & ASAL SIRALAMA GÜCÜ)
-  // • Düello Galibiyeti: 200 Puan (Her zafer için devasa itibar)
-  // • Aktif Galibiyet Serisi: 100 Puan (Canlı momentum)
-  // • Kariyer En İyi Serisi: 50 Puan (Kayıtlı rekor)
-  // • Kazanma Oranı Bonusu: 300 * winRate (10 maçta 0 galibiyet = 0, 6/6 = 300 tam bonus)
+  // • Düello Galibiyeti: 500 Puan (Her zafer için devasa prestij katsayısı)
+  // • Aktif Galibiyet Serisi: 250 Puan (Canlı momentum)
+  // • Kariyer En İyi Serisi: 150 Puan (Kayıtlı rekor)
+  // • Kazanma Oranı Bonusu: 1000 * winRate (10 maçta 0 galibiyet = 0 bonus, 6/6 = 1000 tam bonus)
   // • Düello Maç Puanı: 1.0x çarpan
-  const duelWinsScore = stats.duelWins * 200;
-  const duelStreakScore = stats.duelStreak * 100;
-  const bestStreakScore = (stats.bestDuelStreak || stats.duelStreak) * 50;
-  const winRateBonus = Math.round(winRate * 300);
+  const duelWinsScore = stats.duelWins * 500;
+  const duelStreakScore = stats.duelStreak * 250;
+  const bestStreakScore = (stats.bestDuelStreak || stats.duelStreak) * 150;
+  const winRateBonus = Math.round(winRate * 1000);
   const duelMatchScore = Math.round((stats.duelScore || 0) * 1.0);
 
   const duelPowerScore = duelWinsScore + duelStreakScore + bestStreakScore + winRateBonus + duelMatchScore;
 
   // 2. ÇEVRİMDIŞI & TEST SORU KAZANIMLARI (DAHA DÜŞÜK KATSAYI)
-  // • Doğru Soru Sayısı: Soru başına 4 puan (0.4x katsayı)
-  // • Test Ham Puanı: 0.2x katsayı
-  // • Soru İsabet Oranı Bonusu: accuracyPct * 1.0 (maks 100)
+  // • Doğru Soru Sayısı: Soru başına 3 puan (0.3x katsayı)
+  // • Test Ham Puanı: 0.1x katsayı
+  // • Soru İsabet Oranı Bonusu: accuracyPct * 0.5 (maks 50)
   const kpssPowerScore = Math.round(
-    (stats.correctAnswersCount * 4) +
-    (stats.kpssScore * 0.2) +
-    (stats.accuracyPct * 1.0)
+    (stats.correctAnswersCount * 3) +
+    (stats.kpssScore * 0.1) +
+    (stats.accuracyPct * 0.5)
   );
 
   // 3. ROZET VE KOLEKSİYON BAŞARIMLARI (MÜTEVAZI KATSAYI)
-  // • Rozet başına 15 puan
-  const badgePowerScore = (stats.unlockedBadgesCount || 0) * 15;
+  // • Rozet başına 20 puan
+  const badgePowerScore = (stats.unlockedBadgesCount || 0) * 20;
 
   const rankingScore = duelPowerScore + kpssPowerScore + badgePowerScore;
 
@@ -454,7 +488,10 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
  */
 export async function recordFinishedDuelToRumuzes(duel: DuelSessionData): Promise<void> {
   try {
-    const playersToUpdate = [duel.player1, duel.player2].filter(p => p && !p.isBot && p.rumuz);
+    const rawList = Array.isArray(duel.players) && duel.players.length > 0
+      ? duel.players
+      : [duel.player1, duel.player2, duel.player3, duel.player4];
+    const playersToUpdate = rawList.filter(p => p && !p.isBot && p.rumuz);
 
     for (const player of playersToUpdate) {
       if (!player) continue;

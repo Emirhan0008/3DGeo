@@ -167,5 +167,47 @@
 - **Test ve Doğrulama**:
   - `lint_applet` ve `compile_applet` ile doğrulandı.
 
+---
+
+## 📅 [2026-09-04] - 2-4 Kişilik Çok Oyunculu Düello, Mobil Tam Ekran Lobi, Kaydırarak Çıkış ve Sıralama Çarpanları
+- **Geliştirici**: AI Agent #1 (AI Studio Ortamı A)
+- **Kullanıcı Talepleri**:
+  1. Sıralamada her şeyin katsayısı olsun; düello zaferleri, zafer serisi ve galibiyet oranı en yüksek ağırlığa sahip olsun (0 galibiyetli 10 maç oynayan, 6/6 yapanın üzerine geçemesin).
+  2. Kilitli her şeyin nasıl elde edilebileceği açıklansın (hover/tıklama ile detaylı kilit açma rehberi).
+  3. Kademeler arasında (4. ve 5. kademe rozet/unvanlar) ufak boyut hiyerarşisi olsun.
+  4. Toplam skorun 0 gözükmesi sorunu giderilsin ve puan ile skor ayrımı netleştirilsin.
+  5. Düello moduna 3 veya 4 kişi girebilsin (2-4 kişilik maçlar), lobi ve bekleme ekranları mobilde tam ekran olsun, kapatma çarpısının yanı sıra sağa/sola kaydırarak (swipe-to-exit) ana sayfaya dönülebilinsin.
+- **Etkilenen Dosyalar**:
+  - `/lib/duelService.ts`
+  - `/components/game/DuelMode.tsx`
+  - `/components/map/MapContainer.tsx`
+  - `/lib/rumuzService.ts`
+  - `/lib/store/useStore.ts`
+  - `/components/ui/GlobalLeaderboardModal.tsx`
+  - `/components/ui/ProfileEditModal.tsx`
+- **Yapılan İyileştirmeler**:
+  1. **2-4 Kişilik Çok Oyunculu Düello Altyapısı**:
+     - `DuelSessionData`, `DuelPlayer` ve `duelService.ts` fonksiyonları 2, 3 ve 4 oyunculu odaları tam destekleyecek şekilde genişletildi.
+     - Lobi ekranında oda kapasitesi seçimi (2, 3 veya 4 Oyuncu) eklendi.
+     - `DuelMode.tsx` içindeki bekleme odası, geri sayım, oyun içi çoklu HUD (tüm oyuncuların puanları, yanıt durumları ve mesafeleri) ve maç sonu podyum ekranı 4 oyuncuya kadar dinamik hale getirildi.
+     - `MapContainer.tsx` harita motoru 4 oyuncunun farklı renklerdeki işaretçilerini ve mesafe çizgilerini render edecek şekilde uyarlandı.
+  2. **Mobil Tam Ekran & Sağa/Sola Kaydırarak Kapatma (Swipe-to-Exit)**:
+     - Lobi ve bekleme odası mobilde tam ekran (`fixed inset-0`) düzenine geçirildi.
+     - Dokunmatik ve fare ile sağa/sola sürükleme desteği (`onTouchStart`, `onTouchMove`, `onTouchEnd`, `onMouseDown`, `onMouseMove`, `onMouseUp`) ve görsel kaydırma ipucu eklendi.
+  3. **Adil ve Zafer Odaklı Sıralama Çarpanları (`calculateRankingPower`)**:
+     - Düello Zaferi: 500 Puan
+     - Aktif Zafer Serisi: 250 Puan
+     - Kariyer En İyi Serisi: 150 Puan
+     - Galibiyet Oranı Bonusu: 1000 * winRate (6/6 yapan tam 1000 bonus alırken 10 maçta 0 çeken 0 alır).
+     - Çevrimdışı test ve rozet katsayıları dengelendi.
+  4. **Toplam Kariyer Skoru Hesaplama ve Sıfır Skor Düzeltmesi**:
+     - Harita Pinleme + KPSS Testleri + Düello skorlarının toplamını kapsayan `totalCareerScore` oluşturuldu, Firestore ve LocalStorage ile senkronize edildi.
+  5. **Kademeli Boyut Farkları ve Kilit Açma Rehberi**:
+     - 5. kademeden 1. kademeye rozet ve unvan kartlarında matematiksel ölçeklendirme uygulandı (`1.03x` -> `0.97x`).
+     - Tıklama ile açılan detaylı kilit inceleme modalı (`InspectedItemModal`) ve açıklayıcı rehber metinleri eklendi.
+- **Test ve Doğrulama**:
+  - `lint_applet` ve `compile_applet` ile doğrulandı.
+
+
 
 

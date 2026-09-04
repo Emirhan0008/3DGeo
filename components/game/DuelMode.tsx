@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '@/lib/store/useStore';
 import { 
   findOrCreateQuickMatch, 
@@ -23,13 +24,16 @@ import {
   findCrossModeWaitingRooms,
   joinSuggestedDuelRoom,
   WaitingRoomSuggestion,
-  PlayerProfileInput
+  PlayerProfileInput,
+  getAllSessionPlayers,
+  getPlayerKeyById,
+  forceStartWaitingDuel
 } from '@/lib/duelService';
 import { checkRumuzExists, saveRumuzProfile, normalizeRumuzKey } from '@/lib/rumuzService';
 import { 
   PinGameQuestion, 
   MultipleChoiceQuestion, 
-  PIN_GAME_QUESTIONS,
+  PIN_GAME_QUESTIONS, 
   MULTIPLE_CHOICE_QUESTIONS,
   cleanFeatureTitle 
 } from '@/lib/data/quizQuestions';
@@ -54,7 +58,9 @@ import {
   MapPin,
   HelpCircle,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Crown,
+  Play
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -93,10 +99,11 @@ export default function DuelMode() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
 
-  // Matchmaking / Lobby setup state
+  // Matchmaking / Lobby setup state (2-4 Player selection)
   const [selectedDuelType, setSelectedDuelType] = useState<DuelType>('pin_map');
   const [selectedCategory, setSelectedCategory] = useState<string>('Genel');
   const [selectedQuestionCount, setSelectedQuestionCount] = useState<10 | 20 | 30>(10);
+  const [selectedMaxPlayers, setSelectedMaxPlayers] = useState<2 | 3 | 4>(2);
   const [lobbyTab, setLobbyTab] = useState<'quick' | 'private_create' | 'private_join' | 'bot'>('quick');
   const [joinRoomCodeInput, setJoinRoomCodeInput] = useState('');
   const [joinRoomPinInput, setJoinRoomPinInput] = useState('');
@@ -567,7 +574,7 @@ export default function DuelMode() {
     };
   };
 
-  // Handle Quick Match Finding
+  // Handle Quick Match Finding (2-4 Players)
   const handleStartQuickMatch = async () => {
     if (activeDuelSession) {
       await leaveOrCancelDuel(activeDuelSession.id);
@@ -582,7 +589,8 @@ export default function DuelMode() {
         { 
           questionCount: selectedQuestionCount, 
           categoryFilter: selectedCategory,
-          duelType: selectedDuelType
+          duelType: selectedDuelType,
+          maxPlayers: selectedMaxPlayers
         }
       );
       setActiveDuelSession(res.duel);
@@ -595,7 +603,7 @@ export default function DuelMode() {
     }
   };
 
-  // Handle Private Room Creation
+  // Handle Private Room Creation (2-4 Players)
   const handleCreatePrivateRoom = async () => {
     if (activeDuelSession) {
       await leaveOrCancelDuel(activeDuelSession.id);
@@ -612,13 +620,27 @@ export default function DuelMode() {
           duelType: selectedDuelType,
           questionCount: selectedQuestionCount,
           categoryFilter: selectedCategory,
-          roomPin: createRoomPinInput
+          roomPin: createRoomPinInput,
+          maxPlayers: selectedMaxPlayers
         }
       );
       setActiveDuelSession(session);
     } catch (err: unknown) {
       console.error('Create room error in UI:', err);
       setLobbyError('Özel oda kurulurken hata oluştu.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle Force Start by Host
+  const handleForceStartDuel = async () => {
+    if (!activeDuelSession) return;
+    setActionLoading(true);
+    try {
+      await forceStartWaitingDuel(activeDuelSession.id);
+    } catch (err) {
+      console.error('Force start error:', err);
     } finally {
       setActionLoading(false);
     }
@@ -834,328 +856,376 @@ export default function DuelMode() {
             setActiveTab('map');
           }
         }}
-        className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md overflow-y-auto p-2 sm:p-4 flex flex-col items-center justify-center cursor-pointer"
+        className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md overflow-y-auto p-0 sm:p-4 flex flex-col items-center justify-center cursor-pointer"
       >
-        <div 
+        <motion.div 
           onClick={(e) => e.stopPropagation()} 
-          className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-3 sm:p-5 text-white my-auto cursor-default animate-in zoom-in-95 duration-150"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.4}
+          onDragEnd={(_e, info) => {
+            if (Math.abs(info.offset.x) > 120 || Math.abs(info.velocity.x) > 400) {
+              setActiveTab('map');
+            }
+          }}
+          className="w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[92vh] overflow-y-auto bg-[#09090b]/98 sm:bg-[#09090b]/95 border-0 sm:border-2 border-amber-500/40 sm:rounded-2xl shadow-2xl p-3.5 sm:p-5 text-white my-auto cursor-default animate-in zoom-in-95 duration-150 flex flex-col justify-between sm:justify-start"
         >
-          {/* Header with Avatar and Frame */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-            <div className="flex items-center gap-3">
-              <AvatarWithBadgeFrame 
-                rumuz={rumuz}
-                unlockedBadges={unlockedBadges}
-                duelWins={duelStats.duelWins}
-                duelStreak={duelStats.duelStreak}
-                isDuelMode={true}
-                avatarIcon={avatarIcon}
-                avatarBg={avatarBg}
-                equippedTitle={equippedTitle}
-                size="md"
-              />
+          <div>
+            {/* Mobile Swipe Hint Bar */}
+            <div className="sm:hidden flex flex-col items-center justify-center pb-2 pt-0.5">
+              <div className="w-12 h-1.5 rounded-full bg-white/25 mb-1" />
+              <span className="text-[10px] text-slate-400 font-bold tracking-tight">
+                ← Sağa veya sola kaydırarak haritaya dönün →
+              </span>
+            </div>
+
+            {/* Header with Avatar and Frame */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+              <div className="flex items-center gap-3">
+                <AvatarWithBadgeFrame 
+                  rumuz={rumuz}
+                  unlockedBadges={unlockedBadges}
+                  duelWins={duelStats.duelWins}
+                  duelStreak={duelStats.duelStreak}
+                  isDuelMode={true}
+                  avatarIcon={avatarIcon}
+                  avatarBg={avatarBg}
+                  equippedTitle={equippedTitle}
+                  size="md"
+                />
+                <div>
+                  <h1 className="text-base sm:text-lg font-black text-amber-400 tracking-tight flex items-center gap-2">
+                    <span>Canlı KPSS Düello Arenası</span>
+                    <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-400/40 text-red-300 text-[10px] font-black uppercase">
+                      2-4 Oyuncu
+                    </span>
+                  </h1>
+                  <p className="text-xs text-slate-300 flex items-center gap-2">
+                    <span>{rumuz}</span>
+                    <span className="text-amber-400 font-bold">• {duelStats.duelWins} Galibiyet</span>
+                    {duelStats.duelStreak > 1 && <span className="text-orange-400 font-black">🔥 {duelStats.duelStreak} Seri</span>}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActiveTab('map')}
+                className="p-2 sm:p-1.5 rounded-xl bg-white/10 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 transition-all border border-white/10"
+                title="Haritaya Dön (Sağa/Sola da kaydırabilirsiniz)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* DÜELLO MODU SEKMELERİ: Harita İşaretleme Düellosu vs KPSS Test Düellosu */}
+            <div className="grid grid-cols-2 gap-2 mb-3 bg-white/5 p-1 rounded-xl border border-white/10">
+              <button
+                onClick={() => setSelectedDuelType('pin_map')}
+                className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  selectedDuelType === 'pin_map'
+                    ? 'bg-amber-500 text-slate-950 shadow-md scale-[1.01]'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <MapPin className="w-4 h-4 text-slate-950 shrink-0" />
+                <div className="text-left leading-tight">
+                  <div>Harita İşaretleme</div>
+                  <div className="text-[9px] opacity-80 font-normal">15 sn • Mesafe & Hız Puanı</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setSelectedDuelType('kpss_test')}
+                className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  selectedDuelType === 'kpss_test'
+                    ? 'bg-indigo-600 text-white shadow-md scale-[1.01]'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <HelpCircle className="w-4 h-4 text-white shrink-0" />
+                <div className="text-left leading-tight">
+                  <div>KPSS Test Yarışması</div>
+                  <div className="text-[9px] opacity-80 font-normal">40 sn • Çoktan Seçmeli Test</div>
+                </div>
+              </button>
+            </div>
+
+            {/* Ayarlar Grid'i: Oyuncu Sayısı, Soru Sayısı & Kategori Seçimi */}
+            <div className="space-y-3 mb-4">
+              {/* Oyuncu Kapasitesi (2, 3 veya 4 Kişi) */}
               <div>
-                <h1 className="text-base sm:text-lg font-black text-amber-400 tracking-tight flex items-center gap-2">
-                  <span>1v1 Canlı KPSS Düellosu</span>
-                  <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-400/40 text-red-300 text-[10px] font-black uppercase">
-                    Canlı Arena
-                  </span>
-                </h1>
-                <p className="text-xs text-slate-300 flex items-center gap-2">
-                  <span>{rumuz}</span>
-                  <span className="text-amber-400 font-bold">• {duelStats.duelWins} Galibiyet</span>
-                  {duelStats.duelStreak > 1 && <span className="text-orange-400 font-black">🔥 {duelStats.duelStreak} Seri</span>}
-                </p>
+                <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider flex items-center justify-between">
+                  <span>1. Oyuncu Kapasitesi</span>
+                  <span className="text-amber-400 text-[10px] font-bold lowercase">2, 3 veya 4 kişi aynı maçta</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([2, 3, 4] as const).map((pCount) => (
+                    <button
+                      key={pCount}
+                      onClick={() => setSelectedMaxPlayers(pCount)}
+                      className={`py-1.5 px-3 rounded-xl font-black text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        selectedMaxPlayers === pCount
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                      }`}
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      <span>{pCount === 2 ? '2 Kişi (1v1)' : pCount === 3 ? '3 Kişi (1v1v1)' : '4 Kişi (Kral)'}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Soru Sayısı */}
+              <div>
+                <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider">
+                  2. Soru Sayısı
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([10, 20, 30] as const).map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => setSelectedQuestionCount(count)}
+                      className={`py-1.5 px-3 rounded-xl font-black text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        selectedQuestionCount === count
+                          ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                      }`}
+                    >
+                      <Trophy className="w-3.5 h-3.5" />
+                      <span>{count} Soru</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Kategori / Soru Havuzu */}
+              <div>
+                <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider">
+                  3. KPSS Konu Havuzu
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-28 overflow-y-auto pr-1">
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`p-1.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center gap-1.5 truncate cursor-pointer ${
+                        selectedCategory === cat.id
+                          ? 'bg-amber-500/25 border-amber-400 text-amber-200 ring-1 ring-amber-400 shadow-sm'
+                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="text-sm">{cat.icon}</span>
+                      <span className="truncate">{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <button
-              onClick={() => setActiveTab('map')}
-              className="p-1.5 rounded-xl bg-white/10 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 transition-all border border-white/10"
-              title="Haritaya Dön"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+            {/* Mod Seçim Tabları */}
+            <div className="border-t border-white/10 pt-3">
+              <div className="flex border-b border-white/10 mb-3 overflow-x-auto scrollbar-none gap-1">
+                <button
+                  onClick={() => setLobbyTab('quick')}
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    lobbyTab === 'quick'
+                      ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Rastgele Rakip ({selectedMaxPlayers}P)</span>
+                </button>
 
-          {/* DÜELLO MODU SEKMELERİ: Harita İşaretleme Düellosu vs KPSS Test Düellosu */}
-          <div className="grid grid-cols-2 gap-2 mb-3 bg-white/5 p-1 rounded-xl border border-white/10">
-            <button
-              onClick={() => setSelectedDuelType('pin_map')}
-              className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                selectedDuelType === 'pin_map'
-                  ? 'bg-amber-500 text-slate-950 shadow-md scale-[1.01]'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <MapPin className="w-4 h-4 text-slate-950 shrink-0" />
-              <div className="text-left leading-tight">
-                <div>Harita İşaretleme</div>
-                <div className="text-[9px] opacity-80 font-normal">15 sn • Mesafe & Hız Puanı</div>
+                <button
+                  onClick={() => setLobbyTab('private_create')}
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    lobbyTab === 'private_create'
+                      ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Özel Oda Kur</span>
+                </button>
+
+                <button
+                  onClick={() => setLobbyTab('private_join')}
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    lobbyTab === 'private_join'
+                      ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>Koda Katıl</span>
+                </button>
+
+                <button
+                  onClick={() => setLobbyTab('bot')}
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    lobbyTab === 'bot'
+                      ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  <span>Yapay Zeka Botu</span>
+                </button>
               </div>
-            </button>
 
-            <button
-              onClick={() => setSelectedDuelType('kpss_test')}
-              className={`py-2 px-3 rounded-lg font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                selectedDuelType === 'kpss_test'
-                  ? 'bg-indigo-600 text-white shadow-md scale-[1.01]'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <HelpCircle className="w-4 h-4 text-white shrink-0" />
-              <div className="text-left leading-tight">
-                <div>KPSS Test Yarışması</div>
-                <div className="text-[9px] opacity-80 font-normal">40 sn • Çoktan Seçmeli Test</div>
-              </div>
-            </button>
-          </div>
-
-          {/* Soru Sayısı & Kategori Seçimi */}
-          <div className="space-y-3 mb-4">
-            {/* Soru Sayısı */}
-            <div>
-              <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider">
-                1. Soru Sayısı
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {([10, 20, 30] as const).map((count) => (
+              {/* Tab 1: Hızlı Eşleşme */}
+              {lobbyTab === 'quick' && (
+                <div className="space-y-2.5">
+                  <div className="p-2.5 bg-amber-500/10 border border-amber-400/30 rounded-xl text-xs text-amber-200">
+                    ⚡ <strong>Canlı Eşleşme ({selectedMaxPlayers} Kişilik)</strong>: {selectedDuelType === 'kpss_test' ? 'KPSS test yarışmasında' : 'Harita işaretlemede'} aynı ayarlardaki gerçek rakiplerle eşleşin.
+                  </div>
                   <button
-                    key={count}
-                    onClick={() => setSelectedQuestionCount(count)}
-                    className={`py-1.5 px-3 rounded-xl font-black text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                      selectedQuestionCount === count
-                        ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
-                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
-                    }`}
+                    onClick={handleStartQuickMatch}
+                    disabled={actionLoading}
+                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    <Trophy className="w-3.5 h-3.5" />
-                    <span>{count} Soru</span>
+                    {actionLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4" />
+                        <span>{selectedMaxPlayers} Kişilik Canlı Maç Ara & Başla</span>
+                      </>
+                    )}
                   </button>
-                ))}
-              </div>
-            </div>
+                </div>
+              )}
 
-            {/* Kategori / Soru Havuzu */}
-            <div>
-              <label className="block text-[11px] font-black text-slate-300 mb-1 uppercase tracking-wider">
-                2. KPSS Konu Havuzu
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-28 overflow-y-auto pr-1">
-                {CATEGORIES.map((cat) => (
+              {/* Tab 2: Özel Oda Kur */}
+              {lobbyTab === 'private_create' && (
+                <div className="space-y-2.5">
+                  <div className="p-2.5 bg-indigo-500/10 border border-indigo-400/30 rounded-xl text-xs text-indigo-200">
+                    👥 <strong>{selectedMaxPlayers} Kişilik Özel Oda</strong>: Oda kodunu arkadaşlarınıza atarak 2, 3 veya 4 kişilik kapışmalar başlatabilirsiniz.
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      İsteğe Bağlı Oda Şifresi (PIN)
+                    </label>
+                    <input
+                      type="password"
+                      value={createRoomPinInput}
+                      onChange={(e) => setCreateRoomPinInput(e.target.value)}
+                      placeholder="Boş bırakabilirsiniz veya 4 haneli PIN koyun"
+                      maxLength={10}
+                      className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
                   <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`p-1.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center gap-1.5 truncate cursor-pointer ${
-                      selectedCategory === cat.id
-                        ? 'bg-amber-500/25 border-amber-400 text-amber-200 ring-1 ring-amber-400 shadow-sm'
-                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
-                    }`}
+                    onClick={handleCreatePrivateRoom}
+                    disabled={actionLoading}
+                    className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    <span className="text-sm">{cat.icon}</span>
-                    <span className="truncate">{cat.label}</span>
+                    {actionLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Users className="w-4 h-4" />
+                        <span>{selectedMaxPlayers} Kişilik Özel Oda Oluştur</span>
+                      </>
+                    )}
                   </button>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* Tab 3: Odaya Katıl */}
+              {lobbyTab === 'private_join' && (
+                <div className="space-y-2.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      6 Haneli Oda Kodu
+                    </label>
+                    <input
+                      type="text"
+                      value={joinRoomCodeInput}
+                      onChange={(e) => setJoinRoomCodeInput(e.target.value.toUpperCase())}
+                      placeholder="Örn: TR-8492"
+                      maxLength={10}
+                      className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-sm text-amber-300 font-black placeholder:text-slate-500 focus:outline-none focus:border-amber-400 uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Oda Şifresi (Varsa)
+                    </label>
+                    <input
+                      type="password"
+                      value={joinRoomPinInput}
+                      onChange={(e) => setJoinRoomPinInput(e.target.value)}
+                      placeholder="Şifresiz ise boş bırakın"
+                      maxLength={10}
+                      className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                  <button
+                    onClick={handleJoinPrivateRoom}
+                    disabled={actionLoading}
+                    className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {actionLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                    ) : (
+                      <>
+                        <KeyRound className="w-4 h-4" />
+                        <span>Odaya Katıl ve Başla</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Tab 4: Yapay Zeka Botu */}
+              {lobbyTab === 'bot' && (
+                <div className="space-y-2.5">
+                  <div className="p-2.5 bg-indigo-500/10 border border-indigo-400/30 rounded-xl text-xs text-indigo-200">
+                    🤖 <strong>Antrenman Arenası</strong>: {selectedDuelType === 'kpss_test' ? 'KPSS test' : 'Harita'} yapay zekasına karşı refleks ve bilgilerinizi geliştirin.
+                  </div>
+                  <button
+                    onClick={handleStartBotDuel}
+                    disabled={actionLoading}
+                    className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {actionLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Bot className="w-4 h-4" />
+                        <span>Yapay Zekaya Karşı Başla</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {lobbyError && (
+                <div className="mt-2.5 p-2 rounded-xl bg-red-500/20 border border-red-400/40 text-red-300 text-xs flex items-center gap-2 font-medium">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                  <span>{lobbyError}</span>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Mod Seçim Tabları */}
-          <div className="border-t border-white/10 pt-3">
-            <div className="flex border-b border-white/10 mb-3 overflow-x-auto scrollbar-none gap-1">
-              <button
-                onClick={() => setLobbyTab('quick')}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  lobbyTab === 'quick'
-                    ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>Rastgele Rakip</span>
-              </button>
-
-              <button
-                onClick={() => setLobbyTab('private_create')}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  lobbyTab === 'private_create'
-                    ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Users className="w-3.5 h-3.5" />
-                <span>Arkadaş Odası Kur</span>
-              </button>
-
-              <button
-                onClick={() => setLobbyTab('private_join')}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  lobbyTab === 'private_join'
-                    ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span>Koda Katıl</span>
-              </button>
-
-              <button
-                onClick={() => setLobbyTab('bot')}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  lobbyTab === 'bot'
-                    ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Bot className="w-3.5 h-3.5" />
-                <span>Yapay Zeka Botu</span>
-              </button>
-            </div>
-
-            {/* Tab 1: Hızlı Eşleşme */}
-            {lobbyTab === 'quick' && (
-              <div className="space-y-2.5">
-                <div className="p-2.5 bg-amber-500/10 border border-amber-400/30 rounded-xl text-xs text-amber-200">
-                  ⚡ <strong>Canlı Eşleşme</strong>: {selectedDuelType === 'kpss_test' ? 'KPSS test yarışmasında' : 'Harita işaretlemede'} aynı ayarlardaki gerçek bir rakiple anında eşleşin.
-                </div>
-                <button
-                  onClick={handleStartQuickMatch}
-                  disabled={actionLoading}
-                  className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4" />
-                      <span>Rastgele Canlı Rakip Ara & Başla</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Tab 2: Özel Oda Kur */}
-            {lobbyTab === 'private_create' && (
-              <div className="space-y-2.5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    İsteğe Bağlı Oda Şifresi (PIN)
-                  </label>
-                  <input
-                    type="password"
-                    value={createRoomPinInput}
-                    onChange={(e) => setCreateRoomPinInput(e.target.value)}
-                    placeholder="Boş bırakabilirsiniz veya 4 haneli PIN koyun"
-                    maxLength={10}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-                <button
-                  onClick={handleCreatePrivateRoom}
-                  disabled={actionLoading}
-                  className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  ) : (
-                    <>
-                      <Users className="w-4 h-4" />
-                      <span>Özel Oda Oluştur (Oda Kodu Al)</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Tab 3: Odaya Katıl */}
-            {lobbyTab === 'private_join' && (
-              <div className="space-y-2.5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    6 Haneli Oda Kodu
-                  </label>
-                  <input
-                    type="text"
-                    value={joinRoomCodeInput}
-                    onChange={(e) => setJoinRoomCodeInput(e.target.value.toUpperCase())}
-                    placeholder="Örn: TR-8492"
-                    maxLength={10}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-sm text-amber-300 font-black placeholder:text-slate-500 focus:outline-none focus:border-amber-400 uppercase"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Oda Şifresi (Varsa)
-                  </label>
-                  <input
-                    type="password"
-                    value={joinRoomPinInput}
-                    onChange={(e) => setJoinRoomPinInput(e.target.value)}
-                    placeholder="Şifresiz ise boş bırakın"
-                    maxLength={10}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-                <button
-                  onClick={handleJoinPrivateRoom}
-                  disabled={actionLoading}
-                  className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                  ) : (
-                    <>
-                      <KeyRound className="w-4 h-4" />
-                      <span>Odaya Katıl ve Başla</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Tab 4: Yapay Zeka Botu */}
-            {lobbyTab === 'bot' && (
-              <div className="space-y-2.5">
-                <div className="p-2.5 bg-indigo-500/10 border border-indigo-400/30 rounded-xl text-xs text-indigo-200">
-                  🤖 <strong>Antrenman Arenası</strong>: {selectedDuelType === 'kpss_test' ? 'KPSS test' : 'Harita'} yapay zekasına karşı refleks ve bilgilerinizi geliştirin.
-                </div>
-                <button
-                  onClick={handleStartBotDuel}
-                  disabled={actionLoading}
-                  className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  ) : (
-                    <>
-                      <Bot className="w-4 h-4" />
-                      <span>Yapay Zekaya Karşı Başla</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {lobbyError && (
-              <div className="mt-2.5 p-2 rounded-xl bg-red-500/20 border border-red-400/40 text-red-300 text-xs flex items-center gap-2 font-medium">
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-                <span>{lobbyError}</span>
-              </div>
-            )}
-          </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   // -------------------------------------------------------------
-  // 3. ODA BEKLEME EKRANI (Akıllı Çapraz Mod Eşleştirme & 1 Dk Öneri Desteği)
+  // 3. ODA BEKLEME EKRANI (Akıllı Çapraz Mod Eşleştirme & 2-4 Kişilik Lobi Desteği)
   // -------------------------------------------------------------
   if (activeDuelSession.status === 'waiting') {
     const mins = Math.floor(waitingSeconds / 60);
     const secs = waitingSeconds % 60;
     const formattedWaiting = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    const allJoinedPlayers = getAllSessionPlayers(activeDuelSession);
+    const maxCapacity = activeDuelSession.maxPlayers || 2;
+    const isHost = activeDuelPlayerKey === 'player1';
 
     return (
       <div 
@@ -1164,118 +1234,206 @@ export default function DuelMode() {
             setShowExitConfirmModal(true);
           }
         }}
-        className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto cursor-pointer"
+        className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-0 sm:p-4 overflow-y-auto cursor-pointer"
       >
-        <div 
+        <motion.div 
           onClick={(e) => e.stopPropagation()} 
-          className="w-full max-w-md bg-[#09090b]/95 border-2 border-amber-500/40 rounded-2xl shadow-2xl p-5 text-white text-center animate-in zoom-in-95 duration-150 my-auto cursor-default"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.4}
+          onDragEnd={(_e, info) => {
+            if (Math.abs(info.offset.x) > 120 || Math.abs(info.velocity.x) > 400) {
+              handleLeaveDuel();
+            }
+          }}
+          className="w-full h-full sm:h-auto sm:max-w-lg bg-[#09090b]/98 sm:bg-[#09090b]/95 border-0 sm:border-2 border-amber-500/40 sm:rounded-2xl shadow-2xl p-4 sm:p-5 text-white text-center animate-in zoom-in-95 duration-150 my-auto cursor-default flex flex-col justify-between sm:justify-start"
         >
-          <div className="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center mx-auto mb-3 animate-pulse">
-            <Loader2 className="w-7 h-7 text-amber-400 animate-spin" />
-          </div>
-
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <h2 className="text-lg font-black text-amber-400">
-              {activeDuelSession.mode === 'private' ? 'Arkadaşınız Bekleniyor...' : 'Canlı Rakip Aranıyor...'}
-            </h2>
-            <span className="text-xs font-mono font-black text-amber-300 bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 rounded-lg">
-              ⏱️ {formattedWaiting}
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-400 mb-3">
-            {activeDuelSession.duelType === 'kpss_test' ? '📝 KPSS Test Modu' : '📍 Harita İşaretleme Modu'} • {activeDuelSession.categoryFilter} • {activeDuelSession.questionCount} Soru
-          </p>
-
-          {activeDuelSession.mode === 'private' && (
-            <div className="bg-white/5 border border-white/20 rounded-xl p-3 mb-3">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                Arkadaşınızla Paylaşılacak Oda Kodu
+          <div>
+            {/* Mobile Swipe Hint Bar */}
+            <div className="sm:hidden flex flex-col items-center justify-center pb-2 pt-0.5">
+              <div className="w-12 h-1.5 rounded-full bg-white/25 mb-1" />
+              <span className="text-[10px] text-slate-400 font-bold tracking-tight">
+                ← Sağa veya sola kaydırarak aramayı iptal edin →
               </span>
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-2xl font-black text-amber-300 tracking-widest font-mono">
-                  {activeDuelSession.roomCode}
-                </span>
-                <button
-                  onClick={handleCopyCode}
-                  className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 transition-all flex items-center gap-1 text-xs font-bold"
-                >
-                  {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                  <span>{copiedCode ? 'Kopyalandı' : 'Kopyala'}</span>
-                </button>
-              </div>
-              {activeDuelSession.roomPin && (
-                <span className="text-xs text-slate-400 mt-1 block">
-                  Oda PIN Şifresi: <strong className="text-white">{activeDuelSession.roomPin}</strong>
-                </span>
-              )}
             </div>
-          )}
 
-          {/* Çapraz Mod Eşleştirme Önerisi (Farklı modda veya soru sayısında bekleyenler) */}
-          {crossModeSuggestions.length > 0 && (
-            <div className="mb-3 text-left space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-black text-amber-300 border-b border-white/10 pb-1">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Farklı Modda Rakip Bekleyen Adaylar Bulundu:</span>
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center mx-auto mb-2.5 animate-pulse">
+              <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 text-amber-400 animate-spin" />
+            </div>
+
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h2 className="text-base sm:text-lg font-black text-amber-400">
+                {activeDuelSession.mode === 'private' ? 'Arkadaş Odası Bekleniyor...' : 'Canlı Rakipler Aranıyor...'}
+              </h2>
+              <span className="text-xs font-mono font-black text-amber-300 bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 rounded-lg">
+                ⏱️ {formattedWaiting}
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-400 mb-3">
+              {activeDuelSession.duelType === 'kpss_test' ? '📝 KPSS Test Modu' : '📍 Harita İşaretleme Modu'} • {activeDuelSession.categoryFilter} • {activeDuelSession.questionCount} Soru
+            </p>
+
+            {/* Oyuncu Slotları (2, 3 veya 4 Kişilik) */}
+            <div className="mb-3 p-3 bg-white/5 border border-white/10 rounded-xl">
+              <div className="flex items-center justify-between text-[11px] font-black text-slate-300 mb-2">
+                <span>Katılan Oyuncular ({allJoinedPlayers.length}/{maxCapacity})</span>
+                <span className="text-amber-400 font-bold">{maxCapacity === 2 ? '1v1 Düello' : `${maxCapacity} Kişilik Kapışma`}</span>
               </div>
-              {crossModeSuggestions.map((sugg) => (
-                <div 
-                  key={sugg.id} 
-                  className="p-2.5 rounded-xl bg-gradient-to-r from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 flex items-center justify-between gap-2 text-xs"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-extrabold text-indigo-300 truncate">{sugg.hostRumuz}</span>
-                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 shrink-0">
-                        {Math.floor(sugg.waitingDurationSec / 60)}d {sugg.waitingDurationSec % 60}s bekliyor
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-300 mt-0.5 truncate">
-                      {sugg.duelType === 'kpss_test' ? '📝 KPSS Test' : '📍 Harita İşaretleme'} • {sugg.questionCount} Soru • {sugg.categoryFilter}
-                    </p>
-                  </div>
 
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {Array.from({ length: maxCapacity }).map((_, idx) => {
+                  const p = allJoinedPlayers[idx];
+                  const isMe = p?.id === normalizeRumuzKey(rumuz);
+                  return (
+                    <div 
+                      key={idx}
+                      className={`p-2 rounded-xl border flex flex-col items-center justify-center text-center min-h-[85px] transition-all ${
+                        p 
+                          ? isMe 
+                            ? 'bg-amber-500/20 border-amber-400 text-amber-200 shadow-md' 
+                            : 'bg-indigo-500/20 border-indigo-400 text-indigo-200' 
+                          : 'bg-white/[0.02] border-dashed border-white/20 text-slate-500'
+                      }`}
+                    >
+                      {p ? (
+                        <>
+                          <AvatarWithBadgeFrame 
+                            rumuz={p.rumuz}
+                            unlockedBadges={p.unlockedBadges || ['3D Coğrafyacı Çırağı']}
+                            duelWins={p.duelWins || 1}
+                            duelStreak={p.duelStreak || 0}
+                            isDuelMode={true}
+                            avatarIcon={p.avatarIcon || '⚔️'}
+                            avatarBg={p.avatarBg || 'night_blue'}
+                            equippedTitle={p.equippedTitle || 'Yarışmacı'}
+                            size="sm"
+                          />
+                          <span className="text-[11px] font-black mt-1 truncate max-w-full">
+                            {p.rumuz}
+                          </span>
+                          <span className="text-[9px] opacity-80 font-semibold">
+                            {isMe ? '(Sen)' : idx === 0 ? '(Kurucu)' : `Oyuncu ${idx + 1}`}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-8 h-8 rounded-full border border-dashed border-slate-600 flex items-center justify-center text-slate-500 mb-1">
+                            <Users className="w-4 h-4" />
+                          </div>
+                          <span className="text-[10px] font-medium text-slate-400">Bekleniyor...</span>
+                          <span className="text-[8px] text-slate-500">Slot #{idx + 1}</span>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Kurucu Erken Başlatma Butonu (En az 2 kişi girdiğinde) */}
+              {isHost && allJoinedPlayers.length >= 2 && allJoinedPlayers.length < maxCapacity && (
+                <div className="mt-3 pt-2.5 border-t border-white/10">
                   <button
-                    disabled={joiningSuggestionId === sugg.id}
-                    onClick={() => handleAcceptSuggestion(sugg)}
-                    className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950 font-black text-xs rounded-lg shadow-md transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                    onClick={() => forceStartWaitingDuel(activeDuelSession)}
+                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    {joiningSuggestionId === sugg.id ? 'Bağlanıyor...' : '🚀 Maça Katıl'}
+                    <Zap className="w-4 h-4" />
+                    <span>Daha Fazla Bekleme, {allJoinedPlayers.length} Kişiyle Hemen Başlat!</span>
                   </button>
                 </div>
-              ))}
+              )}
             </div>
-          )}
 
-          {/* 1 Dakika ve Üzeri Bekleme Tavsiyesi */}
-          {waitingSeconds >= 45 && (
-            <div className="mb-3 p-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-xs text-left flex items-start gap-2">
-              <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <strong className="text-amber-300 block font-bold">Bekleme Süresi 1 Dakikaya Yaklaştı:</strong>
-                <span>Dilerseniz hemen Yapay Zeka (AI) KPSS botuna karşı başlayarak pratik yapabilir ve istatistik toplayabilirsiniz.</span>
+            {activeDuelSession.mode === 'private' && (
+              <div className="bg-white/5 border border-white/20 rounded-xl p-3 mb-3">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
+                  Arkadaşlarınızla Paylaşılacak Oda Kodu
+                </span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-2xl font-black text-amber-300 tracking-widest font-mono">
+                    {activeDuelSession.roomCode}
+                  </span>
+                  <button
+                    onClick={handleCopyCode}
+                    className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 transition-all flex items-center gap-1 text-xs font-bold"
+                  >
+                    {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    <span>{copiedCode ? 'Kopyalandı' : 'Kopyala'}</span>
+                  </button>
+                </div>
+                {activeDuelSession.roomPin && (
+                  <span className="text-xs text-slate-400 mt-1 block">
+                    Oda PIN Şifresi: <strong className="text-white">{activeDuelSession.roomPin}</strong>
+                  </span>
+                )}
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="flex gap-2">
+            {/* Çapraz Mod Eşleştirme Önerisi */}
+            {crossModeSuggestions.length > 0 && (
+              <div className="mb-3 text-left space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-black text-amber-300 border-b border-white/10 pb-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Farklı Modda Rakip Bekleyen Adaylar Bulundu:</span>
+                </div>
+                {crossModeSuggestions.map((sugg) => (
+                  <div 
+                    key={sugg.id} 
+                    className="p-2.5 rounded-xl bg-gradient-to-r from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 flex items-center justify-between gap-2 text-xs"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-indigo-300 truncate">{sugg.hostRumuz}</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 shrink-0">
+                          {Math.floor(sugg.waitingDurationSec / 60)}d {sugg.waitingDurationSec % 60}s bekliyor
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 mt-0.5 truncate">
+                        {sugg.duelType === 'kpss_test' ? '📝 KPSS Test' : '📍 Harita İşaretleme'} • {sugg.questionCount} Soru • {sugg.categoryFilter}
+                      </p>
+                    </div>
+
+                    <button
+                      disabled={joiningSuggestionId === sugg.id}
+                      onClick={() => handleAcceptSuggestion(sugg)}
+                      className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950 font-black text-xs rounded-lg shadow-md transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                    >
+                      {joiningSuggestionId === sugg.id ? 'Bağlanıyor...' : '🚀 Maça Katıl'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 1 Dakika ve Üzeri Bekleme Tavsiyesi */}
+            {waitingSeconds >= 45 && (
+              <div className="mb-3 p-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-xs text-left flex items-start gap-2">
+                <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-amber-300 block font-bold">Bekleme Süresi 1 Dakikaya Yaklaştı:</strong>
+                  <span>Dilerseniz hemen Yapay Zeka (AI) KPSS botuna karşı başlayarak pratik yapabilir ve istatistik toplayabilirsiniz.</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-2 pt-2">
             <button
               onClick={handleLeaveDuel}
-              className="flex-1 py-2 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+              className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
             >
               Aramayı İptal Et
             </button>
 
             <button
               onClick={handleStartBotDuel}
-              className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-1 cursor-pointer"
             >
               <Bot className="w-4 h-4" />
               <span>Yapay Zekaya Geç</span>
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -1323,67 +1481,49 @@ export default function DuelMode() {
   }
 
   // -------------------------------------------------------------
-  // 4. BAŞLAMA SAYACI: 10 Saniyelik Geri Sayım & Karşılıklı Kartlar
+  // 4. BAŞLAMA SAYACI: 10 Saniyelik Geri Sayım & Karşılıklı Kartlar (2-4 Kişilik)
   // -------------------------------------------------------------
   if (activeDuelSession.status === 'starting' && countdownNum !== null) {
     const isTest = activeDuelSession.duelType === 'kpss_test';
+    const startingPlayers = getAllSessionPlayers(activeDuelSession);
+    const capacity = activeDuelSession.maxPlayers || 2;
 
     return (
       <div className="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-lg flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-lg bg-[#09090b]/95 border-2 border-amber-500/50 rounded-2xl shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-xl bg-[#09090b]/95 border-2 border-amber-500/50 rounded-2xl shadow-2xl p-5 sm:p-6 text-center animate-in zoom-in-95 duration-200">
           <div className="text-[11px] font-black uppercase tracking-wider text-amber-300 mb-4 px-3 py-1 bg-amber-500/15 border border-amber-400/30 rounded-full inline-block">
-            {isTest ? '📝 KPSS TEST DÜELLOSU BAŞLIYOR' : '📍 1v1 HARİTA DÜELLOSU BAŞLIYOR'}
+            {isTest 
+              ? `📝 KPSS TEST DÜELLOSU (${capacity === 2 ? '1v1' : `${capacity} Kişilik`}) BAŞLIYOR` 
+              : `📍 HARİTA DÜELLOSU (${capacity === 2 ? '1v1' : `${capacity} Kişilik`}) BAŞLIYOR`}
           </div>
 
-          <div className="flex items-center justify-center gap-6 sm:gap-10 mb-6">
-            {/* Player 1 */}
-            <div className="flex flex-col items-center">
-              <AvatarWithBadgeFrame 
-                rumuz={activeDuelSession.player1.rumuz}
-                unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player1.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
-                duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player1.duelWins || 1)}
-                duelStreak={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player1.duelStreak || 0)}
-                isDuelMode={true}
-                avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player1.avatarIcon || '⚔️')}
-                avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player1.avatarBg || 'night_blue')}
-                equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player1.equippedTitle || '3D Coğrafyacı Çırağı')}
-                size="lg"
-              />
-              <span className="text-sm font-black text-indigo-300 max-w-[120px] truncate mt-2">
-                {activeDuelSession.player1.rumuz}
-              </span>
-              <span className="text-[10px] text-slate-400">
-                {activeDuelPlayerKey === 'player1' ? '(Sen)' : 'Oyuncu 1'}
-              </span>
-            </div>
+          <div className={`grid ${startingPlayers.length <= 2 ? 'grid-cols-2 max-w-sm mx-auto' : startingPlayers.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-3 sm:gap-4 mb-5 items-center justify-center`}>
+            {startingPlayers.map((p, idx) => {
+              const isMe = p.id === normalizeRumuzKey(rumuz);
+              const colorClass = idx === 0 ? 'text-indigo-300' : idx === 1 ? 'text-rose-300' : idx === 2 ? 'text-amber-300' : 'text-emerald-300';
 
-            {/* VS */}
-            <div className="flex flex-col items-center">
-              <span className="text-3xl sm:text-4xl font-black text-amber-400 italic">
-                VS
-              </span>
-            </div>
-
-            {/* Player 2 */}
-            <div className="flex flex-col items-center">
-              <AvatarWithBadgeFrame 
-                rumuz={activeDuelSession.player2?.rumuz || 'Rakip'}
-                unlockedBadges={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player2?.unlockedBadges || (activeDuelSession.player2?.isBot ? ['Turing Ustası'] : ['1v1 Gladyatör']))}
-                duelWins={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player2?.duelWins ?? (activeDuelSession.player2?.isBot ? 50 : 3))}
-                duelStreak={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player2?.duelStreak ?? (activeDuelSession.player2?.isBot ? 3 : 1))}
-                isDuelMode={true}
-                avatarIcon={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player2?.avatarIcon || (activeDuelSession.player2?.isBot ? '🤖' : '⚔️'))}
-                avatarBg={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player2?.avatarBg || (activeDuelSession.player2?.isBot ? 'indigo_midnight' : 'gold_glory'))}
-                equippedTitle={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player2?.equippedTitle || (activeDuelSession.player2?.isBot ? 'Turing Başmühendisi' : '1v1 Gladyatör'))}
-                size="lg"
-              />
-              <span className="text-sm font-black text-rose-300 max-w-[120px] truncate mt-2">
-                {activeDuelSession.player2?.rumuz || 'Rakip'}
-              </span>
-              <span className="text-[10px] text-slate-400">
-                {activeDuelPlayerKey === 'player2' ? '(Sen)' : activeDuelSession.player2?.isBot ? '(Bot)' : 'Oyuncu 2'}
-              </span>
-            </div>
+              return (
+                <div key={p.id || idx} className="flex flex-col items-center">
+                  <AvatarWithBadgeFrame 
+                    rumuz={p.rumuz}
+                    unlockedBadges={isMe ? unlockedBadges : (p.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
+                    duelWins={isMe ? duelStats.duelWins : (p.duelWins || (p.isBot ? 50 : 1))}
+                    duelStreak={isMe ? duelStats.duelStreak : (p.duelStreak || (p.isBot ? 3 : 0))}
+                    isDuelMode={true}
+                    avatarIcon={isMe ? avatarIcon : (p.avatarIcon || (p.isBot ? '🤖' : '⚔️'))}
+                    avatarBg={isMe ? avatarBg : (p.avatarBg || (p.isBot ? 'indigo_midnight' : 'gold_glory'))}
+                    equippedTitle={isMe ? equippedTitle : (p.equippedTitle || (p.isBot ? 'Turing Başmühendisi' : '3D Coğrafyacı Çırağı'))}
+                    size={startingPlayers.length > 2 ? 'md' : 'lg'}
+                  />
+                  <span className={`text-xs sm:text-sm font-black ${colorClass} max-w-[110px] truncate mt-1.5`}>
+                    {p.rumuz}
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    {isMe ? '(Sen)' : p.isBot ? '(Bot)' : `Oyuncu ${idx + 1}`}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {/* 10s Countdown Circle */}
@@ -1393,7 +1533,7 @@ export default function DuelMode() {
 
           <p className="text-xs font-bold text-slate-300 mt-4">
             {isTest 
-              ? 'Her soru için 40 saniyeniz var! İki taraf da cevaplarsa anında sonuca geçilir.' 
+              ? 'Her soru için 40 saniyeniz var! Tüm yarışmacılar cevapladığında anında sonuca geçilir.' 
               : 'Haritada aranan yeri en hızlı ve en yakın işaretleyen puanı kapar!'}
           </p>
         </div>
@@ -1402,13 +1542,23 @@ export default function DuelMode() {
   }
 
   // -------------------------------------------------------------
-  // 5. MAÇ SONUÇ EKRANI (Kompakt, Smooth & Mobilde Kaydırılabilir Tasarım)
+  // 5. MAÇ SONUÇ EKRANI (2-4 Kişilik Podyum & Mobilde Kaydırılabilir Tasarım)
   // -------------------------------------------------------------
   if (activeDuelSession.status === 'finished') {
-    const isWinner = activeDuelSession.winnerId === activeDuelPlayerKey;
+    const allFinalPlayers = getAllSessionPlayers(activeDuelSession);
+    const sortedPlayers = [...allFinalPlayers].sort((a, b) => (b.score || 0) - (a.score || 0));
+    const isWinner = activeDuelSession.winnerId === normalizeRumuzKey(rumuz) || activeDuelSession.winnerId === activeDuelPlayerKey;
     const isDraw = activeDuelSession.winnerId === 'draw';
     const historyList = activeDuelSession.roundHistory || [];
     const isTest = activeDuelSession.duelType === 'kpss_test';
+
+    const rankBadges = ['🥇 1.', '🥈 2.', '🥉 3.', '4.'];
+    const playerColorSchemes = [
+      'border-amber-400 bg-amber-500/20 text-amber-300',
+      'border-slate-300 bg-slate-500/20 text-slate-200',
+      'border-amber-700 bg-amber-800/20 text-amber-400',
+      'border-slate-600 bg-slate-800/20 text-slate-400'
+    ];
 
     return (
       <div className="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
@@ -1423,67 +1573,67 @@ export default function DuelMode() {
               {isDraw ? '🤝 BERABERE BİTTİ!' : isWinner ? '🏆 TEBRİKLER! DÜELLOYU KAZANDINIZ!' : '⚔️ DÜELLO TAMAMLANDI!'}
             </h2>
             <p className="text-[10px] sm:text-xs text-slate-400">
-              {isTest ? 'KPSS Test Modu' : 'Harita Modu'} • {activeDuelSession.questionCount} Soru • {activeDuelSession.categoryFilter}
+              {isTest ? 'KPSS Test Modu' : 'Harita Modu'} • {allFinalPlayers.length} Oyuncu • {activeDuelSession.questionCount} Soru • {activeDuelSession.categoryFilter}
             </p>
           </div>
 
-          {/* Karşılaştırma Kartları */}
-          <div className="grid grid-cols-2 gap-2 mb-3 shrink-0">
-            {/* Player 1 */}
-            <div className={`p-2 sm:p-3 rounded-xl border ${activeDuelSession.player1.id === activeDuelSession.winnerId ? 'bg-amber-500/20 border-amber-400' : 'bg-white/5 border-white/10'}`}>
-              <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                <AvatarWithBadgeFrame 
-                  rumuz={activeDuelSession.player1.rumuz}
-                  unlockedBadges={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player1.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
-                  duelWins={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player1.duelWins || 1)}
-                  duelStreak={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player1.duelStreak || 0)}
-                  isDuelMode={true}
-                  avatarIcon={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player1.avatarIcon || '⚔️')}
-                  avatarBg={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player1.avatarBg || 'night_blue')}
-                  equippedTitle={activeDuelSession.player1.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player1.equippedTitle || '3D Coğrafyacı Çırağı')}
-                  size="sm"
-                />
-                <span className="text-xs font-bold text-slate-200 truncate">
-                  {activeDuelSession.player1.rumuz} {activeDuelPlayerKey === 'player1' ? '(Sen)' : ''}
-                </span>
-              </div>
-              <span className="text-lg sm:text-xl font-black text-indigo-400 block">
-                {activeDuelSession.player1.score} P
-              </span>
-              {!isTest && (
-                <span className="text-[9px] sm:text-[10px] text-slate-400 block">
-                  Hata: <strong className="text-amber-300">{Math.round(activeDuelSession.player1.totalDistanceKm)} km</strong>
-                </span>
-              )}
-            </div>
+          {/* Karşılaştırma & Podyum Kartları (2-4 Kişi Dinamik) */}
+          <div className={`grid ${sortedPlayers.length === 2 ? 'grid-cols-2' : sortedPlayers.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-2 mb-3 shrink-0`}>
+            {sortedPlayers.map((p, idx) => {
+              const isMe = p.id === normalizeRumuzKey(rumuz);
+              const isTopWinner = idx === 0 && !isDraw;
+              const colorScheme = playerColorSchemes[idx] || playerColorSchemes[3];
 
-            {/* Player 2 */}
-            <div className={`p-2 sm:p-3 rounded-xl border ${activeDuelSession.player2?.id === activeDuelSession.winnerId ? 'bg-amber-500/20 border-amber-400' : 'bg-white/5 border-white/10'}`}>
-              <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                <AvatarWithBadgeFrame 
-                  rumuz={activeDuelSession.player2?.rumuz || 'Rakip'}
-                  unlockedBadges={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? unlockedBadges : (activeDuelSession.player2?.unlockedBadges || (activeDuelSession.player2?.isBot ? ['Turing Ustası'] : ['1v1 Gladyatör']))}
-                  duelWins={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelWins : (activeDuelSession.player2?.duelWins ?? (activeDuelSession.player2?.isBot ? 50 : 2))}
-                  duelStreak={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? duelStats.duelStreak : (activeDuelSession.player2?.duelStreak ?? (activeDuelSession.player2?.isBot ? 3 : 0))}
-                  isDuelMode={true}
-                  avatarIcon={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarIcon : (activeDuelSession.player2?.avatarIcon || (activeDuelSession.player2?.isBot ? '🤖' : '⚔️'))}
-                  avatarBg={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? avatarBg : (activeDuelSession.player2?.avatarBg || (activeDuelSession.player2?.isBot ? 'indigo_midnight' : 'gold_glory'))}
-                  equippedTitle={activeDuelSession.player2?.id === normalizeRumuzKey(rumuz) ? equippedTitle : (activeDuelSession.player2?.equippedTitle || (activeDuelSession.player2?.isBot ? 'Turing Başmühendisi' : '1v1 Gladyatör'))}
-                  size="sm"
-                />
-                <span className="text-xs font-bold text-slate-200 truncate">
-                  {activeDuelSession.player2?.rumuz || 'Rakip'} {activeDuelPlayerKey === 'player2' ? '(Sen)' : ''}
-                </span>
-              </div>
-              <span className="text-lg sm:text-xl font-black text-rose-400 block">
-                {activeDuelSession.player2?.score || 0} P
-              </span>
-              {!isTest && (
-                <span className="text-[9px] sm:text-[10px] text-slate-400 block">
-                  Hata: <strong className="text-amber-300">{Math.round(activeDuelSession.player2?.totalDistanceKm || 0)} km</strong>
-                </span>
-              )}
-            </div>
+              return (
+                <div 
+                  key={p.id || idx}
+                  className={`p-2 sm:p-2.5 rounded-xl border flex flex-col items-center justify-between text-center transition-all ${
+                    isTopWinner 
+                      ? 'bg-amber-500/25 border-amber-400 ring-2 ring-amber-400/30 shadow-lg' 
+                      : isMe 
+                        ? 'bg-indigo-950/40 border-indigo-400/80' 
+                        : 'bg-white/5 border-white/10'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${colorScheme}`}>
+                      {rankBadges[idx]}
+                    </span>
+                    {isMe && (
+                      <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-1 py-0.5 rounded">
+                        (Sen)
+                      </span>
+                    )}
+                  </div>
+
+                  <AvatarWithBadgeFrame 
+                    rumuz={p.rumuz}
+                    unlockedBadges={isMe ? unlockedBadges : (p.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
+                    duelWins={isMe ? duelStats.duelWins : (p.duelWins || (p.isBot ? 50 : 1))}
+                    duelStreak={isMe ? duelStats.duelStreak : (p.duelStreak || (p.isBot ? 3 : 0))}
+                    isDuelMode={true}
+                    avatarIcon={isMe ? avatarIcon : (p.avatarIcon || (p.isBot ? '🤖' : '⚔️'))}
+                    avatarBg={isMe ? avatarBg : (p.avatarBg || (p.isBot ? 'indigo_midnight' : 'gold_glory'))}
+                    equippedTitle={isMe ? equippedTitle : (p.equippedTitle || (p.isBot ? 'Turing Başmühendisi' : '3D Coğrafyacı Çırağı'))}
+                    size="sm"
+                  />
+
+                  <span className="text-xs font-bold text-slate-200 truncate max-w-full mt-1">
+                    {p.rumuz}
+                  </span>
+
+                  <span className="text-base sm:text-lg font-black text-amber-400 block mt-0.5">
+                    {p.score || 0} P
+                  </span>
+
+                  {!isTest && (
+                    <span className="text-[9px] text-slate-400 block mt-0.5">
+                      Hata: <strong className="text-slate-200">{Math.round(p.totalDistanceKm || 0)} km</strong>
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Soru Soru Karşılaştırma Tablosu (Mobilde Kusursuz Kaydırma & Kompakt Görünüm) */}
@@ -1507,11 +1657,7 @@ export default function DuelMode() {
               ) : (
                 historyList.map((item, idx) => {
                   if (isTest) {
-                    const p1Opt = item.player1SelectedOption;
-                    const p2Opt = item.player2SelectedOption;
                     const correctIdx = item.correctOptionIndex ?? 0;
-                    const p1Correct = p1Opt === correctIdx;
-                    const p2Correct = p2Opt === correctIdx;
                     const optionsList = item.options || [];
 
                     return (
@@ -1530,27 +1676,26 @@ export default function DuelMode() {
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-                          <div className={`p-1 rounded flex items-center justify-between gap-1 ${p1Correct ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border border-rose-500/30 text-rose-300'}`}>
-                            <span className="truncate text-[10px]">{activeDuelSession.player1.rumuz}: {p1Opt !== null && p1Opt !== undefined && p1Opt >= 0 ? (optionsList[p1Opt] || `Seçenek ${p1Opt + 1}`) : 'Boş'}</span>
-                            <span className="font-black text-[10px] shrink-0">+{item.player1Points}P</span>
-                          </div>
+                        <div className={`grid ${allFinalPlayers.length <= 2 ? 'grid-cols-2' : allFinalPlayers.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-1.5 text-[11px]`}>
+                          {allFinalPlayers.map((p, pIdx) => {
+                            const res = item.allPlayerResults?.find(r => r.id === p.id);
+                            const opt = res ? res.selectedOption : pIdx === 0 ? item.player1SelectedOption : pIdx === 1 ? item.player2SelectedOption : pIdx === 2 ? item.player3SelectedOption : item.player4SelectedOption;
+                            const isCorrect = opt === correctIdx;
+                            const points = res ? res.points : pIdx === 0 ? item.player1Points : pIdx === 1 ? item.player2Points : pIdx === 2 ? item.player3Points : item.player4Points;
 
-                          <div className={`p-1 rounded flex items-center justify-between gap-1 ${p2Correct ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border border-rose-500/30 text-rose-300'}`}>
-                            <span className="truncate text-[10px]">{activeDuelSession.player2?.rumuz || 'Rakip'}: {p2Opt !== null && p2Opt !== undefined && p2Opt >= 0 ? (optionsList[p2Opt] || `Seçenek ${p2Opt + 1}`) : 'Boş'}</span>
-                            <span className="font-black text-[10px] shrink-0">+{item.player2Points}P</span>
-                          </div>
+                            return (
+                              <div key={p.id || pIdx} className={`p-1 rounded flex items-center justify-between gap-1 ${isCorrect ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border border-rose-500/30 text-rose-300'}`}>
+                                <span className="truncate text-[10px]">{p.rumuz}: {opt !== null && opt !== undefined && opt >= 0 ? (optionsList[opt] || `Seçenek ${opt + 1}`) : 'Boş'}</span>
+                                <span className="font-black text-[10px] shrink-0">+{points || 0}P</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     );
                   }
 
                   // Pin Map round
-                  const p1Dist = item.player1DistanceKm;
-                  const p2Dist = item.player2DistanceKm;
-                  const p1Closer = p1Dist < p2Dist;
-                  const p2Closer = p2Dist < p1Dist;
-
                   return (
                     <div key={item.questionId || idx} className="bg-white/5 border border-white/10 rounded-lg p-2 transition-all">
                       <div className="flex items-center justify-between gap-1 mb-1">
@@ -1569,22 +1714,22 @@ export default function DuelMode() {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-                        <div className={`p-1 rounded flex items-center justify-between gap-1 ${p1Closer ? 'bg-indigo-950/60 border border-indigo-500/40 text-indigo-200' : 'bg-black/30 text-slate-300'}`}>
-                          <div className="truncate">
-                            <span className="font-semibold text-[10px] text-indigo-300 block truncate">{activeDuelSession.player1.rumuz}</span>
-                            <span className="font-mono font-bold">{item.player1Guess ? `${Math.round(p1Dist)} km` : 'Cevapsız'}</span>
-                          </div>
-                          <span className="font-black text-[10px] text-emerald-400 shrink-0">+{item.player1Points}P</span>
-                        </div>
+                      <div className={`grid ${allFinalPlayers.length <= 2 ? 'grid-cols-2' : allFinalPlayers.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-1.5 text-[11px]`}>
+                        {allFinalPlayers.map((p, pIdx) => {
+                          const res = item.allPlayerResults?.find(r => r.id === p.id);
+                          const dist = res ? res.distanceKm : pIdx === 0 ? item.player1DistanceKm : pIdx === 1 ? item.player2DistanceKm : pIdx === 2 ? item.player3DistanceKm : item.player4DistanceKm;
+                          const points = res ? res.points : pIdx === 0 ? item.player1Points : pIdx === 1 ? item.player2Points : pIdx === 2 ? item.player3Points : item.player4Points;
 
-                        <div className={`p-1 rounded flex items-center justify-between gap-1 ${p2Closer ? 'bg-rose-950/60 border border-rose-500/40 text-rose-200' : 'bg-black/30 text-slate-300'}`}>
-                          <div className="truncate">
-                            <span className="font-semibold text-[10px] text-rose-300 block truncate">{activeDuelSession.player2?.rumuz || 'Rakip'}</span>
-                            <span className="font-mono font-bold">{item.player2Guess ? `${Math.round(p2Dist)} km` : 'Cevapsız'}</span>
-                          </div>
-                          <span className="font-black text-[10px] text-emerald-400 shrink-0">+{item.player2Points}P</span>
-                        </div>
+                          return (
+                            <div key={p.id || pIdx} className="p-1 rounded bg-black/30 border border-white/10 flex items-center justify-between gap-1 text-[11px]">
+                              <div className="truncate">
+                                <span className="font-semibold text-[10px] text-slate-300 block truncate">{p.rumuz}</span>
+                                <span className="font-mono font-bold text-slate-200">{dist && dist < 800 ? `${Math.round(dist)} km` : 'Cevapsız'}</span>
+                              </div>
+                              <span className="font-black text-[10px] text-emerald-400 shrink-0">+{points || 0}P</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -1629,23 +1774,21 @@ export default function DuelMode() {
 
   if (!currentMapQ && !currentTestQ) return null;
 
-  const myPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1 : activeDuelSession.player2;
-  const otherPlayer = activeDuelPlayerKey === 'player1' ? activeDuelSession.player2 : activeDuelSession.player1;
-
+  const allActivePlayers = getAllSessionPlayers(activeDuelSession);
+  const myPlayer = allActivePlayers.find(p => p.id === normalizeRumuzKey(rumuz)) || (activeDuelPlayerKey === 'player1' ? activeDuelSession.player1 : activeDuelSession.player2);
   const isReveal = activeDuelSession.status === 'round_reveal';
 
   // -------------------------------------------------------------
-  // 6A. KPSS TEST DÜELLOSU OYUN EKRANI (40 sn, Çoktan Seçmeli Soru Kartı)
+  // 6A. KPSS TEST DÜELLOSU OYUN EKRANI (40 sn, Çoktan Seçmeli Soru Kartı - 2-4 Kişilik)
   // -------------------------------------------------------------
   if (isTestMode && currentTestQ) {
     const hasMyAnswer = myPlayer?.currentOptionAnswer !== null && myPlayer?.currentOptionAnswer !== undefined;
-    const hasOtherAnswer = otherPlayer?.currentOptionAnswer !== null && otherPlayer?.currentOptionAnswer !== undefined;
     const mySelectedOpt = myPlayer?.currentOptionAnswer;
     const isMyCorrect = isReveal && mySelectedOpt === currentTestQ.correctIndex;
 
     const handleSelectOption = (idx: number) => {
       if (hasMyAnswer || isReveal || !activeDuelPlayerKey) return;
-      const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
+      const myId = myPlayer?.id || normalizeRumuzKey(rumuz);
       if (!myId) return;
 
       const elapsedSec = (Date.now() - (activeDuelSession.roundStartTime || Date.now())) / 1000;
@@ -1671,13 +1814,13 @@ export default function DuelMode() {
         <div 
           id="duel-active-hud" 
           onClick={(e) => e.stopPropagation()}
-          className="pointer-events-auto w-full max-w-xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/80 rounded-2xl shadow-2xl p-2.5 text-white animate-in fade-in duration-150 cursor-default"
+          className="pointer-events-auto w-full max-w-2xl mx-auto bg-[#09090b]/95 backdrop-blur-2xl border-2 border-indigo-500/80 rounded-2xl shadow-2xl p-2 sm:p-2.5 text-white animate-in fade-in duration-150 cursor-default"
         >
           {/* Row 1: Kategori, Bölge & Tur */}
           <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span className="px-2 py-0.5 rounded-lg bg-indigo-600 text-white font-black text-[10px] shrink-0">
-                KPSS TEST
+                KPSS TEST {allActivePlayers.length > 2 ? `(${allActivePlayers.length} Oyuncu)` : ''}
               </span>
               <span className="font-black text-xs sm:text-sm text-indigo-300 truncate">
                 {currentTestQ.category} • {currentTestQ.region}
@@ -1698,38 +1841,54 @@ export default function DuelMode() {
             </div>
           </div>
 
-          {/* Row 2: Sen | 40s / Reveal Timer | Rakip */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <AvatarWithBadgeFrame 
-                rumuz={myPlayer?.rumuz || 'Sen'}
-                unlockedBadges={unlockedBadges}
-                duelWins={duelStats.duelWins}
-                duelStreak={duelStats.duelStreak}
-                isDuelMode={true}
-                avatarIcon={avatarIcon}
-                avatarBg={avatarBg}
-                equippedTitle={equippedTitle}
-                size="sm"
-              />
-              <div className="min-w-0">
-                <span className="text-[10px] sm:text-xs font-black text-indigo-300 truncate block">
-                  {myPlayer?.rumuz} (Sen)
-                </span>
-                <div className="flex items-center gap-1">
-                  <span className="text-[11px] sm:text-xs font-black text-white">{myPlayer?.score || 0} P</span>
-                  {hasMyAnswer ? (
-                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/20 px-1 rounded">✓ Yanıtladın</span>
-                  ) : (
-                    <span className="text-[9px] font-medium text-amber-300 animate-pulse">Cevapla!</span>
-                  )}
-                </div>
-              </div>
+          {/* Row 2: Canlı Oyuncu Kartları ve Süre */}
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+            <div className="grid grid-flow-col auto-cols-fr gap-1 sm:gap-2 flex-1 min-w-0">
+              {allActivePlayers.map((p, idx) => {
+                const isMe = p.id === normalizeRumuzKey(rumuz);
+                const hasAnswered = p.currentOptionAnswer !== null && p.currentOptionAnswer !== undefined;
+
+                return (
+                  <div 
+                    key={p.id || idx} 
+                    className={`p-1 sm:p-1.5 rounded-xl border flex items-center gap-1.5 min-w-0 transition-all ${
+                      isMe 
+                        ? 'bg-indigo-950/60 border-indigo-400' 
+                        : 'bg-white/5 border-white/10'
+                    }`}
+                  >
+                    <AvatarWithBadgeFrame 
+                      rumuz={p.rumuz}
+                      unlockedBadges={isMe ? unlockedBadges : (p.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
+                      duelWins={isMe ? duelStats.duelWins : (p.duelWins || (p.isBot ? 50 : 1))}
+                      duelStreak={isMe ? duelStats.duelStreak : (p.duelStreak || (p.isBot ? 3 : 0))}
+                      isDuelMode={true}
+                      avatarIcon={isMe ? avatarIcon : (p.avatarIcon || (p.isBot ? '🤖' : '⚔️'))}
+                      avatarBg={isMe ? avatarBg : (p.avatarBg || (p.isBot ? 'indigo_midnight' : 'gold_glory'))}
+                      equippedTitle={isMe ? equippedTitle : (p.equippedTitle || (p.isBot ? 'Turing Başmühendisi' : '3D Coğrafyacı Çırağı'))}
+                      size="sm"
+                    />
+                    <div className="min-w-0 leading-tight">
+                      <span className="text-[10px] sm:text-xs font-black truncate block text-slate-200">
+                        {p.rumuz} {isMe ? '(Sen)' : ''}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] sm:text-[11px] font-black text-amber-300">{p.score || 0}P</span>
+                        {hasAnswered ? (
+                          <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/20 px-0.5 rounded">✓</span>
+                        ) : (
+                          <span className="text-[8px] font-medium text-slate-400 animate-pulse">...</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Timer */}
-            <div className="flex flex-col items-center shrink-0 px-2">
-              <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-black text-xs sm:text-sm shadow-lg ${
+            <div className="flex flex-col items-center shrink-0 px-1">
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-black text-xs sm:text-sm shadow-lg ${
                 isReveal
                   ? 'bg-amber-500/30 border-amber-400 text-amber-300 animate-pulse'
                   : timeLeftSec <= 5
@@ -1740,37 +1899,9 @@ export default function DuelMode() {
               }`}>
                 {isReveal ? `${revealCountdown}s` : `${timeLeftSec}s`}
               </div>
-              <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">
+              <span className="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase mt-0.5">
                 {isReveal ? 'Sonraki' : 'Süre'}
               </span>
-            </div>
-
-            {/* Opponent */}
-            <div className="flex items-center justify-end gap-1.5 min-w-0 text-right">
-              <div className="min-w-0">
-                <span className="text-[10px] sm:text-xs font-black text-rose-300 truncate block">
-                  {otherPlayer?.rumuz || 'Rakip'}
-                </span>
-                <div className="flex items-center justify-end gap-1">
-                  {hasOtherAnswer ? (
-                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/20 px-1 rounded">✓ Yanıtladı</span>
-                  ) : (
-                    <span className="text-[9px] font-medium text-slate-400">Düşünüyor...</span>
-                  )}
-                  <span className="text-[11px] sm:text-xs font-black text-white">{otherPlayer?.score || 0} P</span>
-                </div>
-              </div>
-              <AvatarWithBadgeFrame 
-                rumuz={otherPlayer?.rumuz || 'Rakip'}
-                unlockedBadges={otherPlayer?.unlockedBadges || (otherPlayer?.isBot ? ['Turing Ustası'] : ['Düello Yarışçısı'])}
-                duelWins={otherPlayer?.duelWins ?? (otherPlayer?.isBot ? 50 : 2)}
-                duelStreak={otherPlayer?.duelStreak ?? (otherPlayer?.isBot ? 3 : 0)}
-                isDuelMode={true}
-                avatarIcon={otherPlayer?.avatarIcon || (otherPlayer?.isBot ? '🤖' : '⚔️')}
-                avatarBg={otherPlayer?.avatarBg || (otherPlayer?.isBot ? 'indigo_midnight' : 'gold_glory')}
-                equippedTitle={otherPlayer?.equippedTitle || (otherPlayer?.isBot ? 'Turing Başmühendisi' : 'Düello Yarışçısı')}
-                size="sm"
-              />
             </div>
           </div>
         </div>
@@ -1850,14 +1981,12 @@ export default function DuelMode() {
 
               <button
                 onClick={() => {
-                  if (activeDuelPlayerKey) {
-                    const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
-                    if (myId) {
-                      if (activeDuelSession.player2?.isBot) {
-                        advanceDuelRound(activeDuelSession);
-                      } else {
-                        voteToAdvanceDuelRound(activeDuelSession, myId);
-                      }
+                  const myId = myPlayer?.id || normalizeRumuzKey(rumuz);
+                  if (myId) {
+                    if (activeDuelSession.player2?.isBot) {
+                      advanceDuelRound(activeDuelSession);
+                    } else {
+                      voteToAdvanceDuelRound(activeDuelSession, myId);
                     }
                   }
                 }}
@@ -1925,11 +2054,9 @@ export default function DuelMode() {
   }
 
   // -------------------------------------------------------------
-  // 6B. HARİTA İŞARETLEME DÜELLOSU HUD'I (15 sn, Aranan Yer & Tıklama)
+  // 6B. HARİTA İŞARETLEME DÜELLOSU HUD'I (15 sn, 2-4 Kişilik Aranan Yer & Canlı Tıklama)
   // -------------------------------------------------------------
   const sanitizedTitle = currentMapQ ? cleanFeatureTitle(currentMapQ.title) : '';
-  const hasMyGuess = !!myPlayer?.currentGuess;
-  const hasOtherGuess = !!otherPlayer?.currentGuess;
 
   return (
     <>
@@ -1961,38 +2088,54 @@ export default function DuelMode() {
           </div>
         </div>
 
-        {/* Row 2: Sen | 15s Timer | Rakip */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <AvatarWithBadgeFrame 
-              rumuz={myPlayer?.rumuz || 'Sen'}
-              unlockedBadges={unlockedBadges}
-              duelWins={duelStats.duelWins}
-              duelStreak={duelStats.duelStreak}
-              isDuelMode={true}
-              avatarIcon={avatarIcon}
-              avatarBg={avatarBg}
-              equippedTitle={equippedTitle}
-              size="sm"
-            />
-            <div className="min-w-0">
-              <span className="text-[10px] sm:text-xs font-black text-indigo-300 truncate block">
-                {myPlayer?.rumuz} (Sen)
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="text-[11px] sm:text-xs font-black text-white">{myPlayer?.score || 0} P</span>
-                {hasMyGuess ? (
-                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/20 px-1 rounded">⚡ Tıkladın</span>
-                ) : (
-                  <span className="text-[9px] font-medium text-amber-300 animate-pulse">Haritaya Tıkla!</span>
-                )}
-              </div>
-            </div>
+        {/* Row 2: Canlı Oyuncular ve 15s Timer */}
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+          <div className="grid grid-flow-col auto-cols-fr gap-1 sm:gap-2 flex-1 min-w-0">
+            {allActivePlayers.map((p, idx) => {
+              const isMe = p.id === normalizeRumuzKey(rumuz);
+              const hasGuess = !!p.currentGuess;
+
+              return (
+                <div 
+                  key={p.id || idx} 
+                  className={`p-1 sm:p-1.5 rounded-xl border flex items-center gap-1.5 min-w-0 transition-all ${
+                    isMe 
+                      ? 'bg-amber-500/20 border-amber-400' 
+                      : 'bg-white/5 border-white/10'
+                  }`}
+                >
+                  <AvatarWithBadgeFrame 
+                    rumuz={p.rumuz}
+                    unlockedBadges={isMe ? unlockedBadges : (p.unlockedBadges || ['3D Coğrafyacı Çırağı'])}
+                    duelWins={isMe ? duelStats.duelWins : (p.duelWins || (p.isBot ? 50 : 1))}
+                    duelStreak={isMe ? duelStats.duelStreak : (p.duelStreak || (p.isBot ? 3 : 0))}
+                    isDuelMode={true}
+                    avatarIcon={isMe ? avatarIcon : (p.avatarIcon || (p.isBot ? '🤖' : '⚔️'))}
+                    avatarBg={isMe ? avatarBg : (p.avatarBg || (p.isBot ? 'indigo_midnight' : 'gold_glory'))}
+                    equippedTitle={isMe ? equippedTitle : (p.equippedTitle || (p.isBot ? 'Turing Başmühendisi' : '3D Coğrafyacı Çırağı'))}
+                    size="sm"
+                  />
+                  <div className="min-w-0 leading-tight">
+                    <span className="text-[10px] sm:text-xs font-black truncate block text-slate-200">
+                      {p.rumuz} {isMe ? '(Sen)' : ''}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] sm:text-[11px] font-black text-amber-300">{p.score || 0}P</span>
+                      {hasGuess ? (
+                        <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/20 px-0.5 rounded">⚡</span>
+                      ) : (
+                        <span className="text-[8px] font-medium text-amber-300 animate-pulse">...</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* 15s Timer */}
-          <div className="flex flex-col items-center shrink-0 px-2">
-            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-black text-xs sm:text-sm shadow-lg transition-all ${
+          <div className="flex flex-col items-center shrink-0 px-1">
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-black text-xs sm:text-sm shadow-lg transition-all ${
               timeLeftSec <= 4
                 ? 'bg-rose-500/30 border-rose-400 text-rose-300 animate-ping'
                 : timeLeftSec <= 8
@@ -2001,35 +2144,7 @@ export default function DuelMode() {
             }`}>
               {timeLeftSec}s
             </div>
-            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Kalan Süre</span>
-          </div>
-
-          {/* Opponent */}
-          <div className="flex items-center justify-end gap-1.5 min-w-0 text-right">
-            <div className="min-w-0">
-              <span className="text-[10px] sm:text-xs font-black text-rose-300 truncate block">
-                {otherPlayer?.rumuz || 'Rakip'}
-              </span>
-              <div className="flex items-center justify-end gap-1">
-                {hasOtherGuess ? (
-                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/20 px-1 rounded">⚡ Tıkladı</span>
-                ) : (
-                  <span className="text-[9px] font-medium text-slate-400">Düşünüyor...</span>
-                )}
-                <span className="text-[11px] sm:text-xs font-black text-white">{otherPlayer?.score || 0} P</span>
-              </div>
-            </div>
-            <AvatarWithBadgeFrame 
-              rumuz={otherPlayer?.rumuz || 'Rakip'}
-              unlockedBadges={otherPlayer?.unlockedBadges || (otherPlayer?.isBot ? ['Turing Ustası'] : ['Düello Yarışçısı'])}
-              duelWins={otherPlayer?.duelWins ?? (otherPlayer?.isBot ? 50 : 2)}
-              duelStreak={otherPlayer?.duelStreak ?? (otherPlayer?.isBot ? 3 : 0)}
-              isDuelMode={true}
-              avatarIcon={otherPlayer?.avatarIcon || (otherPlayer?.isBot ? '🤖' : '⚔️')}
-              avatarBg={otherPlayer?.avatarBg || (otherPlayer?.isBot ? 'indigo_midnight' : 'gold_glory')}
-              equippedTitle={otherPlayer?.equippedTitle || (otherPlayer?.isBot ? 'Turing Başmühendisi' : 'Düello Yarışçısı')}
-              size="sm"
-            />
+            <span className="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Süre</span>
           </div>
         </div>
       </div>
@@ -2040,32 +2155,34 @@ export default function DuelMode() {
           id="duel-round-reveal-banner"
           className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-30 w-[96vw] max-w-xl bg-[#09090b]/95 backdrop-blur-2xl border border-amber-400/80 rounded-xl shadow-2xl px-2.5 py-1.5 text-white animate-in slide-in-from-bottom-2 duration-150 flex items-center justify-between gap-1.5"
         >
-          {/* Left: Sen */}
-          <div className="flex items-center gap-1.5 min-w-0">
-            <div className="leading-none min-w-0">
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] font-black text-indigo-300 truncate max-w-[65px] sm:max-w-[85px]">
-                  {myPlayer?.rumuz} (Sen)
-                </span>
-                {lastRoundScore && (
-                  <span className={`text-[8px] font-extrabold px-1 py-0.2 rounded hidden sm:inline ${lastRoundScore.tierColor}`}>
-                    {lastRoundScore.tierName}
-                  </span>
-                )}
-              </div>
-              {myPlayer?.currentGuess ? (
-                <div className="text-[10px] font-bold text-amber-300 mt-0.5 whitespace-nowrap">
-                  {Math.round(myPlayer.currentGuess.distanceKm)} km{' '}
-                  <span className="text-emerald-400 font-black">+{myPlayer.currentGuess.pointsEarned}P</span>
+          {/* All Players guesses */}
+          <div className="flex items-center gap-2 min-w-0 flex-1 overflow-x-auto">
+            {allActivePlayers.map((p, pIdx) => {
+              const isMe = p.id === normalizeRumuzKey(rumuz);
+              const g = p.currentGuess;
+
+              return (
+                <div key={p.id || pIdx} className="leading-none min-w-0 shrink-0">
+                  <div className="flex items-center gap-1">
+                    <span className={`text-[10px] font-black truncate ${isMe ? 'text-indigo-300' : 'text-slate-300'}`}>
+                      {p.rumuz} {isMe ? '(Sen)' : ''}
+                    </span>
+                  </div>
+                  {g ? (
+                    <div className="text-[10px] font-bold text-amber-300 mt-0.5 whitespace-nowrap">
+                      {Math.round(g.distanceKm)} km{' '}
+                      <span className="text-emerald-400 font-black">+{g.pointsEarned}P</span>
+                    </div>
+                  ) : (
+                    <span className="text-[9px] text-rose-400 font-bold mt-0.5 block">0P (Geçti)</span>
+                  )}
                 </div>
-              ) : (
-                <span className="text-[9px] text-rose-400 font-bold mt-0.5 block">0P (Geçti)</span>
-              )}
-            </div>
+              );
+            })}
           </div>
 
           {/* Center: Target Location Badge & 7s Countdown */}
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[10px] font-black max-w-[130px] sm:max-w-[180px] truncate shrink">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[10px] font-black max-w-[120px] sm:max-w-[160px] truncate shrink-0">
             <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
             <span className="truncate hidden xs:inline">{sanitizedTitle}</span>
             <span className="text-amber-300 font-mono font-bold ml-auto px-1 py-0.2 bg-amber-500/20 rounded">
@@ -2073,51 +2190,25 @@ export default function DuelMode() {
             </span>
           </div>
 
-          {/* Right: Opponent */}
-          <div className="flex items-center gap-1.5 min-w-0 text-right">
-            <div className="leading-none min-w-0">
-              <div className="flex items-center justify-end gap-1">
-                {opponentRoundScore && (
-                  <span className={`text-[8px] font-extrabold px-1 py-0.2 rounded hidden sm:inline ${opponentRoundScore.tierColor}`}>
-                    {opponentRoundScore.tierName}
-                  </span>
-                )}
-                <span className="text-[10px] font-black text-rose-300 truncate max-w-[65px] sm:max-w-[85px]">
-                  {otherPlayer?.rumuz || 'Rakip'}
-                </span>
-              </div>
-              {otherPlayer?.currentGuess ? (
-                <div className="text-[10px] font-bold text-amber-300 mt-0.5 whitespace-nowrap">
-                  {Math.round(otherPlayer.currentGuess.distanceKm)} km{' '}
-                  <span className="text-emerald-400 font-black">+{otherPlayer.currentGuess.pointsEarned}P</span>
-                </div>
-              ) : (
-                <span className="text-[9px] text-rose-400 font-bold mt-0.5 block">0P (Geçti)</span>
-              )}
-            </div>
-          </div>
-
           {/* Advance Button */}
           <button
             onClick={() => {
-              if (activeDuelPlayerKey) {
-                const myId = activeDuelPlayerKey === 'player1' ? activeDuelSession.player1.id : activeDuelSession.player2?.id;
-                if (myId) {
-                  if (activeDuelSession.player2?.isBot) {
-                    flyToCoords([35.243, 38.963], 0, 0, 5.0);
-                    advanceDuelRound(activeDuelSession);
-                  } else {
-                    voteToAdvanceDuelRound(activeDuelSession, myId);
-                  }
+              const myId = myPlayer?.id || normalizeRumuzKey(rumuz);
+              if (myId) {
+                if (activeDuelSession.player2?.isBot) {
+                  flyToCoords([35.243, 38.963], 0, 0, 5.0);
+                  advanceDuelRound(activeDuelSession);
+                } else {
+                  voteToAdvanceDuelRound(activeDuelSession, myId);
                 }
               }
             }}
-            className={`px-2.5 py-1 font-black text-[10px] sm:text-xs rounded-lg shadow-md transition-all flex items-center gap-0.5 shrink-0 cursor-pointer ml-1 ${
+            className={`px-2.5 py-1 text-[11px] font-black rounded-lg shadow transition-all shrink-0 cursor-pointer ${
               myPlayer?.readyToAdvance
                 ? 'bg-emerald-500/30 border border-emerald-400/60 text-emerald-300'
                 : 'bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950'
             }`}
-            title={myPlayer?.readyToAdvance ? 'Rakip bekleniyor...' : 'Sonraki soruya geç'}
+            title={myPlayer?.readyToAdvance ? 'Rakipler bekleniyor...' : 'Sonraki soruya geç'}
           >
             {myPlayer?.readyToAdvance ? (
               <span>Bekleniyor...</span>
