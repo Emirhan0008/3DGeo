@@ -83,7 +83,53 @@ export default function ProfileEditModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [avatarTierFilter, setAvatarTierFilter] = useState<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze' | 'starter'>('all');
+  // Smart Highest Unlocked Tier Detection (Default views load user's highest reached tier)
+  const userHighestAvatarTier = React.useMemo<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze' | 'starter'>(() => {
+    for (const t of ['mythic', 'diamond', 'gold', 'silver', 'bronze'] as const) {
+      const hasUnlocked = AVATAR_ICONS.some((item) => {
+        if (item.tier !== t) return false;
+        const isBadgesMet = !item.minBadgesRequired || unlockedBadges.length >= item.minBadgesRequired;
+        const isDuelMet = !item.minDuelWinsRequired || duelStats.duelWins >= item.minDuelWinsRequired;
+        const isScoreMet = !item.minScoreRequired || totalCareerScore >= item.minScoreRequired;
+        return isBadgesMet && isDuelMet && isScoreMet;
+      });
+      if (hasUnlocked) return t;
+    }
+    return 'starter';
+  }, [unlockedBadges.length, duelStats.duelWins, totalCareerScore]);
+
+  const userHighestTitleTier = React.useMemo<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze'>(() => {
+    for (const t of ['mythic', 'diamond', 'gold', 'silver', 'bronze'] as const) {
+      const hasUnlocked = ALL_TITLES.some((item) => {
+        if (item.tier !== t) return false;
+        const prog = getTitleProgress(item, unlockedBadges, duelStats?.duelWins || 0, score || 0, categoryMasteryProgress, botStats?.botWins || 0);
+        return prog.isUnlocked;
+      });
+      if (hasUnlocked) return t;
+    }
+    return 'bronze';
+  }, [unlockedBadges, duelStats?.duelWins, score, categoryMasteryProgress, botStats?.botWins]);
+
+  const userHighestBadgeTier = React.useMemo<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze'>(() => {
+    for (const t of ['mythic', 'diamond', 'gold', 'silver', 'bronze'] as const) {
+      const hasUnlocked = ALL_BADGES.some((b) => b.tier === t && unlockedBadges.includes(b.name));
+      if (hasUnlocked) return t;
+    }
+    return 'bronze';
+  }, [unlockedBadges]);
+
+  const [avatarTierFilter, setAvatarTierFilter] = useState<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze' | 'starter'>(userHighestAvatarTier);
+  const [titleTierFilter, setTitleTierFilter] = useState<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze'>(userHighestTitleTier);
+  const [badgeTierFilter, setBadgeTierFilter] = useState<'all' | 'mythic' | 'diamond' | 'gold' | 'silver' | 'bronze'>(userHighestBadgeTier);
+
+  // Sync default tier when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setAvatarTierFilter(userHighestAvatarTier);
+      setTitleTierFilter(userHighestTitleTier);
+      setBadgeTierFilter(userHighestBadgeTier);
+    }
+  }, [isOpen, userHighestAvatarTier, userHighestTitleTier, userHighestBadgeTier]);
   const [inspectedItem, setInspectedItem] = useState<{
     type: 'avatar' | 'title' | 'badge';
     title: string;
@@ -382,8 +428,8 @@ export default function ProfileEditModal({
                 <Palette className="w-4 h-4 text-indigo-400" />
                 <span>1. Avatar &amp; Tema</span>
               </span>
-              <span className="text-[10px] text-slate-400 font-bold">
-                Tıkla ve kuşan • Üzerine gelip şartını gör
+              <span className="text-[10px] text-amber-300/90 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                Kademen: {userHighestAvatarTier === 'mythic' ? '🌌 5. Kademe' : userHighestAvatarTier === 'diamond' ? '💎 4. Kademe' : userHighestAvatarTier === 'gold' ? '👑 3. Kademe' : userHighestAvatarTier === 'silver' ? '🛡️ 2. Kademe' : userHighestAvatarTier === 'bronze' ? '🐣 1. Kademe' : '🌱 Başlangıç'}
               </span>
             </div>
 
@@ -399,6 +445,7 @@ export default function ProfileEditModal({
                 { id: 'starter', label: '🌱 Başlangıç' }
               ].map((tab) => {
                 const isActive = avatarTierFilter === tab.id;
+                const isUserCurrent = userHighestAvatarTier === tab.id;
                 return (
                   <button
                     key={tab.id}
@@ -406,10 +453,12 @@ export default function ProfileEditModal({
                     className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
                       isActive
                         ? 'bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-500/40'
+                        : isUserCurrent
+                        ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30'
                         : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    {tab.label}
+                    {tab.label} {isUserCurrent && tab.id !== 'all' && '★'}
                   </button>
                 );
               })}
@@ -553,19 +602,49 @@ export default function ProfileEditModal({
           </div>
 
           {/* 2. KUŞANILABİLİR RESMİ ÜNVANLAR */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2">
+          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-black text-amber-300 flex items-center gap-1.5 text-xs">
                 <Crown className="w-4 h-4 text-amber-400" />
                 <span>2. Ünvanlar</span>
               </span>
-              <span className="text-[10px] text-slate-400 font-bold">
-                Kuşanılan: <strong className="text-amber-300">{equippedTitle}</strong>
+              <span className="text-[10px] text-amber-300/90 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                Kademen: {userHighestTitleTier === 'mythic' ? '🌌 5. Kademe' : userHighestTitleTier === 'diamond' ? '💎 4. Kademe' : userHighestTitleTier === 'gold' ? '👑 3. Kademe' : userHighestTitleTier === 'silver' ? '🛡️ 2. Kademe' : '🌱 1. Kademe'}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
-              {ALL_TITLES.map((titleObj) => {
+            {/* Ünvan Kademe Filtreleme Sekmeleri */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
+              {[
+                { id: 'all', label: `Tümü (${ALL_TITLES.length})` },
+                { id: 'mythic', label: '🌌 5. Kademe' },
+                { id: 'diamond', label: '💎 4. Kademe' },
+                { id: 'gold', label: '👑 3. Kademe' },
+                { id: 'silver', label: '🛡️ 2. Kademe' },
+                { id: 'bronze', label: '🌱 1. Kademe' }
+              ].map((tab) => {
+                const isActive = titleTierFilter === tab.id;
+                const isUserCurrent = userHighestTitleTier === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setTitleTierFilter(tab.id as typeof titleTierFilter)}
+                    className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-amber-500 border-amber-300 text-slate-950 font-black shadow-md shadow-amber-500/30'
+                        : isUserCurrent
+                        ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.label} {isUserCurrent && tab.id !== 'all' && '★'}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
+              {ALL_TITLES.filter((titleObj) => titleTierFilter === 'all' || titleObj.tier === titleTierFilter).map((titleObj) => {
                 const prog = getTitleProgress(
                   titleObj,
                   unlockedBadges,
@@ -669,19 +748,51 @@ export default function ProfileEditModal({
           </div>
 
           {/* 3. KADEMELİ ROZETLER GALERİSİ */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2">
+          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-black text-xs text-slate-200 flex items-center gap-1.5">
                 <Medal className="w-4 h-4 text-cyan-400" />
                 <span>3. Rozetler ({unlockedBadges.length}/{ALL_BADGES.length})</span>
               </span>
-              <span className="text-[10px] text-amber-400 font-extrabold">
-                %{Math.round((unlockedBadges.length / ALL_BADGES.length) * 100)} Tamamlandı
+              <span className="text-[10px] text-cyan-300/90 font-bold bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                Kademen: {userHighestBadgeTier === 'mythic' ? '🌌 5. Kademe' : userHighestBadgeTier === 'diamond' ? '💎 4. Kademe' : userHighestBadgeTier === 'gold' ? '👑 3. Kademe' : userHighestBadgeTier === 'silver' ? '🛡️ 2. Kademe' : '🌱 1. Kademe'}
               </span>
             </div>
 
-            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-              {(['mythic', 'diamond', 'gold', 'silver', 'bronze'] as BadgeTier[]).map((tierKey) => {
+            {/* Rozet Kademe Filtreleme Sekmeleri */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
+              {[
+                { id: 'all', label: `Tümü (${ALL_BADGES.length})` },
+                { id: 'mythic', label: '🌌 5. Kademe' },
+                { id: 'diamond', label: '💎 4. Kademe' },
+                { id: 'gold', label: '👑 3. Kademe' },
+                { id: 'silver', label: '🛡️ 2. Kademe' },
+                { id: 'bronze', label: '🌱 1. Kademe' }
+              ].map((tab) => {
+                const isActive = badgeTierFilter === tab.id;
+                const isUserCurrent = userHighestBadgeTier === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setBadgeTierFilter(tab.id as typeof badgeTierFilter)}
+                    className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-cyan-600 border-cyan-400 text-white font-black shadow-md shadow-cyan-500/30'
+                        : isUserCurrent
+                        ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 hover:bg-cyan-500/30'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.label} {isUserCurrent && tab.id !== 'all' && '★'}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+              {(['mythic', 'diamond', 'gold', 'silver', 'bronze'] as BadgeTier[])
+                .filter((tierKey) => badgeTierFilter === 'all' || badgeTierFilter === tierKey)
+                .map((tierKey) => {
                 const badgesInTier = tierBadges[tierKey];
                 if (!badgesInTier || badgesInTier.length === 0) return null;
 

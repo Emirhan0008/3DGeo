@@ -4,6 +4,30 @@
 
 ---
 
+## 📅 [2026-09-05] - Profil Özelleştirmede Akıllı Son Kademe Varsayılanı (Avatarlar, Ünvanlar, Rozetler) & 2-4 Kişilik Düello Terk İyileştirmeleri
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "eğer 2 kişilik düelloda biri çıkarsa düelloyu karşı taraf kazansın ama 3 ve 4 kişilik düellolarda tek kişi kalana kadar diğerlerinin çıkması düellonun devam etmesini engellemesin, şu anda birisi çıktığında düello direkt bitiyor 3 ve 4 kişilik düellolarda, ayrıca avatarlar ünvanlar rozetler çok yer kaplıyor default ayar olarak tümü gösterilmesin sadece kullanıcının çıktığı son kademe ne ise onun objeleri gözüksün böylece özellikle mobilde sürekli aşağı kaydırmak zorunda kalmaz"
+- **Etkilenen Dosyalar**:
+  - `/components/ui/ProfileEditModal.tsx`
+  - `/lib/duelService.ts`
+  - `/components/game/DuelMode.tsx`
+  - `/WORK_LOG.md`
+- **Yapılan İyileştirmeler**:
+  1. **Akıllı Son Kademe Varsayılanı (`ProfileEditModal.tsx`)**:
+     - Kullanıcının kariyer puanı, zaferleri ve başarımlarına göre çıktığı en yüksek açık kademe tespit edilerek (`userHighestAvatarTier`, `userHighestTitleTier`, `userHighestBadgeTier`):
+       - **Avatarlar**: Sayfa açıldığında doğrudan kullanıcının çıktığı son kademedeki avatarları filtreler ve gösterir.
+       - **Ünvanlar**: Kademe filtre sekmeleri (Tümü, 5. Kademe... 1. Kademe) eklendi; default olarak kullanıcının en son kademesi açılır.
+       - **Rozetler**: Kademe filtre sekmeleri eklendi; default olarak kullanıcının son ulaştığı kademe rozetleri gösterilir.
+     - Bu sayede özellikle mobil cihazlarda onlarca öğeyi aşağı doğru uzun uzadıya kaydırma zorunluluğu ortadan kalktı, ekran son derece derli toplu ve hızlı hale getirildi.
+  2. **2v2 / 3 ve 4 Kişilik Düellolarda Terk/Çıkış Sistemi**:
+     - 2 kişilik düelloda çıkan oyuncu doğrudan mağlup sayılır, kalan oyuncu hükmen kazanır ve zafer istatistikleri işlenir.
+     - 3 ve 4 kişilik düellolarda bir veya iki kişi çıksa dahi maç bozulmaz ve sonlanmaz; kalan 2-3 oyuncu soruları cevaplamaya kesintisiz devam eder. Yalnızca tek bir kişi kaldığında otomatik olarak o oyuncunun zaferiyle tamamlanır.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - Dev server başarıyla çalışır durumda.
+
+---
+
 ## 📅 [2026-09-05] - 2 Kişilik Hükmen Galibiyet, 3 & 4 Kişilik Kesintisiz Düello & Çift Madalya Desteği
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "eğer 2 kişilik düelloda biri çıkarsa düelloyu karşı taraf kazansın ama 3 ve 4 kişilik düellolarda tek kişi kalana kadar diğerlerinin çıkması düellonun devam etmesini engellemesin, şu anda birisi çıktığında düello direkt bitiyor 3 ve 4 kişilik düellolarda, eğer 1 kullanıcı hem en yüksek seri zafer rekoruna hem başka bir madalyaya sahip ise sola yaslı olarak 2 madalyayı da avatarının altına koy"
