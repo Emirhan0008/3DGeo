@@ -4,6 +4,33 @@
 
 ---
 
+## 📅 [2026-09-05] - Çoklu Düelloda 3. ve 4. Oyuncu İşaretleme ve İzleyici Görünümü Hatasının Düzeltilmesi
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "Çoklu düelloda 3. ve 4. Kullanıcılar işaretleme yapamıyor ve izleyici gibi diğerlerinin işaretledikleri yerleri görebiliyorlar bunu düzelt"
+- **Etkilenen Dosyalar**:
+  - `/components/game/DuelMode.tsx`
+  - `/components/map/MapContainer.tsx`
+  - `/lib/duelService.ts`
+- **Kök Nedenler & Tespitler**:
+  1. **Slot Atama Eksikliği (`DuelMode.tsx`)**: `subscribeToDuel` ve odaya katılım adımlarında yalnızca `player1` ve `player2` kontrol edilip `activeDuelPlayerKey` atanıyordu. 3. ve 4. oyuncular için bu değer `null` kalıyordu.
+  2. **Tıklama Engeli (`MapContainer.tsx`)**: Harita tıklama dinleyicisinde `playerKey` boş olduğunda işlem erken sonlanıyor ve 3./4. oyuncuların tahminleri Firestore'a gönderilemiyordu.
+  3. **İzleyici Gibi Başkasının Pinini Görme (`MapContainer.tsx`)**: `in_progress` esnasında `activeDuelPlayerKey` yokken kod `session.player1` pinine fallback yapıyordu (`|| session.player1`). Bu nedenle 3. ve 4. oyuncular kendi ekranlarında doğrudan 1. oyuncunun haritaya koyduğu pini görüyor ve izleyici konumuna düşüyordu.
+  4. **Puan Çiftleme Riski (`duelService.ts`)**: Tur içinde haritada fikrini değiştirip pinini güncelleyen oyuncunun puanı sıfırlanmadan üst üste ekleniyordu.
+- **Yapılan İyileştirmeler**:
+  1. **4 Oyuncu İçin Dinamik Slot Çözümleme (`DuelMode.tsx`)**:
+     - `subscribeToDuel`, `handleJoinPrivateRoom`, `handleStartQuickMatch`, `handleAcceptSuggestion` fonksiyonlarında `getPlayerKeyById` entegre edilerek `player1`, `player2`, `player3` ve `player4` anında ve hatasız tayin edildi.
+     - KPSS çoktan seçmeli test düellosunda (`handleSelectOption`) 3. ve 4. oyuncunun cevap gönderebilmesi sağlandı.
+  2. **Haritada Bağımsız İşaretleme & Tam Gizlilik (`MapContainer.tsx`)**:
+     - Tıklama anında `activeDuelPlayerKey` yerel aktif rumuz üzerinden dinamik olarak teyit edilerek 3. ve 4. oyuncuların tıklamaları aktif hale getirildi.
+     - `session.player1` fallback'i kaldırıldı. `in_progress` aşamasında oyuncu **yalnızca kendi pinini** (1. mavi, 2. kırmızı, 3. yeşil, 4. sarı) görür. Rakiplerin tahminleri yalnızca tur sonunda (`round_reveal`) açılır.
+  3. **Aynı Turda Pin Düzeltme Desteği (`duelService.ts`)**:
+     - `submitPlayerGuess` fonksiyonunda oyuncunun aynı tur içinde pinini kaydırması durumunda önceki mesafe ve puan hesaplaması telafi edilerek temiz skor güncellemesi sağlandı.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - Dev server başarıyla yeniden başlatıldı.
+
+---
+
 ## 📅 [2026-09-04] - Düello Butonu İsimlendirmesi ve 2, 3, 4 Kişilik Modların Belirgin Sekmelere Dönüştürülmesi
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "belirsiz olmuş, 1v1 düello butonunu Düello olarak değiştir ve 2,3,4 kişilik modları sekme olarak göster böylece daha belirgin olsun"

@@ -24,7 +24,8 @@ import {
   WaitingRoomSuggestion,
   PlayerProfileInput,
   getAllSessionPlayers,
-  forceStartWaitingDuel
+  forceStartWaitingDuel,
+  getPlayerKeyById
 } from '@/lib/duelService';
 import { checkRumuzExists, saveRumuzProfile, normalizeRumuzKey } from '@/lib/rumuzService';
 import { 
@@ -341,12 +342,16 @@ export default function DuelMode() {
 
       setActiveDuelSession(updatedDuel);
 
-      // Determine player key
+      // Determine player key (supports all 2-4 players)
       const myId = normalizeRumuzKey(rumuz);
-      if (updatedDuel.player1.id === myId || updatedDuel.player1.rumuz === rumuz) {
-        setActiveDuelPlayerKey('player1');
-      } else if (updatedDuel.player2?.id === myId || updatedDuel.player2?.rumuz === rumuz) {
-        setActiveDuelPlayerKey('player2');
+      const myKey = getPlayerKeyById(updatedDuel, myId) ||
+        (updatedDuel.player1?.id === myId || updatedDuel.player1?.rumuz === rumuz ? 'player1' :
+         updatedDuel.player2?.id === myId || updatedDuel.player2?.rumuz === rumuz ? 'player2' :
+         updatedDuel.player3?.id === myId || updatedDuel.player3?.rumuz === rumuz ? 'player3' :
+         updatedDuel.player4?.id === myId || updatedDuel.player4?.rumuz === rumuz ? 'player4' : null);
+
+      if (myKey) {
+        setActiveDuelPlayerKey(myKey);
       }
 
       // Load questions according to duelType
@@ -581,6 +586,8 @@ export default function DuelMode() {
         }
       );
       setActiveDuelSession(res.duel);
+      const myKey = res.isNew ? 'player1' : (getPlayerKeyById(res.duel, playerProfile.id) || 'player1');
+      setActiveDuelPlayerKey(myKey);
     } catch (err: unknown) {
       console.error('Quick match error in UI:', err);
       const msg = err instanceof Error ? err.message : 'Hızlı eşleşme aranırken bağlantı hatası oluştu.';
@@ -612,6 +619,7 @@ export default function DuelMode() {
         }
       );
       setActiveDuelSession(session);
+      setActiveDuelPlayerKey('player1');
     } catch (err: unknown) {
       console.error('Create room error in UI:', err);
       setLobbyError('Özel oda kurulurken hata oluştu.');
@@ -656,6 +664,14 @@ export default function DuelMode() {
         setLobbyError(res.errorMsg || 'Odaya bağlanılamadı.');
       } else {
         setActiveDuelSession(res.duel);
+        const myKey = getPlayerKeyById(res.duel, playerProfile.id) ||
+          (res.duel.player1?.id === playerProfile.id ? 'player1' :
+           res.duel.player2?.id === playerProfile.id ? 'player2' :
+           res.duel.player3?.id === playerProfile.id ? 'player3' :
+           res.duel.player4?.id === playerProfile.id ? 'player4' : null);
+        if (myKey) {
+          setActiveDuelPlayerKey(myKey);
+        }
       }
     } catch (err: unknown) {
       console.error('Join private room error in UI:', err);
@@ -685,6 +701,7 @@ export default function DuelMode() {
         }
       );
       setActiveDuelSession(session);
+      setActiveDuelPlayerKey('player1');
     } catch (err: unknown) {
       console.error('Start bot duel error in UI:', err);
       setLobbyError('Antrenman modu başlatılamadı.');
@@ -704,6 +721,14 @@ export default function DuelMode() {
       const res = await joinSuggestedDuelRoom(suggestion.id, playerProfile);
       if (res.success && res.duel) {
         setActiveDuelSession(res.duel);
+        const myKey = getPlayerKeyById(res.duel, playerProfile.id) ||
+          (res.duel.player1?.id === playerProfile.id ? 'player1' :
+           res.duel.player2?.id === playerProfile.id ? 'player2' :
+           res.duel.player3?.id === playerProfile.id ? 'player3' :
+           res.duel.player4?.id === playerProfile.id ? 'player4' : null);
+        if (myKey) {
+          setActiveDuelPlayerKey(myKey);
+        }
       } else {
         setLobbyError(res.errorMsg || 'Önerilen maça bağlanılamadı.');
       }
@@ -1804,7 +1829,10 @@ export default function DuelMode() {
   if (!currentMapQ && !currentTestQ) return null;
 
   const allActivePlayers = getAllSessionPlayers(activeDuelSession);
-  const myPlayer = allActivePlayers.find(p => p.id === normalizeRumuzKey(rumuz)) || (activeDuelPlayerKey === 'player1' ? activeDuelSession.player1 : activeDuelSession.player2);
+  const myId = normalizeRumuzKey(rumuz);
+  const myPlayer = (activeDuelPlayerKey && activeDuelSession[activeDuelPlayerKey]) ||
+    allActivePlayers.find(p => p.id === myId || p.rumuz === rumuz) ||
+    activeDuelSession.player1;
   const isReveal = activeDuelSession.status === 'round_reveal';
 
   // -------------------------------------------------------------
@@ -1816,9 +1844,8 @@ export default function DuelMode() {
     const isMyCorrect = isReveal && mySelectedOpt === currentTestQ.correctIndex;
 
     const handleSelectOption = (idx: number) => {
-      if (hasMyAnswer || isReveal || !activeDuelPlayerKey) return;
-      const myId = myPlayer?.id || normalizeRumuzKey(rumuz);
-      if (!myId) return;
+      const resolvedKey = activeDuelPlayerKey || getPlayerKeyById(activeDuelSession, myId);
+      if (hasMyAnswer || isReveal || !resolvedKey || !myId) return;
 
       const elapsedSec = (Date.now() - (activeDuelSession.roundStartTime || Date.now())) / 1000;
       submitPlayerTestAnswer(

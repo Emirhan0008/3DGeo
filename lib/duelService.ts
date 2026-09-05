@@ -1044,8 +1044,13 @@ export async function submitPlayerGuess(
     submittedAt: Date.now()
   };
 
-  const newScore = currentPlayer.score + scoreResult.totalPoints;
-  const newDistance = currentPlayer.totalDistanceKm + scoreResult.distanceKm;
+  const prevPoints = currentPlayer.currentGuess?.pointsEarned || 0;
+  const prevDistance = currentPlayer.currentGuess?.distanceKm || 0;
+  const baseScore = Math.max(0, (currentPlayer.score || 0) - prevPoints);
+  const baseDistance = Math.max(0, (currentPlayer.totalDistanceKm || 0) - prevDistance);
+
+  const newScore = baseScore + scoreResult.totalPoints;
+  const newDistance = baseDistance + scoreResult.distanceKm;
 
   // Clone and update players array
   const updatedPlayers = allPlayers.map(p => {

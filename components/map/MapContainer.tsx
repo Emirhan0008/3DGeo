@@ -10,7 +10,8 @@ import {
   getCurrentQuizQuestion,
   getFeatureCityName
 } from '@/lib/data/quizQuestions';
-import { getQuestionsByIds, submitPlayerGuess } from '@/lib/duelService';
+import { getQuestionsByIds, submitPlayerGuess, getPlayerKeyById } from '@/lib/duelService';
+import { normalizeRumuzKey } from '@/lib/rumuzService';
 import { 
   Play, 
   Pause, 
@@ -406,19 +407,35 @@ export default function MapContainer() {
         storeState.submitPinGuess(e.lngLat.lng, e.lngLat.lat);
       }
 
-      // 2. 1v1 Real-time Map Duel Guess (Only for map pin duels, allows changing pin freely until round expires)
+      // 2. Real-time Map Duel Guess (2-4 Players, allows changing pin freely until round expires)
       if (storeState.activeTab === 'duel') {
         const session = storeState.activeDuelSession;
-        const playerKey = storeState.activeDuelPlayerKey;
-        if (session && session.status === 'in_progress' && playerKey && session.duelType !== 'kpss_test') {
-          const currentPlayer = playerKey === 'player1' ? session.player1 : session.player2;
-          if (currentPlayer) {
-            const questions = getQuestionsByIds(session.questionIds);
-            const currentQ = questions[session.currentRound];
-            if (currentQ) {
-              const startMs = session.roundStartTime || Date.now();
-              const timeTakenSec = Math.max(0.5, Math.round(((Date.now() - startMs) / 1000) * 10) / 10);
-              submitPlayerGuess(session, currentPlayer.id, [e.lngLat.lng, e.lngLat.lat], currentQ.targetCoords, timeTakenSec);
+        let playerKey = storeState.activeDuelPlayerKey;
+        if (session && session.status === 'in_progress' && session.duelType !== 'kpss_test') {
+          // If playerKey is not yet in store, resolve dynamically from active rumuz
+          if (!playerKey && typeof window !== 'undefined') {
+            const activeRumuz = localStorage.getItem('kpss3d_active_rumuz') || '';
+            const myId = normalizeRumuzKey(activeRumuz);
+            playerKey = getPlayerKeyById(session, myId) || 
+              (session.player1?.id === myId || session.player1?.rumuz === activeRumuz ? 'player1' :
+               session.player2?.id === myId || session.player2?.rumuz === activeRumuz ? 'player2' :
+               session.player3?.id === myId || session.player3?.rumuz === activeRumuz ? 'player3' :
+               session.player4?.id === myId || session.player4?.rumuz === activeRumuz ? 'player4' : null);
+            if (playerKey) {
+              storeState.setActiveDuelPlayerKey(playerKey);
+            }
+          }
+
+          if (playerKey) {
+            const currentPlayer = session[playerKey];
+            if (currentPlayer) {
+              const questions = getQuestionsByIds(session.questionIds);
+              const currentQ = questions[session.currentRound];
+              if (currentQ) {
+                const startMs = session.roundStartTime || Date.now();
+                const timeTakenSec = Math.max(0.5, Math.round(((Date.now() - startMs) / 1000) * 10) / 10);
+                submitPlayerGuess(session, currentPlayer.id, [e.lngLat.lng, e.lngLat.lat], currentQ.targetCoords, timeTakenSec);
+              }
             }
           }
         }
@@ -823,16 +840,30 @@ export default function MapContainer() {
         { name: 'p4', bg: 'bg-amber-600', hex: '#f59e0b', emoji: '🟡' },
       ];
 
-      // If player placed guess during in_progress (show only own guess)
+      // If player placed guess during in_progress (show ONLY own guess, NEVER other players' guesses)
       if (session.status === 'in_progress') {
-        const myPlayer = (activeDuelPlayerKey && session[activeDuelPlayerKey]) || session.player1;
+        let playerKey = activeDuelPlayerKey;
+        if (!playerKey && typeof window !== 'undefined') {
+          const activeRumuz = localStorage.getItem('kpss3d_active_rumuz') || '';
+          const myId = normalizeRumuzKey(activeRumuz);
+          playerKey = getPlayerKeyById(session, myId) || 
+            (session.player1?.id === myId || session.player1?.rumuz === activeRumuz ? 'player1' :
+             session.player2?.id === myId || session.player2?.rumuz === activeRumuz ? 'player2' :
+             session.player3?.id === myId || session.player3?.rumuz === activeRumuz ? 'player3' :
+             session.player4?.id === myId || session.player4?.rumuz === activeRumuz ? 'player4' : null);
+        }
+
+        const myPlayer = playerKey ? session[playerKey] : null;
         if (myPlayer?.currentGuess) {
+          const playerIdx = playerKey === 'player1' ? 0 : playerKey === 'player2' ? 1 : playerKey === 'player3' ? 2 : 3;
+          const cfg = playerColorConfig[playerIdx] || playerColorConfig[0];
+
           const el = document.createElement('div');
           el.className = 'relative flex items-center justify-center';
           el.innerHTML = `
-            <div class="absolute w-8 h-8 bg-indigo-500/40 rounded-full animate-ping"></div>
-            <div class="px-2.5 py-0.5 bg-indigo-600 border-2 border-white text-white font-black text-xs rounded-full shadow-2xl flex items-center gap-1">
-              📍 ${myPlayer.rumuz}
+            <div class="absolute w-8 h-8 ${cfg.bg}/40 rounded-full animate-ping"></div>
+            <div class="px-2.5 py-0.5 ${cfg.bg} border-2 border-white text-white font-black text-xs rounded-full shadow-2xl flex items-center gap-1">
+              📍 ${myPlayer.rumuz} (Sen)
             </div>
           `;
           const marker = new maplibregl.Marker({ element: el })
