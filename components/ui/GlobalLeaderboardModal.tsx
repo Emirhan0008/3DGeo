@@ -93,6 +93,12 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
   const unrankedList = leaderboard.filter(e => !!e.isUnranked);
   const displayList = showUnranked ? leaderboard : rankedList;
 
+  // Calculate highest streak across the global leaderboard
+  const highestStreakInList = Math.max(0, ...rankedList.map(e => Math.max(e.bestDuelStreak || 0, e.duelStreak || 0)));
+  const currentUserEntry = rankedList.find(e => e.rumuz.toLowerCase() === activeRumuz.toLowerCase());
+  const currentUserRank = currentUserEntry?.rank;
+  const currentUserIsRecordStreak = highestStreakInList >= 3 && currentUserEntry && Math.max(currentUserEntry.bestDuelStreak || 0, currentUserEntry.duelStreak || 0) === highestStreakInList;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-3xl bg-gradient-to-b from-[#0e111a] via-[#090b10] to-[#06080c] border-2 border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
@@ -223,7 +229,10 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               avatarBg={avatarBg}
               unlockedBadges={unlockedBadges}
               duelWins={duelStats.duelWins}
+              duelStreak={duelStats.duelStreak}
               equippedTitle={equippedTitle}
+              rank={currentUserRank}
+              isRecordStreakHolder={currentUserIsRecordStreak}
               size="sm"
             />
             <div className="min-w-0 flex-1">
@@ -268,14 +277,14 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
         <div className="mx-3.5 sm:mx-4 mt-2 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between text-[10px] text-slate-300">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-300 font-bold border border-indigo-400/30">
-              ⚡ Ağırlıklı Katsayı Sistemi
+              ⚡ Adil Güç & Zafer Sistemi
             </span>
             <span>
-              Düello Zaferi (<strong>500x</strong>), Zafer Serisi (<strong>250x</strong>), Rekor Seri (<strong>150x</strong>) ve Kazanma Oranı (<strong>1000x</strong>) en yüksek katsayıya sahiptir.
+              Düello Zaferi (<strong>8000x</strong>), Kazanma Oranı (<strong>20000x</strong>), Rekor Seri (<strong>3000x</strong>) ve Canlı Seri (<strong>1500x</strong>) doğrudan sıralamayı belirler. 🥇🥈🥉 İlk 3 ve ⚡ Rekortmen madalyaları otomatik atanır.
             </span>
           </div>
           <span className="text-amber-300 font-bold hidden sm:inline-block shrink-0">
-            Adil &amp; Zafer Odaklı Sıralama
+            Zafer &amp; WR Odaklı
           </span>
         </div>
 
@@ -432,7 +441,10 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                       avatarBg={entry.avatarBg}
                       unlockedBadges={Array(entry.unlockedBadgesCount).fill('')}
                       duelWins={entry.duelWins}
+                      duelStreak={entry.duelStreak}
                       equippedTitle={entry.equippedTitle}
+                      rank={entry.isUnranked ? undefined : entry.rank}
+                      isRecordStreakHolder={!entry.isUnranked && highestStreakInList >= 3 && Math.max(entry.bestDuelStreak || 0, entry.duelStreak || 0) === highestStreakInList}
                       size="sm"
                     />
 

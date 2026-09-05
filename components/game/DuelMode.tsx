@@ -104,6 +104,7 @@ export default function DuelMode() {
   const [lobbyTab, setLobbyTab] = useState<'quick' | 'private_create' | 'private_join' | 'bot'>('quick');
   const [joinRoomCodeInput, setJoinRoomCodeInput] = useState('');
   const [joinRoomPinInput, setJoinRoomPinInput] = useState('');
+  const [createRoomNameInput, setCreateRoomNameInput] = useState('');
   const [createRoomPinInput, setCreateRoomPinInput] = useState('');
   const [copiedCode, setCopiedCode] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -607,6 +608,7 @@ export default function DuelMode() {
         playerProfile,
         {
           mode: 'private',
+          customRoomCode: createRoomNameInput.trim() || undefined,
           duelType: selectedDuelType,
           questionCount: selectedQuestionCount,
           categoryFilter: selectedCategory,
@@ -1057,7 +1059,7 @@ export default function DuelMode() {
               <div className="flex border-b border-white/10 mb-3 overflow-x-auto scrollbar-none gap-1">
                 <button
                   onClick={() => setLobbyTab('quick')}
-                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                     lobbyTab === 'quick'
                       ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
                       : 'text-slate-400 hover:text-white'
@@ -1069,31 +1071,31 @@ export default function DuelMode() {
 
                 <button
                   onClick={() => setLobbyTab('private_create')}
-                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                     lobbyTab === 'private_create'
                       ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
-                  <span>Özel Oda Kur</span>
+                  <span>Oda Kur</span>
                 </button>
 
                 <button
                   onClick={() => setLobbyTab('private_join')}
-                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                     lobbyTab === 'private_join'
                       ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>Koda Katıl</span>
+                  <span>Oda Katıl</span>
                 </button>
 
                 <button
                   onClick={() => setLobbyTab('bot')}
-                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                     lobbyTab === 'bot'
                       ? 'bg-amber-500 text-slate-950 border-b-2 border-amber-300'
                       : 'text-slate-400 hover:text-white'
@@ -1127,25 +1129,41 @@ export default function DuelMode() {
                 </div>
               )}
 
-              {/* Tab 2: Özel Oda Kur */}
+              {/* Tab 2: Oda Kur */}
               {lobbyTab === 'private_create' && (
                 <div className="space-y-2.5">
                   <div className="p-2.5 bg-indigo-500/10 border border-indigo-400/30 rounded-xl text-xs text-indigo-200">
-                    👥 <strong>{selectedMaxPlayers} Kişilik Özel Oda</strong>: Oda kodunu arkadaşlarınıza atarak 2, 3 veya 4 kişilik kapışmalar başlatabilirsiniz.
+                    👥 <strong>{selectedMaxPlayers} Kişilik Oda Kur</strong>: Odaya özel bir isim veya şifre koyabilirsiniz. Boş bırakırsanız boşta olan en küçük oda numarası (TR-001, TR-002...) otomatik verilir.
                   </div>
+
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
-                      İsteğe Bağlı Oda Şifresi (PIN)
+                      Oda İsmi / Kodu <span className="text-slate-500 text-[10px] font-normal">(İsteğe Bağlı)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={createRoomNameInput}
+                      onChange={(e) => setCreateRoomNameInput(e.target.value)}
+                      placeholder="Boş bırakırsan sıradaki en küçük numara atanır (TR-001, TR-002...)"
+                      maxLength={20}
+                      className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Oda Şifresi / PIN <span className="text-slate-500 text-[10px] font-normal">(İsteğe Bağlı)</span>
                     </label>
                     <input
                       type="password"
                       value={createRoomPinInput}
                       onChange={(e) => setCreateRoomPinInput(e.target.value)}
-                      placeholder="Boş bırakabilirsiniz veya 4 haneli PIN koyun"
+                      placeholder="Şifresiz herkese açık için boş bırakın veya PIN belirleyin"
                       maxLength={10}
                       className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
                     />
                   </div>
+
                   <button
                     onClick={handleCreatePrivateRoom}
                     disabled={actionLoading}
@@ -1156,32 +1174,32 @@ export default function DuelMode() {
                     ) : (
                       <>
                         <Users className="w-4 h-4" />
-                        <span>{selectedMaxPlayers} Kişilik Özel Oda Oluştur</span>
+                        <span>{selectedMaxPlayers} Kişilik Oda Kur</span>
                       </>
                     )}
                   </button>
                 </div>
               )}
 
-              {/* Tab 3: Odaya Katıl */}
+              {/* Tab 3: Oda Katıl */}
               {lobbyTab === 'private_join' && (
                 <div className="space-y-2.5">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
-                      6 Haneli Oda Kodu
+                      Oda Adı veya Kodu
                     </label>
                     <input
                       type="text"
                       value={joinRoomCodeInput}
                       onChange={(e) => setJoinRoomCodeInput(e.target.value.toUpperCase())}
-                      placeholder="Örn: TR-8492"
-                      maxLength={10}
+                      placeholder="Örn: TR-001 veya Arkadaşının Oda Adı"
+                      maxLength={20}
                       className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2 text-sm text-amber-300 font-black placeholder:text-slate-500 focus:outline-none focus:border-amber-400 uppercase"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
-                      Oda Şifresi (Varsa)
+                      Oda Şifresi <span className="text-slate-500 text-[10px] font-normal">(Varsa)</span>
                     </label>
                     <input
                       type="password"
@@ -1202,7 +1220,7 @@ export default function DuelMode() {
                     ) : (
                       <>
                         <KeyRound className="w-4 h-4" />
-                        <span>Odaya Katıl ve Başla</span>
+                        <span>Odaya Katıl</span>
                       </>
                     )}
                   </button>

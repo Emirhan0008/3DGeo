@@ -4,6 +4,68 @@
 
 ---
 
+## 📅 [2026-09-05] - Dinamik Sıralı Oda Sistemi (TR-001...), Zafer Odaklı Adil Sıralama Algoritması & Avatar Madalyaları
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "Oda Kur ve Oda Katıl olarak değiştir başlıkları, oda sistemi şöyle olsun: odaya bir isim ve opsiyonel olarak bir şifre koyulabilsin eğer hiçbir şey kurulmazsa o an olan oda sayısına göre sıra versin örneğin TR-001, TR-002, TR003 ... eğer 001 odası dağılmışsa ve 002 ve 003 hala devam ediyorsa bir sonraki oda TR-001 adıyla kurulsun boşta en küçük hangi rakam varsa odaya o rakam veya sayı atansın oda ismi boş bırakılmış ise, puanlama sistemini değiştir hala zafer sayısı yeteri kadar etki etmiyor puanlara, çok maç oynamış ama az maç kazanmış birisi az maç oynamış ama çok zafer kazanmış kişiden daha çok puan alamasın bu sıralamada 14 maç oynayıp 2 maç kazanmış kullanıcı 9 maç oynayıp 7 zafer alan ve 7 seri rekoru olan kullanıcıdan daha çok puan almış olmamalı. Ayrıca avatarın sol altına özel kullanıcılara özel madalyalar verilsin örneğin ilk 3 derecedekilere altın gümüş ve bronz madalya ve en çok seri yapan kullanıcıya rekor madalyası..."
+- **Etkilenen Dosyalar**:
+  - `/lib/duelService.ts`
+  - `/lib/rumuzService.ts`
+  - `/components/game/DuelMode.tsx`
+  - `/components/ui/AvatarWithBadgeFrame.tsx`
+  - `/components/ui/GlobalLeaderboardModal.tsx`
+- **Yapılan İyileştirmeler**:
+  1. **Lobi Başlıkları & Dinamik Boş Oda Numarası Atama (`duelService.ts` & `DuelMode.tsx`)**:
+     - Lobi sekmeleri `Oda Kur` ve `Oda Katıl` olarak güncellendi.
+     - `generateLowestAvailableRoomCode` fonksiyonu eklendi: Firestore'daki aktif odalar taranarak boşta olan en küçük sıra numarası (`TR-001`, `TR-002`, `TR-003`...) tespit edilip atanıyor. Örneğin 001 kapandığında ve 002-003 açıkken yeni oda doğrudan `TR-001` olarak açılıyor.
+     - İsteğe bağlı özel oda adı ve şifre (PIN) belirleme desteği sağlandı.
+  2. **Zafer ve Kazanma Oranı Odaklı Adil Sıralama Gücü Algoritması (`rumuzService.ts`)**:
+     - `calculateRankingPower` formülü baştan tasarlandı:
+       - Düello Zaferi: **8000 Puan / Zafer**
+       - Kazanma Oranı: **20000 Puan x WR** (Maç hacmine bağlı katsayı ile)
+       - Kariyer En İyi Serisi Rekoru: **3000 Puan / Adım**
+       - Canlı Galibiyet Serisi: **1500 Puan / Adım**
+       - Maç ham puanı katılım spam'ini önlemek için bastırıldı (maks 3000 puan).
+     - Bu sayede 9 maçta 7 zafer ve 7 seri alan bir oyuncu, 14 maç oynayıp 2 zafer alan oyuncunun açık ara önüne geçer.
+  3. **Avatar Sol Alt Özel Derece ve Rekortmen Madalyaları (`AvatarWithBadgeFrame.tsx` & `GlobalLeaderboardModal.tsx`)**:
+     - Avatar bileşenine sol alt madalya rozeti eklendi:
+       - 🥇 **1.lik Altın Madalyası** (Global Lider)
+       - 🥈 **2.lik Gümüş Madalyası** (Global 2.lik)
+       - 🥉 **3.lük Bronz Madalyası** (Global 3.lük)
+       - ⚡ **Zafer Serisi Rekortmeni Madalyası** (Tüm Zamanlar Seri Rekoru Sahibi)
+     - Liderlik tablosundaki oyuncu satırlarında ve kullanıcının kendi profil kartında dinamik olarak hesaplanarak gösterildi.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - Dev server başarıyla çalışır durumda.
+
+---
+
+## 📅 [2026-09-05] - 1. Tur Senkronizasyon & Puanlama Onarımı, Kompakt Profil Arayüzü ve Kontrast İyileştirmeleri
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "bazen ilk turda bazı oyuncular basamıyor veya bastığı halde 0 puan alıyor bunları analiz et ve hatayı bulabilirsen düzelt, ayrıca avatar, ünvan ve rozetlerin başlıklarını basitleştir çok fazla yer kaplıyorlar, lobi ekranı hala tam olarak mobilde ekrana sığmıyor hem yatayda hem dikeyde bunu düzelt, özellikler mor üstüne yazılan yazılar okunmuyor kontrastları iyi ayarla her şey okunabilir olsun ve profil kısmını tamamen kompakt hale getir açıklamaları üstüne basıldığı veya fare ile gelindiği zaman görünecek şekilde ayarla"
+- **Etkilenen Dosyalar**:
+  - `/lib/duelService.ts`
+  - `/components/map/MapContainer.tsx`
+  - `/components/ui/ProfileEditModal.tsx`
+  - `/components/game/DuelMode.tsx`
+  - `/lib/data/badgesData.ts`
+- **Yapılan İyileştirmeler**:
+  1. **1. Tur Başlatma ve Sıfır Puan Sorununun Çözümü (`duelService.ts` & `MapContainer.tsx`)**:
+     - `startFirstRoundFromStarting` fonksiyonu eklenerek lobiden maça geçiş anında oyuncu state'lerinin (süre, puan, mesafe) temiz bir şekilde senkronize edilmesi sağlandı.
+     - `calculateDuelScore` fonksiyonu güncellenerek geçerli tahminlerde 0 puan alınması engellendi (mesafeye göre taban puan güvencesi).
+     - `MapContainer.tsx` üzerinde `starting` -> `in_progress` aşama geçişi algılayıcısı optimize edildi; ilk turda tıklamaların düşmesi ve kilitlenmesi önlendi.
+  2. **Kompakt Profil Arayüzü & Hover/Tıklama Dinamik Açıklamaları (`ProfileEditModal.tsx`)**:
+     - Başlıklar ve kartlar mikro-kompakt boyuta getirildi ("1. Avatar & Tema", "2. Ünvanlar", "3. Rozetler").
+     - Avatar, ünvan ve rozetlerin uzun kilit ve edinim metinleri doğrudan kart içerisinden kaldırılarak üzerlerine gelindiğinde (*hover*) veya tıklandığında anında açılan interaktif **İnceleme & Şart Gösterge Paneli**'ne taşındı.
+  3. **Yüksek Kontrast & Sadeleştirilmiş Başlıklar (`badgesData.ts`)**:
+     - Mor ve koyu arkaplanlarda okunmayı zorlaştıran düşük kontrastlı renkler yerine yüksek kontrastlı, canlı ve keskin renk sınıfları uygulandı.
+  4. **Mobil Lobi Boyutlandırması (`DuelMode.tsx`)**:
+     - Lobideki buton, kart ve filtre boyutları daraltılarak dikey ve yatay taşma olmadan tüm mobil ekranlara sığması sağlandı.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - Dev server başarıyla aktif.
+
+---
+
 ## 📅 [2026-09-05] - Çoklu Düelloda 3. ve 4. Oyuncu İşaretleme ve İzleyici Görünümü Hatasının Düzeltilmesi
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "Çoklu düelloda 3. ve 4. Kullanıcılar işaretleme yapamıyor ve izleyici gibi diğerlerinin işaretledikleri yerleri görebiliyorlar bunu düzelt"

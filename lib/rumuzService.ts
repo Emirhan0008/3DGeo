@@ -104,8 +104,9 @@ export type LeaderboardSortTab = 'total' | 'score' | 'kpss_test' | 'duels' | 'st
 
 /**
  * Calculates the multi-factored weighted ranking prestige score.
- * Multipliers prioritize 1v1 live duel victories, win streaks, and win rates over offline tests/badges.
- * Guarantees that active winners (e.g. 6 wins out of 6) rank significantly higher than non-winners with many matches.
+ * Multipliers heavily prioritize 1v1 and multiplayer live duel victories, win rate %, and win streaks.
+ * Guarantees that players with high wins and high win rate (e.g. 7 wins / 9 matches, 7 streak)
+ * rank decisively higher than players who simply spam matches with low win rate (e.g. 2 wins / 14 matches, 1 streak).
  */
 export function calculateRankingPower(stats: {
   score: number;
@@ -131,33 +132,40 @@ export function calculateRankingPower(stats: {
   const winRate = totalD > 0 ? (stats.duelWins / totalD) : 0;
   const winRatePct = Math.round(winRate * 100);
 
-  // 1. DÜELLO VE ZAFER KAZANIMLARI (EN BÜYÜK ÇARPAN & ASAL SIRALAMA GÜCÜ)
-  // • Düello Galibiyeti: 500 Puan (Her zafer için devasa prestij katsayısı)
-  // • Aktif Galibiyet Serisi: 250 Puan (Canlı momentum)
-  // • Kariyer En İyi Serisi: 150 Puan (Kayıtlı rekor)
-  // • Kazanma Oranı Bonusu: 1000 * winRate (10 maçta 0 galibiyet = 0 bonus, 6/6 = 1000 tam bonus)
-  // • Düello Maç Puanı: 1.0x çarpan
-  const duelWinsScore = stats.duelWins * 500;
-  const duelStreakScore = stats.duelStreak * 250;
-  const bestStreakScore = (stats.bestDuelStreak || stats.duelStreak) * 150;
-  const winRateBonus = Math.round(winRate * 1000);
-  const duelMatchScore = Math.round((stats.duelScore || 0) * 1.0);
+  // 1. DÜELLO ZAFERLERİ & KAZANMA ORANI & SERİ REKORLARI (BİRİNCİL VE EN BÜYÜK GÜÇ)
+  // • Düello Galibiyeti: 8000 Puan (Her zafer için devasa güç)
+  // • Kazanma Oranı Bonusu: 20000 * winRate (Minimum maç hacmi ile ölçekli)
+  // • Kariyer En İyi Serisi Rekoru: 3000 Puan (Her rekor seri adımı için)
+  // • Aktif Galibiyet Serisi: 1500 Puan (Mevcut form)
+  // • Maç Katılım/Ham Puan: Logaritmik/bastırılmış katsayı (yenilgi biriktirerek puan şişirilmesini engeller)
+  const duelWinsScore = stats.duelWins * 8000;
+  
+  // Win rate bonus is fully awarded as match volume reaches 3+ matches
+  const matchVolumeWeight = Math.min(1, totalD / 3);
+  const winRateBonus = Math.round(winRate * 20000 * matchVolumeWeight);
 
-  const duelPowerScore = duelWinsScore + duelStreakScore + bestStreakScore + winRateBonus + duelMatchScore;
+  const bestStreak = Math.max(stats.bestDuelStreak || 0, stats.duelStreak || 0);
+  const bestStreakScore = bestStreak * 3000;
+  const activeStreakScore = (stats.duelStreak || 0) * 1500;
 
-  // 2. ÇEVRİMDIŞI & TEST SORU KAZANIMLARI (DAHA DÜŞÜK KATSAYI)
-  // • Doğru Soru Sayısı: Soru başına 3 puan (0.3x katsayı)
-  // • Test Ham Puanı: 0.1x katsayı
-  // • Soru İsabet Oranı Bonusu: accuracyPct * 0.5 (maks 50)
+  // Damped duel match score: max 3000 power from pure match score points so losing doesn't inflate power
+  const duelMatchScore = Math.round(Math.min((stats.duelScore || 0) * 0.02, 3000));
+
+  const duelPowerScore = duelWinsScore + winRateBonus + bestStreakScore + activeStreakScore + duelMatchScore;
+
+  // 2. ÇEVRİMDIŞI & TEST SORU KAZANIMLARI (MÜTEVAZI KATSAYI)
+  // • Doğru Soru Sayısı: Soru başına 10 puan
+  // • Test Ham Puanı: Bastırılmış katsayı (maks 2000)
+  // • Soru İsabet Oranı Bonusu: accuracyPct * 1 (maks 100)
   const kpssPowerScore = Math.round(
-    (stats.correctAnswersCount * 3) +
-    (stats.kpssScore * 0.1) +
-    (stats.accuracyPct * 0.5)
+    (stats.correctAnswersCount * 10) +
+    Math.min((stats.kpssScore || 0) * 0.02, 2000) +
+    (stats.accuracyPct * 1)
   );
 
-  // 3. ROZET VE KOLEKSİYON BAŞARIMLARI (MÜTEVAZI KATSAYI)
-  // • Rozet başına 20 puan
-  const badgePowerScore = (stats.unlockedBadgesCount || 0) * 20;
+  // 3. ROZET VE KOLEKSİYON BAŞARIMLARI
+  // • Rozet başına 50 puan
+  const badgePowerScore = (stats.unlockedBadgesCount || 0) * 50;
 
   const rankingScore = duelPowerScore + kpssPowerScore + badgePowerScore;
 

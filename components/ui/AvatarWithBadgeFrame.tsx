@@ -16,6 +16,9 @@ interface AvatarWithBadgeFrameProps {
   showBadgePin?: boolean;
   showTitleBadge?: boolean;
   className?: string;
+  rank?: number;
+  isRecordStreakHolder?: boolean;
+  specialMedal?: 'gold' | 'silver' | 'bronze' | 'record' | null;
 }
 
 export default function AvatarWithBadgeFrame({
@@ -30,7 +33,10 @@ export default function AvatarWithBadgeFrame({
   size = 'md',
   showBadgePin = true,
   showTitleBadge = false,
-  className = ''
+  className = '',
+  rank,
+  isRecordStreakHolder = false,
+  specialMedal
 }: AvatarWithBadgeFrameProps) {
   const prestige = isDuelMode 
     ? getDuelPrestigeTier(duelWins, duelStreak, unlockedBadges, equippedTitle)
@@ -38,6 +44,36 @@ export default function AvatarWithBadgeFrame({
 
   const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
   const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
+
+  // Determine bottom-left special medal
+  let activeMedal: { icon: string; title: string; filter: string } | null = null;
+  const effectiveMedalType = specialMedal || (rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : isRecordStreakHolder ? 'record' : null);
+
+  if (effectiveMedalType === 'gold') {
+    activeMedal = {
+      icon: '🥇',
+      title: '🥇 1.lik Şampiyonluk Altın Madalyası (Global Lider)',
+      filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 1px #fff)'
+    };
+  } else if (effectiveMedalType === 'silver') {
+    activeMedal = {
+      icon: '🥈',
+      title: '🥈 2.lik Gümüş Madalyası (Global Derece)',
+      filter: 'drop-shadow(0 0 4px rgba(203, 213, 225, 0.9)) drop-shadow(0 0 1px #fff)'
+    };
+  } else if (effectiveMedalType === 'bronze') {
+    activeMedal = {
+      icon: '🥉',
+      title: '🥉 3.lük Bronz Madalyası (Global Derece)',
+      filter: 'drop-shadow(0 0 4px rgba(217, 119, 6, 0.9)) drop-shadow(0 0 1px #fff)'
+    };
+  } else if (effectiveMedalType === 'record' || isRecordStreakHolder) {
+    activeMedal = {
+      icon: '⚡',
+      title: '⚡ Zafer Serisi Rekortmen Madalyası (Tüm Zamanlar Rekoru)',
+      filter: 'drop-shadow(0 0 5px rgba(249, 115, 22, 1)) drop-shadow(0 0 1px #fff)'
+    };
+  }
 
   // Transparent object sticker outline filter (No rectangular or circular box)
   const activeOutlineFilter = getAvatarOutlineFilter(avatarBg, prestige.tierLevel);
@@ -48,6 +84,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-xs',
       emojiScale: 'scale-100',
       pin: '-top-1 -right-1 text-[8px]',
+      medal: '-bottom-1 -left-1 text-[8px]',
       titleText: 'text-[9px]'
     },
     sm: {
@@ -55,6 +92,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-base sm:text-lg',
       emojiScale: 'scale-105',
       pin: '-top-1 -right-1 text-[10px]',
+      medal: '-bottom-1 -left-1 text-[10px]',
       titleText: 'text-[10px]'
     },
     md: {
@@ -62,6 +100,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-xl sm:text-2xl',
       emojiScale: 'scale-105',
       pin: '-top-1.5 -right-1.5 text-xs',
+      medal: '-bottom-1.5 -left-1.5 text-xs',
       titleText: 'text-[10px] sm:text-[11px]'
     },
     lg: {
@@ -69,6 +108,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-2xl sm:text-3xl',
       emojiScale: 'scale-110',
       pin: '-top-1.5 -right-1.5 text-sm',
+      medal: '-bottom-1.5 -left-1.5 text-sm',
       titleText: 'text-xs'
     },
     xl: {
@@ -76,6 +116,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-4xl sm:text-5xl',
       emojiScale: 'scale-115',
       pin: '-top-2 -right-2 text-base',
+      medal: '-bottom-2 -left-2 text-base',
       titleText: 'text-xs sm:text-sm'
     }
   }[size];
@@ -125,6 +166,19 @@ export default function AvatarWithBadgeFrame({
             title={`${prestige.pinBadgeName} • ${activeTitle} (${prestige.tierLabel})`}
           >
             {prestige.pinIcon}
+          </span>
+        )}
+
+        {/* Sol Alt Özel Kullanıcı Madalyası (1., 2., 3. ve Rekortmen Kullanıcılar İçin) */}
+        {activeMedal && (
+          <span
+            className={`absolute ${sizeClasses.medal} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10 leading-none select-none animate-bounce-subtle`}
+            style={{
+              filter: activeMedal.filter
+            }}
+            title={activeMedal.title}
+          >
+            {activeMedal.icon}
           </span>
         )}
       </div>

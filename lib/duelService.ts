@@ -271,11 +271,51 @@ export function calculateTestDuelScore(isCorrect: boolean, timeTakenSec: number,
 }
 
 /**
- * Generates a clean 6-character room code like TR-7492
+ * Generates a clean room code or calculates the lowest missing sequence number (TR-001, TR-002...)
  */
 export function generateRoomCode(): string {
-  const digits = Math.floor(1000 + Math.random() * 9000);
+  const digits = Math.floor(100 + Math.random() * 900);
   return `TR-${digits}`;
+}
+
+/**
+ * Queries active/waiting/in_progress duels in Firestore and calculates the lowest available room sequence code.
+ * Example: if TR-001 is free -> 'TR-001'.
+ * If TR-001 is closed/abandoned and TR-002 and TR-003 are running -> next room gets 'TR-001' (lowest available integer sequence).
+ */
+export async function generateLowestAvailableRoomCode(): Promise<string> {
+  try {
+    const q = query(
+      collection(db, 'duels'),
+      where('status', 'in', ['waiting', 'starting', 'in_progress', 'round_reveal']),
+      limit(100)
+    );
+    const snap = await getDocs(q);
+    const usedNumbers = new Set<number>();
+    snap.forEach((docSnap) => {
+      const data = docSnap.data() as DuelSession;
+      if (data?.roomCode) {
+        const match = data.roomCode.match(/^TR-(\d+)$/i);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > 0) {
+            usedNumbers.add(num);
+          }
+        }
+      }
+    });
+
+    // Find the smallest missing positive integer (1, 2, 3...)
+    let lowest = 1;
+    while (usedNumbers.has(lowest)) {
+      lowest++;
+    }
+    const formattedNum = lowest.toString().padStart(3, '0');
+    return `TR-${formattedNum}`;
+  } catch (error) {
+    console.warn('Could not determine lowest room code sequence, using fallback:', error);
+    return `TR-001`;
+  }
 }
 
 /**
@@ -417,6 +457,7 @@ export async function createDuelRoom(
   player: PlayerProfileInput,
   options: {
     mode: 'quick' | 'private';
+    customRoomCode?: string;
     duelType?: DuelType;
     questionCount: 10 | 20 | 30;
     categoryFilter: string;
@@ -427,7 +468,13 @@ export async function createDuelRoom(
   const duelType = options.duelType || 'pin_map';
   const maxPlayers: 2 | 3 | 4 = options.maxPlayers || 2;
   const duelId = `duel_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-  const roomCode = generateRoomCode();
+  
+  // If custom room name/code was provided, use it; otherwise compute lowest available sequence (TR-001, TR-002...)
+  let roomCode = options.customRoomCode?.trim().toUpperCase();
+  if (!roomCode) {
+    roomCode = await generateLowestAvailableRoomCode();
+  }
+
   const questionIds = prepareDuelQuestions(options.categoryFilter, options.questionCount, duelType);
 
   const initialPlayer: DuelPlayer = sanitizePlayer(player, true);
