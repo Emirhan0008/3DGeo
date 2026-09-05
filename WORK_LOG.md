@@ -4,6 +4,28 @@
 
 ---
 
+## 📅 [2026-09-05] - 2 Kişilik Hükmen Galibiyet, 3 & 4 Kişilik Kesintisiz Düello & Çift Madalya Desteği
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "eğer 2 kişilik düelloda biri çıkarsa düelloyu karşı taraf kazansın ama 3 ve 4 kişilik düellolarda tek kişi kalana kadar diğerlerinin çıkması düellonun devam etmesini engellemesin, şu anda birisi çıktığında düello direkt bitiyor 3 ve 4 kişilik düellolarda, eğer 1 kullanıcı hem en yüksek seri zafer rekoruna hem başka bir madalyaya sahip ise sola yaslı olarak 2 madalyayı da avatarının altına koy"
+- **Etkilenen Dosyalar**:
+  - `/lib/duelService.ts`
+  - `/components/game/DuelMode.tsx`
+  - `/components/ui/AvatarWithBadgeFrame.tsx`
+  - `/WORK_LOG.md`
+- **Yapılan İyileştirmeler**:
+  1. **Akıllı Düello Terk & Devam Algoritması (`duelService.ts` & `DuelMode.tsx`)**:
+     - `leaveOrCancelDuel` fonksiyonu çok oyunculu dinamiklerine göre yeniden kodlandı:
+       - **2 Kişilik Maç**: Bir oyuncu maçtan çıktığında maç doğrudan `status: 'finished'` olur ve kalan oyuncu hükmen galip sayılır (`winnerId = remainingPlayer.id`). Zafer verisi Firestore üzerinden liderlik tablosuna işlenir.
+       - **3 ve 4 Kişilik Maç**: Bir veya iki oyuncu çıktığında maç sonlanmaz; çıkan oyuncu maçtan düşürülür ve kalan 2 veya 3 oyuncu soruları cevaplamaya kesintisiz devam eder. Eğer çıkan kişi o turun son beklenen cevabı ise tur otomatik olarak `round_reveal` aşamasına geçer.
+       - **Son Oyuncu Kuralı**: 3 veya 4 kişilik maçta peş peşe çıkışlar sonucu geriye tek bir oyuncu kalırsa maç tamamlanır ve son kalan oyuncu otomatik olarak maçı kazanır.
+  2. **Avatar Altında Çift Madalya Desteği (`AvatarWithBadgeFrame.tsx`)**:
+     - `activeMedals` dizisi tanımlanarak bir kullanıcının hem derece madalyasına (🥇 1.lik, 🥈 2.lik, 🥉 3.lük) hem de ⚡ Zafer Serisi Rekortmeni madalyasına sahip olması durumunda iki madalyanın da avatarın sol altına sola yaslı olarak (`🥇 ⚡`) yan yana şık bir şekilde yerleştirilmesi sağlandı.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - Dev server başarıyla çalışır durumda.
+
+---
+
 ## 📅 [2026-09-05] - Dinamik Sıralı Oda Sistemi (TR-001...), Zafer Odaklı Adil Sıralama Algoritması & Avatar Madalyaları
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "Oda Kur ve Oda Katıl olarak değiştir başlıkları, oda sistemi şöyle olsun: odaya bir isim ve opsiyonel olarak bir şifre koyulabilsin eğer hiçbir şey kurulmazsa o an olan oda sayısına göre sıra versin örneğin TR-001, TR-002, TR003 ... eğer 001 odası dağılmışsa ve 002 ve 003 hala devam ediyorsa bir sonraki oda TR-001 adıyla kurulsun boşta en küçük hangi rakam varsa odaya o rakam veya sayı atansın oda ismi boş bırakılmış ise, puanlama sistemini değiştir hala zafer sayısı yeteri kadar etki etmiyor puanlara, çok maç oynamış ama az maç kazanmış birisi az maç oynamış ama çok zafer kazanmış kişiden daha çok puan alamasın bu sıralamada 14 maç oynayıp 2 maç kazanmış kullanıcı 9 maç oynayıp 7 zafer alan ve 7 seri rekoru olan kullanıcıdan daha çok puan almış olmamalı. Ayrıca avatarın sol altına özel kullanıcılara özel madalyalar verilsin örneğin ilk 3 derecedekilere altın gümüş ve bronz madalya ve en çok seri yapan kullanıcıya rekor madalyası..."

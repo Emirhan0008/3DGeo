@@ -742,7 +742,8 @@ export default function DuelMode() {
   const handleLeaveDuel = async () => {
     setShowExitConfirmModal(false);
     if (activeDuelSession) {
-      await leaveOrCancelDuel(activeDuelSession.id);
+      const myId = normalizeRumuzKey(rumuz);
+      await leaveOrCancelDuel(activeDuelSession.id, myId);
     }
     setActiveDuelSession(null);
     setActiveDuelPlayerKey(null);

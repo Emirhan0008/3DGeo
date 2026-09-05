@@ -1642,23 +1642,129 @@ export async function voteToAdvanceDuelRound(duel: DuelSession, playerId: string
 }
 
 /**
- * Cancels or leaves the duel room
+ * Cancels or leaves the duel room with smart multiplayer continuation:
+ * - In 2-player match: If 1 player leaves, the remaining player wins immediately (status: 'finished', winnerId: remainingPlayer.id).
+ * - In 3-4 player match: If 1 player leaves, the match continues smoothly for the remaining 2+ players until only 1 remains or the match concludes.
  */
-export async function leaveOrCancelDuel(duelId: string): Promise<void> {
+export async function leaveOrCancelDuel(duelId: string, leavingPlayerId?: string): Promise<void> {
   try {
     const duelRef = doc(db, 'duels', duelId);
     const snap = await getDoc(duelRef);
-    if (snap.exists()) {
-      const data = snap.data() as DuelSession;
-      if (data.status === 'waiting') {
+    if (!snap.exists()) return;
+
+    const data = snap.data() as DuelSession;
+    const allPlayers = getAllSessionPlayers(data);
+
+    // 1. If still waiting in lobby
+    if (data.status === 'waiting') {
+      if (!leavingPlayerId || allPlayers.length <= 1) {
         await deleteDoc(duelRef);
-      } else {
-        await updateDoc(duelRef, {
-          status: 'abandoned',
+        return;
+      }
+
+      if (data.player1?.id === leavingPlayerId) {
+        // Host left lobby - promote next player as host
+        const remaining = allPlayers.filter(p => p.id !== leavingPlayerId);
+        const newHost = remaining[0];
+        const newPlayer2 = remaining[1] || null;
+        const newPlayer3 = remaining[2] || null;
+        const newPlayer4 = remaining[3] || null;
+
+        await updateDoc(duelRef, sanitizeForFirestore({
+          player1: { ...newHost, playerSlot: 'player1' },
+          player2: newPlayer2 ? { ...newPlayer2, playerSlot: 'player2' } : null,
+          player3: newPlayer3 ? { ...newPlayer3, playerSlot: 'player3' } : null,
+          player4: newPlayer4 ? { ...newPlayer4, playerSlot: 'player4' } : null,
+          players: remaining.map((p, idx) => ({ ...p, playerSlot: `player${idx + 1}` as 'player1' | 'player2' | 'player3' | 'player4' })),
           updatedAt: new Date().toISOString()
-        });
+        }));
+      } else {
+        // Guest player left lobby
+        const remaining = allPlayers.filter(p => p.id !== leavingPlayerId);
+        const playerKey = getPlayerKeyById(data, leavingPlayerId);
+        const updates: Record<string, unknown> = {
+          players: remaining,
+          updatedAt: new Date().toISOString()
+        };
+        if (playerKey) {
+          updates[playerKey] = null;
+        }
+        await updateDoc(duelRef, sanitizeForFirestore(updates));
+      }
+      return;
+    }
+
+    // 2. If duel is already finished or abandoned
+    if (data.status === 'finished' || data.status === 'abandoned') {
+      return;
+    }
+
+    // 3. Active match (starting, in_progress, round_reveal)
+    const remainingPlayers = leavingPlayerId 
+      ? allPlayers.filter(p => p.id !== leavingPlayerId)
+      : [];
+
+    // Case A: No players left -> abandon room
+    if (remainingPlayers.length === 0) {
+      await updateDoc(duelRef, {
+        status: 'abandoned',
+        updatedAt: new Date().toISOString()
+      });
+      return;
+    }
+
+    // Case B: Exactly 1 player left (2-player match or last survivor in 3/4-player match)
+    // The last remaining player wins automatically!
+    if (remainingPlayers.length === 1) {
+      const winner = remainingPlayers[0];
+      const leavingKey = leavingPlayerId ? getPlayerKeyById(data, leavingPlayerId) : null;
+      const updates: Record<string, unknown> = {
+        status: 'finished',
+        winnerId: winner.id,
+        players: remainingPlayers,
+        updatedAt: new Date().toISOString()
+      };
+      if (leavingKey) {
+        updates[leavingKey] = null;
+      }
+
+      await updateDoc(duelRef, sanitizeForFirestore(updates));
+
+      // Record victory to global leaderboard
+      recordFinishedDuelToRumuzes({
+        ...data,
+        status: 'finished',
+        winnerId: winner.id,
+        players: remainingPlayers
+      }).catch(() => {});
+      return;
+    }
+
+    // Case C: 2 or more players remain in a 3-player or 4-player match!
+    // The duel continues smoothly for all remaining players!
+    const leavingKey = leavingPlayerId ? getPlayerKeyById(data, leavingPlayerId) : null;
+    const updates: Record<string, unknown> = {
+      players: remainingPlayers,
+      updatedAt: new Date().toISOString()
+    };
+    if (leavingKey) {
+      updates[leavingKey] = null;
+    }
+
+    // Check if all remaining players have already answered the current question
+    if (data.status === 'in_progress') {
+      const isTest = data.duelType === 'kpss_test';
+      const allAnswered = isTest
+        ? remainingPlayers.every(p => p.currentOptionAnswer !== null && p.currentOptionAnswer !== undefined)
+        : remainingPlayers.every(p => !!p.currentGuess);
+
+      if (allAnswered) {
+        updates.status = 'round_reveal';
+        updates.bothAnsweredAt = Date.now();
       }
     }
+
+    await updateDoc(duelRef, sanitizeForFirestore(updates));
   } catch (error) {
     console.warn('Leave duel error:', error);
   }

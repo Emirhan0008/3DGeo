@@ -45,34 +45,44 @@ export default function AvatarWithBadgeFrame({
   const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
   const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
 
-  // Determine bottom-left special medal
-  let activeMedal: { icon: string; title: string; filter: string } | null = null;
-  const effectiveMedalType = specialMedal || (rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : isRecordStreakHolder ? 'record' : null);
+  // Determine bottom-left special medals (Can hold both rank medal and record streak medal)
+  const activeMedals: Array<{ id: string; icon: string; title: string; filter: string }> = [];
 
-  if (effectiveMedalType === 'gold') {
-    activeMedal = {
+  // 1. Rank / Placement Medal
+  if (specialMedal === 'gold' || rank === 1) {
+    activeMedals.push({
+      id: 'gold',
       icon: '🥇',
       title: '🥇 1.lik Şampiyonluk Altın Madalyası (Global Lider)',
       filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 1px #fff)'
-    };
-  } else if (effectiveMedalType === 'silver') {
-    activeMedal = {
+    });
+  } else if (specialMedal === 'silver' || rank === 2) {
+    activeMedals.push({
+      id: 'silver',
       icon: '🥈',
-      title: '🥈 2.lik Gümüş Madalyası (Global Derece)',
+      title: '🥈 2.lik Gümüş Madalyası (Global 2.lik)',
       filter: 'drop-shadow(0 0 4px rgba(203, 213, 225, 0.9)) drop-shadow(0 0 1px #fff)'
-    };
-  } else if (effectiveMedalType === 'bronze') {
-    activeMedal = {
+    });
+  } else if (specialMedal === 'bronze' || rank === 3) {
+    activeMedals.push({
+      id: 'bronze',
       icon: '🥉',
-      title: '🥉 3.lük Bronz Madalyası (Global Derece)',
+      title: '🥉 3.lük Bronz Madalyası (Global 3.lük)',
       filter: 'drop-shadow(0 0 4px rgba(217, 119, 6, 0.9)) drop-shadow(0 0 1px #fff)'
-    };
-  } else if (effectiveMedalType === 'record' || isRecordStreakHolder) {
-    activeMedal = {
-      icon: '⚡',
-      title: '⚡ Zafer Serisi Rekortmen Madalyası (Tüm Zamanlar Rekoru)',
-      filter: 'drop-shadow(0 0 5px rgba(249, 115, 22, 1)) drop-shadow(0 0 1px #fff)'
-    };
+    });
+  }
+
+  // 2. Record Streak Medal (⚡)
+  if (isRecordStreakHolder || specialMedal === 'record') {
+    // Avoid duplicate if record is already added
+    if (!activeMedals.some(m => m.id === 'record')) {
+      activeMedals.push({
+        id: 'record',
+        icon: '⚡',
+        title: '⚡ Zafer Serisi Rekortmen Madalyası (Tüm Zamanlar Seri Rekoru Sahibi)',
+        filter: 'drop-shadow(0 0 5px rgba(249, 115, 22, 1)) drop-shadow(0 0 1px #fff)'
+      });
+    }
   }
 
   // Transparent object sticker outline filter (No rectangular or circular box)
@@ -84,7 +94,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-xs',
       emojiScale: 'scale-100',
       pin: '-top-1 -right-1 text-[8px]',
-      medal: '-bottom-1 -left-1 text-[8px]',
+      medalContainer: '-bottom-1.5 -left-1 text-[8px] gap-0.5',
       titleText: 'text-[9px]'
     },
     sm: {
@@ -92,7 +102,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-base sm:text-lg',
       emojiScale: 'scale-105',
       pin: '-top-1 -right-1 text-[10px]',
-      medal: '-bottom-1 -left-1 text-[10px]',
+      medalContainer: '-bottom-1.5 -left-1.5 text-[10px] gap-0.5',
       titleText: 'text-[10px]'
     },
     md: {
@@ -100,7 +110,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-xl sm:text-2xl',
       emojiScale: 'scale-105',
       pin: '-top-1.5 -right-1.5 text-xs',
-      medal: '-bottom-1.5 -left-1.5 text-xs',
+      medalContainer: '-bottom-2 -left-1.5 text-xs gap-0.5',
       titleText: 'text-[10px] sm:text-[11px]'
     },
     lg: {
@@ -108,7 +118,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-2xl sm:text-3xl',
       emojiScale: 'scale-110',
       pin: '-top-1.5 -right-1.5 text-sm',
-      medal: '-bottom-1.5 -left-1.5 text-sm',
+      medalContainer: '-bottom-2.5 -left-2 text-sm gap-0.5',
       titleText: 'text-xs'
     },
     xl: {
@@ -116,7 +126,7 @@ export default function AvatarWithBadgeFrame({
       avatarText: 'text-4xl sm:text-5xl',
       emojiScale: 'scale-115',
       pin: '-top-2 -right-2 text-base',
-      medal: '-bottom-2 -left-2 text-base',
+      medalContainer: '-bottom-3 -left-2 text-base gap-1',
       titleText: 'text-xs sm:text-sm'
     }
   }[size];
@@ -169,17 +179,24 @@ export default function AvatarWithBadgeFrame({
           </span>
         )}
 
-        {/* Sol Alt Özel Kullanıcı Madalyası (1., 2., 3. ve Rekortmen Kullanıcılar İçin) */}
-        {activeMedal && (
-          <span
-            className={`absolute ${sizeClasses.medal} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10 leading-none select-none animate-bounce-subtle`}
-            style={{
-              filter: activeMedal.filter
-            }}
-            title={activeMedal.title}
+        {/* Sol Alt Özel Kullanıcı Madalyaları (1., 2., 3. ve Rekortmen Kullanıcılar İçin - Sola Yaslı Yan Yana) */}
+        {activeMedals.length > 0 && (
+          <div
+            className={`absolute ${sizeClasses.medalContainer} flex items-center cursor-pointer z-10 leading-none select-none`}
           >
-            {activeMedal.icon}
-          </span>
+            {activeMedals.map((m) => (
+              <span
+                key={m.id}
+                className="transform hover:scale-125 transition-transform animate-bounce-subtle"
+                style={{
+                  filter: m.filter
+                }}
+                title={m.title}
+              >
+                {m.icon}
+              </span>
+            ))}
+          </div>
         )}
       </div>
 
