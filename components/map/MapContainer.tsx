@@ -397,7 +397,7 @@ export default function MapContainer() {
     map.on('click', (e) => {
       const storeState = useAppStore.getState();
       // If any sidebar is open, treat this click exclusively as sidebar dismissal
-      if (storeState.isSidebarOpen || storeState.isAiDrawerOpen) {
+      if (storeState.activeTab !== 'duel' && (storeState.isSidebarOpen || storeState.isAiDrawerOpen)) {
         storeState.closeAllSidebars();
         return;
       }
@@ -411,7 +411,12 @@ export default function MapContainer() {
       if (storeState.activeTab === 'duel') {
         const session = storeState.activeDuelSession;
         let playerKey = storeState.activeDuelPlayerKey;
-        if (session && session.status === 'in_progress' && session.duelType !== 'kpss_test') {
+        const isGameReady = session && (
+          session.status === 'in_progress' || 
+          (session.status === 'starting' && Date.now() >= (session.roundStartTime || 0))
+        );
+
+        if (session && isGameReady && session.duelType !== 'kpss_test') {
           // If playerKey is not yet in store, resolve dynamically from active rumuz
           if (!playerKey && typeof window !== 'undefined') {
             const activeRumuz = localStorage.getItem('kpss3d_active_rumuz') || '';
@@ -430,10 +435,13 @@ export default function MapContainer() {
             const currentPlayer = session[playerKey];
             if (currentPlayer) {
               const questions = getQuestionsByIds(session.questionIds);
-              const currentQ = questions[session.currentRound];
+              const roundIdx = session.currentRound && session.currentRound >= 0 ? session.currentRound : 0;
+              const currentQ = questions[roundIdx] || questions[0];
               if (currentQ) {
-                const startMs = session.roundStartTime || Date.now();
-                const timeTakenSec = Math.max(0.5, Math.round(((Date.now() - startMs) / 1000) * 10) / 10);
+                const startMs = (session.status === 'in_progress' && session.roundStartTime && session.roundStartTime <= Date.now())
+                  ? session.roundStartTime
+                  : Date.now();
+                const timeTakenSec = Math.max(0.5, Math.min(15, Math.round(((Date.now() - startMs) / 1000) * 10) / 10));
                 submitPlayerGuess(session, currentPlayer.id, [e.lngLat.lng, e.lngLat.lat], currentQ.targetCoords, timeTakenSec);
               }
             }

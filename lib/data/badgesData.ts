@@ -128,18 +128,18 @@ export const AVATAR_ICONS: AvatarIconOption[] = [
 export const AVATAR_THEMES: AvatarThemeOption[] = [
   {
     id: 'cosmic_mythic',
-    name: '🌌 5. Kademe: Kozmik Mistik & Zirve Neon (En Yüksek)',
+    name: '🌌 5. Kademe (Kozmik Neon)',
     tierLevel: 5,
     bgGradient: 'bg-transparent',
     borderGlow: 'border-0',
     badgePinBg: 'text-amber-300',
     outlineFilter: 'drop-shadow(1.5px 0 0 #f472b6) drop-shadow(-1.5px 0 0 #f472b6) drop-shadow(0 1.5px 0 #22d3ee) drop-shadow(0 -1.5px 0 #22d3ee) drop-shadow(0 0 5px rgba(217,70,239,0.75))',
     outlineColor: '#f472b6',
-    outlineLabel: 'Kozmik Neon (Zirve)'
+    outlineLabel: 'Kozmik Neon'
   },
   {
     id: 'cyan_mythic',
-    name: '💎 4. Kademe: Elmas Safir & Mor Parıltı',
+    name: '💎 4. Kademe (Elmas Safir)',
     tierLevel: 4,
     bgGradient: 'bg-transparent',
     borderGlow: 'border-0',
@@ -150,7 +150,7 @@ export const AVATAR_THEMES: AvatarThemeOption[] = [
   },
   {
     id: 'gold_glory',
-    name: '👑 3. Kademe: Altın & Şampiyon Işıltısı',
+    name: '👑 3. Kademe (Şampiyon Altın)',
     tierLevel: 3,
     bgGradient: 'bg-transparent',
     borderGlow: 'border-0',
@@ -161,7 +161,7 @@ export const AVATAR_THEMES: AvatarThemeOption[] = [
   },
   {
     id: 'indigo_midnight',
-    name: '🛡️ 2. Kademe: Gümüş & Metalik Çelik',
+    name: '🛡️ 2. Kademe (Parlak Gümüş)',
     tierLevel: 2,
     bgGradient: 'bg-transparent',
     borderGlow: 'border-0',
@@ -172,7 +172,7 @@ export const AVATAR_THEMES: AvatarThemeOption[] = [
   },
   {
     id: 'emerald_forest',
-    name: '🐣 1. Kademe: Bronz & Bakır Sıcak Çırak',
+    name: '🐣 1. Kademe (Sıcak Bronz)',
     tierLevel: 1,
     bgGradient: 'bg-transparent',
     borderGlow: 'border-0',
@@ -1177,53 +1177,53 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
   switch (tier) {
     case 'mythic':
       return {
-        badgeClass: 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-2 border-fuchsia-400 ring-2 ring-cyan-400 text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 shadow-[0_0_24px_rgba(217,70,239,0.8)] font-black animate-pulse',
-        textClass: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-cyan-200 to-amber-200 font-black',
-        borderClass: 'border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_24px_rgba(217,70,239,0.8)]',
-        bgClass: 'bg-gradient-to-tr from-purple-950 via-slate-950 to-cyan-950',
-        tierName: '🌌 5. Kademe: Mistik Kozmik (Zirve)',
+        badgeClass: 'bg-purple-950/90 border-2 border-fuchsia-400 ring-2 ring-cyan-400/80 text-fuchsia-100 shadow-[0_0_20px_rgba(217,70,239,0.7)] font-black',
+        textClass: 'text-fuchsia-200 font-black',
+        borderClass: 'border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(217,70,239,0.7)]',
+        bgClass: 'bg-gradient-to-tr from-purple-950/90 via-slate-950 to-cyan-950/90',
+        tierName: '🌌 5. Kademe (Mistik)',
         tierNumber: 5,
-        glowShadow: 'shadow-[0_0_24px_rgba(217,70,239,0.8)]'
+        glowShadow: 'shadow-[0_0_20px_rgba(217,70,239,0.7)]'
       };
     case 'diamond':
       return {
-        badgeClass: 'bg-gradient-to-r from-cyan-950 via-indigo-950 to-purple-950 border-2 border-cyan-300 ring-2 ring-purple-400 text-cyan-200 shadow-[0_0_18px_rgba(6,182,212,0.7)] font-black',
+        badgeClass: 'bg-cyan-950/90 border-2 border-cyan-300 ring-2 ring-purple-400/80 text-cyan-100 shadow-[0_0_16px_rgba(6,182,212,0.6)] font-black',
         textClass: 'text-cyan-200 font-black',
-        borderClass: 'border-2 border-cyan-300 ring-2 ring-purple-400 shadow-[0_0_18px_rgba(6,182,212,0.7)]',
-        bgClass: 'bg-gradient-to-tr from-cyan-950 via-indigo-950 to-purple-950',
-        tierName: '💎 4. Kademe: Elmas & Efsanevi',
+        borderClass: 'border-2 border-cyan-300 ring-2 ring-purple-400 shadow-[0_0_16px_rgba(6,182,212,0.6)]',
+        bgClass: 'bg-gradient-to-tr from-cyan-950/90 via-indigo-950 to-purple-950/90',
+        tierName: '💎 4. Kademe (Elmas)',
         tierNumber: 4,
-        glowShadow: 'shadow-[0_0_18px_rgba(6,182,212,0.7)]'
+        glowShadow: 'shadow-[0_0_16px_rgba(6,182,212,0.6)]'
       };
     case 'gold':
       return {
-        badgeClass: 'bg-amber-950/90 border-2 border-amber-300 ring-2 ring-amber-400/70 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.6)] font-bold',
+        badgeClass: 'bg-amber-950/90 border-2 border-amber-300 ring-2 ring-amber-400/70 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.5)] font-bold',
         textClass: 'text-amber-300 font-bold',
-        borderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/70 shadow-[0_0_14px_rgba(245,158,11,0.6)]',
+        borderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/70 shadow-[0_0_14px_rgba(245,158,11,0.5)]',
         bgClass: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-        tierName: '👑 3. Kademe: Altın & Şampiyon',
+        tierName: '👑 3. Kademe (Altın)',
         tierNumber: 3,
-        glowShadow: 'shadow-[0_0_14px_rgba(245,158,11,0.6)]'
+        glowShadow: 'shadow-[0_0_14px_rgba(245,158,11,0.5)]'
       };
     case 'silver':
       return {
-        badgeClass: 'bg-slate-900/80 border-2 border-slate-200 ring-1 ring-slate-300/70 text-slate-100 shadow-[0_0_10px_rgba(203,213,225,0.45)] font-bold',
+        badgeClass: 'bg-slate-900/90 border-2 border-slate-200 ring-1 ring-slate-300/70 text-slate-100 shadow-[0_0_10px_rgba(203,213,225,0.4)] font-bold',
         textClass: 'text-slate-100 font-bold',
-        borderClass: 'border-2 border-slate-200 ring-1 ring-slate-300/70 shadow-[0_0_10px_rgba(203,213,225,0.45)]',
+        borderClass: 'border-2 border-slate-200 ring-1 ring-slate-300/70 shadow-[0_0_10px_rgba(203,213,225,0.4)]',
         bgClass: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
-        tierName: '🛡️ 2. Kademe: Gümüş & Uzman',
+        tierName: '🛡️ 2. Kademe (Gümüş)',
         tierNumber: 2,
-        glowShadow: 'shadow-[0_0_10px_rgba(203,213,225,0.45)]'
+        glowShadow: 'shadow-[0_0_10px_rgba(203,213,225,0.4)]'
       };
     case 'bronze':
       return {
-        badgeClass: 'bg-amber-950/60 border-2 border-amber-500 ring-1 ring-amber-700/60 text-amber-300 shadow-[0_0_8px_rgba(180,83,9,0.35)] font-semibold',
+        badgeClass: 'bg-amber-950/70 border-2 border-amber-500 ring-1 ring-amber-700/60 text-amber-200 shadow-[0_0_8px_rgba(180,83,9,0.3)] font-semibold',
         textClass: 'text-amber-300 font-semibold',
-        borderClass: 'border-2 border-amber-500 ring-1 ring-amber-700/60 shadow-[0_0_8px_rgba(180,83,9,0.35)]',
+        borderClass: 'border-2 border-amber-500 ring-1 ring-amber-700/60 shadow-[0_0_8px_rgba(180,83,9,0.3)]',
         bgClass: 'bg-gradient-to-tr from-amber-950/50 to-slate-950',
-        tierName: '🐣 1. Kademe: Bronz & Çırak',
+        tierName: '🐣 1. Kademe (Bronz)',
         tierNumber: 1,
-        glowShadow: 'shadow-[0_0_8px_rgba(180,83,9,0.35)]'
+        glowShadow: 'shadow-[0_0_8px_rgba(180,83,9,0.3)]'
       };
     case 'starter':
     default:

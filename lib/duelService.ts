@@ -223,13 +223,13 @@ export function calculateDuelScore(distanceKm: number, timeTakenSec: number): Di
     tierName = '🧭 UZAK TAHMİN (250-450 km)';
     tierColor = 'text-rose-400';
   } else if (roundedDist <= 750) {
-    distancePoints = Math.max(1, Math.round(100 - (roundedDist - 450) * 0.33));
+    distancePoints = Math.max(50, Math.round(150 - (roundedDist - 450) * 0.33));
     tierName = '⚠️ ÇOK UZAK (450-750 km)';
-    tierColor = 'text-rose-500';
+    tierColor = 'text-rose-400';
   } else {
-    distancePoints = 0;
-    tierName = '❌ ISKA (>750 km)';
-    tierColor = 'text-slate-400';
+    distancePoints = Math.max(25, Math.round(50 - (roundedDist - 750) * 0.03));
+    tierName = '🧭 GENEL TAHMİN (>750 km)';
+    tierColor = 'text-slate-300';
   }
 
   // Time Bonus: Up to 300 pts (20 pts per second saved from 15s limit)
@@ -1402,6 +1402,58 @@ function recordCurrentRoundHistory(duel: DuelSession): DuelRoundHistory[] {
   const existingHistory = duel.roundHistory || [];
   const filtered = existingHistory.filter(h => h.roundIndex !== duel.currentRound);
   return [...filtered, historyEntry];
+}
+
+/**
+ * Starts the first round (Round 0) safely from the 'starting' countdown state.
+ * Resets all round guesses and ensures synchronized roundStartTime for all 2-4 players.
+ */
+export async function startFirstRoundFromStarting(duel: DuelSession): Promise<void> {
+  if (duel.status !== 'starting' && duel.status !== 'waiting') return;
+
+  const now = Date.now();
+  const allPlayers = getAllSessionPlayers(duel);
+  const resetPlayers = allPlayers.map(p => ({
+    ...p,
+    score: 0,
+    totalDistanceKm: 0,
+    currentGuess: null,
+    currentOptionAnswer: null,
+    readyToAdvance: false
+  }));
+
+  const updates: Record<string, unknown> = {
+    currentRound: 0,
+    status: 'in_progress',
+    roundStartTime: now,
+    bothAnsweredAt: null,
+    roundHistory: [],
+    players: resetPlayers,
+    'player1.currentGuess': null,
+    'player2.currentGuess': null,
+    'player3.currentGuess': null,
+    'player4.currentGuess': null,
+    'player1.score': 0,
+    'player2.score': 0,
+    'player3.score': 0,
+    'player4.score': 0,
+    'player1.totalDistanceKm': 0,
+    'player2.totalDistanceKm': 0,
+    'player3.totalDistanceKm': 0,
+    'player4.totalDistanceKm': 0,
+    'player1.readyToAdvance': false,
+    'player2.readyToAdvance': false,
+    'player3.readyToAdvance': false,
+    'player4.readyToAdvance': false,
+    updatedAt: new Date(now).toISOString()
+  };
+
+  try {
+    const cleaned = sanitizeForFirestore(updates);
+    await updateDoc(doc(db, 'duels', duel.id), cleaned);
+  } catch (error) {
+    console.error('Start first round error:', error);
+  }
 }
 
 /**

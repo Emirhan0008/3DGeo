@@ -376,14 +376,14 @@ export default function ProfileEditModal({
           )}
 
           {/* 1. KUŞANILABİLİR AVATAR & ÇERÇEVE TEMASI */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-3">
+          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-black text-xs text-indigo-300 flex items-center gap-1.5">
                 <Palette className="w-4 h-4 text-indigo-400" />
-                <span>1. Karakter Avatarı &amp; Renk Teması Seçimi</span>
+                <span>1. Avatar &amp; Tema</span>
               </span>
               <span className="text-[10px] text-slate-400 font-bold">
-                Tıkla ve anında kuşan • Kilitliye tıkla şartını gör
+                Tıkla ve kuşan • Üzerine gelip şartını gör
               </span>
             </div>
 
@@ -415,8 +415,8 @@ export default function ProfileEditModal({
               })}
             </div>
 
-            {/* Avatar Icons Grid (Kademelere göre filtrelenmiş ve büyüyen boyutlar) */}
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+            {/* Avatar Icons Grid (Compact) */}
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5">
               {AVATAR_ICONS.filter((item) => avatarTierFilter === 'all' || item.tier === avatarTierFilter).map((item) => {
                 const isBadgesMet = !item.minBadgesRequired || unlockedBadges.length >= item.minBadgesRequired;
                 const isDuelMet = !item.minDuelWinsRequired || duelStats.duelWins >= item.minDuelWinsRequired;
@@ -438,54 +438,49 @@ export default function ProfileEditModal({
                   ? `Coğrafya harita testlerini çözerek ve düellolara katılarak en az ${item.minBadgesRequired} farklı başarı rozeti kazanın.`
                   : 'Bu avatar başlangıç seviyesinde tüm kullanıcılara açıktır.';
 
-                // Kademe bazlı dengeli nesne boyutu ve ölçeklendirme
                 const iconScaleClass = itemTierLevel === 5
-                  ? 'text-2xl sm:text-3xl scale-105'
+                  ? 'text-xl sm:text-2xl scale-105'
                   : itemTierLevel === 4
-                  ? 'text-xl sm:text-2xl scale-100'
+                  ? 'text-lg sm:text-xl scale-100'
                   : itemTierLevel === 3
-                  ? 'text-xl sm:text-2xl scale-100'
-                  : itemTierLevel === 2
-                  ? 'text-lg sm:text-xl scale-95'
-                  : itemTierLevel === 1
-                  ? 'text-lg sm:text-xl scale-95'
-                  : 'text-base sm:text-lg scale-90';
+                  ? 'text-lg sm:text-xl scale-100'
+                  : 'text-base sm:text-lg scale-95';
+
+                const inspectData = {
+                  type: 'avatar' as const,
+                  title: item.label,
+                  icon: item.icon,
+                  tier: `${itemTierLevel}. Kademe (${item.tier.toUpperCase()})`,
+                  tierLevel: itemTierLevel,
+                  isUnlocked,
+                  reqDescription: isUnlocked ? `Bu avatar kuşanılabilir durumdadır.` : `Kilit Açma Şartı: ${reqString}`,
+                  howToUnlock: howTo,
+                  currentProgress: `Mevcut: ${unlockedBadges.length} Rozet, ${duelStats.duelWins} Zafer, ${totalCareerScore} Puan`
+                };
 
                 return (
                   <button
                     key={item.id}
+                    onMouseEnter={() => setInspectedItem(inspectData)}
                     onClick={() => {
                       if (isUnlocked) {
                         handleSelectAvatarIcon(item.icon);
                       }
-                      setInspectedItem({
-                        type: 'avatar',
-                        title: item.label,
-                        icon: item.icon,
-                        tier: `${itemTierLevel}. Kademe (${item.tier.toUpperCase()})`,
-                        tierLevel: itemTierLevel,
-                        isUnlocked,
-                        reqDescription: isUnlocked ? `Bu avatar başarıyla kuşanıldı.` : `Kilit Açma Şartı: ${reqString}`,
-                        howToUnlock: howTo,
-                        currentProgress: `Mevcut Durumunuz: ${unlockedBadges.length} Rozet, ${duelStats.duelWins} Zafer, ${totalCareerScore} Puan`
-                      });
+                      setInspectedItem(inspectData);
                     }}
-                    title={isUnlocked ? (isSelected ? `${item.label} (Şu An Kuşanıldı)` : `${item.label} (Kuşanılabilir - Tıkla ve Kuşan)`) : `Kilitli: ${reqString} (Detay için tıkla)`}
-                    className={`relative p-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer min-h-[70px] ${
+                    title={isUnlocked ? `${item.label} (Kuşan)` : `Kilitli: ${reqString}`}
+                    className={`relative p-1.5 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer min-h-[58px] ${
                       isSelected
-                        ? 'bg-gradient-to-b from-amber-500/35 via-yellow-500/20 to-amber-950/70 outline outline-2 outline-offset-2 outline-amber-400 border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_24px_rgba(251,191,36,0.85)] scale-105 z-10'
+                        ? 'bg-gradient-to-b from-amber-500/35 via-yellow-500/20 to-amber-950/70 outline outline-2 outline-offset-1 outline-amber-400 border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(251,191,36,0.8)] scale-105 z-10'
                         : isUnlocked
-                        ? 'bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-950 outline outline-2 outline-offset-1 outline-emerald-400/80 border-2 border-emerald-400 hover:border-emerald-300 text-white hover:scale-105 shadow-[0_0_16px_rgba(16,185,129,0.35)]'
-                        : 'bg-black/60 outline outline-1 outline-slate-700/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-85 hover:border-slate-500'
+                        ? 'bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-950 border-2 border-emerald-400 hover:border-emerald-300 text-white hover:scale-105'
+                        : 'bg-black/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-90 hover:border-slate-500'
                     }`}
                   >
                     {isSelected && (
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-md bg-amber-400 text-slate-950 font-black text-[9px] flex items-center justify-center shadow-md ring-1 ring-white">
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-md bg-amber-400 text-slate-950 font-black text-[8px] flex items-center justify-center shadow ring-1 ring-white">
                         ✓
                       </span>
-                    )}
-                    {isUnlocked && !isSelected && (
-                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-md bg-emerald-400 ring-2 ring-slate-950 animate-ping" />
                     )}
                     <span
                       className={`my-0.5 leading-none select-none transition-transform hover:scale-125 ${iconScaleClass}`}
@@ -493,20 +488,20 @@ export default function ProfileEditModal({
                     >
                       {item.icon}
                     </span>
-                    <span className="text-[8px] font-bold truncate max-w-full text-center leading-tight">
-                      {isUnlocked ? item.label : '🔒 Kilitli'}
+                    <span className="text-[8px] font-bold truncate max-w-full text-center leading-none">
+                      {item.label}
                     </span>
                     {isSelected ? (
-                      <span className="text-[7.5px] font-black text-amber-300 bg-amber-950/90 px-1 py-0.5 rounded border border-amber-400/60 leading-none">
-                        Kuşanıldı
+                      <span className="text-[7px] font-black text-amber-300 bg-amber-950/90 px-1 py-0.2 rounded border border-amber-400/60 leading-none">
+                        Aktif
                       </span>
                     ) : isUnlocked ? (
-                      <span className="text-[7.5px] font-black text-emerald-300 bg-emerald-950/90 px-1 py-0.5 rounded border border-emerald-400/70 leading-none">
-                        Kuşan
+                      <span className="text-[7px] font-black text-emerald-300 bg-emerald-950/90 px-1 py-0.2 rounded border border-emerald-400/70 leading-none">
+                        Açık
                       </span>
                     ) : (
-                      <span className="text-[7px] text-amber-400 font-extrabold truncate max-w-full">
-                        {reqList[0] || 'Kilitli'}
+                      <span className="text-[7px] text-slate-400 font-extrabold truncate max-w-full">
+                        🔒 Kilitli
                       </span>
                     )}
                   </button>
@@ -516,8 +511,8 @@ export default function ProfileEditModal({
 
             {/* Avatar Outline Çizgisi & Parıltı Efekti */}
             <div className="pt-2 border-t border-white/10">
-              <span className="text-[11px] font-bold text-slate-300 block mb-1.5">
-                Transparan Avatar Outline Çizgisi:
+              <span className="text-[10px] font-bold text-slate-300 block mb-1">
+                Avatar Efekti:
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
                 {AVATAR_THEMES.map((theme) => {
@@ -526,30 +521,28 @@ export default function ProfileEditModal({
                     <button
                       key={theme.id}
                       onClick={() => handleSelectAvatarBg(theme.id)}
-                      className={`p-2 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer ${
+                      className={`p-1.5 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'outline outline-2 outline-offset-2 outline-amber-400 border-2 border-amber-300 ring-2 ring-amber-400/70 bg-white/10 shadow-[0_0_24px_rgba(251,191,36,0.7)] scale-[1.02] z-10 relative'
-                          : 'outline outline-1 outline-emerald-400/60 border-2 border-emerald-400/80 hover:border-emerald-300 bg-white/5 hover:scale-[1.01] shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                          ? 'border-2 border-amber-300 ring-2 ring-amber-400/70 bg-white/10 shadow-[0_0_16px_rgba(251,191,36,0.6)] scale-[1.01] z-10 relative'
+                          : 'border border-emerald-400/60 hover:border-emerald-300 bg-white/5 hover:scale-[1.01]'
                       }`}
                     >
-                      {/* Canlı Avatar Objesi + Outline Önizlemesi */}
                       <span
-                        className="text-xl leading-none shrink-0 select-none"
+                        className="text-lg leading-none shrink-0 select-none"
                         style={{ filter: theme.outlineFilter }}
                       >
                         {avatarIcon || '🦁'}
                       </span>
                       <div className="min-w-0 text-left">
                         <span className="text-[10px] font-bold text-slate-200 block truncate">{theme.name}</span>
-                        <span className="text-[8px] text-slate-400 font-medium">{theme.outlineLabel}</span>
                       </div>
                       {isSelected ? (
-                        <span className="ml-auto text-[8px] font-black px-2 py-0.5 rounded bg-amber-400 text-slate-950 shadow border border-amber-200 shrink-0">
+                        <span className="ml-auto text-[7.5px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 shadow border border-amber-200 shrink-0">
                           KUŞANILDI ✓
                         </span>
                       ) : (
-                        <span className="ml-auto text-[8px] font-bold text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-400/60 shrink-0">
-                          Kuşan
+                        <span className="ml-auto text-[7.5px] font-bold text-emerald-300 bg-emerald-950/80 px-1 py-0.5 rounded border border-emerald-400/60 shrink-0">
+                          Seç
                         </span>
                       )}
                     </button>
@@ -559,19 +552,19 @@ export default function ProfileEditModal({
             </div>
           </div>
 
-          {/* 2. KUŞANILABİLİR RESMİ ÜNVANLAR (Hiyerarşik Sıralama & İlerleme Barları & Kademeler Arası Boyut Farkı) */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
+          {/* 2. KUŞANILABİLİR RESMİ ÜNVANLAR */}
+          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-black text-amber-300 flex items-center gap-1.5 text-xs">
                 <Crown className="w-4 h-4 text-amber-400" />
-                <span>2. Kuşanılabilir Resmi Ünvanlar</span>
+                <span>2. Ünvanlar</span>
               </span>
               <span className="text-[10px] text-slate-400 font-bold">
                 Kuşanılan: <strong className="text-amber-300">{equippedTitle}</strong>
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
               {ALL_TITLES.map((titleObj) => {
                 const prog = getTitleProgress(
                   titleObj,
@@ -585,17 +578,6 @@ export default function ProfileEditModal({
                 const isEquipped = equippedTitle === titleObj.name;
                 const tierStyle = getTitleTierStyle(titleObj.tier);
 
-                // Tier micro-scale differences (5. Kademe > 4. Kademe > 3. Kademe > 2. Kademe > 1. Kademe)
-                const tierScaleClass = titleObj.tier === 'mythic'
-                  ? 'scale-[1.03] p-3'
-                  : titleObj.tier === 'diamond'
-                  ? 'scale-[1.015] p-2.5'
-                  : titleObj.tier === 'gold'
-                  ? 'scale-[1.0] p-2.5'
-                  : titleObj.tier === 'silver'
-                  ? 'scale-[0.985] p-2'
-                  : 'scale-[0.97] p-2';
-
                 const tierLevel = titleObj.tier === 'mythic' ? 5 : titleObj.tier === 'diamond' ? 4 : titleObj.tier === 'gold' ? 3 : titleObj.tier === 'silver' ? 2 : 1;
 
                 const howTo = titleObj.tier === 'mythic'
@@ -608,50 +590,45 @@ export default function ProfileEditModal({
                   ? '5 rozet veya 5 düello galibiyeti elde edin.'
                   : 'Coğrafya testlerine başlayarak ilk sorularınızı doğru yanıtlayın.';
 
+                const inspectData = {
+                  type: 'title' as const,
+                  title: titleObj.name,
+                  icon: titleObj.icon,
+                  tier: tierStyle.tierName,
+                  tierLevel,
+                  isUnlocked,
+                  reqDescription: titleObj.desc,
+                  howToUnlock: howTo,
+                  currentProgress: isUnlocked ? 'Şartlar sağlandı ve ünvan kuşanılmaya hazır!' : `${prog.remainingText} (${prog.currentValue}/${prog.targetValue} - %${prog.progressPct})`
+                };
+
                 return (
                   <div
                     key={titleObj.id}
+                    onMouseEnter={() => setInspectedItem(inspectData)}
                     onClick={() => {
-                      setInspectedItem({
-                        type: 'title',
-                        title: titleObj.name,
-                        icon: titleObj.icon,
-                        tier: tierStyle.tierName,
-                        tierLevel,
-                        isUnlocked,
-                        reqDescription: titleObj.desc,
-                        howToUnlock: howTo,
-                        currentProgress: isUnlocked ? 'Şartlar sağlandı ve ünvan kuşanılmaya hazır!' : `${prog.remainingText} (${prog.currentValue}/${prog.targetValue} - %${prog.progressPct})`
-                      });
+                      setInspectedItem(inspectData);
                     }}
-                    className={`rounded-xl border flex flex-col justify-between gap-1.5 transition-all cursor-pointer ${tierScaleClass} ${
+                    className={`rounded-xl border p-2 flex flex-col justify-between gap-1 transition-all cursor-pointer ${
                       isEquipped
-                        ? `border-3 border-amber-300 ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-950 ${tierStyle.bgClass} shadow-[0_0_30px_rgba(251,191,36,0.85)] scale-[1.03] relative z-10`
+                        ? `border-2 border-amber-300 ring-2 ring-amber-400 ${tierStyle.bgClass} shadow-[0_0_20px_rgba(251,191,36,0.7)] relative z-10`
                         : isUnlocked
-                        ? `border-2 border-emerald-400 hover:border-emerald-300 ring-2 ring-emerald-400/60 hover:ring-4 hover:ring-emerald-300 ${tierStyle.bgClass} shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:scale-[1.03] relative`
+                        ? `border-2 border-emerald-400 hover:border-emerald-300 ${tierStyle.bgClass} hover:scale-[1.01]`
                         : 'bg-black/50 border border-slate-700/50 opacity-65 hover:opacity-90 hover:border-slate-500'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`shrink-0 ${titleObj.tier === 'mythic' ? 'text-xl' : titleObj.tier === 'diamond' ? 'text-lg' : 'text-base'}`}>{titleObj.icon}</span>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-base shrink-0">{titleObj.icon}</span>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className={`font-black truncate ${titleObj.tier === 'mythic' ? 'text-sm' : 'text-xs'} ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-200'}`}>
                               {titleObj.name}
                             </span>
                             <span className={`text-[8px] font-black px-1 rounded ${tierStyle.badgeClass}`}>
-                              {titleObj.tier === 'mythic' ? '🌌 5. Kademe (Mistik)' : titleObj.tier === 'diamond' ? '💎 4. Kademe (Elmas)' : titleObj.tier === 'gold' ? '👑 3. Kademe (Altın)' : titleObj.tier === 'silver' ? '🛡️ 2. Kademe (Gümüş)' : '🐣 1. Kademe (Bronz)'}
+                              {tierStyle.tierName}
                             </span>
-                            {isUnlocked && !isEquipped && (
-                              <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/60">
-                                ⚡ Kuşanılabilir
-                              </span>
-                            )}
                           </div>
-                          <p className="text-[10px] text-slate-300 truncate mt-0.5">
-                            {isUnlocked ? titleObj.desc : `🔒 Şart: ${titleObj.requiredMetricText}`}
-                          </p>
                         </div>
                       </div>
 
@@ -661,34 +638,28 @@ export default function ProfileEditModal({
                             e.stopPropagation();
                             handleEquipTitle(titleObj.name);
                           }}
-                          className={`px-3 py-1 rounded-lg text-[10px] font-black shrink-0 transition-all cursor-pointer ${
+                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black shrink-0 transition-all cursor-pointer ${
                             isEquipped
-                              ? 'bg-amber-400 text-slate-950 shadow-[0_0_14px_rgba(251,191,36,0.8)] border-2 border-amber-200'
-                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md border border-emerald-300 hover:scale-105'
+                              ? 'bg-amber-400 text-slate-950 shadow border border-amber-200'
+                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow border border-emerald-300'
                           }`}
                         >
-                          {isEquipped ? '👑 KUŞANILDI ✓' : 'Kuşan'}
+                          {isEquipped ? 'KUŞANILDI ✓' : 'Kuşan'}
                         </button>
                       ) : (
-                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-amber-300 shrink-0">
-                          🔒 Detay Gör
+                        <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-white/10 text-amber-300 shrink-0">
+                          🔒 Şartı Gör
                         </span>
                       )}
                     </div>
 
-                    {/* Progress Bar & Remaining Counter for Titles */}
+                    {/* Progress Bar for Titles */}
                     {!isUnlocked && (
-                      <div className="mt-1 pt-1.5 border-t border-white/10 space-y-1">
-                        <div className="flex items-center justify-between text-[9px] font-bold">
-                          <span className="text-amber-400">{prog.remainingText}</span>
-                          <span className="text-slate-300">{prog.currentValue}/{prog.targetValue} (%{prog.progressPct})</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300"
-                            style={{ width: `${prog.progressPct}%` }}
-                          />
-                        </div>
+                      <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden mt-0.5">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300"
+                          style={{ width: `${prog.progressPct}%` }}
+                        />
                       </div>
                     )}
                   </div>
@@ -697,19 +668,19 @@ export default function ProfileEditModal({
             </div>
           </div>
 
-          {/* 3. KADEMELİ ROZETLER GALERİSİ (Boyut Hiyerarşisi & Detaylı Kilit Açıklamaları) */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
+          {/* 3. KADEMELİ ROZETLER GALERİSİ */}
+          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-black text-xs text-slate-200 flex items-center gap-1.5">
                 <Medal className="w-4 h-4 text-cyan-400" />
-                <span>3. Kademeli Başarı Rozetleri ({unlockedBadges.length}/{ALL_BADGES.length})</span>
+                <span>3. Rozetler ({unlockedBadges.length}/{ALL_BADGES.length})</span>
               </span>
               <span className="text-[10px] text-amber-400 font-extrabold">
                 %{Math.round((unlockedBadges.length / ALL_BADGES.length) * 100)} Tamamlandı
               </span>
             </div>
 
-            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
               {(['mythic', 'diamond', 'gold', 'silver', 'bronze'] as BadgeTier[]).map((tierKey) => {
                 const badgesInTier = tierBadges[tierKey];
                 if (!badgesInTier || badgesInTier.length === 0) return null;
@@ -717,35 +688,14 @@ export default function ProfileEditModal({
                 const tierStyle = getTitleTierStyle(tierKey);
                 const tierLevel = tierKey === 'mythic' ? 5 : tierKey === 'diamond' ? 4 : tierKey === 'gold' ? 3 : tierKey === 'silver' ? 2 : 1;
 
-                // Micro scale classes for badge tiers
-                const badgeCardScale = tierKey === 'mythic'
-                  ? 'scale-[1.03] p-3'
-                  : tierKey === 'diamond'
-                  ? 'scale-[1.015] p-2.5'
-                  : tierKey === 'gold'
-                  ? 'scale-[1.0] p-2.5'
-                  : tierKey === 'silver'
-                  ? 'scale-[0.985] p-2'
-                  : 'scale-[0.97] p-2';
-
-                const badgeIconSize = tierKey === 'mythic'
-                  ? 'w-9 h-9 text-xl'
-                  : tierKey === 'diamond'
-                  ? 'w-8 h-8 text-lg'
-                  : tierKey === 'gold'
-                  ? 'w-7.5 h-7.5 text-base'
-                  : tierKey === 'silver'
-                  ? 'w-7 h-7 text-sm'
-                  : 'w-6.5 h-6.5 text-xs';
-
                 return (
-                  <div key={tierKey} className="space-y-1.5">
-                    <div className={`px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-wider flex items-center justify-between ${tierStyle.badgeClass}`}>
-                      <span>{tierStyle.tierName} • {tierLevel}. Kademe</span>
-                      <span className="text-[8px] opacity-80">Boyut Çarpanı: {tierLevel === 5 ? '1.03x' : tierLevel === 4 ? '1.015x' : tierLevel === 3 ? '1.0x' : tierLevel === 2 ? '0.985x' : '0.97x'}</span>
+                  <div key={tierKey} className="space-y-1">
+                    <div className={`px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-wider flex items-center justify-between ${tierStyle.badgeClass}`}>
+                      <span>{tierStyle.tierName}</span>
+                      <span className="text-[8px] opacity-90">{badgesInTier.length} Adet</span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                       {badgesInTier.map((badge) => {
                         const isUnlocked = unlockedBadges.includes(badge.name);
                         const currentProgress = (categoryMasteryProgress && categoryMasteryProgress[badge.trackerKey]) || 0;
@@ -753,107 +703,52 @@ export default function ProfileEditModal({
                         const pct = Math.min(100, Math.round((currentProgress / target) * 100));
                         const remaining = Math.max(0, target - currentProgress);
 
-                        const unlockedCardStyle = tierKey === 'mythic'
-                          ? 'bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-3 border-fuchsia-400 ring-3 ring-cyan-400 shadow-[0_0_26px_rgba(217,70,239,0.75)]'
-                          : tierKey === 'diamond'
-                          ? 'bg-gradient-to-r from-cyan-950/70 via-purple-950/50 to-slate-900 border-3 border-cyan-300 ring-2 ring-purple-400 shadow-[0_0_20px_rgba(6,182,212,0.65)]'
-                          : tierKey === 'gold'
-                          ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(245,158,11,0.6)]'
-                          : tierKey === 'silver'
-                          ? 'bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-800 border-2 border-slate-200 ring-1 ring-slate-300/70 shadow-[0_0_12px_rgba(203,213,225,0.45)]'
-                          : 'bg-gradient-to-r from-amber-950/50 to-slate-900 border-2 border-amber-600 ring-1 ring-amber-700/60 shadow-[0_0_8px_rgba(180,83,9,0.35)]';
-
-                        const iconBgStyle = isUnlocked
-                          ? tierKey === 'mythic'
-                            ? 'bg-gradient-to-tr from-fuchsia-500 via-cyan-400 to-amber-300 text-slate-950 font-black shadow-xl ring-2 ring-fuchsia-300'
-                            : tierKey === 'diamond'
-                            ? 'bg-gradient-to-tr from-cyan-400 to-purple-500 text-slate-950 font-black shadow-lg ring-1 ring-cyan-300'
-                            : tierKey === 'gold'
-                            ? 'bg-amber-400 text-slate-950 font-black shadow-md ring-1 ring-yellow-300'
-                            : tierKey === 'silver'
-                            ? 'bg-slate-200 text-slate-950 font-black shadow-sm ring-1 ring-slate-300'
-                            : 'bg-amber-800 text-amber-100 font-bold'
-                          : 'bg-white/10 text-slate-500';
-
-                        const howToBadge = badge.category === 'duel'
-                          ? `Canlı 1v1 Düellolarda rakiplerinizi yenerek galibiyet ve galibiyet serisi hedefine ulaşın.`
-                          : badge.category === 'kpss'
-                          ? `3D Türkiye Haritası üzerinde ilgili coğrafya kategorisindeki KPSS sorularını doğru yanıtlayarak ilerleyin.`
-                          : `Tüm soru kategorilerini ve düelloları tamamlayarak büyük koleksiyonu açın.`;
+                        const inspectData = {
+                          type: 'badge' as const,
+                          title: badge.name,
+                          icon: badge.icon,
+                          tier: tierStyle.tierName,
+                          tierLevel,
+                          isUnlocked,
+                          reqDescription: badge.desc,
+                          howToUnlock: badge.category === 'duel'
+                            ? `Canlı 1v1 Düellolarda rakiplerinizi yenerek galibiyet hedefine ulaşın.`
+                            : `3D Türkiye Haritasında ilgili kategorideki KPSS sorularını doğru yanıtlayın.`,
+                          currentProgress: isUnlocked
+                            ? 'Tebrikler! Bu rozet kilidi açılmış ve koleksiyonunuza eklenmiştir.'
+                            : `İlerleme: ${currentProgress}/${target} (%${pct}) • Kalan: ${remaining}`
+                        };
 
                         return (
                           <div
                             key={badge.id}
+                            onMouseEnter={() => setInspectedItem(inspectData)}
                             onClick={() => {
-                              setInspectedItem({
-                                type: 'badge',
-                                title: badge.name,
-                                icon: badge.icon,
-                                tier: tierStyle.tierName,
-                                tierLevel,
-                                isUnlocked,
-                                reqDescription: badge.desc,
-                                howToUnlock: howToBadge,
-                                currentProgress: isUnlocked
-                                  ? 'Tebrikler! Bu rozet kilidi açılmış ve koleksiyonunuza eklenmiştir.'
-                                  : `İlerleme: ${currentProgress}/${target} (%${pct}) • Kalan: ${remaining} adet/zafer`
-                              });
+                              setInspectedItem(inspectData);
                             }}
-                            className={`rounded-xl border flex flex-col justify-between transition-all cursor-pointer ${badgeCardScale} ${
+                            className={`rounded-xl border p-1.5 flex items-center justify-between gap-1.5 transition-all cursor-pointer ${
                               isUnlocked
-                                ? unlockedCardStyle
+                                ? `border border-emerald-400/80 ${tierStyle.bgClass} hover:border-emerald-300`
                                 : 'bg-white/5 border-white/10 opacity-70 hover:opacity-100 hover:border-cyan-400/50'
                             }`}
                           >
-                            <div className="flex items-start gap-2">
-                              <div className={`rounded-lg flex items-center justify-center shrink-0 ${badgeIconSize} ${iconBgStyle}`}>
-                                {badge.icon}
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
-                                  <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
-                                    {badge.name}
-                                  </span>
-                                  {isUnlocked ? (
-                                    <span className={`text-[8px] font-black px-1.5 py-0.2 rounded ${
-                                      tierKey === 'mythic'
-                                        ? 'bg-gradient-to-r from-fuchsia-400 to-cyan-400 text-slate-950 font-black ring-1 ring-amber-300'
-                                        : tierKey === 'diamond'
-                                        ? 'bg-cyan-300 text-slate-950 ring-1 ring-purple-500'
-                                        : tierKey === 'gold'
-                                        ? 'bg-amber-400 text-slate-950'
-                                        : tierKey === 'silver'
-                                        ? 'bg-slate-200 text-slate-950'
-                                        : 'bg-amber-700 text-white'
-                                    }`}>
-                                      KAZANILDI ✓
-                                    </span>
-                                  ) : (
-                                    <span className="text-[8px] text-amber-300 font-bold px-1 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                                      🔒 Nasıl Alınır?
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-[10px] text-slate-300 leading-snug mt-0.5 truncate">{badge.desc}</p>
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="text-base shrink-0">{badge.icon}</span>
+                              <div className="min-w-0">
+                                <span className={`font-black text-[11px] truncate block ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
+                                  {badge.name}
+                                </span>
                               </div>
                             </div>
 
-                            {!isUnlocked && (
-                              <div className="mt-1.5 pt-1 border-t border-white/10 space-y-0.5">
-                                <div className="flex justify-between items-center text-[9px] text-slate-400">
-                                  <span className="truncate text-amber-300/90 font-medium">{badge.reqText}</span>
-                                  <span className="font-extrabold text-amber-400 shrink-0 ml-1">
-                                    {currentProgress}/{target} (%{pct})
-                                  </span>
-                                </div>
-                                <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                                  <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full" style={{ width: `${pct}%` }} />
-                                </div>
-                                <div className="text-[8px] text-slate-400 font-semibold text-right">
-                                  Kalan: <strong className="text-amber-300">{remaining} adet/zafer</strong>
-                                </div>
-                              </div>
+                            {isUnlocked ? (
+                              <span className="text-[7.5px] font-black px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 shrink-0">
+                                AÇIK ✓
+                              </span>
+                            ) : (
+                              <span className="text-[7.5px] text-amber-300 font-bold px-1 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 shrink-0">
+                                %{pct}
+                              </span>
                             )}
                           </div>
                         );
