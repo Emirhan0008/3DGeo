@@ -4,6 +4,78 @@
 
 ---
 
+## 📅 [2026-09-16] - Harita Hızlandırıldı Bilgilendirme Bannerı Sadeleştirme & Buton Hiyerarşisi
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "başlangıçtaki harita hızlamdırıldı mesajını küçült ve sadeleştir ve anladımı belirginleştirip tümünü açı daha belirsiz yap kullanıcı isterse açsın yanlışlıkla açmasın"
+- **Etkilenen Dosyalar**:
+  - `/components/ui/LayerHintBanner.tsx`
+  - `/WORK_LOG.md`
+- **Yapılan İyileştirmeler**:
+  1. **Boyut & Metin Sadeleştirmesi**:
+     - Banner genişliği `max-w-md` seviyesinden kompakt `max-w-[290px] sm:max-w-xs` boyutuna indirildi; padding ve ikon boyutları küçültüldü.
+     - Metin daha öz, okuması kolay ve sade bir hale getirildi.
+  2. **"Anladım" Butonunun Ön Plana Çıkarılması**:
+     - "Anladım" butonu birincil (primary) stil ile indigo renkli, belirgin ve ilk sırada konumlandırıldı.
+     - "Katmanlar" butonu ikincil nötr stil ile yanına eklendi.
+  3. **"Tümünü Aç" Seçeneğinin İkincilleştirilmesi**:
+     - Kullanıcının kazara basıp haritayı kasmaması için "Tümünü Aç" butonu alt sağ köşede soluk, altı çizgili metin bağlantısı (subtle text link) şeklinde stilize edildi.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+
+---
+
+## 📅 [2026-09-05] - Global Madalyalar (Tüm Avatarlarda), Belirgin Profil Kategorileri, "Nick" Harmonizasyonu & "Odaya Katıl"
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "rozetler ve madalyalar avatarın olduğu her yerde gözüksün sadece sıralamada değil, ayrıca avatar avatar efekti ünvan ve rozetlerin ayrı başlıklar olduğu ilk bakışta anlaşılmıyor başlıkları belirginleştir, rumuz yerine nick kelimesini kullan ve bunu bütün kodda değiştir dosya başlıkları, firebase, firestore vs.. dahil, eğer bazılarının değişmesi sıkıntı olacaksa sadece kullanıcı arayüznde değiştir, oda katıl değil odaya katıl olacak"
+- **Etkilenen Dosyalar**:
+  - `/lib/rumuzService.ts`
+  - `/components/ui/AvatarWithBadgeFrame.tsx`
+  - `/components/ui/ProfileEditModal.tsx`
+  - `/components/game/DuelMode.tsx`
+  - `/components/ui/AuthUserButton.tsx`
+  - `/components/ui/GlobalLeaderboardModal.tsx`
+  - `/components/ui/FeedbackModal.tsx`
+  - `/WORK_LOG.md`
+- **Yapılan İyileştirmeler**:
+  1. **Global Madalya ve Rozet Sistemi (Her Yerde Canlı Çözümleme)**:
+     - `rumuzService.ts` içinde `getCachedUserMedalInfo` ve `subscribeToLeaderboardMedals` servisleri kuruldu.
+     - `AvatarWithBadgeFrame.tsx` artık yalnızca sıralama tablosunda değil; düello lobisinde, oyun içi HUD'da, kullanıcı profil butonunda ve analiz panosunda da oyuncunun global sıralamadaki derecesini (1., 2., 3. madalyaları) ve rekor seri madalyasını otomatik olarak çözüp sol altta gösterir.
+  2. **Profil Özelleştirme Başlıklarının Belirginleştirilmesi (`ProfileEditModal.tsx`)**:
+     - Avatar, Avatar Efekti, Ünvanlar ve Rozetler sekmeleri numaralandırılmış, renkli rozet ikonları ve net açıklamalarla birbirinden bağımsız 5 ayrı kategori halinde belirginleştirildi.
+  3. **"Odaya Katıl" İsimlendirme Düzeltmesi (`DuelMode.tsx`)**:
+     - Lobi sekmesindeki "Oda Katıl" butonu "Odaya Katıl" olarak güncellendi.
+  4. **Kullanıcı Arayüzünde "Rumuz" -> "Nick" Harmonizasyonu**:
+     - Geriye dönük Firestore veritabanı belgelerinin ve kayıtlı kullanıcı hesaplarının bozulmaması için (güvenli yaklaşım) tüm kullanıcı arayüzü, modal diyaloglar, form etiketleri ve bildirimlerde "Rumuz" ifadeleri "Nick" olarak harmonize edildi.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - `compile_applet`: Başarılı.
+
+---
+
+## 📅 [2026-09-05] - Kapsamlı Güvenlik Taraması, Açık Analizi & Güçlendirme (Security Audit & Hardening)
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "açıklıkları test et ve detaylı bir tarama yap"
+- **Etkilenen Dosyalar**:
+  - `/firestore.rules` (Dağıtıldı - `deploy_firebase`)
+  - `/lib/rumuzService.ts`
+  - `/app/api/gemini/explain/route.ts`
+  - `/app/api/gemini/analyze/route.ts`
+  - `/WORK_LOG.md`
+- **Tespit Edilen ve Kapatılan Güvenlik Riskleri**:
+  1. **Firestore Liderlik & Rumuz Silinme Açığı (Data Wipe / DoS)**:
+     - Eskiden `rumuzes` koleksiyonunda `allow delete: if true;` bulunuyordu. Bu durum kötü niyetli bir kullanıcının tüm liderlik tablosunu veya rakiplerin profillerini silmesine olanak tanıyordu. `allow delete: if false;` yapılarak ve `isValidId` ile karakter/uzunluk sınırı getirilerek tamamen engellendi.
+  2. **Geri Bildirim (Feedback) Gizlilik Sızıntısı & Kazıma**:
+     - `feedbacks` koleksiyonunda `allow get, list: if false;` yapılarak kullanıcıların yazdığı geri bildirimlerin dışarıdan taranması ve kazınması engellendi. Sadece güvenli yazma (`create`) izni bırakıldı.
+  3. **Prototype Pollution & ID Enjeksiyonu Koruması (`normalizeRumuzKey`)**:
+     - `__proto__`, `constructor`, `prototype` gibi anahtar kelimelerin obje kirliliğine yol açmaması için anahtar filtrelemesi ve 40 karakterlik sınır uygulandı.
+  4. **Gemini API Rotalarında DoS ve Aşırı Yükleme Koruması**:
+     - `/app/api/gemini/explain` ve `/app/api/gemini/analyze` rotalarında gelen JSON yükleri tür kontrollerine tabi tutuldu ve metin uzunlukları sınırlandırıldı.
+- **Doğrulama**:
+  - `firestore.rules` Firebase'e başarıyla deploy edildi.
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+
+---
+
 ## 📅 [2026-09-05] - Profil Özelleştirmede Akıllı Son Kademe Varsayılanı (Avatarlar, Ünvanlar, Rozetler) & 2-4 Kişilik Düello Terk İyileştirmeleri
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "eğer 2 kişilik düelloda biri çıkarsa düelloyu karşı taraf kazansın ama 3 ve 4 kişilik düellolarda tek kişi kalana kadar diğerlerinin çıkması düellonun devam etmesini engellemesin, şu anda birisi çıktığında düello direkt bitiyor 3 ve 4 kişilik düellolarda, ayrıca avatarlar ünvanlar rozetler çok yer kaplıyor default ayar olarak tümü gösterilmesin sadece kullanıcının çıktığı son kademe ne ise onun objeleri gözüksün böylece özellikle mobilde sürekli aşağı kaydırmak zorunda kalmaz"

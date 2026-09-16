@@ -524,10 +524,10 @@ export default function AuthUserButton() {
         <button
           onClick={() => setShowAuthModal(true)}
           className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black rounded-lg sm:rounded-xl text-[10px] sm:text-xs shadow-lg shadow-indigo-500/20 border border-amber-300/50 flex items-center gap-1 sm:gap-1.5 transition-all active:scale-95 shrink-0 cursor-pointer"
-          title="Rumuz Gir veya Geçmiş Yükle"
+          title="Nick Gir veya Geçmiş Yükle"
         >
           <LogIn className="w-3.5 h-3.5 text-amber-300" />
-          <span className="hidden xs:inline">Rumuz Gir</span>
+          <span className="hidden xs:inline">Nick Gir</span>
           <span className="xs:hidden">Giriş</span>
         </button>
       ) : (
@@ -563,7 +563,7 @@ export default function AuthUserButton() {
           <button
             onClick={handleSignOut}
             className="p-1 text-slate-400 hover:text-rose-400 transition-colors border-l border-white/10 pl-1 sm:pl-1.5 pr-0.5 sm:pr-1"
-            title="Oturumu Kapat / Rumuz Değiştir"
+            title="Oturumu Kapat / Nick Değiştir"
           >
             <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </button>
@@ -624,8 +624,8 @@ export default function AuthUserButton() {
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-black text-base text-white">Çapraz Domain Benzersiz Rumuz &amp; Geçmiş</h3>
-                <p className="text-xs text-slate-400">Rumuzunuzu anahtar/şifre gibi kullanarak tüm domainlerden geçmişinizi yükleyin.</p>
+                <h3 className="font-black text-base text-white">Çapraz Domain Benzersiz Nick &amp; Geçmiş</h3>
+                <p className="text-xs text-slate-400">Nickinizi anahtar/şifre gibi kullanarak tüm domainlerden geçmişinizi yükleyin.</p>
               </div>
             </div>
 
@@ -658,7 +658,7 @@ export default function AuthUserButton() {
                   authTab === 'guest' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-300 hover:text-white'
                 }`}
               >
-                ⚡ Benzersiz Rumuz
+                ⚡ Benzersiz Nick
               </button>
               <button
                 onClick={() => setAuthTab('email_login')}
@@ -685,15 +685,15 @@ export default function AuthUserButton() {
               <div className="space-y-3 bg-white/5 border border-white/10 p-3.5 rounded-xl animate-in fade-in duration-150">
                 <div className="space-y-1">
                   <label className="text-xs font-black text-amber-300 block flex items-center justify-between">
-                    <span>⚡ Rumuz &amp; PIN İle Çapraz Domain Yükle</span>
+                    <span>⚡ Nick &amp; PIN İle Çapraz Domain Yükle</span>
                     {isExistingRumuzDetected && (
                       <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold border border-emerald-500/30">
-                        ● Kayıtlı Rumuz Bulundu
+                        ● Kayıtlı Nick Bulundu
                       </span>
                     )}
                   </label>
                   <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Farklı bir domain veya cihazda olsanız dahi, rumuzunuzu ve PIN şifrenizi girerek tüm puan, rozet ve test geçmişinizi anında geri yükleyebilirsiniz!
+                    Farklı bir domain veya cihazda olsanız dahi, nickinizi ve PIN şifrenizi girerek tüm puan, rozet ve test geçmişinizi anında geri yükleyebilirsiniz!
                   </p>
                 </div>
 
@@ -702,7 +702,7 @@ export default function AuthUserButton() {
                     <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
-                      placeholder="Benzersiz Rumuzunuz (örn: emirhan0008)"
+                      placeholder="Benzersiz Nickiniz (örn: emirhan0008)"
                       value={customName}
                       onChange={(e) => handleRumuzInputChange(e.target.value)}
                       className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-400"
@@ -724,11 +724,11 @@ export default function AuthUserButton() {
 
                 <button
                   onClick={handleRumuzSignInOrRegister}
-                  className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                  className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
                   <span>
-                    {isExistingRumuzDetected ? '⚡ Rumuz Geçmişini Buluttan Yükle' : '🔒 Rumuz Oluştur & Şifreyle Kaydet'}
+                    {isExistingRumuzDetected ? '⚡ Nick Geçmişini Buluttan Yükle' : '🔒 Nick Oluştur & Şifreyle Kaydet'}
                   </span>
                 </button>
               </div>
@@ -747,7 +747,7 @@ export default function AuthUserButton() {
                   <button
                     type="button"
                     onClick={() => setAuthTab(authTab === 'email_login' ? 'email_register' : 'email_login')}
-                    className="text-[10px] font-bold text-amber-400 underline hover:text-amber-300"
+                    className="text-[10px] font-bold text-amber-400 underline hover:text-amber-300 cursor-pointer"
                   >
                     {authTab === 'email_login' ? 'Hesabın yok mu? Kaydol' : 'Zaten hesabın var mı? Giriş yap'}
                   </button>
@@ -758,7 +758,7 @@ export default function AuthUserButton() {
                     <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
-                      placeholder="Ad Soyad veya Rumuz"
+                      placeholder="Ad Soyad veya Nick"
                       value={customName}
                       onChange={(e) => setCustomName(e.target.value)}
                       className="w-full bg-black/60 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-indigo-400"
@@ -792,7 +792,7 @@ export default function AuthUserButton() {
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                  className="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
                 >
                   <span>{authTab === 'email_login' ? 'Giriş Yap' : 'Kayıt Ol ve Giriş Yap'}</span>
                 </button>
@@ -804,7 +804,7 @@ export default function AuthUserButton() {
               <div className="space-y-3 bg-white/5 border border-white/10 p-3.5 rounded-xl animate-in fade-in duration-150">
                 <button
                   onClick={handleGoogleSignIn}
-                  className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-900 font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+                  className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-900 font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -815,7 +815,7 @@ export default function AuthUserButton() {
                   <span>Google Hesabı İle Giriş Yap</span>
                 </button>
                 <p className="text-[10px] text-slate-400 text-center">
-                  Google pop-up doğrulaması önizleme ortamlarında çalışır. Vercel yayınlarında Hızlı Rumuz önerilir.
+                  Google pop-up doğrulaması önizleme ortamlarında çalışır. Vercel yayınlarında Hızlı Nick önerilir.
                 </p>
               </div>
             )}

@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getPrestigeTier, getDuelPrestigeTier, getAvatarOutlineFilter } from '@/lib/data/badgesData';
+import { getCachedUserMedalInfo, subscribeToLeaderboardMedals } from '@/lib/rumuzService';
 
 interface AvatarWithBadgeFrameProps {
   rumuz: string;
+  nick?: string;
   unlockedBadges?: string[];
   duelWins?: number;
   duelStreak?: number;
@@ -23,6 +25,7 @@ interface AvatarWithBadgeFrameProps {
 
 export default function AvatarWithBadgeFrame({
   rumuz,
+  nick,
   unlockedBadges = [],
   duelWins = 0,
   duelStreak = 0,
@@ -34,36 +37,53 @@ export default function AvatarWithBadgeFrame({
   showBadgePin = true,
   showTitleBadge = false,
   className = '',
-  rank,
-  isRecordStreakHolder = false,
-  specialMedal
+  rank: explicitRank,
+  isRecordStreakHolder: explicitIsRecord,
+  specialMedal: explicitSpecialMedal
 }: AvatarWithBadgeFrameProps) {
+  const activeName = nick || rumuz || '';
+
+  // Auto-resolve medals from leaderboard cache if not explicitly passed
+  const [cachedMedals, setCachedMedals] = useState(() => getCachedUserMedalInfo(activeName));
+
+  useEffect(() => {
+    setCachedMedals(getCachedUserMedalInfo(activeName));
+    const unsubscribe = subscribeToLeaderboardMedals(() => {
+      setCachedMedals(getCachedUserMedalInfo(activeName));
+    });
+    return () => unsubscribe();
+  }, [activeName]);
+
+  const resolvedRank = explicitRank !== undefined ? explicitRank : cachedMedals.rank;
+  const resolvedIsRecord = explicitIsRecord !== undefined ? explicitIsRecord : cachedMedals.isRecordStreakHolder;
+  const resolvedSpecialMedal = explicitSpecialMedal !== undefined ? explicitSpecialMedal : cachedMedals.specialMedal;
+
   const prestige = isDuelMode 
     ? getDuelPrestigeTier(duelWins, duelStreak, unlockedBadges, equippedTitle)
     : getPrestigeTier(unlockedBadges, duelWins, equippedTitle);
 
-  const displayIcon = avatarIcon || (rumuz?.trim()?.[0] || 'K').toUpperCase();
+  const displayIcon = avatarIcon || (activeName?.trim()?.[0] || 'K').toUpperCase();
   const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
 
   // Determine bottom-left special medals (Can hold both rank medal and record streak medal)
   const activeMedals: Array<{ id: string; icon: string; title: string; filter: string }> = [];
 
   // 1. Rank / Placement Medal
-  if (specialMedal === 'gold' || rank === 1) {
+  if (resolvedSpecialMedal === 'gold' || resolvedRank === 1) {
     activeMedals.push({
       id: 'gold',
       icon: '🥇',
       title: '🥇 1.lik Şampiyonluk Altın Madalyası (Global Lider)',
       filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 1px #fff)'
     });
-  } else if (specialMedal === 'silver' || rank === 2) {
+  } else if (resolvedSpecialMedal === 'silver' || resolvedRank === 2) {
     activeMedals.push({
       id: 'silver',
       icon: '🥈',
       title: '🥈 2.lik Gümüş Madalyası (Global 2.lik)',
       filter: 'drop-shadow(0 0 4px rgba(203, 213, 225, 0.9)) drop-shadow(0 0 1px #fff)'
     });
-  } else if (specialMedal === 'bronze' || rank === 3) {
+  } else if (resolvedSpecialMedal === 'bronze' || resolvedRank === 3) {
     activeMedals.push({
       id: 'bronze',
       icon: '🥉',
@@ -73,7 +93,7 @@ export default function AvatarWithBadgeFrame({
   }
 
   // 2. Record Streak Medal (⚡)
-  if (isRecordStreakHolder || specialMedal === 'record') {
+  if (resolvedIsRecord || resolvedSpecialMedal === 'record') {
     // Avoid duplicate if record is already added
     if (!activeMedals.some(m => m.id === 'record')) {
       activeMedals.push({

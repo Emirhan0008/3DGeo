@@ -421,14 +421,21 @@ export default function ProfileEditModal({
             </div>
           )}
 
-          {/* 1. KUŞANILABİLİR AVATAR & ÇERÇEVE TEMASI */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="font-black text-xs text-indigo-300 flex items-center gap-1.5">
-                <Palette className="w-4 h-4 text-indigo-400" />
-                <span>1. Avatar &amp; Tema</span>
-              </span>
-              <span className="text-[10px] text-amber-300/90 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+          {/* 1. KATEGORİ: AVATAR İKONU SEÇİMİ */}
+          <div className="p-3.5 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 border-2 border-indigo-500/40 rounded-2xl space-y-3 shadow-lg">
+            <div className="flex items-center justify-between border-b border-indigo-500/30 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-md">
+                  <Palette className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-indigo-200 tracking-wide uppercase">
+                    1. Avatar İkonu
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-medium">Karakterini temsil eden bir obje seç</p>
+                </div>
+              </div>
+              <span className="text-[10px] text-amber-300 font-black bg-amber-500/15 px-2.5 py-1 rounded-lg border border-amber-500/30 shadow-sm">
                 Kademen: {userHighestAvatarTier === 'mythic' ? '🌌 5. Kademe' : userHighestAvatarTier === 'diamond' ? '💎 4. Kademe' : userHighestAvatarTier === 'gold' ? '👑 3. Kademe' : userHighestAvatarTier === 'silver' ? '🛡️ 2. Kademe' : userHighestAvatarTier === 'bronze' ? '🐣 1. Kademe' : '🌱 Başlangıç'}
               </span>
             </div>
@@ -557,58 +564,76 @@ export default function ProfileEditModal({
                 );
               })}
             </div>
+          </div>
 
-            {/* Avatar Outline Çizgisi & Parıltı Efekti */}
-            <div className="pt-2 border-t border-white/10">
-              <span className="text-[10px] font-bold text-slate-300 block mb-1">
-                Avatar Efekti:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
-                {AVATAR_THEMES.map((theme) => {
-                  const isSelected = avatarBg === theme.id;
-                  return (
-                    <button
-                      key={theme.id}
-                      onClick={() => handleSelectAvatarBg(theme.id)}
-                      className={`p-1.5 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-2 border-amber-300 ring-2 ring-amber-400/70 bg-white/10 shadow-[0_0_16px_rgba(251,191,36,0.6)] scale-[1.01] z-10 relative'
-                          : 'border border-emerald-400/60 hover:border-emerald-300 bg-white/5 hover:scale-[1.01]'
-                      }`}
-                    >
-                      <span
-                        className="text-lg leading-none shrink-0 select-none"
-                        style={{ filter: theme.outlineFilter }}
-                      >
-                        {avatarIcon || '🦁'}
-                      </span>
-                      <div className="min-w-0 text-left">
-                        <span className="text-[10px] font-bold text-slate-200 block truncate">{theme.name}</span>
-                      </div>
-                      {isSelected ? (
-                        <span className="ml-auto text-[7.5px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 shadow border border-amber-200 shrink-0">
-                          KUŞANILDI ✓
-                        </span>
-                      ) : (
-                        <span className="ml-auto text-[7.5px] font-bold text-emerald-300 bg-emerald-950/80 px-1 py-0.5 rounded border border-emerald-400/60 shrink-0">
-                          Seç
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+          {/* 2. KATEGORİ: AVATAR EFEKTİ & PARILTI */}
+          <div className="p-3.5 bg-gradient-to-b from-purple-950/40 to-slate-900/60 border-2 border-purple-500/40 rounded-2xl space-y-3 shadow-lg">
+            <div className="flex items-center justify-between border-b border-purple-500/30 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center shadow-md">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-purple-200 tracking-wide uppercase">
+                    2. Avatar Efekti &amp; Parıltı
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-medium">Avatarının etrafını saran parlak aura ve neon outline çizgisi</p>
+                </div>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
+              {AVATAR_THEMES.map((theme) => {
+                const isSelected = avatarBg === theme.id;
+                return (
+                  <button
+                    key={theme.id}
+                    onClick={() => handleSelectAvatarBg(theme.id)}
+                    className={`p-2 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-2 border-amber-300 ring-2 ring-amber-400/70 bg-purple-900/30 shadow-[0_0_16px_rgba(251,191,36,0.6)] scale-[1.01] z-10 relative'
+                        : 'border border-purple-400/40 hover:border-purple-300 bg-white/5 hover:scale-[1.01]'
+                    }`}
+                  >
+                    <span
+                      className="text-xl leading-none shrink-0 select-none"
+                      style={{ filter: theme.outlineFilter }}
+                    >
+                      {avatarIcon || '🦁'}
+                    </span>
+                    <div className="min-w-0 text-left">
+                      <span className="text-xs font-bold text-slate-200 block truncate">{theme.name}</span>
+                    </div>
+                    {isSelected ? (
+                      <span className="ml-auto text-[8px] font-black px-2 py-0.5 rounded bg-amber-400 text-slate-950 shadow border border-amber-200 shrink-0">
+                        KUŞANILDI ✓
+                      </span>
+                    ) : (
+                      <span className="ml-auto text-[8px] font-bold text-purple-300 bg-purple-950/80 px-1.5 py-0.5 rounded border border-purple-400/60 shrink-0">
+                        Seç
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* 2. KUŞANILABİLİR RESMİ ÜNVANLAR */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="font-black text-amber-300 flex items-center gap-1.5 text-xs">
-                <Crown className="w-4 h-4 text-amber-400" />
-                <span>2. Ünvanlar</span>
-              </span>
-              <span className="text-[10px] text-amber-300/90 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+          {/* 3. KATEGORİ: KUŞANILABİLİR RESMİ ÜNVANLAR */}
+          <div className="p-3.5 bg-gradient-to-b from-amber-950/40 to-slate-900/60 border-2 border-amber-500/40 rounded-2xl space-y-3 shadow-lg">
+            <div className="flex items-center justify-between border-b border-amber-500/30 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-md">
+                  <Crown className="w-3.5 h-3.5 text-amber-100" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-amber-200 tracking-wide uppercase">
+                    3. Resmi Ünvanlar
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-medium">Profilinde ve liderlik tablosunda adının altında sergilenen resmi ünvan</p>
+                </div>
+              </div>
+              <span className="text-[10px] text-amber-300 font-black bg-amber-500/15 px-2.5 py-1 rounded-lg border border-amber-500/30 shadow-sm">
                 Kademen: {userHighestTitleTier === 'mythic' ? '🌌 5. Kademe' : userHighestTitleTier === 'diamond' ? '💎 4. Kademe' : userHighestTitleTier === 'gold' ? '👑 3. Kademe' : userHighestTitleTier === 'silver' ? '🛡️ 2. Kademe' : '🌱 1. Kademe'}
               </span>
             </div>
@@ -747,14 +772,21 @@ export default function ProfileEditModal({
             </div>
           </div>
 
-          {/* 3. KADEMELİ ROZETLER GALERİSİ */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="font-black text-xs text-slate-200 flex items-center gap-1.5">
-                <Medal className="w-4 h-4 text-cyan-400" />
-                <span>3. Rozetler ({unlockedBadges.length}/{ALL_BADGES.length})</span>
-              </span>
-              <span className="text-[10px] text-cyan-300/90 font-bold bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+          {/* 4. KATEGORİ: KADEMELİ ROZETLER GALERİSİ */}
+          <div className="p-3.5 bg-gradient-to-b from-cyan-950/40 to-slate-900/60 border-2 border-cyan-500/40 rounded-2xl space-y-3 shadow-lg">
+            <div className="flex items-center justify-between border-b border-cyan-500/30 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-cyan-600 text-white flex items-center justify-center shadow-md">
+                  <Medal className="w-3.5 h-3.5 text-cyan-100" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-cyan-200 tracking-wide uppercase">
+                    4. Başarı Rozetleri ({unlockedBadges.length}/{ALL_BADGES.length})
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-medium">KPSS harita testleri ve düellolarla kazanılan başarı madalyonları</p>
+                </div>
+              </div>
+              <span className="text-[10px] text-cyan-300 font-black bg-cyan-500/15 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">
                 Kademen: {userHighestBadgeTier === 'mythic' ? '🌌 5. Kademe' : userHighestBadgeTier === 'diamond' ? '💎 4. Kademe' : userHighestBadgeTier === 'gold' ? '👑 3. Kademe' : userHighestBadgeTier === 'silver' ? '🛡️ 2. Kademe' : '🌱 1. Kademe'}
               </span>
             </div>
@@ -871,22 +903,31 @@ export default function ProfileEditModal({
             </div>
           </div>
 
-          {/* 4. RUMUZ & PIN ŞİFRESİ DEĞİŞTİRME */}
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2.5">
-            <h3 className="font-black text-indigo-300 flex items-center gap-1.5 text-xs">
-              <User className="w-4 h-4 text-indigo-400" />
-              <span>4. Rumuz &amp; Güvenlik Şifresi Ayarları</span>
-            </h3>
+          {/* 5. KATEGORİ: NICK & PIN ŞİFRESİ DEĞİŞTİRME */}
+          <div className="p-3.5 bg-gradient-to-b from-blue-950/40 to-slate-900/60 border-2 border-blue-500/40 rounded-2xl space-y-3 shadow-lg">
+            <div className="flex items-center justify-between border-b border-blue-500/30 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-md">
+                  <User className="w-3.5 h-3.5 text-blue-100" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-blue-200 tracking-wide uppercase">
+                    5. Nick &amp; Güvenlik Şifresi Ayarları
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-medium">Oyuncu adını (Nick) ve hesabını koruyan 4 haneli PIN şifreni güncelle</p>
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-300">Rumuz:</label>
+                <label className="text-[11px] font-bold text-slate-300">Oyuncu Adı (Nick):</label>
                 <input
                   type="text"
                   value={newRumuzInput}
                   onChange={(e) => setNewRumuzInput(e.target.value)}
                   className="w-full bg-black/60 border border-white/20 rounded-xl px-3 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-indigo-400"
-                  placeholder="Yeni rumuzunuz"
+                  placeholder="Yeni nickiniz"
                 />
               </div>
 
@@ -918,10 +959,10 @@ export default function ProfileEditModal({
             <button
               onClick={handleSaveProfileInfo}
               disabled={isSaving}
-              className="w-full py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:brightness-110 text-white font-black rounded-xl text-xs shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+              className="w-full py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-black rounded-xl text-xs shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-amber-300" />}
-              <span>Rumuz &amp; Şifre Değişikliğini Kaydet</span>
+              <span>Nick &amp; Şifre Değişikliğini Kaydet</span>
             </button>
           </div>
 

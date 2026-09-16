@@ -203,17 +203,17 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                   ? 'bg-purple-950/70 border-purple-500 text-purple-200 shadow-sm'
                   : 'bg-white/5 hover:bg-white/10 border-white/15 text-slate-300 hover:text-white'
               }`}
-              title={isAnonymous ? 'Rumuzun şu an gizli (*** olarak görünüyor)' : 'Rumuzunu gizle'}
+              title={isAnonymous ? 'Nickiniz şu an gizli (*** olarak görünüyor)' : 'Nickinizi gizle'}
             >
               {isAnonymous ? (
                 <>
                   <EyeOff className="w-3.5 h-3.5 text-purple-300" />
-                  <span>🔒 Rumuz Gizli (***)</span>
+                  <span>🔒 Nick Gizli (***)</span>
                 </>
               ) : (
                 <>
                   <Eye className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Rumuzumu Gizle (***)</span>
+                  <span>Nickimi Gizle (***)</span>
                 </>
               )}
             </button>

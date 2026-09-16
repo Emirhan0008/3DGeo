@@ -5,7 +5,22 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, featureName, category } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const rawPrompt = typeof body?.prompt === 'string' ? body.prompt.trim() : '';
+    const rawFeatureName = typeof body?.featureName === 'string' ? body.featureName.trim() : '';
+    const rawCategory = typeof body?.category === 'string' ? body.category.trim() : '';
+
+    if (!rawPrompt && !rawFeatureName) {
+      return NextResponse.json(
+        { error: 'Lütfen geçerli bir soru veya coğrafi konu girin.' },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize and limit payload length to prevent DoS/overflow
+    const prompt = rawPrompt.slice(0, 500);
+    const featureName = rawFeatureName.slice(0, 100);
+    const category = rawCategory.slice(0, 100);
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {

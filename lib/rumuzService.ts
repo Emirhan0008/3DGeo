@@ -542,6 +542,65 @@ export async function recordFinishedDuelToRumuzes(duel: DuelSessionData): Promis
   }
 }
 
+export interface UserMedalInfo {
+  rank: number;
+  isRecordStreakHolder: boolean;
+  specialMedal: 'gold' | 'silver' | 'bronze' | 'record' | null;
+}
+
+let cachedLeaderboardForMedals: LeaderboardEntry[] = [];
+let lastLeaderboardFetchTime = 0;
+const medalSubscribers = new Set<() => void>();
+
+export function getCachedUserMedalInfo(rumuz: string): UserMedalInfo {
+  if (!rumuz) return { rank: 0, isRecordStreakHolder: false, specialMedal: null };
+  const targetKey = normalizeRumuzKey(rumuz);
+  
+  // Trigger background refresh if cache is older than 60 seconds
+  const now = Date.now();
+  if (now - lastLeaderboardFetchTime > 60000) {
+    lastLeaderboardFetchTime = now;
+    fetchGlobalLeaderboard('total').then((entries) => {
+      cachedLeaderboardForMedals = entries;
+      medalSubscribers.forEach(cb => cb());
+    }).catch(() => {});
+  }
+
+  if (!cachedLeaderboardForMedals.length) {
+    return { rank: 0, isRecordStreakHolder: false, specialMedal: null };
+  }
+
+  const userEntry = cachedLeaderboardForMedals.find(e => e.rumuzKey === targetKey || e.rumuz?.toLowerCase() === rumuz.toLowerCase());
+  const rank = userEntry && !userEntry.isUnranked ? userEntry.rank : 0;
+
+  // Global all-time best streak record holder
+  let highestStreak = 0;
+  let recordHolderKey = '';
+  cachedLeaderboardForMedals.forEach(e => {
+    const s = Math.max(e.duelStreak || 0, e.bestDuelStreak || 0, e.streak || 0);
+    if (s > highestStreak) {
+      highestStreak = s;
+      recordHolderKey = e.rumuzKey;
+    }
+  });
+
+  const isRecordStreakHolder = !!(highestStreak >= 3 && recordHolderKey === targetKey);
+  const specialMedal = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : isRecordStreakHolder ? 'record' : null;
+
+  return {
+    rank,
+    isRecordStreakHolder,
+    specialMedal
+  };
+}
+
+export function subscribeToLeaderboardMedals(callback: () => void): () => void {
+  medalSubscribers.add(callback);
+  return () => {
+    medalSubscribers.delete(callback);
+  };
+}
+
 export interface RumuzProfileData {
   rumuz: string;
   rumuzKey: string;
@@ -606,7 +665,14 @@ export function normalizeRumuzKey(rumuz: string): string {
   cleaned = cleaned.replace(/[^a-z0-9_\-]/g, '_');
   cleaned = cleaned.replace(/_+/g, '_');
   cleaned = cleaned.replace(/^_+|_+$/g, '');
+  cleaned = cleaned.slice(0, 40);
   
+  // Guard against prototype pollution identifiers
+  const reservedKeys = new Set(['__proto__', 'constructor', 'prototype', 'toString', 'valueOf']);
+  if (reservedKeys.has(cleaned)) {
+    cleaned = `player_${cleaned}`;
+  }
+
   return cleaned || 'kpss_ogrencisi';
 }
 

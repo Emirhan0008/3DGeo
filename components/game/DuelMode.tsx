@@ -1091,7 +1091,7 @@ export default function DuelMode() {
                   }`}
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>Oda Katıl</span>
+                  <span>Odaya Katıl</span>
                 </button>
 
                 <button

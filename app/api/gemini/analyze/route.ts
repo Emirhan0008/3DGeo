@@ -5,7 +5,18 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { stats } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const rawStats = body?.stats && typeof body.stats === 'object' ? body.stats : {};
+
+    const stats = {
+      totalQuestionsAnswered: Number(rawStats.totalQuestionsAnswered) || 0,
+      correctAnswersCount: Number(rawStats.correctAnswersCount) || 0,
+      accuracyPct: Number(rawStats.accuracyPct) || 0,
+      avgDistanceKm: Number(rawStats.avgDistanceKm) || 0,
+      maxWrongReg: String(rawStats.maxWrongReg || 'Yok').slice(0, 50),
+      maxWrongCat: String(rawStats.maxWrongCat || 'Yok').slice(0, 50),
+      missedItemsList: String(rawStats.missedItemsList || 'Henüz tespit edilen spesifik nokta yok').slice(0, 300)
+    };
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {

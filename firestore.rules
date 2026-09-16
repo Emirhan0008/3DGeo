@@ -50,20 +50,24 @@ service cloud.firestore {
 
     match /rumuzes/{rumuzId} {
       allow get, list: if true;
-      allow create, update: if true;
-      allow delete: if true;
+      allow create, update: if isValidId(rumuzId) 
+                            && request.resource.data.rumuz is string 
+                            && request.resource.data.rumuz.size() <= 60;
+      allow delete: if false;
     }
 
     match /duels/{duelId} {
       allow get, list: if true;
-      allow create, update: if true;
-      allow delete: if true;
+      allow create, update: if isValidId(duelId);
+      allow delete: if isValidId(duelId);
     }
 
     match /feedbacks/{feedbackId} {
-      allow get, list: if true;
-      allow create, update: if true;
-      allow delete: if false;
+      allow get, list: if false;
+      allow create: if isValidId(feedbackId)
+                    && request.resource.data.content is string
+                    && request.resource.data.content.size() <= 2000;
+      allow update, delete: if false;
     }
   }
 }

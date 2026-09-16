@@ -205,15 +205,15 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               </div>
             </div>
 
-            {/* Rumuz & Email Optional Row */}
+            {/* Nick & Email Optional Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-300">Rumuzunuz:</label>
+                <label className="text-[11px] font-bold text-slate-300">Oyuncu Adınız (Nick):</label>
                 <input
                   type="text"
                   value={rumuz}
                   onChange={(e) => setRumuz(e.target.value)}
-                  placeholder="İsminiz veya Rumuz"
+                  placeholder="İsminiz veya Nick"
                   className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-indigo-400"
                 />
               </div>
