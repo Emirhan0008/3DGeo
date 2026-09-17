@@ -4,6 +4,20 @@
 
 ---
 
+## 📅 [2026-09-17] - Vercel Dağıtım Hatası Çözümü (TypeScript Type Narrowing & Storage Sanitization Fix)
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "vercele deploy ederken hata verdi olası hataları kontrol et"
+- **Hata Kaynağı**:
+  - `lib/store/useStore.ts:274:27: Type error: Property 'score' does not exist on type 'never'.`
+  - TypeScript, `if ('__proto__' in obj || 'constructor' in obj || 'prototype' in obj)` denetimi sonrasında `obj` nesnesini `never` tipine indirgemişti (type narrowing). Bu durum Vercel'deki `npm run build` (tsc strict check) aşamasında derlemenin çökmesine neden oluyordu.
+- **Etkilenen Dosyalar**:
+  - `/lib/store/useStore.ts` (`sanitizeStoredStats` güvenli nesne okuma fonksiyonu `getProp` ve `Object.prototype.hasOwnProperty.call` ile revize edildi, `any` kullanılmadan linter ve type-checker uyumlu hale getirildi)
+  - `/WORK_LOG.md`
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (ESLint temiz geçti).
+
+---
+
 ## 📅 [2026-09-16] - KPSS Zayıf Nokta Takipçisi ("Hata Defteri") Modülü & Soru Tekrar Modu
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "Hata Defteri (Weak Spot Tracker) - Soru testlerinde yanlış yapılan soruların toplanması, tekrar çözülmesi ve pekiştirilmesi"

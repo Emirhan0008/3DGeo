@@ -247,12 +247,16 @@ function saveStatsToLocalStorage(state: AppState) {
 function sanitizeStoredStats(parsed: unknown): Partial<AppState> {
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
 
-  const obj = parsed as Record<string, unknown>;
+  const record = parsed as Record<string, unknown>;
   // Disallow Prototype Pollution
-  if ('__proto__' in obj || 'constructor' in obj || 'prototype' in obj) {
+  if (Object.prototype.hasOwnProperty.call(record, '__proto__') || 
+      Object.prototype.hasOwnProperty.call(record, 'constructor') || 
+      Object.prototype.hasOwnProperty.call(record, 'prototype')) {
     console.warn('Security alert: Malformed or prototype pollution attempt detected in storage.');
     return {};
   }
+
+  const getProp = (key: string): unknown => record[key];
 
   const safeNumber = (val: unknown, max = 5000000): number => {
     const num = Number(val);
@@ -270,25 +274,33 @@ function sanitizeStoredStats(parsed: unknown): Partial<AppState> {
     return val.trim().slice(0, maxLen);
   };
 
+  const regStats = getProp('regionalStats');
+  const catStats = getProp('categoryStats');
+  const catProg = getProp('categoryMasteryProgress');
+  const missedI = getProp('missedItems');
+  const missedQ = getProp('missedQuestions');
+  const duelS = getProp('duelStats');
+  const botS = getProp('botStats');
+
   return {
-    score: safeNumber(obj.score),
-    quizScore: safeNumber(obj.quizScore),
-    totalQuestionsAnswered: safeNumber(obj.totalQuestionsAnswered, 200000),
-    correctAnswersCount: safeNumber(obj.correctAnswersCount, 100000),
-    totalDistanceErrorKm: safeNumber(obj.totalDistanceErrorKm, 1000000),
-    pinGuessCount: safeNumber(obj.pinGuessCount, 100000),
-    unlockedBadges: safeArray(obj.unlockedBadges),
-    unlockedTitles: safeArray(obj.unlockedTitles),
-    avatarIcon: safeStr(obj.avatarIcon, '🐣', 30),
-    avatarBg: safeStr(obj.avatarBg, 'indigo_midnight', 40),
-    equippedTitle: safeStr(obj.equippedTitle, '3D Coğrafyacı Çırağı', 50),
-    regionalStats: typeof obj.regionalStats === 'object' && obj.regionalStats !== null ? (obj.regionalStats as Record<string, { correct: number; wrong: number }>) : {},
-    categoryStats: typeof obj.categoryStats === 'object' && obj.categoryStats !== null ? (obj.categoryStats as Record<string, { correct: number; wrong: number }>) : {},
-    categoryMasteryProgress: typeof obj.categoryMasteryProgress === 'object' && obj.categoryMasteryProgress !== null ? (obj.categoryMasteryProgress as Record<string, number>) : {},
-    missedItems: typeof obj.missedItems === 'object' && obj.missedItems !== null ? (obj.missedItems as Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>) : {},
-    missedQuestions: typeof obj.missedQuestions === 'object' && obj.missedQuestions !== null ? (obj.missedQuestions as Record<string, MissedQuestionRecord>) : {},
-    duelStats: typeof obj.duelStats === 'object' && obj.duelStats !== null ? (obj.duelStats as AppState['duelStats']) : undefined,
-    botStats: typeof obj.botStats === 'object' && obj.botStats !== null ? (obj.botStats as AppState['botStats']) : undefined,
+    score: safeNumber(getProp('score')),
+    quizScore: safeNumber(getProp('quizScore')),
+    totalQuestionsAnswered: safeNumber(getProp('totalQuestionsAnswered'), 200000),
+    correctAnswersCount: safeNumber(getProp('correctAnswersCount'), 100000),
+    totalDistanceErrorKm: safeNumber(getProp('totalDistanceErrorKm'), 1000000),
+    pinGuessCount: safeNumber(getProp('pinGuessCount'), 100000),
+    unlockedBadges: safeArray(getProp('unlockedBadges')),
+    unlockedTitles: safeArray(getProp('unlockedTitles')),
+    avatarIcon: safeStr(getProp('avatarIcon'), '🐣', 30),
+    avatarBg: safeStr(getProp('avatarBg'), 'indigo_midnight', 40),
+    equippedTitle: safeStr(getProp('equippedTitle'), '3D Coğrafyacı Çırağı', 50),
+    regionalStats: typeof regStats === 'object' && regStats !== null ? (regStats as Record<string, { correct: number; wrong: number }>) : {},
+    categoryStats: typeof catStats === 'object' && catStats !== null ? (catStats as Record<string, { correct: number; wrong: number }>) : {},
+    categoryMasteryProgress: typeof catProg === 'object' && catProg !== null ? (catProg as Record<string, number>) : {},
+    missedItems: typeof missedI === 'object' && missedI !== null ? (missedI as Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>) : {},
+    missedQuestions: typeof missedQ === 'object' && missedQ !== null ? (missedQ as Record<string, MissedQuestionRecord>) : {},
+    duelStats: typeof duelS === 'object' && duelS !== null ? (duelS as AppState['duelStats']) : undefined,
+    botStats: typeof botS === 'object' && botS !== null ? (botS as AppState['botStats']) : undefined,
   };
 }
 
