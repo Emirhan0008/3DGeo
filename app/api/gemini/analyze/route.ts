@@ -1,21 +1,38 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimiter';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. IP Rate Limiting (10 requests per minute per IP for heavier analyze endpoint)
+    const rateCheck = checkRateLimit(req, { limit: 10, windowSeconds: 60 });
+    if (!rateCheck.isAllowed) {
+      return NextResponse.json(
+        { error: `Çok fazla analiz isteği gönderildi. Lütfen ${rateCheck.retryAfterSeconds} saniye bekleyin.` },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': String(rateCheck.retryAfterSeconds),
+            'X-RateLimit-Remaining': '0'
+          }
+        }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const rawStats = body?.stats && typeof body.stats === 'object' ? body.stats : {};
 
+    // Sanitize and clamp numeric statistics to realistic boundaries
     const stats = {
-      totalQuestionsAnswered: Number(rawStats.totalQuestionsAnswered) || 0,
-      correctAnswersCount: Number(rawStats.correctAnswersCount) || 0,
-      accuracyPct: Number(rawStats.accuracyPct) || 0,
-      avgDistanceKm: Number(rawStats.avgDistanceKm) || 0,
-      maxWrongReg: String(rawStats.maxWrongReg || 'Yok').slice(0, 50),
-      maxWrongCat: String(rawStats.maxWrongCat || 'Yok').slice(0, 50),
-      missedItemsList: String(rawStats.missedItemsList || 'Henüz tespit edilen spesifik nokta yok').slice(0, 300)
+      totalQuestionsAnswered: Math.min(Math.max(0, Number(rawStats.totalQuestionsAnswered) || 0), 100000),
+      correctAnswersCount: Math.min(Math.max(0, Number(rawStats.correctAnswersCount) || 0), 100000),
+      accuracyPct: Math.min(Math.max(0, Number(rawStats.accuracyPct) || 0), 100),
+      avgDistanceKm: Math.min(Math.max(0, Number(rawStats.avgDistanceKm) || 0), 5000),
+      maxWrongReg: String(rawStats.maxWrongReg || 'Yok').slice(0, 50).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, ''),
+      maxWrongCat: String(rawStats.maxWrongCat || 'Yok').slice(0, 50).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, ''),
+      missedItemsList: String(rawStats.missedItemsList || 'Henüz tespit edilen spesifik nokta yok').slice(0, 300).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, '')
     };
 
     const apiKey = process.env.GEMINI_API_KEY;

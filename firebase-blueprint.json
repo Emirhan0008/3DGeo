@@ -100,6 +100,21 @@
         "updatedAt": { "type": "string" }
       },
       "required": ["mode", "status", "questionCount", "player1"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Kullanıcı geri bildirim ve önerileri",
+      "type": "object",
+      "properties": {
+        "rumuz": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 50 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "rating": { "type": "number" },
+        "deviceInfo": { "type": "object" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["message", "createdAt"]
     }
   },
   "firestore": {
@@ -122,6 +137,10 @@
     "/duels/{duelId}": {
       "schema": { "$ref": "#/entities/DuelSession" },
       "description": "Gerçek zamanlı harita düello oturumları"
+    },
+    "/feedbacks/{feedbackId}": {
+      "schema": { "$ref": "#/entities/Feedback" },
+      "description": "Kullanıcı hata ve öneri bildirimleri"
     }
   }
 }

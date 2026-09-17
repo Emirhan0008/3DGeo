@@ -1,10 +1,26 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimiter';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. IP Rate Limiting (15 requests per minute per IP)
+    const rateCheck = checkRateLimit(req, { limit: 15, windowSeconds: 60 });
+    if (!rateCheck.isAllowed) {
+      return NextResponse.json(
+        { error: `Çok fazla istek gönderildi. Lütfen ${rateCheck.retryAfterSeconds} saniye bekleyin.` },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': String(rateCheck.retryAfterSeconds),
+            'X-RateLimit-Remaining': '0'
+          }
+        }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const rawPrompt = typeof body?.prompt === 'string' ? body.prompt.trim() : '';
     const rawFeatureName = typeof body?.featureName === 'string' ? body.featureName.trim() : '';
@@ -17,10 +33,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Sanitize and limit payload length to prevent DoS/overflow
-    const prompt = rawPrompt.slice(0, 500);
-    const featureName = rawFeatureName.slice(0, 100);
-    const category = rawCategory.slice(0, 100);
+    // Sanitize and limit payload length to prevent DoS/overflow and prompt injection
+    const prompt = rawPrompt.slice(0, 500).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, '');
+    const featureName = rawFeatureName.slice(0, 100).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, '');
+    const category = rawCategory.slice(0, 100).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, '');
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {

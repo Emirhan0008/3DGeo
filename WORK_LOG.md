@@ -4,6 +4,58 @@
 
 ---
 
+## 📅 [2026-09-16] - KPSS Zayıf Nokta Takipçisi ("Hata Defteri") Modülü & Soru Tekrar Modu
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "Hata Defteri (Weak Spot Tracker) - Soru testlerinde yanlış yapılan soruların toplanması, tekrar çözülmesi ve pekiştirilmesi"
+- **Etkilenen Dosyalar**:
+  - `/lib/store/useStore.ts` (`missedQuestions`, `recordMissedQuestion`, `resolveMissedQuestion`, `clearMissedQuestions`, `startMissedQuestionsPractice`, localStorage persistence ve sanitization)
+  - `/components/game/QuizTestGame.tsx` (`📕 Hata Defterim` kategorisi, boş durum ekranı, pekiştirme bildirimleri, amber temalı tekrar modu)
+  - `/components/ui/StatsModal.tsx` (`Hata Defteri` alt sekmesi, soru ve harita hatalarını filtreleme, soru kartları, ÖSYM püf noktaları, doğrudan "Hataları Tekrar Çöz" entegrasyonu)
+  - `/WORK_LOG.md`
+- **Yapılan İyileştirmeler**:
+  1. **Zustand & LocalStorage Durum Yönetimi**:
+     - `MissedQuestionRecord` veri modeli eklendi (soru metni, şıklar, doğru şık, açıklama, ÖSYM notu, yanlış sayısı, zaman damgası).
+     - Kullanıcı bir soruyu yanlış cevapladığında otomatik olarak `recordMissedQuestion` çalışır; tekrar çözüp doğru bildiğinde `resolveMissedQuestion` ile defterden temizlenir.
+     - Prototype pollution ve localStorage bellek taşmasına karşı sanitasyon ve 150 kayıt kotası uygulandı.
+  2. **QuizTestGame Entegrasyonu**:
+     - Kategori açılır menüsüne canlı sayaçlı `📕 Hata Defterim (X)` eklendi.
+     - Hata defteri boşken motive edici boş durum (empty state) gösterilir.
+     - Soru doğru yanıtlandığında yeşil pekiştirme tebrik kutusu ("Harika! Bu konuyu pekiştirdiniz ve Hata Defterinizden silindi") gösterilir.
+  3. **İstatistik Paneli (StatsModal) Genişletmesi**:
+     - "Hata Defteri" sekmesinde hem harita ıskalama noktaları hem de KPSS soru hataları sekmelerle filtrelenebilir hale getirildi.
+     - "Hataları Tekrar Çöz" butonuyla doğrudan hata testine geçiş sağlandı.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+
+---
+
+## 📅 [2026-09-16] - Kapsamlı Güvenlik Açığı Taraması, Kural Güçlendirme & Dağıtım (Security Hardening)
+- **Geliştirici**: AI Agent (AI Studio Ortamı)
+- **Kullanıcı Talebi**: "güvenlik açıklarını kapat"
+- **Etkilenen Dosyalar**:
+  - `/firestore.rules` (Dağıtıldı - `deploy_firebase`)
+  - `/firebase-blueprint.json`
+  - `/security_spec.md`
+  - `/WORK_LOG.md`
+- **Tespit Edilen ve Kapatılan Güvenlik Riskleri**:
+  1. **Feedback Koleksiyonu Alan Uyuşmazlığı & Payload Boyut Koruması**:
+     - Firestore kurallarında `content` alanı kontrol ediliyordu ancak istemci `message` alanını gönderiyordu; kural `message` alanına güncellendi.
+     - Mesajın boş veya spam amaçlı aşırı büyük gönderilmesini önlemek amacıyla `message.size() >= 5 && message.size() <= 2000` kuralı uygulandı.
+     - `feedbacks` koleksiyonu `get`, `list`, `update`, `delete: if false;` tutularak dışarıdan taranması ve kazınması engellendi.
+  2. **Rumuz & Liderlik Tablosu Koruması (Wipe / Data Tampering)**:
+     - `rumuzes` koleksiyonunda `allow delete: if false;` kuralı teyit edildi; toplu silme / veri sıfırlama saldırıları engellendi.
+     - `normalizeRumuzKey` üzerinde prototype pollution (`__proto__`, `constructor`) koruması ve uzunluk sınırı teyit edildi.
+  3. **Kullanıcı Veri Alanı & İlerleme İzolasyonu**:
+     - `/users/{userId}` ve alt koleksiyonları (`/progress`, `/history`) yalnızca oturum açmış gerçek sahibine (`isOwner(userId)`) sınırlandırıldı; toplu listeleme (`allow list: if false`) yasaklandı.
+  4. **Kuralların Buluta Dağıtımı & Şema Uyumu**:
+     - `firebase-blueprint.json` dosyasına eksik olan `Feedback` varlığı ve `/feedbacks/{feedbackId}` yolu eklendi.
+     - `firestore.rules` `deploy_firebase` aracıyla canlı ortama başarıyla dağıtıldı.
+- **Doğrulama**:
+  - `lint_applet`: 0 hata, 0 uyarı (temiz).
+  - Firestore rules canlıya deploy edildi.
+
+---
+
 ## 📅 [2026-09-16] - Harita Hızlandırıldı Bilgilendirme Bannerı Sadeleştirme & Buton Hiyerarşisi
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "başlangıçtaki harita hızlamdırıldı mesajını küçült ve sadeleştir ve anladımı belirginleştirip tümünü açı daha belirsiz yap kullanıcı isterse açsın yanlışlıkla açmasın"

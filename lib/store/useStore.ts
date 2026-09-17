@@ -57,6 +57,21 @@ export interface BotStats {
   bestBotStreak: number;
 }
 
+export interface MissedQuestionRecord {
+  id: string;
+  category: string;
+  region?: string;
+  questionText: string;
+  options: string[];
+  correctIndex: number;
+  focusFeatureId?: string;
+  targetCoords?: [number, number];
+  explanation: string;
+  osymTip: string;
+  wrongCount: number;
+  lastMissedAt: string;
+}
+
 export interface AppState {
   // Navigation & UI
   activeTab: ActiveTabType;
@@ -160,8 +175,13 @@ export interface AppState {
   toggleHideLandformsInBlindMode: () => void;
   setBlindMapMode: (enabled: boolean) => void;
 
-  // Tracked Weak Spots / Misplaced Geography Items
+  // Tracked Weak Spots / Misplaced Geography Items & Missed Questions
   missedItems: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
+  missedQuestions: Record<string, MissedQuestionRecord>;
+  recordMissedQuestion: (q: MultipleChoiceQuestion) => void;
+  resolveMissedQuestion: (questionId: string) => void;
+  clearMissedQuestions: () => void;
+  startMissedQuestionsPractice: () => void;
   resetStats: () => void;
   clearAllUserData: () => void;
   hydrateUserData: (data: Partial<AppState>) => void;
@@ -192,6 +212,7 @@ function saveStatsToLocalStorage(state: AppState) {
       unlockedTitles: state.unlockedTitles,
       categoryMasteryProgress: state.categoryMasteryProgress,
       missedItems: state.missedItems,
+      missedQuestions: state.missedQuestions,
       duelStats: state.duelStats,
       botStats: state.botStats
     };
@@ -223,12 +244,60 @@ function saveStatsToLocalStorage(state: AppState) {
   }
 }
 
+function sanitizeStoredStats(parsed: unknown): Partial<AppState> {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+
+  const obj = parsed as Record<string, unknown>;
+  // Disallow Prototype Pollution
+  if ('__proto__' in obj || 'constructor' in obj || 'prototype' in obj) {
+    console.warn('Security alert: Malformed or prototype pollution attempt detected in storage.');
+    return {};
+  }
+
+  const safeNumber = (val: unknown, max = 5000000): number => {
+    const num = Number(val);
+    if (!Number.isFinite(num) || isNaN(num) || num < 0) return 0;
+    return Math.min(num, max);
+  };
+
+  const safeArray = (val: unknown): string[] => {
+    if (!Array.isArray(val)) return [];
+    return val.filter(item => typeof item === 'string' && item.length <= 100).slice(0, 100);
+  };
+
+  const safeStr = (val: unknown, fallback: string, maxLen = 100): string => {
+    if (typeof val !== 'string' || !val.trim()) return fallback;
+    return val.trim().slice(0, maxLen);
+  };
+
+  return {
+    score: safeNumber(obj.score),
+    quizScore: safeNumber(obj.quizScore),
+    totalQuestionsAnswered: safeNumber(obj.totalQuestionsAnswered, 200000),
+    correctAnswersCount: safeNumber(obj.correctAnswersCount, 100000),
+    totalDistanceErrorKm: safeNumber(obj.totalDistanceErrorKm, 1000000),
+    pinGuessCount: safeNumber(obj.pinGuessCount, 100000),
+    unlockedBadges: safeArray(obj.unlockedBadges),
+    unlockedTitles: safeArray(obj.unlockedTitles),
+    avatarIcon: safeStr(obj.avatarIcon, '🐣', 30),
+    avatarBg: safeStr(obj.avatarBg, 'indigo_midnight', 40),
+    equippedTitle: safeStr(obj.equippedTitle, '3D Coğrafyacı Çırağı', 50),
+    regionalStats: typeof obj.regionalStats === 'object' && obj.regionalStats !== null ? (obj.regionalStats as Record<string, { correct: number; wrong: number }>) : {},
+    categoryStats: typeof obj.categoryStats === 'object' && obj.categoryStats !== null ? (obj.categoryStats as Record<string, { correct: number; wrong: number }>) : {},
+    categoryMasteryProgress: typeof obj.categoryMasteryProgress === 'object' && obj.categoryMasteryProgress !== null ? (obj.categoryMasteryProgress as Record<string, number>) : {},
+    missedItems: typeof obj.missedItems === 'object' && obj.missedItems !== null ? (obj.missedItems as Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>) : {},
+    missedQuestions: typeof obj.missedQuestions === 'object' && obj.missedQuestions !== null ? (obj.missedQuestions as Record<string, MissedQuestionRecord>) : {},
+    duelStats: typeof obj.duelStats === 'object' && obj.duelStats !== null ? (obj.duelStats as AppState['duelStats']) : undefined,
+    botStats: typeof obj.botStats === 'object' && obj.botStats !== null ? (obj.botStats as AppState['botStats']) : undefined,
+  };
+}
+
 function getStoredStatsFromLocalStorage(): Partial<AppState> {
   if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem('kpss3d_user_stats');
     if (raw) {
-      return JSON.parse(raw);
+      return sanitizeStoredStats(JSON.parse(raw));
     }
   } catch (e) {
     console.warn('LocalStorage parse error:', e);
@@ -574,8 +643,93 @@ export const useAppStore = create<AppState>((set, get) => ({
     hideLandformsInBlindMode: enabled ? true : s.hideLandformsInBlindMode
   })),
 
-  // Tracked Weak Spots / Misplaced Geography Items
+  // Tracked Weak Spots / Misplaced Geography Items & Missed Questions
   missedItems: getStoredStatsFromLocalStorage().missedItems || {},
+  missedQuestions: getStoredStatsFromLocalStorage().missedQuestions || {},
+
+  recordMissedQuestion: (q) => {
+    if (!q || !q.id) return;
+    const state = get();
+    const currentMissed = { ...state.missedQuestions };
+    const existing = currentMissed[q.id];
+    
+    // Cap storage at 150 items to prevent localStorage overflow
+    const keys = Object.keys(currentMissed);
+    if (keys.length >= 150 && !existing) {
+      delete currentMissed[keys[0]];
+    }
+
+    currentMissed[q.id] = {
+      id: q.id,
+      category: q.category || 'Genel',
+      region: q.region,
+      questionText: q.questionText,
+      options: q.options,
+      correctIndex: q.correctIndex,
+      focusFeatureId: q.focusFeatureId,
+      targetCoords: q.targetCoords,
+      explanation: q.explanation,
+      osymTip: q.osymTip,
+      wrongCount: (existing?.wrongCount || 0) + 1,
+      lastMissedAt: new Date().toISOString()
+    };
+
+    set({ missedQuestions: currentMissed });
+    saveStatsToLocalStorage(get());
+  },
+
+  resolveMissedQuestion: (questionId) => {
+    if (!questionId) return;
+    const state = get();
+    if (!state.missedQuestions[questionId]) return;
+
+    const currentMissed = { ...state.missedQuestions };
+    delete currentMissed[questionId];
+
+    // If currently playing in missed questions mode, filter the active questions list
+    let updatedShuffled = state.shuffledQuizQuestions;
+    if (state.gameCategoryFilter === 'Hata Defterim') {
+      updatedShuffled = updatedShuffled.filter((q) => q.id !== questionId);
+    }
+
+    set({ 
+      missedQuestions: currentMissed,
+      shuffledQuizQuestions: updatedShuffled
+    });
+    saveStatsToLocalStorage(get());
+  },
+
+  clearMissedQuestions: () => {
+    set({ missedQuestions: {} });
+    saveStatsToLocalStorage(get());
+  },
+
+  startMissedQuestionsPractice: () => {
+    const state = get();
+    const list = Object.values(state.missedQuestions).map((m): MultipleChoiceQuestion => ({
+      id: m.id,
+      category: m.category,
+      region: m.region as MultipleChoiceQuestion['region'],
+      questionText: m.questionText,
+      options: m.options,
+      correctIndex: m.correctIndex,
+      focusFeatureId: m.focusFeatureId,
+      targetCoords: m.targetCoords,
+      explanation: m.explanation,
+      osymTip: m.osymTip
+    }));
+
+    if (list.length === 0) return;
+
+    set({
+      activeTab: 'quiz_test',
+      gameCategoryFilter: 'Hata Defterim',
+      shuffledQuizQuestions: shuffleArray(list),
+      quizTestIndex: 0,
+      quizSelectedOption: null,
+      isQuizAnswered: false
+    });
+  },
 
   resetStats: () => {
     set({
@@ -603,6 +757,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       totalDistanceErrorKm: 0,
       pinGuessCount: 0,
       missedItems: {},
+      missedQuestions: {},
       duelStats: {
         duelWins: 0,
         duelLosses: 0,
@@ -669,6 +824,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       totalDistanceErrorKm: 0,
       pinGuessCount: 0,
       missedItems: {},
+      missedQuestions: {},
       duelStats: {
         duelWins: 0,
         duelLosses: 0,
@@ -691,7 +847,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   hydrateUserData: (data) => {
-    set((s) => ({ ...s, ...data }));
+    if (!data || typeof data !== 'object') return;
+    if ('__proto__' in data || 'constructor' in data) {
+      console.warn('Security alert: Prototype pollution attempt detected during hydration.');
+      return;
+    }
+    const sanitized = sanitizeStoredStats(data);
+    set((s) => ({ ...s, ...sanitized }));
     saveStatsToLocalStorage(get());
   },
 
@@ -1022,9 +1184,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (isCorrect) {
       updatedRegStats[reg].correct += 1;
       updatedCatStats[cat].correct += 1;
+      // If student was practicing in Hata Defterim mode or previously missed this, resolve it!
+      if (state.missedQuestions[currentQ.id]) {
+        state.resolveMissedQuestion(currentQ.id);
+      }
     } else {
       updatedRegStats[reg].wrong += 1;
       updatedCatStats[cat].wrong += 1;
+      // Automatically record in Missed Questions Book
+      state.recordMissedQuestion(currentQ);
     }
 
     set({

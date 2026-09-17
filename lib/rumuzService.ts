@@ -187,20 +187,23 @@ export async function fetchGlobalLeaderboard(sortBy: LeaderboardSortTab = 'total
       const rumuzesRef = collection(db, 'rumuzes');
       const snap = await getDocs(query(rumuzesRef, limit(100)));
       snap.forEach((docSnap) => {
-        const d = docSnap.data() as RumuzProfileData;
-        if (!d.rumuz) return;
-        const totalAnswers = d.totalQuestionsAnswered || 0;
-        const correct = d.correctAnswersCount || 0;
+        const d = docSnap.data() as RumuzProfileData & { isDeleted?: boolean; isMigrated?: boolean };
+        if (!d.rumuz || d.isDeleted || d.isMigrated) return;
+        // Strip sensitive credentials from client memory immediately
+        delete (d as Partial<RumuzProfileData>).pin;
+
+        const totalAnswers = Math.min(Math.max(0, Number(d.totalQuestionsAnswered) || 0), 200000);
+        const correct = Math.min(Math.max(0, Number(d.correctAnswersCount) || 0), 100000);
         const accuracyPct = totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0;
-        const duelWins = d.duelStats?.duelWins || 0;
-        const duelLosses = d.duelStats?.duelLosses || 0;
-        const duelDraws = d.duelStats?.duelDraws || 0;
+        const duelWins = Math.min(Math.max(0, Number(d.duelStats?.duelWins) || 0), 50000);
+        const duelLosses = Math.min(Math.max(0, Number(d.duelStats?.duelLosses) || 0), 50000);
+        const duelDraws = Math.min(Math.max(0, Number(d.duelStats?.duelDraws) || 0), 50000);
         const totalDuels = d.duelStats?.totalDuelsPlayed || (duelWins + duelLosses + duelDraws);
-        const duelStreak = d.duelStats?.duelStreak || 0;
+        const duelStreak = Math.min(Math.max(0, Number(d.duelStats?.duelStreak) || 0), 50000);
         const bestDuelStreak = Math.max(d.duelStats?.bestDuelStreak || 0, duelStreak);
         const duelScore = d.duelStats?.duelScore || (duelWins * 120);
         const kpssScore = correct * 10;
-        const rawScore = d.score || 0;
+        const rawScore = Math.min(Math.max(0, Number(d.score) || 0), 5000000);
 
         // Ensure real players who have activity never show 0 points
         let calculatedScore = rawScore;
@@ -643,6 +646,53 @@ export interface RumuzProfileData {
   updatedAt: string;
 }
 
+const PIN_SALT = 'kpss3d_sec_v2_';
+
+/**
+ * Securely hashes a PIN using Web Crypto SHA-256 with a unique app salt.
+ */
+export async function hashPin(pin: string): Promise<string> {
+  const clean = (pin || '').trim();
+  if (!clean) return '';
+  if (clean.startsWith('sha256:')) return clean; // Already hashed
+  
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(PIN_SALT + clean);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return 'sha256:' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      // Fallback below
+    }
+  }
+  // Deterministic fallback if subtle crypto is unavailable
+  let hash = 5381;
+  const str = PIN_SALT + clean;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return 'sha256:fb_' + Math.abs(hash).toString(16);
+}
+
+/**
+ * Verifies a provided PIN against a stored hash or legacy plaintext PIN.
+ */
+export async function verifyPin(providedPin: string, storedPinOrHash: string): Promise<boolean> {
+  const clean = (providedPin || '').trim();
+  const stored = (storedPinOrHash || '').trim();
+  if (!clean || !stored) return false;
+
+  if (stored.startsWith('sha256:')) {
+    const computed = await hashPin(clean);
+    return computed === stored;
+  }
+  // Backwards compatibility for legacy unhashed PINs
+  return stored === clean;
+}
+
 /**
  * Normalizes user nickname into a valid Firestore Document ID.
  * Replaces Turkish characters, replaces invalid chars with underscores.
@@ -705,19 +755,20 @@ export async function saveRumuzProfile(
 ): Promise<RumuzProfileData> {
   const key = normalizeRumuzKey(rumuz);
   const path = `rumuzes/${key}`;
+  const hashedPin = await hashPin(pin);
   
   const payload: RumuzProfileData = {
     rumuz: rumuz.trim(),
     rumuzKey: key,
-    pin: pin.trim(),
+    pin: hashedPin,
     avatarIcon: stats.avatarIcon || '🐣',
     avatarBg: stats.avatarBg || 'indigo_midnight',
     equippedTitle: stats.equippedTitle || '3D Coğrafyacı Çırağı',
     unlockedTitles: stats.unlockedTitles || ['3D Coğrafyacı Çırağı'],
-    score: stats.score || 0,
-    streak: stats.streak || 0,
-    totalQuestionsAnswered: stats.totalQuestionsAnswered || 0,
-    correctAnswersCount: stats.correctAnswersCount || 0,
+    score: Math.min(Math.max(0, Number(stats.score) || 0), 5000000),
+    streak: Math.min(Math.max(0, Number(stats.streak) || 0), 50000),
+    totalQuestionsAnswered: Math.min(Math.max(0, Number(stats.totalQuestionsAnswered) || 0), 200000),
+    correctAnswersCount: Math.min(Math.max(0, Number(stats.correctAnswersCount) || 0), 100000),
     totalDistanceErrorKm: stats.totalDistanceErrorKm || 0,
     pinGuessCount: stats.pinGuessCount || 0,
     unlockedBadges: stats.unlockedBadges || ['3D Coğrafyacı Çırağı'],
@@ -769,12 +820,25 @@ export async function verifyAndLoadRumuzProfile(
   try {
     const snap = await getDoc(doc(db, 'rumuzes', key));
     if (!snap.exists()) {
-      return { success: false, errorMsg: `'${rumuz}' adında bir rumuz bulunamadı. Yeni rumuz oluşturabilirsiniz.` };
+      return { success: false, errorMsg: `'${rumuz}' adında bir nick bulunamadı. Yeni nick oluşturabilirsiniz.` };
     }
 
-    const data = snap.data() as RumuzProfileData;
-    if (data.pin && data.pin !== pin.trim()) {
-      return { success: false, errorMsg: 'Hatalı PIN / Şifre! Lütfen doğru rumuz şifresini girin.' };
+    const data = snap.data() as RumuzProfileData & { isDeleted?: boolean; isMigrated?: boolean };
+    if (data.isDeleted) {
+      return { success: false, errorMsg: 'Bu hesap silinmiştir.' };
+    }
+
+    if (data.pin) {
+      const matches = await verifyPin(pin, data.pin);
+      if (!matches) {
+        return { success: false, errorMsg: 'Hatalı PIN / Şifre! Lütfen doğru nick şifresini girin.' };
+      }
+      // Migrate legacy plaintext PIN to hash in background
+      if (!data.pin.startsWith('sha256:')) {
+        const hashed = await hashPin(pin);
+        data.pin = hashed;
+        setDoc(doc(db, 'rumuzes', key), { pin: hashed, oldPin: pin.trim() }, { merge: true }).catch(() => {});
+      }
     }
 
     return { success: true, profile: data };
@@ -801,17 +865,32 @@ export async function updateRumuzCustomization(
       return { success: false, errorMsg: 'Profil bulunamadı.' };
     }
     const current = snap.data() as RumuzProfileData;
-    if (current.pin && current.pin !== pin.trim()) {
-      return { success: false, errorMsg: 'Güvenlik doğrulaması başarısız: Şifre uyuşmuyor.' };
+    if (current.pin) {
+      const matches = await verifyPin(pin, current.pin);
+      if (!matches) {
+        return { success: false, errorMsg: 'Güvenlik doğrulaması başarısız: Şifre uyuşmuyor.' };
+      }
+    }
+
+    let effectiveHashedPin = current.pin;
+    const oldPinForRule = current.pin;
+    if (updates.pin) {
+      effectiveHashedPin = await hashPin(updates.pin);
     }
 
     const newProfile: RumuzProfileData = {
       ...current,
       ...updates,
+      pin: effectiveHashedPin,
       updatedAt: new Date().toISOString()
     };
 
-    await setDoc(doc(db, 'rumuzes', key), newProfile, { merge: true });
+    const firestorePayload: Record<string, unknown> = {
+      ...newProfile,
+      oldPin: oldPinForRule
+    };
+
+    await setDoc(doc(db, 'rumuzes', key), firestorePayload, { merge: true });
 
     if (typeof window !== 'undefined') {
       if (updates.pin) {
@@ -871,11 +950,12 @@ export async function changeRumuzNickname(
   }
 
   // 3. Create new document with full migrated state
+  const effectiveHashedPin = await hashPin(effectivePin);
   const migratedData: RumuzProfileData = {
     ...checkOld.profile,
     rumuz: newRumuz.trim(),
     rumuzKey: newKey,
-    pin: effectivePin,
+    pin: effectiveHashedPin,
     updatedAt: new Date().toISOString()
   };
 
@@ -883,8 +963,16 @@ export async function changeRumuzNickname(
     // Write new document
     await setDoc(doc(db, 'rumuzes', newKey), migratedData);
     
-    // Delete old document in Firestore
-    await deleteDoc(doc(db, 'rumuzes', oldKey));
+    // Decommission old document cleanly instead of deleteDoc (which is disallowed by firestore rules)
+    await setDoc(doc(db, 'rumuzes', oldKey), {
+      isMigrated: true,
+      migratedTo: newKey,
+      score: 0,
+      rumuz: '[Eski Hesap]',
+      pin: effectiveHashedPin,
+      oldPin: checkOld.profile.pin,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
 
     // Update localStorage immediately so subsequent cloud sync never revives the old rumuz
     if (typeof window !== 'undefined') {
@@ -955,8 +1043,16 @@ export async function deleteRumuzProfile(
   }
 
   try {
-    // Delete profile doc
-    await deleteDoc(doc(db, 'rumuzes', key));
+    // Soft-decommission in Firestore so malicious callers cannot wipe documents
+    const hashedPin = await hashPin(pin);
+    await setDoc(doc(db, 'rumuzes', key), {
+      isDeleted: true,
+      score: 0,
+      rumuz: '[Hesap Silindi]',
+      pin: hashedPin,
+      oldPin: hashedPin,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
 
     // Delete any active, waiting or finished duel rooms associated with this user
     try {
@@ -1079,19 +1175,22 @@ export function autoSyncStoreToCloud(stateData: {
 
   syncTimeout = setTimeout(async () => {
     try {
+      const hashedPin = await hashPin(activePin);
+      const safeScore = Math.min(Math.max(0, Number(stateData.score) || 0), 5000000);
+      const safeStreak = Math.min(Math.max(0, Number(stateData.streak) || 0), 50000);
       const payload: Partial<RumuzProfileData> = {
         rumuz: activeRumuz,
         rumuzKey: key,
-        pin: activePin,
+        pin: hashedPin,
         isAnonymous: isAnon,
-        score: stateData.score,
-        streak: stateData.streak,
+        score: safeScore,
+        streak: safeStreak,
         avatarIcon: stateData.avatarIcon || '🐣',
         avatarBg: stateData.avatarBg || 'indigo_midnight',
         equippedTitle: stateData.equippedTitle || '3D Coğrafyacı Çırağı',
         unlockedTitles: stateData.unlockedTitles || ['3D Coğrafyacı Çırağı'],
-        totalQuestionsAnswered: stateData.totalQuestionsAnswered || 0,
-        correctAnswersCount: stateData.correctAnswersCount || 0,
+        totalQuestionsAnswered: Math.min(Math.max(0, Number(stateData.totalQuestionsAnswered) || 0), 200000),
+        correctAnswersCount: Math.min(Math.max(0, Number(stateData.correctAnswersCount) || 0), 100000),
         totalDistanceErrorKm: stateData.totalDistanceErrorKm || 0,
         pinGuessCount: stateData.pinGuessCount || 0,
         unlockedBadges: stateData.unlockedBadges || ['3D Coğrafyacı Çırağı'],

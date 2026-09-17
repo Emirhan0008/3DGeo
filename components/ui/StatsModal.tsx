@@ -25,7 +25,9 @@ import {
   CheckCircle2,
   Layers,
   Swords,
-  Crown
+  Crown,
+  BookOpen,
+  Trash2
 } from 'lucide-react';
 
 export default function StatsModal() {
@@ -44,6 +46,10 @@ export default function StatsModal() {
     totalDistanceErrorKm,
     pinGuessCount,
     missedItems,
+    missedQuestions,
+    resolveMissedQuestion,
+    clearMissedQuestions,
+    startMissedQuestionsPractice,
     duelStats,
     botStats,
     flyToCoords,
@@ -113,8 +119,12 @@ export default function StatsModal() {
     }
   });
 
-  // Array of missed items
+  // Array of missed items (pins) and missed questions
   const missedList = Object.values(missedItems || {});
+  const missedQuestionsList = Object.values(missedQuestions || {});
+  const totalMissedCount = missedList.length + missedQuestionsList.length;
+
+  const [weakspotsSubView, setWeakspotsSubView] = useState<'all' | 'questions' | 'pins'>('all');
 
   const handleGenerateAiReport = async () => {
     setLoadingAi(true);
@@ -241,7 +251,7 @@ export default function StatsModal() {
           }`}
         >
           <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
-          <span>Hatalar ({missedList.length})</span>
+          <span>Hata Defteri ({totalMissedCount})</span>
         </button>
 
         <button
@@ -570,30 +580,175 @@ export default function StatsModal() {
         </div>
       )}
 
-      {/* SUB-TAB 3: WEAK SPOTS / MISSED ITEMS LIST */}
+      {/* SUB-TAB 3: WEAK SPOTS / MISSED ITEMS & QUESTIONS LIST */}
       {activeSubTab === 'weakspots' && (
         <div className="space-y-3 animate-in fade-in duration-200 text-xs">
-          <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-200 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>Sık karıştırılan veya yanlış tahmin edilen spesifik KPSS noktalarınız:</span>
+          {/* Top Status & Practice Action Bar */}
+          <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <BookOpen className="w-5 h-5 text-amber-400 shrink-0" />
+              <div>
+                <div className="font-extrabold text-white text-xs sm:text-sm">KPSS Hata &amp; Zayıf Nokta Defteri</div>
+                <div className="text-[11px] text-amber-300/80">
+                  Yanlış yapılan çoktan seçmeli sorular ve haritada ıskalanan yer şekilleri burada toplanır.
+                </div>
+              </div>
             </div>
-            <span className="font-black px-2 py-0.5 rounded bg-rose-500 text-white text-[10px]">
-              {missedList.length} Öğe
-            </span>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              {missedQuestionsList.length > 0 && (
+                <button
+                  onClick={() => {
+                    startMissedQuestionsPractice();
+                  }}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+                  <span>Hataları Tekrar Çöz ({missedQuestionsList.length})</span>
+                </button>
+              )}
+
+              {totalMissedCount > 0 && (
+                <button
+                  onClick={() => {
+                    if (confirm('Hata defterindeki tüm kayıtları temizlemek istediğinizden emin misiniz?')) {
+                      clearMissedQuestions();
+                      useAppStore.setState({ missedItems: {} });
+                    }
+                  }}
+                  title="Hata Defterini Temizle"
+                  className="p-1.5 bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 rounded-lg transition-all cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
-          {missedList.length === 0 ? (
-            <div className="p-6 bg-white/5 border border-white/10 rounded-xl text-center space-y-2 text-slate-400">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-              <p className="font-bold text-slate-200 text-xs">Henüz Kaydedilmiş Hatanız Bulunmuyor!</p>
-              <p className="text-[11px]">Harita veya soru testlerini çözdükçe karıştırılan noktalar otomatik olarak burada listelenecektir.</p>
+          {/* Subfilter Pills */}
+          <div className="flex items-center gap-1.5 border-b border-white/10 pb-2">
+            <button
+              onClick={() => setWeakspotsSubView('all')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                weakspotsSubView === 'all'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10'
+              }`}
+            >
+              Tüm Hatalar ({totalMissedCount})
+            </button>
+            <button
+              onClick={() => setWeakspotsSubView('questions')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 ${
+                weakspotsSubView === 'questions'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10'
+              }`}
+            >
+              <span>KPSS Soru Hataları</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-black/40 text-[10px]">
+                {missedQuestionsList.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setWeakspotsSubView('pins')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 ${
+                weakspotsSubView === 'pins'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10'
+              }`}
+            >
+              <span>Harita Iskalama Noktaları</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-black/40 text-[10px]">
+                {missedList.length}
+              </span>
+            </button>
+          </div>
+
+          {totalMissedCount === 0 ? (
+            <div className="p-8 bg-white/5 border border-white/10 rounded-xl text-center space-y-2 text-slate-400">
+              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+              <p className="font-extrabold text-slate-100 text-sm">Tebrikler! Hata Defteriniz Boş</p>
+              <p className="text-xs text-slate-300 max-w-md mx-auto">
+                Henüz yanlış yaptığınız veya haritada ıskaladığınız bir coğrafi nokta bulunmuyor. Test ve oyunları çözdükçe yapamadığınız sorular otomatik olarak buraya kaydedilecektir.
+              </p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {missedList.map((item, idx) => (
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+              {/* Render Missed Quiz Questions */}
+              {(weakspotsSubView === 'all' || weakspotsSubView === 'questions') && missedQuestionsList.map((q) => (
                 <div
-                  key={idx}
+                  key={`q-${q.id}`}
+                  className="p-3 bg-white/5 hover:bg-white/10 border border-amber-500/20 rounded-xl space-y-2 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-black text-[9px] border border-amber-400/30">
+                          {q.category}
+                        </span>
+                        {q.region && (
+                          <span className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300 text-[9px] border border-white/10 font-bold">
+                            {q.region}
+                          </span>
+                        )}
+                        <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[9px] font-black border border-rose-400/30">
+                          {q.wrongCount}x Yanlış Yapıldı
+                        </span>
+                      </div>
+                      <p className="font-bold text-white text-xs sm:text-sm leading-snug">
+                        {q.questionText}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => resolveMissedQuestion(q.id)}
+                        title="Öğrenildi olarak işaretle ve listeden kaldır"
+                        className="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-400/30 transition-all cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Options display with correct answer highlighted */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 pt-1">
+                    {q.options.map((opt, oIdx) => (
+                      <div
+                        key={oIdx}
+                        className={`px-2 py-1 rounded text-[11px] font-medium border ${
+                          oIdx === q.correctIndex
+                            ? 'bg-emerald-500/20 border-emerald-400/60 text-emerald-200 font-bold'
+                            : 'bg-white/5 border-white/5 text-slate-400'
+                        }`}
+                      >
+                        <span className="opacity-60 mr-1 font-bold">{String.fromCharCode(65 + oIdx)})</span>
+                        <span>{opt}</span>
+                        {oIdx === q.correctIndex && (
+                          <span className="ml-1 text-emerald-400 font-black text-[9px]">✓ DOĞRU</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* ÖSYM Note & Explanation */}
+                  <div className="p-2 bg-black/40 border border-white/10 rounded-lg text-[11px] text-slate-300 space-y-1">
+                    <p className="text-slate-200">{q.explanation}</p>
+                    {q.osymTip && (
+                      <div className="text-amber-300 font-bold flex items-start gap-1 pt-0.5 border-t border-white/5">
+                        <Sparkles className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
+                        <span><strong>ÖSYM Püf Noktası:</strong> {q.osymTip}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Render Missed Map Pin Items */}
+              {(weakspotsSubView === 'all' || weakspotsSubView === 'pins') && missedList.map((item, idx) => (
+                <div
+                  key={`pin-${idx}`}
                   className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl flex items-center justify-between transition-all"
                 >
                   <div className="space-y-0.5">
@@ -601,7 +756,7 @@ export default function StatsModal() {
                     <div className="flex items-center gap-2 text-[10px] text-slate-400">
                       <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{item.region}</span>
                       <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">{item.category}</span>
-                      <span className="text-rose-400 font-bold">{item.wrongCount}x Hata</span>
+                      <span className="text-rose-400 font-bold">{item.wrongCount}x Iskalama</span>
                     </div>
                   </div>
 
@@ -610,7 +765,7 @@ export default function StatsModal() {
                       setActiveTab('map');
                       flyToCoords(item.coords, 60, 10, 8.2);
                     }}
-                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-[10px] flex items-center gap-1 transition-all active:scale-95"
+                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-[10px] flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
                   >
                     <Navigation className="w-3 h-3" />
                     <span>3D Haritada İncele</span>

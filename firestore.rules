@@ -50,23 +50,38 @@ service cloud.firestore {
 
     match /rumuzes/{rumuzId} {
       allow get, list: if true;
-      allow create, update: if isValidId(rumuzId) 
-                            && request.resource.data.rumuz is string 
-                            && request.resource.data.rumuz.size() <= 60;
+      allow create: if isValidId(rumuzId) 
+                    && request.resource.data.rumuz is string 
+                    && request.resource.data.rumuz.size() >= 2
+                    && request.resource.data.rumuz.size() <= 40
+                    && request.resource.data.pin is string
+                    && request.resource.data.pin.size() >= 4
+                    && request.resource.data.pin.size() <= 128
+                    && (!('score' in request.resource.data) || (request.resource.data.score is number && request.resource.data.score >= 0 && request.resource.data.score <= 5000000));
+      allow update: if isValidId(rumuzId) 
+                    && request.resource.data.rumuz is string 
+                    && request.resource.data.rumuz.size() >= 2
+                    && request.resource.data.rumuz.size() <= 40
+                    && (!('pin' in resource.data) || resource.data.pin == '' || request.resource.data.pin == resource.data.pin || (('oldPin' in request.resource.data) && request.resource.data.oldPin == resource.data.pin))
+                    && (!('score' in request.resource.data) || (request.resource.data.score is number && request.resource.data.score >= 0 && request.resource.data.score <= 5000000));
       allow delete: if false;
     }
 
     match /duels/{duelId} {
       allow get, list: if true;
-      allow create, update: if isValidId(duelId);
-      allow delete: if isValidId(duelId);
+      allow create, update: if isValidId(duelId)
+                            && (!('status' in request.resource.data) || request.resource.data.status in ['waiting', 'playing', 'finished', 'cancelled'])
+                            && (!('questionCount' in request.resource.data) || (request.resource.data.questionCount is number && request.resource.data.questionCount >= 1 && request.resource.data.questionCount <= 50));
+      allow delete: if isValidId(duelId)
+                    && (!('status' in resource.data) || resource.data.status in ['finished', 'cancelled', 'waiting']);
     }
 
     match /feedbacks/{feedbackId} {
       allow get, list: if false;
       allow create: if isValidId(feedbackId)
-                    && request.resource.data.content is string
-                    && request.resource.data.content.size() <= 2000;
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() >= 5
+                    && request.resource.data.message.size() <= 2000;
       allow update, delete: if false;
     }
   }
