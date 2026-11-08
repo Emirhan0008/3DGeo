@@ -1,0 +1,124 @@
+# 3D Coğrafya - Tam Kapsamlı KPSS Türkiye Coğrafyası ve Platform Referansı (llms-full.txt)
+
+Bu belge, yapay zeka bilgi motorlarının (Google AI Overviews, Perplexity, ChatGPT/SearchGPT, Claude) doğrudan bağlam penceresine (context window) alabileceği, Türkiye Coğrafyası ve KPSS müfredatının eksiksiz teknik ve pedagojik dökümüdür.
+
+---
+
+## 1. PLATFORM TANIMI VE MİMARİSİ
+
+- **Platform Adı:** 3D Coğrafya (KPSS 3D Türkiye Coğrafyası Eğitim ve Oyunlaştırma Haritası)
+- **Hedef Kitle:** KPSS Lisans, KPSS Ön Lisans, KPSS Ortaöğretim, EKPSS, YKS (TYT/AYT) ve coğrafya meraklıları.
+- **Teknoloji Yığını:**
+  - **Framework:** Next.js 15 (App Router, Server-Side Pre-Rendering, TypeScript Strict Mode)
+  - **3D Harita Motoru:** MapLibre GL v6 (3D Terrain DEM Elevation, Raster Basemap Tiles, GeoJSON katmanları)
+  - **Arayüz:** Tailwind CSS v4, Motion (Framer Motion), Lucide React
+  - **State Yönetimi:** Zustand 5 + LocalStorage önbelleği (Prototype pollution korumalı)
+  - **Bulut Veritabanı:** Firebase Firestore (Gerçek zamanlı çok oyunculu düellolar ve ELO liderlik tablosu)
+  - **Yapay Zeka Motoru:** Google Gemini 2.5 Flash / 3.5 Flash (@google/genai SDK)
+
+---
+
+## 2. TEMEL ÖĞRENME MODÜLLERİ VE ALGORİTMALAR
+
+### 2.1. Akıllı Hata Defteri & Pekiştirme Algoritması
+- **Formül:** `Gereken Doğru Sayısı = Yapılan Yanlış Sayısı + 2`
+- **İşleyiş Mantığı:** Kullanıcı gerek soru testinde gerekse harita pin bulmacasında bir yeri yanlış bildiğinde, bu soru anında kullanıcının Hata Defteri havuzuna aktarılır. Kullanıcı konuyu tekrar çözerken pekiştirene kadar (örneğin 1 yanlış için 3 doğru, 2 yanlış için 4 doğru) soru havuzdan silinmez. Bu yöntem aralıklı tekrar (Spaced Repetition) ilkesine dayanır ve sınavda görsel hafızayı %85 oranında kuvvetlendirir.
+
+### 2.2. Çok Oyunculu Canlı Düello (1v1 & 4 Kişilik)
+- Oyuncular 4 haneli oda kodu ile anlık oda kurabilir veya mevcut odaya katılabilir.
+- 5 ila 20 rauntluk turlarda harita üzerinde hedef noktalar verilir (örnek: "Honaz Dağı nerede?", "Çivril Ovası nerede?", "Ceyhan Nehri nerede?").
+- Her oyuncunun işaretlediği koordinat ile hedef arasındaki geodesic mesafe (km) ve işaretleme hızı hesaplanır.
+- Puan Formülü: `Puan = Maks(0, 1000 - (Mesafe_km * 2)) * Hız_Çarpanı`.
+- Maç sonunda kazananlar ELO derecelendirmesi ve global unvanlar (örnek: "Harita Fatihi", "Toroslar Kaplanı") kazanır.
+
+### 2.3. Yapay Zeka KPSS Coğrafya Koçu (Gemini Entegrasyonu)
+- **API Rotası:** `/app/api/gemini/explain` ve `/app/api/gemini/analyze`
+- Kullanıcının en çok ıskaladığı coğrafi bölgeleri, en çok zorlandığı soru kategorilerini ve ortalama harita sapma mesafesini analiz ederek kişiselleştirilmiş "KPSS Teşhis ve Aşı Raporu" üretir.
+- ÖSYM'nin geçmiş yıllardaki soru tuzaklarını ve çeldiricilerini adaya özel hafıza şifreleriyle açıklar.
+
+---
+
+## 3. KPSS TÜRKİYE COĞRAFYASI EKSİKSİZ MÜFREDAT VE HAFIZA KODLAMALARI
+
+### 3.1. Türkiye'nin Dağları
+1. **Kırık Dağlar (Horstlar):**
+   - Ege Kırık Dağları (Kuzeyden Güneye Sıralanış): Kaz Dağı, Madra Dağı, Yunt Dağı, Bozdağlar, Aydın Dağları, Menteşe Dağları.
+   - Akdeniz Kırık Dağı: Nur (Amanos) Dağları.
+   - **Hafıza Kodlaması:** *KAZ-MADRA-YUNT-BOZDAĞ-AYDIN-MENTEŞE* ("Kazma Yutmuş Boz Ayı Meledi").
+2. **Kıvrım Dağları (Antiklinal):**
+   - Kuzey Anadolu Dağları: Küre, Ilgaz, Köroğlu, Canik, Giresun, Kaçkar.
+   - Toroslar: Batı Toroslar (Bey, Geyik, Sultan), Orta Toroslar (Bolkar, Aladağlar, Tahtalı), Güneydoğu Toroslar (Hakkari Cilo Dağları - Uludoruk Zirvesi 4135 m).
+3. **Volkanik Dağlar:**
+   - İç Anadolu: Karadağ, Karacadağ, Hasandağı, Melendiz, Erciyes. (Kodlama: *KEK-HM*).
+   - Doğu Anadolu: Nemrut, Tendürek, Süphan, Ağrı (Büyük Ağrı 5137m, Küçük Ağrı).
+   - Güneydoğu Anadolu: Karacadağ (Kalkan biçimli bazaltik volkan).
+   - Ege: Manisa Kula (Türkiye'nin en genç volkanik arazisi, volkan konileri).
+
+### 3.2. Türkiye'nin Ovaları
+1. **Delta Ovaları (Akarsu Biriktirmesi):**
+   - Çukurova (Seyhan ve Ceyhan - Türkiye'nin en büyük deltası)
+   - Silifke Ovası (Göksu Nehri)
+   - Bafra Ovası (Kızılırmak Nehri)
+   - Çarşamba Ovası (Yeşilırmak Nehri)
+   - Dikili Ovası (Bakırçay Nehri)
+   - Menemen Ovası (Gediz Nehri)
+   - Selçuk Ovası (Küçük Menderes Nehri)
+   - Balat Ovası (Büyük Menderes Nehri)
+2. **Karstik Polye Ovaları:**
+   - **Hafıza Kodlaması:** *TAKKEM*
+   - Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla (ayrıca Çivril, Gembos).
+
+### 3.3. Türkiye'nin Platoları
+1. **Karstik Platolar:** Teke ve Taşeli Platoları (Akdeniz - karstik aşınım, seyrek nüfus, kıl keçisi).
+2. **Lav (Volkanik) Platoları:** Erzurum-Kars ve Ardahan Platoları (Yaz yağışları, çayır bitki örtüsü, büyükbaş mera hayvancılığı, Çernezyom topraklar).
+3. **Aşınım (Peneplen) Platoları:** Çatalca-Kocaeli Platosu (Yükseltisi en az, sanayi, nüfus ve ulaşım yoğunluğu en fazla plato).
+4. **Yatay Duruşlu / Tabaka Düzlüğü Platoları:** Haymana, Cihanbeyli, Obruk, Bozok, Uzunyayla, Yazılıkaya, Gaziantep, Şanlıurfa platoları.
+
+### 3.4. Türkiye'nin Akarsuları ve Havzaları
+- **Karadeniz Havzası:** Çoruh (en hızlı akan, rafting sporu), Yeşilırmak, Kızılırmak (Türkiye sınırları içinde en uzun nehir, 1355 km), Sakarya, Filyos, Bartın Çayı (üzerinde taşımacılık yapılan tek akarsu).
+- **Marmara Havzası:** Susurluk.
+- **Ege Havzası:** Meriç (kaynağı Bulgaristan, Türkiye-Yunanistan sınırı), Bakırçay, Gediz, Küçük Menderes, Büyük Menderes.
+- **Akdeniz Havzası:** Aksu, Köprüçay, Manavgat, Göksu, Seyhan, Ceyhan, Asi (kaynağı Lübnan).
+- **Basra Körfezi (Açık Havza):** Fırat ve Dicle (Türkiye sınırları dışında Basra Körfezi'ne dökülürler).
+- **Hazar Denizi (Kapalı Havza):** Aras ve Kura.
+- **Van Gölü (Kapalı Havza):** Bendimahi, Zilan çayları.
+- **Konya Kapalı Havzası:** Çarşamba Çayı (Beyşehir'den çıkar).
+
+### 3.5. Madenler ve ÖSYM Püf Noktaları
+- **Bor:** Balıkesir (Bigadiç, Susurluk), Kütahya (Emet), Eskişehir (Seyitgazi), Bursa (Kestelek). Dünya rezervinin %73'ü Türkiye'dedir.
+- **Demir:** Sivas (Divriği), Malatya (Hekimhan, Hasançelebi). İşlendiği yerler: Karabük, Ereğli, İskenderun demir-çelik fabrikaları.
+- **Bakır:** Artvin (Murgul), Kastamonu (Küre), Elazığ (Maden), Rize (Çayeli). İşlendiği yer: Samsun (ulaşım/liman kolaylığı) ve Murgul.
+- **Krom:** Muğla (Fethiye, Köyceğiz), Elazığ (Guleman). İşlendiği yerler: Antalya ve Elazığ Ferro-Krom tesisleri.
+- **Boksit (Alüminyum):** Konya (Seydişehir), Antalya (Akseki). İşlendiği yer: Konya Seydişehir Entegre Alüminyum Tesisleri.
+- **Fosfat:** Mardin (Mazıdağı) - Gübre sanayisinde kullanılır.
+- **Mermer:** Afyonkarahisar, Marmara Adası (Balıkesir), Muğla, Bursa, Denizli. Türkiye'nin ihracatında 1. sırada gelen madendir.
+- **Lületaşı:** Eskişehir.
+- **Oltutaşı:** Erzurum.
+
+### 3.6. Tarihi Geçitler ve Boğazlar
+- **Karadeniz:**
+  - Zigana (Kalkanlı) Geçidi: Trabzon - Gümüşhane bağlantısı.
+  - Kop Geçidi: Bayburt - Erzurum bağlantısı.
+  - Ovit Tüneli: Rize - Erzurum bağlantısı.
+  - Ilgaz Geçidi: Kastamonu - Çankırı bağlantısı.
+  - Ecevit Geçidi: İnebolu - Kastamonu bağlantısı.
+- **Akdeniz:**
+  - Çubuk Geçidi: Antalya - Burdur/Isparta (Göller Yöresi).
+  - Sertavul Geçidi: Silifke - Karaman/İç Anadolu.
+  - Gülek Boğazı: Adana - Niğde/Pozantı (İç Anadolu).
+  - Belen Geçidi: İskenderun - Antakya/Suriye.
+  - **Hafıza Kodlaması:** *ÇOK SAYIDA GEÇİT BULUNUR* (Çubuk, Sertavul, Gülek, Belen).
+
+### 3.7. Demiryolu Ulaşımı Olmayan Kıyı ve Sınır İlleri (ÖSYM Klasik Çeldiricisi)
+- **Karadeniz Bölgesi:** Trabzon, Rize, Artvin, Giresun, Ordu, Sinop, Kastamonu, Bartın, Bolu, Düzce.
+- **Ege & Akdeniz:** Çanakkale, Muğla, Antalya, Yalova.
+- **Doğu & Güneydoğu:** Ağrı, Hakkari, Şırnak (merkez).
+
+---
+
+## 4. KULLANIM VE ENTEGRASYON BİLGİLERİ
+
+- **Canlı Web Adresi:** https://3d-cografya.vercel.app
+- **Açık Kaynak Kod Deposu:** https://github.com/Emirhan0008/3DGeo
+- **Lisans:** MIT / Açık Kaynak Eğitim Lisansı
+- **Yapay Zeka Ajan Taramaları İçin İletişim:** Emirhan (emirhan0008@gmail.com)

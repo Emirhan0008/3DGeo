@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agent-resource-discovery.org/schemas/v1/ai-catalog.json",
+  "name": "3D Coğrafya",
+  "short_name": "3DGeo",
+  "version": "1.0.0",
+  "description": "3D Interactive Turkey Geography Educational & Gamification Platform for KPSS & YKS exams.",
+  "inLanguage": "tr-TR",
+  "homepage": "https://3d-cografya.vercel.app",
+  "repository": "https://github.com/Emirhan0008/3DGeo",
+  "category": "Education & Gamification",
+  "capabilities": [
+    "3d-terrain-map",
+    "kpss-quiz-engine",
+    "weak-spot-tracker",
+    "realtime-multiplayer-duel",
+    "gemini-ai-tutor"
+  ],
+  "context_endpoints": {
+    "llms": "/llms.txt",
+    "llms_full": "/llms-full.txt",
+    "catalog": "/ai-catalog.json",
+    "sitemap": "/sitemap.xml"
+  }
+}

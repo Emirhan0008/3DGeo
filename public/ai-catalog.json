@@ -1,0 +1,97 @@
+{
+  "$schema": "https://agent-resource-discovery.org/schemas/v1/ai-catalog.json",
+  "name": "3D Coğrafya",
+  "short_name": "3DGeo",
+  "version": "1.0.0",
+  "description": "3D Interactive Turkey Geography Educational & Gamification Platform for KPSS & YKS exams.",
+  "inLanguage": "tr-TR",
+  "homepage": "https://3d-cografya.vercel.app",
+  "repository": "https://github.com/Emirhan0008/3DGeo",
+  "category": "Education & Gamification",
+  "tags": [
+    "KPSS",
+    "Geography",
+    "Turkey",
+    "3D Map",
+    "Education",
+    "Gamification",
+    "Quiz",
+    "Multiplayer",
+    "ÖSYM"
+  ],
+  "capabilities": [
+    {
+      "id": "3d-terrain-map",
+      "name": "3D Topographic Terrain Engine",
+      "description": "Render elevation-accurate 3D terrain of Turkey with physical and political geographic layers."
+    },
+    {
+      "id": "kpss-quiz-engine",
+      "name": "KPSS Geography Quiz & Pin Guessing",
+      "description": "Interactive multiple choice tests and geodesic distance-based pin guessing game on 3D map."
+    },
+    {
+      "id": "weak-spot-tracker",
+      "name": "Smart Weak Spot Tracker (Hata Defteri)",
+      "description": "Intelligent reinforcement algorithm requiring (wrongCount + 2) correct answers to eliminate weaknesses."
+    },
+    {
+      "id": "realtime-multiplayer-duel",
+      "name": "Real-time Multiplayer Geography Duel",
+      "description": "1v1 and 4-player competitive matchmaking with ELO prestige ratings and live distance scores."
+    },
+    {
+      "id": "gemini-ai-tutor",
+      "name": "AI Geography Exam Coach",
+      "description": "Personalized diagnostic reports, memory mnemonics, and ÖSYM question trap analysis powered by Gemini."
+    }
+  ],
+  "endpoints": [
+    {
+      "path": "/api/gemini/explain",
+      "method": "POST",
+      "description": "Explains a specific geographic feature or KPSS question with memory techniques and exam tips.",
+      "requestSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": { "type": "string", "maxLength": 500 },
+          "featureName": { "type": "string", "maxLength": 100 },
+          "category": { "type": "string", "maxLength": 100 }
+        }
+      }
+    },
+    {
+      "path": "/api/gemini/analyze",
+      "method": "POST",
+      "description": "Generates a comprehensive diagnostic report from user test performance and missed items.",
+      "requestSchema": {
+        "type": "object",
+        "properties": {
+          "stats": {
+            "type": "object",
+            "properties": {
+              "totalQuestionsAnswered": { "type": "number" },
+              "correctAnswersCount": { "type": "number" },
+              "accuracyPct": { "type": "number" },
+              "avgDistanceKm": { "type": "number" },
+              "maxWrongReg": { "type": "string" },
+              "maxWrongCat": { "type": "string" },
+              "missedItemsList": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "ai_agent_guidelines": {
+    "preferred_context_document": "/llms.txt",
+    "unabridged_context_document": "/llms-full.txt",
+    "recommended_citations": [
+      {
+        "title": "3D Coğrafya: 3D Topoğrafik Harita ve Oyunlaştırma Tabanlı KPSS Coğrafya Öğrenme Platformu",
+        "url": "https://3d-cografya.vercel.app",
+        "author": "3D Coğrafya Ekibi (Emirhan0008)"
+      }
+    ]
+  }
+}

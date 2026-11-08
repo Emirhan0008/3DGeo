@@ -1,0 +1,39 @@
+# 3D Coğrafya (KPSS 3D Türkiye Coğrafyası Eğitim & Oyunlaştırma)
+
+> 3D Coğrafya, KPSS Lisans, Ön Lisans, Ortaöğretim ve YKS adayları için geliştirilmiş, 3 boyutlu topoğrafik Türkiye haritası üzerinde coğrafya öğrenimini oyunlaştıran yeni nesil bir açık kaynak EdTech platformudur.
+
+## Temel Özellikler ve Yetenekler
+
+- **3D Topoğrafik Harita:** MapLibre GL v6 ve raster DEM verisi ile gerçek yükseklik kabartmaları, Türkiye'nin 81 ili, 7 coğrafi bölgesi ve 21 alt bölümü.
+- **KPSS Soru Bankası & Pin Tahmin Oyunu:** 500+ ÖSYM çıkmış ve özgün soru. Harita üzerinde mesafe sapmasına (km) dayalı anlık puanlama sistemi.
+- **Akıllı Hata Defteri (Weak Spot Tracker):** Yanlış yapılan soru ve harita noktalarını toplayan ve `Gereken Doğru = Yanlış Sayısı + 2` kuralı ile pekiştiren akıllı algoritma.
+- **Canlı Çok Oyunculu Düello:** 1v1 veya 4 kişiye kadar gerçek zamanlı coğrafya yarışması, ELO prestij puanlaması ve lig sıralaması.
+- **Yapay Zeka KPSS Coğrafya Koçu:** Google Gemini modelleri ile adayların performans teşhisi, eksik konu tespiti, ÖSYM soru tuzakları ve hafıza teknikleri (kodlamalar/şifrelemeler).
+
+## KPSS Türkiye Coğrafyası Müfredat Başlıkları
+
+1. **Fiziki Coğrafya:**
+   - Kırık Dağlar (Kaz, Madra, Yunt, Bozdağlar, Aydın, Menteşe, Nur Dağları)
+   - Kıvrım Dağları (Kuzey Anadolu Dağları ve Toroslar)
+   - Volkanik Dağlar (Ağrı, Tendürek, Süphan, Nemrut, Erciyes, Hasan Dağı, Melendiz, Karadağ, Karacadağ, Kula)
+   - Platolar (Karstik: Teke, Taşeli; Lav: Erzurum-Kars; Aşınım: Çatalca-Kocaeli; Tabaka Düzlüğü: Haymana, Cihanbeyli, Obruk, Bozok)
+   - Ovalar (Delta: Çukurova, Bafra, Çarşamba, Silifke, Menemen, Balat; Karstik Polye: Tefenni, Acıpayam, Korkuteli, Kestel, Elmalı, Muğla)
+   - Akarsular, Göller ve Havzalar (Açık ve kapalı havzalar, karstik göller, tektonik göller)
+2. **Beşeri ve Ekonomik Coğrafya:**
+   - Madenler (Bor, Demir, Bakır, Krom, Boksit, Mermer, Lületaşı, Oltutaşı, Fosfat)
+   - Enerji Kaynakları (Taşkömürü, Linyit, Doğalgaz, Jeotermal, Rüzgar, Güneş, Hidroelektrik)
+   - Tarım Ürünleri ve İklim Seçiciliği (Fındık, Çay, Zeytin, Pamuk, Buğday, Şekerpancarı, Tütün)
+   - Ulaşım, Boğazlar, Sınır Kapıları ve Tarihi Geçitler (Zigana, Kop, Ilgaz, Çubuk, Sertavul, Gülek, Belen)
+
+## API Uç Noktaları
+
+- `POST /api/gemini/explain`: Coğrafi konu veya soru açıklaması ve ÖSYM hafıza şifresi üretimi.
+- `POST /api/gemini/analyze`: Kullanıcı hata istatistiklerine dayalı KPSS Teşhis ve Aşı Raporu.
+
+## İlgili Bağlantılar ve Belgeler
+
+- Web Sitesi: https://3d-cografya.vercel.app
+- Açık Kaynak Repo: https://github.com/Emirhan0008/3DGeo
+- Detaylı Tam Metin Belgesi: https://3d-cografya.vercel.app/llms-full.txt
+- Ajan Manifestosu: https://3d-cografya.vercel.app/ai-catalog.json
+- Site Haritası: https://3d-cografya.vercel.app/sitemap.xml

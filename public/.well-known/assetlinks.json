@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.emirhan008.cografya3d",
+      "sha256_cert_fingerprints": [
+        "B6:3D:48:55:36:4B:44:8A:43:39:B8:03:4E:7E:5A:B6:F6:CA:5E:37:5D:80:6E:30:34:CC:33:8A:96:32:DE:6B"
+      ]
+    }
+  }
+]

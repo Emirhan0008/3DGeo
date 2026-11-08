@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Kullanıcının KPSS Coğrafya profil ve istatistik verileri",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "score": { "type": "number" },
+        "streak": { "type": "number" },
+        "totalQuestionsAnswered": { "type": "number" },
+        "correctAnswersCount": { "type": "number" },
+        "totalDistanceErrorKm": { "type": "number" },
+        "pinGuessCount": { "type": "number text" },
+        "unlockedBadges": { "type": "array" },
+        "isBlindMapMode": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "Kullanıcının detaylı yanlış soruları ve bölge istatistikleri",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "regionalStats": { "type": "object" },
+        "categoryStats": { "type": "object" },
+        "missedItems": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId"]
+    },
+    "RumuzProfile": {
+      "title": "RumuzProfile",
+      "description": "Cross-domain unique rumuz profile and statistics key",
+      "type": "object",
+      "properties": {
+        "rumuz": { "type": "string", "maxLength": 100 },
+        "rumuzKey": { "type": "string", "maxLength": 100 },
+        "pin": { "type": "string", "maxLength": 64 },
+        "avatarIcon": { "type": "string", "maxLength": 32 },
+        "avatarBg": { "type": "string", "maxLength": 64 },
+        "equippedTitle": { "type": "string", "maxLength": 100 },
+        "unlockedTitles": { "type": "array" },
+        "score": { "type": "number" },
+        "streak": { "type": "number" },
+        "totalQuestionsAnswered": { "type": "number" },
+        "correctAnswersCount": { "type": "number" },
+        "totalDistanceErrorKm": { "type": "number" },
+        "pinGuessCount": { "type": "number" },
+        "unlockedBadges": { "type": "array" },
+        "categoryMasteryProgress": { "type": "object" },
+        "duelStats": { "type": "object" },
+        "isBlindMapMode": { "type": "boolean" },
+        "regionalStats": { "type": "object" },
+        "categoryStats": { "type": "object" },
+        "missedItems": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["rumuz", "rumuzKey"]
+    },
+    "UserHistory": {
+      "title": "UserHistory",
+      "description": "Kullanıcının geçmiş test ve harita tahmin etkinlikleri",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "scoreEarned": { "type": "number" },
+        "details": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "type", "createdAt"]
+    },
+    "DuelSession": {
+      "title": "DuelSession",
+      "description": "Gerçek zamanlı 1v1 harita düello oturumu",
+      "type": "object",
+      "properties": {
+        "roomCode": { "type": "string", "maxLength": 16 },
+        "roomPin": { "type": "string", "maxLength": 32 },
+        "mode": { "type": "string" },
+        "status": { "type": "string" },
+        "questionCount": { "type": "number" },
+        "categoryFilter": { "type": "string" },
+        "questionIds": { "type": "array" },
+        "player1": { "type": "object" },
+        "player2": { "type": "object" },
+        "currentRound": { "type": "number" },
+        "roundStartTime": { "type": "number" },
+        "roundTimeLimit": { "type": "number" },
+        "bothAnsweredAt": { "type": "number" },
+        "winnerId": { "type": "string" },
+        "roundHistory": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["mode", "status", "questionCount", "player1"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Kullanıcı geri bildirim ve önerileri",
+      "type": "object",
+      "properties": {
+        "rumuz": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 50 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "rating": { "type": "number" },
+        "deviceInfo": { "type": "object" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Kullanıcı profil kartı"
+    },
+    "/users/{userId}/progress/{progressId}": {
+      "schema": { "$ref": "#/entities/UserProgress" },
+      "description": "Kullanıcı soru ve harita ilerleme detayları"
+    },
+    "/users/{userId}/history/{historyId}": {
+      "schema": { "$ref": "#/entities/UserHistory" },
+      "description": "Kullanıcı geçmiş aktivite kayıtları"
+    },
+    "/rumuzes/{rumuzId}": {
+      "schema": { "$ref": "#/entities/RumuzProfile" },
+      "description": "Rumuz anahtarlı benzersiz çapraz domain istatistik kaydı"
+    },
+    "/duels/{duelId}": {
+      "schema": { "$ref": "#/entities/DuelSession" },
+      "description": "Gerçek zamanlı harita düello oturumları"
+    },
+    "/feedbacks/{feedbackId}": {
+      "schema": { "$ref": "#/entities/Feedback" },
+      "description": "Kullanıcı hata ve öneri bildirimleri"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Global Safety Net Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId)
+                    && isValidId(userId)
+                    && request.resource.data.uid == userId;
+      allow update: if isOwner(userId)
+                    && isValidId(userId)
+                    && request.resource.data.uid == userId;
+      allow delete: if isOwner(userId);
+
+      match /progress/{progressId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+                             && isValidId(progressId)
+                             && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      match /history/{historyId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+                             && isValidId(historyId)
+                             && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /rumuzes/{rumuzId} {
+      allow get, list: if true;
+      allow create: if isValidId(rumuzId) 
+                    && request.resource.data.rumuz is string 
+                    && request.resource.data.rumuz.size() >= 2
+                    && request.resource.data.rumuz.size() <= 40
+                    && request.resource.data.pin is string
+                    && request.resource.data.pin.size() >= 4
+                    && request.resource.data.pin.size() <= 128
+                    && (!('score' in request.resource.data) || (request.resource.data.score is number && request.resource.data.score >= 0 && request.resource.data.score <= 5000000))
+                    && (!('streak' in request.resource.data) || (request.resource.data.streak is number && request.resource.data.streak >= 0 && request.resource.data.streak <= 50000))
+                    && (!('totalQuestionsAnswered' in request.resource.data) || (request.resource.data.totalQuestionsAnswered is number && request.resource.data.totalQuestionsAnswered >= 0 && request.resource.data.totalQuestionsAnswered <= 200000))
+                    && (!('correctAnswersCount' in request.resource.data) || (request.resource.data.correctAnswersCount is number && request.resource.data.correctAnswersCount >= 0 && request.resource.data.correctAnswersCount <= 100000));
+      allow update: if isValidId(rumuzId) 
+                    && request.resource.data.rumuz is string 
+                    && request.resource.data.rumuz.size() >= 2
+                    && request.resource.data.rumuz.size() <= 40
+                    && (!('score' in request.resource.data) || (request.resource.data.score is number && request.resource.data.score >= 0 && request.resource.data.score <= 5000000))
+                    && (!('streak' in request.resource.data) || (request.resource.data.streak is number && request.resource.data.streak >= 0 && request.resource.data.streak <= 50000))
+                    && (!('totalQuestionsAnswered' in request.resource.data) || (request.resource.data.totalQuestionsAnswered is number && request.resource.data.totalQuestionsAnswered >= 0 && request.resource.data.totalQuestionsAnswered <= 200000))
+                    && (!('correctAnswersCount' in request.resource.data) || (request.resource.data.correctAnswersCount is number && request.resource.data.correctAnswersCount >= 0 && request.resource.data.correctAnswersCount <= 100000))
+                    && (
+                      // Case 1: PIN is unchanged
+                      (!('pin' in request.resource.data) || request.resource.data.pin == resource.data.pin)
+                      // Case 2: PIN change requires proof of matching oldPin
+                      || (('oldPin' in request.resource.data) && request.resource.data.oldPin == resource.data.pin && request.resource.data.pin is string && request.resource.data.pin.size() >= 4 && request.resource.data.pin.size() <= 128)
+                    );
+      allow delete: if false;
+    }
+
+    match /duels/{duelId} {
+      allow get, list: if true;
+      allow create: if isValidId(duelId)
+                    && request.resource.data.status in ['waiting', 'playing', 'finished', 'cancelled']
+                    && request.resource.data.player1 is map
+                    && request.resource.data.player1.id is string
+                    && request.resource.data.player1.id.size() <= 64
+                    && request.resource.data.player1.rumuz is string
+                    && request.resource.data.player1.rumuz.size() <= 40
+                    && (!('questionCount' in request.resource.data) || (request.resource.data.questionCount is number && request.resource.data.questionCount >= 1 && request.resource.data.questionCount <= 50));
+      allow update: if isValidId(duelId)
+                    && (!('status' in request.resource.data) || request.resource.data.status in ['waiting', 'playing', 'finished', 'cancelled'])
+                    && (!('questionCount' in request.resource.data) || (request.resource.data.questionCount is number && request.resource.data.questionCount >= 1 && request.resource.data.questionCount <= 50))
+                    && (!('player1' in request.resource.data) || !('score' in request.resource.data.player1) || (request.resource.data.player1.score is number && request.resource.data.player1.score >= 0 && request.resource.data.player1.score <= 100000));
+      allow delete: if isValidId(duelId)
+                    && resource.data.status != 'playing'
+                    && (!('status' in resource.data) || resource.data.status in ['finished', 'cancelled', 'waiting']);
+    }
+
+    match /feedbacks/{feedbackId} {
+      allow get, list: if false;
+      allow create: if isValidId(feedbackId)
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() >= 5
+                    && request.resource.data.message.size() <= 2000
+                    && (!('email' in request.resource.data) || request.resource.data.email == null || (request.resource.data.email is string && request.resource.data.email.size() <= 120))
+                    && (!('rumuz' in request.resource.data) || (request.resource.data.rumuz is string && request.resource.data.rumuz.size() <= 50));
+      allow update, delete: if false;
+    }
+  }
+}
