@@ -74,9 +74,10 @@ export default function FeatureDetailModal() {
  alt={selectedFeature.name}
  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
  />
- <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+ <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
  <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[10px] text-white/90 font-medium">
- <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/15 text-indigo-300 font-bold">Coğrafi Görsel
+ <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/15 text-[#dcc07d] font-bold">
+ {getFeatureImageUrl(selectedFeature).startsWith('data:image/svg') ? 'Temsili Gravür' : 'Coğrafi Fotoğraf'}
  </span>
  <span className="text-slate-300 font-semibold">{selectedFeature.region}</span>
  </div>

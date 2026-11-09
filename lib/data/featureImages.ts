@@ -89,12 +89,12 @@ export const VERIFIED_IMAGES: Record<string, string> = {
     'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/K%C4%B1z%C4%B1l%C4%B1rmak_River.jpg/960px-K%C4%B1z%C4%B1l%C4%B1rmak_River.jpg',
 };
 
-const INK = '#2a2412';
-const INK_SOFT = '#4a3c1e';
-const PAPER = '#efe3c6';
-const PAPER_DEEP = '#ddc79b';
-const WATER = '#7fa8b8';
-const WATER_DEEP = '#5c8595';
+const INK = '#1f1a0e';
+const INK_SOFT = '#3a2f16';
+const PAPER = '#f7efd9';
+const PAPER_DEEP = '#e3d3a8';
+const WATER = '#6f9dae';
+const WATER_DEEP = '#48707f';
 
 /** Wraps an SVG body in the shared plate frame. */
 function plate(body: string, opts = { bg: PAPER }): string {
@@ -113,7 +113,7 @@ function plate(body: string, opts = { bg: PAPER }): string {
       <rect width="400" height="225" fill="url(#sky)"/>
       ${body}
       <rect width="400" height="225" fill="url(#hatch)"/>
-      <rect x="3" y="3" width="394" height="219" fill="none" stroke="${INK}" stroke-opacity="0.35"/>
+      <rect x="3" y="3" width="394" height="219" fill="none" stroke="${INK}" stroke-opacity="0.65"/>
       <rect x="7" y="7" width="386" height="211" fill="none" stroke="${INK}" stroke-opacity="0.18"/>
     </svg>`;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.replace(/\s+/g, ' '));
@@ -124,105 +124,105 @@ function mountains() {
     <path d="M0 168 L52 108 L86 134 L128 76 L170 126 L206 96 L248 140 L286 104 L330 146 L372 116 L400 148 L400 225 L0 225 Z"
           fill="${INK}" fill-opacity="0.30"/>
     <path d="M0 186 L44 150 L82 172 L124 132 L166 168 L208 142 L252 176 L292 148 L336 180 L378 152 L400 174 L400 225 L0 225 Z"
-          fill="${INK}" fill-opacity="0.55"/>
-    <path d="M128 76 L140 92 L120 92 Z" fill="${PAPER}" fill-opacity="0.85"/>
-    <path d="M286 104 L297 118 L277 118 Z" fill="${PAPER}" fill-opacity="0.7"/>
-    <path d="M196 120 q10 -8 20 0 q10 8 20 0" stroke="${INK_SOFT}" stroke-opacity="0.4" fill="none" stroke-width="1.2"/>
+          fill="${INK}" fill-opacity="0.68"/>
+    <path d="M128 76 L140 92 L120 92 Z" fill="${PAPER}" fill-opacity="0.9"/>
+    <path d="M286 104 L297 118 L277 118 Z" fill="${PAPER}" fill-opacity="0.78"/>
+    <path d="M196 120 q10 -8 20 0 q10 8 20 0" stroke="${INK_SOFT}" stroke-opacity="0.7" fill="none" stroke-width="1.2"/>
   `);
 }
 
 function river() {
   return plate(`
     <path d="M0 150 C60 140 96 168 140 158 C190 146 214 118 262 126 C310 134 344 164 400 152 L400 225 L0 225 Z"
-          fill="${INK}" fill-opacity="0.2"/>
+          fill="${INK}" fill-opacity="0.38"/>
     <path d="M-10 172 C50 150 92 186 140 172 C196 156 220 130 268 140 C318 150 350 182 410 168"
           stroke="${WATER_DEEP}" stroke-width="14" fill="none" stroke-linecap="round"/>
     <path d="M-10 172 C50 150 92 186 140 172 C196 156 220 130 268 140 C318 150 350 182 410 168"
           stroke="${WATER}" stroke-width="7" fill="none" stroke-linecap="round"/>
     <path d="M60 196 q8 -5 16 0 M150 200 q8 -5 16 0 M250 196 q8 -5 16 0 M330 200 q8 -5 16 0"
-          stroke="${INK_SOFT}" stroke-opacity="0.45" fill="none" stroke-width="1.4"/>
+          stroke="${INK_SOFT}" stroke-opacity="0.72" fill="none" stroke-width="1.4"/>
   `);
 }
 
 function lake() {
   return plate(`
-    <ellipse cx="200" cy="150" rx="150" ry="52" fill="${WATER_DEEP}" fill-opacity="0.55"/>
-    <ellipse cx="200" cy="148" rx="140" ry="44" fill="${WATER}" fill-opacity="0.75"/>
+    <ellipse cx="200" cy="150" rx="150" ry="52" fill="${WATER_DEEP}" fill-opacity="0.68"/>
+    <ellipse cx="200" cy="148" rx="140" ry="44" fill="${WATER}" fill-opacity="0.82"/>
     <path d="M70 132 q22 -10 44 0 M150 122 q24 -10 48 0 M250 130 q22 -10 44 0"
-          stroke="${PAPER}" stroke-opacity="0.55" fill="none" stroke-width="1.6"/>
+          stroke="${PAPER}" stroke-opacity="0.7" fill="none" stroke-width="1.6"/>
     <path d="M0 186 L60 176 L120 188 L190 178 L260 190 L330 180 L400 190 L400 225 L0 225 Z"
-          fill="${INK}" fill-opacity="0.35"/>
+          fill="${INK}" fill-opacity="0.52"/>
   `);
 }
 
 function plain() {
   return plate(`
-    <path d="M0 128 L400 120 L400 225 L0 225 Z" fill="${INK}" fill-opacity="0.18"/>
+    <path d="M0 128 L400 120 L400 225 L0 225 Z" fill="${INK}" fill-opacity="0.36"/>
     ${Array.from({ length: 7 }, (_, i) => {
       const y = 136 + i * 12;
-      return `<path d="M${20 + (i % 2) * 30} ${y} L${360 - (i % 2) * 20} ${y - 3}" stroke="${INK}" stroke-opacity="0.22" stroke-width="1"`;
+      return `<path d="M${20 + (i % 2) * 30} ${y} L${360 - (i % 2) * 20} ${y - 3}" stroke="${INK}" stroke-opacity="0.38" stroke-width="1"`;
     }).join('')}
     <path d="M40 150 l14 -22 l14 22 M70 154 l14 -22 l14 22 M300 148 l14 -22 l14 22"
-          stroke="${INK_SOFT}" stroke-opacity="0.5" fill="none" stroke-width="1.4"/>
+          stroke="${INK_SOFT}" stroke-opacity="0.65" fill="none" stroke-width="1.4"/>
   `);
 }
 
 function plateau() {
   return plate(`
     <path d="M0 190 L70 190 L86 128 L250 122 L268 190 L400 190 L400 225 L0 225 Z"
-          fill="${INK}" fill-opacity="0.42"/>
-    <path d="M86 128 L250 122" stroke="${INK}" stroke-opacity="0.6" stroke-width="2"/>
-    <path d="M70 190 L70 225 M268 190 L268 225" stroke="${INK}" stroke-opacity="0.35" stroke-width="1.2"/>
+          fill="${INK}" fill-opacity="0.58"/>
+    <path d="M86 128 L250 122" stroke="${INK}" stroke-opacity="0.72" stroke-width="2"/>
+    <path d="M70 190 L70 225 M268 190 L268 225" stroke="${INK}" stroke-opacity="0.65" stroke-width="1.2"/>
   `);
 }
 
 function cave() {
   return plate(`
-    <path d="M40 225 L40 110 Q200 6 360 110 L360 225 Z" fill="${INK}" fill-opacity="0.55"/>
-    <path d="M110 225 L110 150 Q200 84 290 150 L290 225 Z" fill="${PAPER}" fill-opacity="0.5"/>
+    <path d="M40 225 L40 110 Q200 6 360 110 L360 225 Z" fill="${INK}" fill-opacity="0.68"/>
+    <path d="M110 225 L110 150 Q200 84 290 150 L290 225 Z" fill="${PAPER}" fill-opacity="0.64"/>
     ${Array.from({ length: 6 }, (_, i) => {
       const x = 122 + i * 30;
       const h = 22 + (i % 3) * 12;
-      return `<path d="M${x} 150 L${x + 5} ${150 + h} L${x + 10} 150 Z" fill="${INK_SOFT}" fill-opacity="0.5"/>`;
+      return `<path d="M${x} 150 L${x + 5} ${150 + h} L${x + 10} 150 Z" fill="${INK_SOFT}" fill-opacity="0.64"/>`;
     }).join('')}
     ${Array.from({ length: 5 }, (_, i) => {
       const x = 130 + i * 34;
       const h = 18 + (i % 2) * 14;
-      return `<path d="M${x} 225 L${x + 5} ${225 - h} L${x + 10} 225 Z" fill="${INK_SOFT}" fill-opacity="0.45"/>`;
+      return `<path d="M${x} 225 L${x + 5} ${225 - h} L${x + 10} 225 Z" fill="${INK_SOFT}" fill-opacity="0.6"/>`;
     }).join('')}
   `);
 }
 
 function ancientCity() {
   return plate(`
-    <path d="M0 190 L400 184 L400 225 L0 225 Z" fill="${INK}" fill-opacity="0.3"/>
+    <path d="M0 190 L400 184 L400 225 L0 225 Z" fill="${INK}" fill-opacity="0.48"/>
     ${Array.from({ length: 5 }, (_, i) => {
       const x = 90 + i * 52;
-      return `<rect x="${x}" y="108" width="16" height="76" fill="${INK}" fill-opacity="0.62"/>
-              <rect x="${x - 5}" y="100" width="26" height="9" fill="${INK}" fill-opacity="0.72"/>
-              <rect x="${x - 5}" y="184" width="26" height="8" fill="${INK}" fill-opacity="0.72"/>`;
+      return `<rect x="${x}" y="108" width="16" height="76" fill="${INK}" fill-opacity="0.8"/>
+              <rect x="${x - 5}" y="100" width="26" height="9" fill="${INK}" fill-opacity="0.8"/>
+              <rect x="${x - 5}" y="184" width="26" height="8" fill="${INK}" fill-opacity="0.8"/>`;
     }).join('')}
-    <path d="M60 108 L340 98" stroke="${INK}" stroke-opacity="0.45" stroke-width="3"/>
+    <path d="M60 108 L340 98" stroke="${INK}" stroke-opacity="0.72" stroke-width="3"/>
   `);
 }
 
 function borderGate() {
   return plate(`
-    <rect x="120" y="96" width="14" height="94" fill="${INK}" fill-opacity="0.7"/>
-    <rect x="266" y="96" width="14" height="94" fill="${INK}" fill-opacity="0.7"/>
-    <rect x="120" y="90" width="160" height="10" fill="${INK}" fill-opacity="0.75"/>
-    <rect x="150" y="126" width="100" height="8" fill="${INK}" fill-opacity="0.45"/>
-    <path d="M200 134 L200 178" stroke="${INK}" stroke-opacity="0.5" stroke-width="3" stroke-dasharray="10 7"/>
-    <path d="M0 190 L400 190" stroke="${INK}" stroke-opacity="0.3" stroke-width="2"/>
+    <rect x="120" y="96" width="14" height="94" fill="${INK}" fill-opacity="0.78"/>
+    <rect x="266" y="96" width="14" height="94" fill="${INK}" fill-opacity="0.78"/>
+    <rect x="120" y="90" width="160" height="10" fill="${INK}" fill-opacity="0.82"/>
+    <rect x="150" y="126" width="100" height="8" fill="${INK}" fill-opacity="0.6"/>
+    <path d="M200 134 L200 178" stroke="${INK}" stroke-opacity="0.65" stroke-width="3" stroke-dasharray="10 7"/>
+    <path d="M0 190 L400 190" stroke="${INK}" stroke-opacity="0.72" stroke-width="2"/>
   `);
 }
 
 function pass() {
   return plate(`
     <path d="M0 225 L0 120 L70 158 L140 108 L200 186 L260 118 L330 160 L400 128 L400 225 Z"
-          fill="${INK}" fill-opacity="0.5"/>
+          fill="${INK}" fill-opacity="0.64"/>
     <path d="M170 225 L200 186 L230 225 Z" fill="${PAPER}" fill-opacity="0.4"/>
-    <path d="M200 186 L200 225" stroke="${INK}" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="6 6"/>
+    <path d="M200 186 L200 225" stroke="${INK}" stroke-opacity="0.65" stroke-width="2" stroke-dasharray="6 6"/>
   `);
 }
 
@@ -240,20 +240,20 @@ function mine() {
 function karstic() {
   return plate(`
     <path d="M0 148 L120 132 L200 156 L280 128 L400 146 L400 225 L0 225 Z"
-          fill="${INK}" fill-opacity="0.35"/>
-    <ellipse cx="200" cy="164" rx="58" ry="26" fill="${INK}" fill-opacity="0.55"/>
-    <ellipse cx="200" cy="160" rx="44" ry="18" fill="${PAPER}" fill-opacity="0.35"/>
-    <path d="M120 132 L120 168 M280 128 L280 164" stroke="${INK}" stroke-opacity="0.4" stroke-width="2"/>
+          fill="${INK}" fill-opacity="0.52"/>
+    <ellipse cx="200" cy="164" rx="58" ry="26" fill="${INK}" fill-opacity="0.68"/>
+    <ellipse cx="200" cy="160" rx="44" ry="18" fill="${PAPER}" fill-opacity="0.52"/>
+    <path d="M120 132 L120 168 M280 128 L280 164" stroke="${INK}" stroke-opacity="0.7" stroke-width="2"/>
   `);
 }
 
 function coastal() {
   return plate(`
-    <path d="M0 225 L0 96 L96 96 L128 152 L108 225 Z" fill="${INK}" fill-opacity="0.5"/>
-    <path d="M96 96 L128 152 L108 225" stroke="${INK}" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+    <path d="M0 225 L0 96 L96 96 L128 152 L108 225 Z" fill="${INK}" fill-opacity="0.64"/>
+    <path d="M96 96 L128 152 L108 225" stroke="${INK}" stroke-opacity="0.7" stroke-width="2" fill="none"/>
     <rect x="140" y="150" width="260" height="75" fill="${WATER_DEEP}" fill-opacity="0.6"/>
     <path d="M150 166 q22 -8 44 0 t44 0 t44 0 t44 0 M150 184 q22 -8 44 0 t44 0 t44 0 t44 0 M150 202 q22 -8 44 0 t44 0 t44 0 t44 0"
-          stroke="${PAPER}" stroke-opacity="0.5" fill="none" stroke-width="1.6"/>
+          stroke="${PAPER}" stroke-opacity="0.65" fill="none" stroke-width="1.6"/>
   `);
 }
 
