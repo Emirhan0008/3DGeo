@@ -74,7 +74,7 @@ export default function HataDefteriView() {
  <div className='flex items-center gap-3'>
  <button
  onClick={() => setActiveTab('map')}
- className='rounded-full border border-[#c9a24a]/20 p-2 text-[#9a9276] transition-colors hover:text-[#f0e6cd]'
+ className='rounded-full border border-[#c9a24a]/20 p-2 text-[#a9a894] transition-colors hover:text-[#f7f2e3]'
 >
  <ArrowLeft className='w-5 h-5' />
  </button>
@@ -138,7 +138,7 @@ export default function HataDefteriView() {
  {q.category}
  </span>
  {q.region && (
- <span className='rounded border border-[#c9a24a]/20 px-2 py-0.5 text-[10px] font-medium text-[#9a9276]'>
+ <span className='rounded border border-[#c9a24a]/20 px-2 py-0.5 text-[10px] font-medium text-[#a9a894]'>
  {q.region}
  </span>
  )}

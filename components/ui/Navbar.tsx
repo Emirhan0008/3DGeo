@@ -119,7 +119,7 @@ export default function Navbar() {
           <div className="hf-serif text-[14px] font-semibold tracking-[0.18em] text-[#f4ebd4]">
             COĞRAFYA <span className="text-[#d9b45f]">3D</span>
           </div>
-          <div className="mt-1.5 text-[8.5px] uppercase tracking-[0.24em] text-[#8d8768]">
+          <div className="mt-1.5 text-[8.5px] uppercase tracking-[0.24em] text-[#9a9a88]">
             Keşfet · Anla · Pekiştir
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function Navbar() {
           {/* Search */}
           <div className="relative">
             <div className="relative flex items-center">
-              <Search className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-[#8d8768]" />
+              <Search className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-[#9a9a88]" />
               <input
                 type="text"
                 value={searchTerm}
@@ -206,7 +206,7 @@ export default function Navbar() {
                 onFocus={() => setShowSearchResults(true)}
                 onBlur={() => window.setTimeout(() => setShowSearchResults(false), 140)}
                 placeholder="Ara..."
-                className="hf-serif w-24 rounded-full border border-[#c9a24a]/25 bg-[#0c0f08]/80 py-1 pl-8 pr-3 text-[11px] tracking-wide text-[#eee5cd] placeholder:text-[#7c7660] focus:border-[#c9a24a]/70 focus:outline-none sm:w-36 md:w-44"
+                className="hf-serif w-24 rounded-full border border-[#c9a24a]/25 bg-[#0c0f08]/80 py-1 pl-8 pr-3 text-[11px] tracking-wide text-[#f7f2e3] placeholder:text-[#7c7660] focus:border-[#c9a24a]/70 focus:outline-none sm:w-36 md:w-44"
               />
             </div>
 
@@ -268,7 +268,7 @@ export default function Navbar() {
             className={`flex items-center gap-1.5 rounded-full border px-2 py-1 text-[11px] font-semibold transition-colors ${
               isAiDrawerOpen
                 ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 text-[#f0dba8]'
-                : 'border-[#c9a24a]/25 text-[#b7ae8e] hover:border-[#c9a24a]/60 hover:text-[#eadfbf]'
+                : 'border-[#c9a24a]/25 text-[#c9c2a6] hover:border-[#c9a24a]/60 hover:text-[#eadfbf]'
             }`}
           >
             <Bot className="h-3.5 w-3.5" />
@@ -321,7 +321,7 @@ export default function Navbar() {
   // Standard top bar
   return (
     <>
-      <header className="hf-nav relative z-30 w-full select-none px-2 py-2 text-[#eee5cd] sm:px-3">
+      <header className="hf-nav relative z-30 w-full select-none px-2 py-2 text-[#f7f2e3] sm:px-3">
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/45 to-transparent" />
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/25 to-transparent" />
         {renderNavbarContent()}

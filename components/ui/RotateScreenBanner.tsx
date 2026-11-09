@@ -60,7 +60,7 @@ export default function RotateScreenBanner() {
 
   return (
     <div className="fixed bottom-16 left-1/2 z-50 w-[94vw] max-w-lg -translate-x-1/2 sm:bottom-3">
-      <div className="hf-panel flex items-center justify-between gap-2 rounded-2xl p-2.5 text-[#eee5cd] sm:p-3">
+      <div className="hf-panel flex items-center justify-between gap-2 rounded-2xl p-2.5 text-[#f7f2e3] sm:p-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]">
             {isPinGameAlert ? (
@@ -75,11 +75,11 @@ export default function RotateScreenBanner() {
               <span className="hf-label truncate">
                 {isPinGameAlert ? 'Harita Testi için Tam Ekran' : 'Ekranı yan çevirin'}
               </span>
-              <span className="ml-auto shrink-0 rounded-full border border-[#c9a24a]/30 px-1.5 py-0.5 text-[10px] text-[#b7ae8e]">
+              <span className="ml-auto shrink-0 rounded-full border border-[#c9a24a]/30 px-1.5 py-0.5 text-[10px] text-[#c9c2a6]">
                 {timeLeft}s
               </span>
             </div>
-            <p className="truncate text-[10px] font-normal leading-tight text-[#9a9276] sm:text-[11px]">
+            <p className="truncate text-[10px] font-normal leading-tight text-[#a9a894] sm:text-[11px]">
               {isPinGameAlert
                 ? 'Haritayı geniş görmek için tam ekrana geçin ve telefonu yan çevirin.'
                 : 'En iyi harita deneyimi için yatay mod ve tam ekran önerilir.'}
@@ -101,7 +101,7 @@ export default function RotateScreenBanner() {
 
           <button
             onClick={() => setIsVisible(false)}
-            className="shrink-0 rounded-full p-1 text-[#8d8768] transition-colors hover:text-[#d98a6a]"
+            className="shrink-0 rounded-full p-1 text-[#9a9a88] transition-colors hover:text-[#d98a6a]"
             title="Kapat"
           >
             <X className="h-4 w-4" />

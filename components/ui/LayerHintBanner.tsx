@@ -61,7 +61,7 @@ export default function LayerHintBanner() {
   return (
     <div
       id="layer-initial-hint-banner"
-      className="hf-panel fixed left-3 top-[92px] z-40 max-w-[290px] rounded-xl p-2.5 text-[#eee5cd] pointer-events-auto sm:left-4 sm:top-24 sm:max-w-xs sm:p-3"
+      className="hf-panel fixed left-3 top-[92px] z-40 max-w-[290px] rounded-xl p-2.5 text-[#f7f2e3] pointer-events-auto sm:left-4 sm:top-24 sm:max-w-xs sm:p-3"
     >
       <div className="flex items-start justify-between gap-1.5">
         <div className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export default function LayerHintBanner() {
             <Sliders className="h-3.5 w-3.5" />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="hf-serif text-xs font-semibold text-[#f0e6cd]">
+            <span className="hf-serif text-xs font-semibold text-[#f7f2e3]">
               Harita Hızlandırıldı
             </span>
             <span className="hf-label rounded border border-[#c9a24a]/35 px-1 py-0.5 text-[8px] text-[#dcc07d]">
@@ -80,14 +80,14 @@ export default function LayerHintBanner() {
 
         <button
           onClick={handleDismiss}
-          className="-mr-0.5 -mt-0.5 shrink-0 cursor-pointer rounded-full p-1 text-[#8d8768] transition-colors hover:text-[#f0e6cd]"
+          className="-mr-0.5 -mt-0.5 shrink-0 cursor-pointer rounded-full p-1 text-[#9a9a88] transition-colors hover:text-[#f7f2e3]"
           title="Kapat"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <p className="mt-1.5 text-[10.5px] font-normal leading-snug text-[#b7ae8e]">
+      <p className="mt-1.5 text-[10.5px] font-normal leading-snug text-[#c9c2a6]">
         Açılışın hızlı olması için harita temiz başlatıldı. Yer şekillerini
         dilediğiniz zaman{' '}
         <span className="font-semibold text-[#dcc07d]">Katmanlar</span>{' '}
@@ -105,7 +105,7 @@ export default function LayerHintBanner() {
 
           <button
             onClick={handleOpenLayers}
-            className="cursor-pointer rounded-full border border-[#c9a24a]/20 px-2 py-1 text-[11px] font-medium text-[#b7ae8e] transition-colors hover:border-[#c9a24a]/50 hover:text-[#f0e6cd]"
+            className="cursor-pointer rounded-full border border-[#c9a24a]/20 px-2 py-1 text-[11px] font-medium text-[#c9c2a6] transition-colors hover:border-[#c9a24a]/50 hover:text-[#f7f2e3]"
           >
             Katmanlar
           </button>
@@ -113,7 +113,7 @@ export default function LayerHintBanner() {
 
         <button
           onClick={handleEnableAllLayers}
-          className="cursor-pointer px-1 py-0.5 text-[9.5px] text-[#7d7a63] underline decoration-[#5f5c47] transition-colors hover:text-[#c3b993]"
+          className="cursor-pointer px-1 py-0.5 text-[9.5px] text-[#8b8f7f] underline decoration-[#5f5c47] transition-colors hover:text-[#c9c2a6]"
           title="Tüm katmanları açar (düşük sistemlerde yavaşlama yapabilir)"
         >
           Tümünü Aç

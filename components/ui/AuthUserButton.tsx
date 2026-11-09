@@ -511,7 +511,7 @@ export default function AuthUserButton() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-1.5 rounded-full border border-[#c9a24a]/20 px-2.5 py-1 text-[11px] text-[#8d8768]">
+      <div className="flex items-center gap-1.5 rounded-full border border-[#c9a24a]/20 px-2.5 py-1 text-[11px] text-[#9a9a88]">
         <Loader2 className="h-3.5 w-3.5 animate-spin text-[#c9a24a]" />
         <span className="hidden sm:inline">Giriş Yapılıyor...</span>
       </div>
@@ -551,7 +551,7 @@ export default function AuthUserButton() {
                 <span className="max-w-[60px] truncate font-semibold leading-tight tracking-wide text-[#e9d7a8] sm:max-w-[100px]">
                   {activeDisplayName}
                 </span>
-                <Settings className="h-3 w-3 text-[#8d8768] transition-colors hover:text-[#c9a24a]" />
+                <Settings className="h-3 w-3 text-[#9a9a88] transition-colors hover:text-[#c9a24a]" />
               </div>
               <span className="flex max-w-[70px] items-center gap-1 truncate text-[9px] leading-tight text-[#a9bd8b] sm:max-w-[105px]">
                 <CloudCheck className="h-2 w-2 shrink-0 text-[#b9c99a]" />
@@ -562,7 +562,7 @@ export default function AuthUserButton() {
 
           <button
             onClick={handleSignOut}
-            className="border-l border-[#c9a24a]/20 p-1 pl-1.5 pr-0.5 text-[#8d8768] transition-colors hover:text-[#d98a6a]"
+            className="border-l border-[#c9a24a]/20 p-1 pl-1.5 pr-0.5 text-[#9a9a88] transition-colors hover:text-[#d98a6a]"
             title="Oturumu Kapat / Nick Değiştir"
           >
             <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />

@@ -8,17 +8,20 @@
    inherits the theme without touching each component.
    ================================================================== */
 @theme {
-  /* neutral surface ladder (was slate) */
-  --color-slate-950: #0a0c07;
-  --color-slate-900: #111409;
-  --color-slate-800: #1a1e12;
-  --color-slate-700: #262b18;
-  --color-slate-600: #3b4126;
-  --color-slate-500: #6a6f4e;
-  --color-slate-400: #98906f;
-  --color-slate-300: #c0b795;
-  --color-slate-200: #dcd2b2;
-  --color-slate-100: #eee5cd;
+  /* Neutral surface ladder.
+     Deep end is deliberately COOL (teal-green, hue ~170) while the bright
+     end stays warm parchment. That warm/cool split is what gives the
+     interface depth — an all-warm ramp collapses into one flat mass. */
+  --color-slate-950: #050909;
+  --color-slate-900: #0a1211;
+  --color-slate-800: #111b19;
+  --color-slate-700: #1a2725;
+  --color-slate-600: #293b38;
+  --color-slate-500: #4c635e;
+  --color-slate-400: #7a908a;
+  --color-slate-300: #b3bda9;
+  --color-slate-200: #ddd8bd;
+  --color-slate-100: #f6f1e1;
 
   /* primary accent (was indigo) — brass / gold */
   --color-indigo-950: #241d0c;
@@ -189,13 +192,24 @@
   --color-green-300: #9db8a4;
 
   /* named tokens */
-  --color-ink-900: #0a0c07;
-  --color-ink-800: #111409;
-  --color-ink-700: #1a1e12;
+  --color-ink-900: #050909;
+  --color-ink-800: #0a1211;
+  --color-ink-700: #111b19;
   --color-brass: #c9a24a;
   --color-brass-dim: #8a6a1d;
-  --color-parchment: #efe3c6;
-  --color-parchment-deep: #dcc79b;
+  --color-parchment: #f7f2e3;
+  --color-parchment-deep: #ddd8bd;
+
+  /* Cool counterweight. Used for informational/secondary accents so the
+     whole UI is not one continuous warm band. Ties into the map water. */
+  --color-atlas: #7fa8b8;
+  --color-atlas-dim: #4c7280;
+
+  /* Four-step text scale. Each step is a visible jump, not a nudge. */
+  --color-text-1: #f7f2e3;
+  --color-text-2: #c9c2a6;
+  --color-text-3: #8f9282;
+  --color-text-4: #5f6357;
 
   --font-serif-hf: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino,
     "Book Antiqua", Georgia, "Times New Roman", serif;
@@ -215,8 +229,8 @@
 
   html,
   body {
-    background-color: #0a0c07;
-    color: #eee5cd;
+    background-color: #050909;
+    color: #f7f2e3;
     overflow: hidden;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -242,27 +256,30 @@
 }
 
 @layer components {
-  /* --- surfaces ------------------------------------------------- */
+  /* --- surfaces -------------------------------------------------
+     Luminance ladder is deliberately wide: 6% → 10% → 14% → 20%.
+     Each layer must be distinguishable at a glance, otherwise every
+     panel reads as the same flat plane. */
   .hf-panel {
-    background-image: linear-gradient(180deg, #171a10 0%, #0e1009 100%);
-    border: 1px solid rgba(201, 162, 74, 0.26);
+    background-image: linear-gradient(180deg, #2e403c 0%, #17211f 100%);
+    border: 1px solid rgba(201, 162, 74, 0.36);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 24px 60px -24px rgba(0, 0, 0, 0.9);
+      inset 0 1px 0 rgba(255, 255, 255, 0.13),
+      0 24px 60px -24px rgba(0, 0, 0, 0.95);
   }
 
   .hf-plaque {
-    background-image: linear-gradient(180deg, #1b1f12 0%, #101208 100%);
-    border: 1px solid rgba(201, 162, 74, 0.3);
+    background-image: linear-gradient(180deg, #31433f 0%, #182421 100%);
+    border: 1px solid rgba(201, 162, 74, 0.4);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.45),
       0 18px 40px -18px rgba(0, 0, 0, 0.95);
   }
 
   .hf-nav {
-    background-image: linear-gradient(180deg, #191d12 0%, #0f1209 100%);
-    border-bottom: 1px solid rgba(201, 162, 74, 0.3);
+    background-image: linear-gradient(180deg, #2e403c 0%, #16201e 100%);
+    border-bottom: 1px solid rgba(201, 162, 74, 0.4);
     box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.95);
   }
 
@@ -280,24 +297,24 @@
   /* --- controls -------------------------------------------------- */
   .hf-chip {
     border: 1px solid transparent;
-    color: #b7ae8e;
+    color: var(--color-text-2);
     transition: color 160ms ease, background-color 160ms ease,
       border-color 160ms ease;
   }
 
   .hf-chip:hover {
-    color: #f0e6cd;
-    background-color: rgba(201, 162, 74, 0.09);
-    border-color: rgba(201, 162, 74, 0.22);
+    color: var(--color-text-1);
+    background-color: rgba(201, 162, 74, 0.12);
+    border-color: rgba(201, 162, 74, 0.3);
   }
 
   .hf-chip-on {
-    background-image: linear-gradient(180deg, #f2e7ca 0%, #dcc79b 100%);
-    color: #2a2314;
-    border-color: rgba(201, 162, 74, 0.85);
+    background-image: linear-gradient(180deg, #fdf8e9 0%, #e8dab5 100%);
+    color: #1e1810;
+    border-color: rgba(201, 162, 74, 0.9);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      0 6px 16px -8px rgba(201, 162, 74, 0.6);
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 6px 16px -8px rgba(201, 162, 74, 0.65);
   }
 
   .hf-rule {
@@ -376,14 +393,14 @@
 
   /* --- modal / dialog chrome ------------------------------------ */
   .hf-modal {
-    background-image: linear-gradient(180deg, #171b10 0%, #0d1008 100%);
-    border: 1px solid rgba(201, 162, 74, 0.35);
+    background-image: linear-gradient(180deg, #33443f 0%, #1b2624 100%);
+    border: 1px solid rgba(201, 162, 74, 0.5);
     border-radius: inherit;
-    color: #eee5cd;
+    color: var(--color-text-1);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      inset 0 0 0 1px rgba(0, 0, 0, 0.5),
-      0 30px 70px -24px rgba(0, 0, 0, 0.95);
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.45),
+      0 30px 70px -20px rgba(0, 0, 0, 0.95);
   }
 
   /* Inner hairline, 3px in — the engraved plate rule */
@@ -404,36 +421,36 @@
   .hf-input {
     width: 100%;
     border-radius: 10px;
-    border: 1px solid rgba(201, 162, 74, 0.24);
-    background-color: rgba(0, 0, 0, 0.34);
+    border: 1px solid rgba(201, 162, 74, 0.3);
+    background-color: rgba(0, 0, 0, 0.42);
     padding: 0.5rem 0.75rem;
     font-size: 0.75rem;
-    color: #f0e6cd;
+    color: var(--color-text-1);
     transition: border-color 160ms ease, background-color 160ms ease,
       box-shadow 160ms ease;
   }
 
   .hf-input::placeholder {
-    color: #7c7660;
+    color: var(--color-text-4);
   }
 
   .hf-input:focus {
     outline: none;
-    border-color: rgba(201, 162, 74, 0.72);
-    background-color: rgba(0, 0, 0, 0.5);
-    box-shadow: 0 0 0 3px rgba(201, 162, 74, 0.12);
+    border-color: rgba(201, 162, 74, 0.8);
+    background-color: rgba(0, 0, 0, 0.58);
+    box-shadow: 0 0 0 3px rgba(201, 162, 74, 0.16);
   }
 
   /* --- buttons --------------------------------------------------- */
   .hf-btn-brass {
     border-radius: 10px;
-    border: 1px solid rgba(201, 162, 74, 0.75);
-    background-image: linear-gradient(180deg, #f2e7ca 0%, #d8c193 100%);
-    color: #2a2314;
+    border: 1px solid rgba(201, 162, 74, 0.85);
+    background-image: linear-gradient(180deg, #fdf8e9 0%, #e2cb9e 100%);
+    color: #1e1810;
     font-weight: 700;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      0 6px 16px -10px rgba(201, 162, 74, 0.7);
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 6px 18px -10px rgba(201, 162, 74, 0.8);
     transition: filter 150ms ease, transform 150ms ease;
   }
 
@@ -452,18 +469,18 @@
 
   .hf-btn-ghost {
     border-radius: 10px;
-    border: 1px solid rgba(201, 162, 74, 0.24);
-    background-color: rgba(255, 255, 255, 0.03);
-    color: #b7ae8e;
+    border: 1px solid rgba(201, 162, 74, 0.28);
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--color-text-2);
     font-weight: 600;
     transition: color 150ms ease, border-color 150ms ease,
       background-color 150ms ease;
   }
 
   .hf-btn-ghost:hover {
-    color: #f0e6cd;
-    border-color: rgba(201, 162, 74, 0.5);
-    background-color: rgba(201, 162, 74, 0.1);
+    color: var(--color-text-1);
+    border-color: rgba(201, 162, 74, 0.55);
+    background-color: rgba(201, 162, 74, 0.12);
   }
 
   /* Italic serif voice for motto / caption lines */
@@ -499,7 +516,7 @@
    Legacy dark panels (arbitrary hex values used inline) → ink surfaces
    ------------------------------------------------------------------ */
 [class*="bg-[#09090b]"] {
-  background-color: #101208 !important;
+  background-color: #0f1716 !important;
 }
 
 /* ------------------------------------------------------------------

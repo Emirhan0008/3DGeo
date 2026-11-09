@@ -780,7 +780,7 @@ export default function DuelMode() {
               <h2 className="hf-serif text-base font-semibold tracking-wide text-[#e8d7ab] sm:text-xl">
                 1v1 Canlı KPSS Düellosu
               </h2>
-              <p className="text-[11px] text-[#9a9276] sm:text-xs">
+              <p className="text-[11px] text-[#a9a894] sm:text-xs">
                 Rumuz ve şifrenizi belirleyerek arenaya adım atın
               </p>
             </div>
@@ -790,7 +790,7 @@ export default function DuelMode() {
 
           <form onSubmit={handleSaveRumuz} className="space-y-4">
             <div>
-              <label className="mb-1 block text-[11px] font-semibold text-[#b7ae8e]">
+              <label className="mb-1 block text-[11px] font-semibold text-[#c9c2a6]">
                 Düello Rumuzu (Kullanıcı Adı)
               </label>
               <input
@@ -805,7 +805,7 @@ export default function DuelMode() {
             </div>
 
             <div>
-              <label className="mb-1 block text-[11px] font-semibold text-[#b7ae8e]">
+              <label className="mb-1 block text-[11px] font-semibold text-[#c9c2a6]">
                 Rumuz Şifresi / PIN (Skorunuzu ve Odanızı Korur)
               </label>
               <input
@@ -817,7 +817,7 @@ export default function DuelMode() {
                 className="hf-input font-semibold"
                 required
               />
-              <span className="mt-1 block text-[10px] text-[#7d7a63]">
+              <span className="mt-1 block text-[10px] text-[#8b8f7f]">
                 * Bu şifre ile aynı rumuzu diğer cihazlardan da kullanabilirsiniz.
               </span>
             </div>

@@ -112,7 +112,7 @@ export default function AITutorDrawer() {
  <aside
  onMouseEnter={handleMouseEnter}
  onMouseLeave={handleMouseLeave}
- className={`hf-plaque hf-double-rule absolute right-1 top-1 bottom-1 flex max-h-full flex-col overflow-hidden rounded-xl text-[#eee5cd] transition-all duration-300 ease-in-out sm:right-2 sm:top-2 sm:bottom-2 sm:rounded-2xl h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] ${
+ className={`hf-plaque hf-double-rule absolute right-1 top-1 bottom-1 flex max-h-full flex-col overflow-hidden rounded-xl text-[#f7f2e3] transition-all duration-300 ease-in-out sm:right-2 sm:top-2 sm:bottom-2 sm:rounded-2xl h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] ${
  isExpanded ? 'z-45' : 'z-20'
  } ${
  isExpanded

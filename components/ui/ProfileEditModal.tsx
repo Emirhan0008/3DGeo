@@ -529,7 +529,7 @@ export default function ProfileEditModal({
                       isSelected
                         ? 'bg-[linear-gradient(180deg,rgba(201,162,74,.28),rgba(29,21,8,.55))] outline outline-2 outline-offset-1 outline-[#d4a94f] border-2 border-[#e3c987] ring-2 ring-[#c9a24a]/60 shadow-[0_0_16px_rgba(251,191,36,0.8)] scale-105 z-10'
                         : isUnlocked
-                        ? 'border border-[#6d9479]/50 bg-[#3c6d55]/18 text-[#d8e3d9] hover:border-[#9db8a4] hover:scale-105'
+                        ? 'border border-[#6d9479]/50 bg-[#3c6d55]/18 text-[#dfe9df] hover:border-[#9db8a4] hover:scale-105'
                         : 'bg-black/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-90 hover:border-slate-500'
                     }`}
                   >
