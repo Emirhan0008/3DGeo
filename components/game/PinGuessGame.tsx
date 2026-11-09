@@ -345,7 +345,7 @@ export default function PinGuessGame() {
         {/* Right Column (Target Name & Question & Result) */}
         <div className="md:col-span-8 space-y-1 sm:space-y-2">
           {/* Target Name Banner */}
-          <div className="p-1 sm:p-1.5 bg-gradient-to-r from-amber-500/20 via-indigo-600/30 to-purple-600/20 border border-amber-400/80 rounded-lg flex items-center justify-between gap-1 shadow-sm">
+          <div className="p-1 sm:p-1.5 border border-[#c9a24a]/45 bg-[#c9a24a]/10 rounded-lg flex items-center justify-between gap-1 shadow-sm">
             <div className="flex items-center gap-1 sm:gap-1.5 min-w-0 flex-1">
               <span className="px-1.5 py-0.5 bg-amber-400 text-slate-950 rounded font-black text-[9px] sm:text-xs shrink-0 flex items-center gap-0.5 shadow-sm">
                 <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3" />

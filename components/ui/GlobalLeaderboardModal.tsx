@@ -103,9 +103,9 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-3xl bg-gradient-to-b from-[#0e111a] via-[#090b10] to-[#06080c] border-2 border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header Bar */}
-        <div className="p-3.5 sm:p-4 bg-gradient-to-r from-amber-950/60 via-indigo-950/70 to-slate-900/80 border-b border-amber-500/30 flex items-center justify-between gap-2">
+        <div className="p-3.5 sm:p-4 border-b border-[#c9a24a]/25 bg-[#12150b] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 font-black shadow-lg shrink-0">
+            <div className="w-10 h-10 rounded-full border border-[#c9a24a]/45 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)] flex items-center justify-center text-[#dcc07d] shrink-0">
               <Trophy className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -148,7 +148,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               onClick={() => setActiveTab('total')}
               className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
                 activeTab === 'total' || activeTab === 'score'
-                  ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20'
+                  ? 'hf-btn-brass border-[#c9a24a]/70'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
@@ -160,7 +160,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               onClick={() => setActiveTab('kpss_test')}
               className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
                 activeTab === 'kpss_test'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-300 shadow-md shadow-emerald-500/20'
+                  ? 'border-[#6d9479]/60 bg-[#3c6d55]/25 text-[#c8d8cb]'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
@@ -172,7 +172,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               onClick={() => setActiveTab('duels')}
               className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
                 activeTab === 'duels'
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 shadow-md shadow-indigo-500/20'
+                  ? 'hf-btn-brass border-[#c9a24a]/70'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
@@ -184,7 +184,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
               onClick={() => setActiveTab('streak')}
               className={`py-1.5 px-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
                 activeTab === 'streak'
-                  ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white border-rose-300 shadow-md shadow-rose-500/20'
+                  ? 'border-[#bf7f66]/55 bg-[#9c5540]/25 text-[#eccfc2]'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
@@ -221,7 +221,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
         </div>
 
         {/* Current User Snapshot Banner */}
-        <div className="mx-3.5 sm:mx-4 my-2 p-3 rounded-xl bg-gradient-to-r from-amber-500/15 via-indigo-500/15 to-purple-500/15 border border-amber-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-inner">
+        <div className="mx-3.5 sm:mx-4 my-2 p-3 rounded-xl border border-[#c9a24a]/35 bg-[#c9a24a]/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-inner">
           <div className="flex items-center gap-2.5 min-w-0 w-full sm:w-auto">
             <AvatarWithBadgeFrame
               rumuz={activeRumuz}
@@ -365,7 +365,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                   —
                 </div>
               ) : isFirst ? (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950 flex items-center justify-center font-black text-xs shadow-lg shadow-amber-500/50 ring-2 ring-amber-300">
+                <div className="w-7 h-7 rounded-full bg-[linear-gradient(180deg,#e3c987,#c9a24a)] text-[#221b0c] flex items-center justify-center font-semibold text-xs ring-2 ring-[#c9a24a]/50">
                   👑
                 </div>
               ) : isSecond ? (
@@ -373,7 +373,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                   🥈
                 </div>
               ) : isThird ? (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-700 to-yellow-800 text-white flex items-center justify-center font-black text-xs shadow-md ring-2 ring-amber-600">
+                <div className="w-7 h-7 rounded-full bg-[#453213] text-[#e3c987] flex items-center justify-center font-semibold text-xs ring-2 ring-[#61471b]">
                   🥉
                 </div>
               ) : (
@@ -427,7 +427,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                       : isCurrentUser
                       ? 'bg-amber-500/20 border-amber-400 ring-2 ring-amber-400/50 shadow-lg'
                       : isFirst
-                      ? 'bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-slate-900 border-amber-500/50 shadow-md'
+                      ? 'border border-[#c9a24a]/45 bg-[#c9a24a]/12'
                       : 'bg-white/5 hover:bg-white/10 border-white/10'
                   }`}
                 >

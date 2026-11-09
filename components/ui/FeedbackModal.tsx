@@ -124,7 +124,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+          <div className="w-10 h-10 rounded-full border border-[#c9a24a]/45 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)] flex items-center justify-center text-[#dcc07d]">
             <MessageSquarePlus className="w-5 h-5" />
           </div>
           <div>
@@ -245,7 +245,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-500 hover:brightness-110 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+              className="hf-btn-brass w-full py-2.5 rounded-xl text-xs shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>

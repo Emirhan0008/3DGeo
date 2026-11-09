@@ -365,7 +365,7 @@ export default function ProfileEditModal({
 
           {/* ITEM INSPECTOR DIALOG / BANNER (Reveals exactly how to unlock and current progress on click/hover) */}
           {inspectedItem && (
-            <div className="p-3.5 rounded-xl border-2 border-amber-400/80 bg-gradient-to-r from-slate-900 via-indigo-950/80 to-slate-900 shadow-xl space-y-2 animate-in fade-in zoom-in-95 duration-150 relative">
+            <div className="p-3.5 rounded-xl border border-[#c9a24a]/50 bg-[#c9a24a]/10 space-y-2 animate-in fade-in zoom-in-95 duration-150 relative">
               <button
                 onClick={() => setInspectedItem(null)}
                 className="absolute top-2.5 right-2.5 p-1 rounded-lg bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-white"
@@ -376,8 +376,8 @@ export default function ProfileEditModal({
 
               <div className="flex items-start gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${
-                  inspectedItem.tierLevel === 5 ? 'bg-gradient-to-tr from-fuchsia-500 to-cyan-400 text-slate-950 font-black ring-2 ring-amber-300 shadow-lg' :
-                  inspectedItem.tierLevel === 4 ? 'bg-gradient-to-tr from-cyan-400 to-purple-500 text-slate-950 font-black ring-1 ring-cyan-300' :
+                  inspectedItem.tierLevel === 5 ? 'bg-[linear-gradient(180deg,#e3c987,#c9a24a)] text-[#221b0c] font-semibold ring-2 ring-[#c9a24a]/60' :
+                  inspectedItem.tierLevel === 4 ? 'bg-[linear-gradient(180deg,#9db8a4,#6d9479)] text-[#0a1410] font-semibold ring-1 ring-[#9db8a4]/60' :
                   inspectedItem.tierLevel === 3 ? 'bg-amber-400 text-slate-950 font-black' :
                   inspectedItem.tierLevel === 2 ? 'bg-slate-200 text-slate-950 font-black' :
                   'bg-amber-800 text-amber-100'
@@ -422,7 +422,7 @@ export default function ProfileEditModal({
           )}
 
           {/* 1. KATEGORİ: AVATAR İKONU SEÇİMİ */}
-          <div className="p-3.5 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 border-2 border-indigo-500/40 rounded-2xl space-y-3 shadow-lg">
+          <div className="p-3.5 rounded-2xl border border-[#c9a24a]/30 bg-[#c9a24a]/8 space-y-3">
             <div className="flex items-center justify-between border-b border-indigo-500/30 pb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-md">
@@ -459,7 +459,7 @@ export default function ProfileEditModal({
                     onClick={() => setAvatarTierFilter(tab.id as typeof avatarTierFilter)}
                     className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-500/40'
+                        ? 'hf-btn-brass border-[#c9a24a]/60'
                         : isUserCurrent
                         ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30'
                         : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
@@ -527,9 +527,9 @@ export default function ProfileEditModal({
                     title={isUnlocked ? `${item.label} (Kuşan)` : `Kilitli: ${reqString}`}
                     className={`relative p-1.5 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer min-h-[58px] ${
                       isSelected
-                        ? 'bg-gradient-to-b from-amber-500/35 via-yellow-500/20 to-amber-950/70 outline outline-2 outline-offset-1 outline-amber-400 border-2 border-amber-300 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(251,191,36,0.8)] scale-105 z-10'
+                        ? 'bg-[linear-gradient(180deg,rgba(201,162,74,.28),rgba(29,21,8,.55))] outline outline-2 outline-offset-1 outline-[#d4a94f] border-2 border-[#e3c987] ring-2 ring-[#c9a24a]/60 shadow-[0_0_16px_rgba(251,191,36,0.8)] scale-105 z-10'
                         : isUnlocked
-                        ? 'bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-950 border-2 border-emerald-400 hover:border-emerald-300 text-white hover:scale-105'
+                        ? 'border border-[#6d9479]/50 bg-[#3c6d55]/18 text-[#d8e3d9] hover:border-[#9db8a4] hover:scale-105'
                         : 'bg-black/60 border border-slate-700/60 text-slate-500 opacity-60 hover:opacity-90 hover:border-slate-500'
                     }`}
                   >
@@ -567,7 +567,7 @@ export default function ProfileEditModal({
           </div>
 
           {/* 2. KATEGORİ: AVATAR EFEKTİ & PARILTI */}
-          <div className="p-3.5 bg-gradient-to-b from-purple-950/40 to-slate-900/60 border-2 border-purple-500/40 rounded-2xl space-y-3 shadow-lg">
+          <div className="p-3.5 rounded-2xl border border-[#c9a24a]/30 bg-[#c9a24a]/8 space-y-3">
             <div className="flex items-center justify-between border-b border-purple-500/30 pb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center shadow-md">
@@ -620,7 +620,7 @@ export default function ProfileEditModal({
           </div>
 
           {/* 3. KATEGORİ: KUŞANILABİLİR RESMİ ÜNVANLAR */}
-          <div className="p-3.5 bg-gradient-to-b from-amber-950/40 to-slate-900/60 border-2 border-amber-500/40 rounded-2xl space-y-3 shadow-lg">
+          <div className="p-3.5 rounded-2xl border border-[#c9a24a]/40 bg-[#c9a24a]/10 space-y-3">
             <div className="flex items-center justify-between border-b border-amber-500/30 pb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-md">
@@ -761,7 +761,7 @@ export default function ProfileEditModal({
                     {!isUnlocked && (
                       <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden mt-0.5">
                         <div
-                          className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300"
+                          className="h-full rounded-full bg-[linear-gradient(90deg,#a8871f,#d4a94f)] transition-all duration-300"
                           style={{ width: `${prog.progressPct}%` }}
                         />
                       </div>
@@ -773,7 +773,7 @@ export default function ProfileEditModal({
           </div>
 
           {/* 4. KATEGORİ: KADEMELİ ROZETLER GALERİSİ */}
-          <div className="p-3.5 bg-gradient-to-b from-cyan-950/40 to-slate-900/60 border-2 border-cyan-500/40 rounded-2xl space-y-3 shadow-lg">
+          <div className="p-3.5 rounded-2xl border border-[#3f7070]/40 bg-[#3f7070]/8 space-y-3">
             <div className="flex items-center justify-between border-b border-cyan-500/30 pb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-cyan-600 text-white flex items-center justify-center shadow-md">
@@ -809,7 +809,7 @@ export default function ProfileEditModal({
                     onClick={() => setBadgeTierFilter(tab.id as typeof badgeTierFilter)}
                     className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-cyan-600 border-cyan-400 text-white font-black shadow-md shadow-cyan-500/30'
+                        ? 'border-[#3f6673]/70 bg-[#30525d]/40 text-[#c3d0d2] font-semibold'
                         : isUserCurrent
                         ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 hover:bg-cyan-500/30'
                         : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
@@ -904,7 +904,7 @@ export default function ProfileEditModal({
           </div>
 
           {/* 5. KATEGORİ: NICK & PIN ŞİFRESİ DEĞİŞTİRME */}
-          <div className="p-3.5 bg-gradient-to-b from-blue-950/40 to-slate-900/60 border-2 border-blue-500/40 rounded-2xl space-y-3 shadow-lg">
+          <div className="p-3.5 rounded-2xl border border-[#3f6673]/40 bg-[#3f6673]/8 space-y-3">
             <div className="flex items-center justify-between border-b border-blue-500/30 pb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-md">
@@ -959,7 +959,7 @@ export default function ProfileEditModal({
             <button
               onClick={handleSaveProfileInfo}
               disabled={isSaving}
-              className="w-full py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-black rounded-xl text-xs shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+              className="hf-btn-brass w-full py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-amber-300" />}
               <span>Nick &amp; Şifre Değişikliğini Kaydet</span>

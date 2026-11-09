@@ -2,15 +2,20 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-slate-100 p-4">
-      <h2 className="text-2xl font-bold mb-2">Sayfa Bulunamadı (404)</h2>
-      <p className="text-slate-400 mb-6">Aradığınız sayfa mevcut değil veya taşınmış olabilir.</p>
-      <Link 
-        href="/" 
-        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white font-medium transition-colors"
-      >
-        Ana Sayfaya Dön
-      </Link>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0a0c07] p-4 text-[#eee5cd]">
+      <div className="hf-modal hf-modal-rule w-full max-w-md rounded-2xl p-8 text-center">
+        <p className="hf-label mb-1 text-[10px] text-[#a98f4e]">Hata 404</p>
+        <h2 className="hf-serif mb-2 text-2xl font-semibold text-[#e8d7ab]">
+          Sayfa Bulunamadı
+        </h2>
+        <div className="hf-divider mb-4 text-[8px]">◆</div>
+        <p className="mb-6 text-sm text-[#9a9276]">
+          Aradığınız sayfa mevcut değil veya taşınmış olabilir.
+        </p>
+        <Link href="/" className="hf-btn-brass inline-block px-5 py-2.5 text-sm">
+          Ana Sayfaya Dön
+        </Link>
+      </div>
     </div>
   );
 }

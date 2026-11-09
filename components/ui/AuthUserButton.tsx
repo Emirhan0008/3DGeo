@@ -724,7 +724,7 @@ export default function AuthUserButton() {
 
                 <button
                   onClick={handleRumuzSignInOrRegister}
-                  className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                  className="hf-btn-brass w-full py-2.5 px-3 rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
                   <span>

@@ -106,6 +106,88 @@
   --color-amber-300: #e3c987;
   --color-amber-200: #f0e0b6;
 
+  /* yellow / orange / lime → brass and sage, so the remaining legacy
+     ramps stop reading as neon confetti */
+  --color-yellow-950: #1d1508;
+  --color-yellow-900: #2e210c;
+  --color-yellow-800: #453213;
+  --color-yellow-700: #61471b;
+  --color-yellow-600: #8a6626;
+  --color-yellow-500: #b8892f;
+  --color-yellow-400: #d4a94f;
+  --color-yellow-300: #e3c987;
+  --color-orange-950: #1f1208;
+  --color-orange-900: #301c0c;
+  --color-orange-800: #472a13;
+  --color-orange-700: #62391b;
+  --color-orange-600: #8a5126;
+  --color-orange-500: #b5692f;
+  --color-orange-400: #d4974f;
+  --color-orange-300: #e3b987;
+  --color-lime-950: #141a0c;
+  --color-lime-900: #1e2612;
+  --color-lime-800: #2c381c;
+  --color-lime-700: #3c4c27;
+  --color-lime-600: #526636;
+  --color-lime-500: #6a8148;
+  --color-lime-400: #93a76d;
+  --color-lime-300: #b8c79d;
+
+  /* blue / teal → the same atlas-water family as sky */
+  --color-blue-950: #0d1517;
+  --color-blue-900: #142226;
+  --color-blue-800: #1b2f35;
+  --color-blue-700: #244049;
+  --color-blue-600: #30525d;
+  --color-blue-500: #3f6673;
+  --color-blue-400: #6d8c96;
+  --color-blue-300: #9ab0b6;
+  --color-blue-200: #c3d0d2;
+  --color-teal-950: #0a1412;
+  --color-teal-900: #10201d;
+  --color-teal-800: #172d28;
+  --color-teal-700: #1f3d36;
+  --color-teal-600: #2b534a;
+  --color-teal-500: #3c6d61;
+  --color-teal-400: #6d948a;
+  --color-teal-300: #9db8b0;
+
+  /* red / pink / fuchsia → terracotta and dried rose */
+  --color-red-950: #1a0e0a;
+  --color-red-900: #2b1710;
+  --color-red-800: #402117;
+  --color-red-700: #5c2f20;
+  --color-red-600: #7d402b;
+  --color-red-500: #9c5540;
+  --color-red-400: #bf7f66;
+  --color-red-300: #d8a891;
+  --color-pink-950: #1c0f12;
+  --color-pink-900: #2e1a1e;
+  --color-pink-800: #452629;
+  --color-pink-700: #5e3438;
+  --color-pink-600: #7d474b;
+  --color-pink-500: #9c5f60;
+  --color-pink-400: #bf8a88;
+  --color-pink-300: #d8b0ac;
+  --color-fuchsia-950: #1c0f16;
+  --color-fuchsia-900: #2e1a24;
+  --color-fuchsia-800: #452632;
+  --color-fuchsia-700: #5e3444;
+  --color-fuchsia-600: #7d4759;
+  --color-fuchsia-500: #9c5f70;
+  --color-fuchsia-400: #bf8a95;
+  --color-fuchsia-300: #d8b0b6;
+
+  /* green → sage */
+  --color-green-950: #0a1410;
+  --color-green-900: #102019;
+  --color-green-800: #172d23;
+  --color-green-700: #1f3d2f;
+  --color-green-600: #2b5340;
+  --color-green-500: #3c6d55;
+  --color-green-400: #6d9479;
+  --color-green-300: #9db8a4;
+
   /* named tokens */
   --color-ink-900: #0a0c07;
   --color-ink-800: #111409;

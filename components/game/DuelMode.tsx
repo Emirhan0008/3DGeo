@@ -955,7 +955,7 @@ export default function DuelMode() {
                       onClick={() => setSelectedMaxPlayers(pCount)}
                       className={`relative py-1.5 px-1.5 rounded-lg transition-all flex flex-col items-center justify-center gap-0.5 text-center cursor-pointer border ${
                         isSelected
-                          ? 'bg-gradient-to-b from-amber-500 via-amber-400 to-orange-500 text-slate-950 border-amber-200 shadow-md shadow-amber-500/30 scale-[1.01] ring-1 ring-amber-300'
+                          ? 'hf-btn-brass border-[#c9a24a]/80 scale-[1.01] ring-1 ring-[#c9a24a]/40'
                           : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-amber-400/40 hover:text-white'
                       }`}
                     >
@@ -1122,7 +1122,7 @@ export default function DuelMode() {
                   <button
                     onClick={handleStartQuickMatch}
                     disabled={actionLoading}
-                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-2.5 hf-btn-brass text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {actionLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
@@ -1174,7 +1174,7 @@ export default function DuelMode() {
                   <button
                     onClick={handleCreatePrivateRoom}
                     disabled={actionLoading}
-                    className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-2.5 hf-btn-brass text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {actionLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -1220,7 +1220,7 @@ export default function DuelMode() {
                   <button
                     onClick={handleJoinPrivateRoom}
                     disabled={actionLoading}
-                    className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-2.5 hf-btn-brass text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {actionLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
@@ -1244,7 +1244,7 @@ export default function DuelMode() {
                     type="button"
                     onClick={handleStartBotDuel}
                     disabled={actionLoading}
-                    className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-2.5 hf-btn-brass text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {actionLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -1395,7 +1395,7 @@ export default function DuelMode() {
                   <button
                     onClick={handleForceStartDuel}
                     disabled={actionLoading}
-                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="w-full py-2 hf-btn-brass text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
                     <Zap className="w-4 h-4" />
                     <span>Daha Fazla Bekleme, {allJoinedPlayers.length} Kişiyle Hemen Başlat!</span>
@@ -1439,7 +1439,7 @@ export default function DuelMode() {
                 {crossModeSuggestions.map((sugg) => (
                   <div 
                     key={sugg.id} 
-                    className="p-2.5 rounded-xl bg-gradient-to-r from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 flex items-center justify-between gap-2 text-xs"
+                    className="p-2.5 rounded-xl border border-[#c9a24a]/25 bg-[#c9a24a]/8 flex items-center justify-between gap-2 text-xs"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
@@ -1456,7 +1456,7 @@ export default function DuelMode() {
                     <button
                       disabled={joiningSuggestionId === sugg.id}
                       onClick={() => handleAcceptSuggestion(sugg)}
-                      className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950 font-black text-xs rounded-lg shadow-md transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                      className="px-2.5 py-1.5 hf-btn-brass text-xs rounded-lg transition-all shrink-0 cursor-pointer disabled:opacity-50"
                     >
                       {joiningSuggestionId === sugg.id ? 'Bağlanıyor...' : '🚀 Maça Katıl'}
                     </button>
@@ -1487,7 +1487,7 @@ export default function DuelMode() {
 
             <button
               onClick={handleStartBotDuel}
-              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              className="flex-1 py-2.5 hf-btn-brass text-xs rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer"
             >
               <Bot className="w-4 h-4" />
               <span>Yapay Zekaya Geç</span>
@@ -1529,7 +1529,7 @@ export default function DuelMode() {
                 await handleLeaveDuel();
                 handleStartQuickMatch();
               }}
-              className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="flex-1 py-2.5 hf-btn-brass text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Zap className="w-4 h-4" />
               <span>Yeni Rakip Bul</span>
@@ -1587,7 +1587,7 @@ export default function DuelMode() {
           </div>
 
           {/* 10s Countdown Circle */}
-          <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 font-black text-3xl flex items-center justify-center mx-auto shadow-2xl shadow-amber-500/50 animate-pulse">
+          <div className="w-16 h-16 rounded-full bg-[#c9a24a] text-[#221b0c] font-semibold text-3xl flex items-center justify-center mx-auto shadow-2xl shadow-amber-500/50 animate-pulse">
             {countdownNum}
           </div>
 
@@ -1625,7 +1625,7 @@ export default function DuelMode() {
         <div className="w-full max-w-xl max-h-[92dvh] bg-[#09090b]/95 border-2 border-amber-500/50 rounded-2xl shadow-2xl p-3.5 sm:p-5 text-white text-center animate-in zoom-in-95 duration-200 flex flex-col my-auto">
           {/* Header Summary */}
           <div className="shrink-0 mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center mx-auto mb-1.5 shadow-xl shadow-amber-500/30">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border border-[#c9a24a]/45 bg-[#1a1e12] flex items-center justify-center mx-auto mb-1.5">
               <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
             </div>
 
@@ -2127,7 +2127,7 @@ export default function DuelMode() {
         {/* Row 1: Soru İsmi, Kategori & Tur Sayısı */}
         <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-1.5">
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
-            <span className="px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-[10px] sm:text-xs shrink-0 flex items-center gap-1 shadow-sm">
+            <span className="px-2 py-0.5 rounded-lg bg-[#c9a24a] text-[#221b0c] font-semibold text-[10px] sm:text-xs shrink-0 flex items-center gap-1 shadow-sm">
               <Crosshair className="w-3 h-3" />
               ARANAN:
             </span>
@@ -2268,7 +2268,7 @@ export default function DuelMode() {
             className={`px-2.5 py-1 text-[11px] font-black rounded-lg shadow transition-all shrink-0 cursor-pointer ${
               myPlayer?.readyToAdvance
                 ? 'bg-emerald-500/30 border border-emerald-400/60 text-emerald-300'
-                : 'bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 active:scale-95 text-slate-950'
+                : 'hf-btn-brass'
             }`}
             title={myPlayer?.readyToAdvance ? 'Rakipler bekleniyor...' : 'Sonraki soruya geç'}
           >
