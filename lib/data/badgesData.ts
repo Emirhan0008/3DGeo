@@ -222,7 +222,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'mythic',
     desc: '30\'dan fazla rozet ve mutlak bilgi birikimiyle evrensel zirveye ulaşan efsane.',
     requiredBadge: 'Kozmik Coğrafya Hükümdarı',
-    requiredMetricText: '30 veya daha fazla rozet kazan'
+    requiredMetricText: '38 veya daha fazla rozet kazan'
   },
   {
     id: 'mutlak_taht_efendisi',
@@ -231,7 +231,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'mythic',
     desc: '100 canlı 1v1 PvP düello zaferiyle kırılması imkansız bir efsane yazan hükümdar.',
     requiredBadge: 'Mutlak Tahtın Sahibi',
-    requiredMetricText: '100 Canlı Düello zaferi kazan'
+    requiredMetricText: '250 Canlı Düello zaferi kazan'
   },
   {
     id: 'kpss_ordinaryusu',
@@ -240,7 +240,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'mythic',
     desc: '5000 test puanına ulaşarak Türkiye coğrafyasının en büyük otoritesi haline gelen bilgin.',
     requiredBadge: 'KPSS Coğrafya Ordinaryüsü',
-    requiredMetricText: '5000 toplam test puanına ulaş'
+    requiredMetricText: '20000 toplam test puanına ulaş'
   },
   {
     id: 'namaGlup_fatih_lord',
@@ -249,7 +249,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'mythic',
     desc: 'Canlı düellolarda üst üste 10 maç sıfır mağlubiyetle seriyi tamamlayan yenilmez.',
     requiredBadge: '10\'lu Yenilmez Seri',
-    requiredMetricText: 'Üst üste 10 canlı düello kazan'
+    requiredMetricText: 'Üst üste 20 canlı düello kazan'
   },
 
   // --- 💎 4. KADEME: ELMAS & EFSANE ---
@@ -260,7 +260,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: '20 kademeli rozeti toplayarak elmas mertebesine yükselen elit üstat.',
     requiredBadge: 'Efsanevi Coğrafyacı',
-    requiredMetricText: '20 veya daha fazla rozet kazan'
+    requiredMetricText: '22 veya daha fazla rozet kazan'
   },
   {
     id: 'arena_tanrisi',
@@ -269,7 +269,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: '50 canlı PVP düello zaferiyle arena tarihine adını altın harflerle kazıyan savaşçı.',
     requiredBadge: '50 Düello Zaferi',
-    requiredMetricText: '50 Canlı Düello zaferi kazan'
+    requiredMetricText: '120 Canlı Düello zaferi kazan'
   },
   {
     id: 'tahtin_sahibi',
@@ -278,7 +278,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: '25 canlı PVP düello zaferiyle mutlak arena şampiyonu olan usta.',
     requiredBadge: 'Tahtın Sahibi',
-    requiredMetricText: '25 Canlı Düello zaferi kazan'
+    requiredMetricText: '60 Canlı Düello zaferi kazan'
   },
   {
     id: 'duello_krali',
@@ -287,7 +287,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: '10 canlı düello zaferiyle KPSS coğrafya arenasında zirveye oturan gladyatör.',
     requiredBadge: 'Düello Şampiyonu',
-    requiredMetricText: '10 Canlı Düello zaferi kazan'
+    requiredMetricText: '25 Canlı Düello zaferi kazan'
   },
   {
     id: 'kpss_sampiyonu',
@@ -296,7 +296,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: 'Testlerde 1500 puan barajını aşarak coğrafya sorularını altüst eden usta.',
     requiredBadge: 'KPSS Coğrafya Üstadı',
-    requiredMetricText: '1500 toplam test puanına ulaş'
+    requiredMetricText: '4000 toplam test puanına ulaş'
   },
   {
     id: 'turing_basmuhendisi',
@@ -305,7 +305,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: 'Yapay zeka botuna karşı 25 galibiyet alarak siber arenayı fethetti.',
     requiredBadge: 'Siber Antrenör',
-    requiredMetricText: 'Yapay zekaya karşı 25 galibiyet al'
+    requiredMetricText: 'Yapay zekaya karşı 60 galibiyet al'
   },
   {
     id: 'milimetrik_kartograf',
@@ -314,7 +314,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: 'Harita testlerinde 20 kez 5km altı kusursuz tam isabet gerçekleştirdi.',
     requiredBadge: 'Milimetrik Kartograf',
-    requiredMetricText: '20 kez 5km altı tam isabet yap'
+    requiredMetricText: '40 kez 5km altı tam isabet yap'
   },
   {
     id: 'dilsiz_harita_efendisi',
@@ -323,7 +323,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'diamond',
     desc: 'Dilsiz harita modunda 20 doğru tahmin yaparak haritayı hafızasına kazıdı.',
     requiredBadge: 'Dilsiz Harita Efendisi',
-    requiredMetricText: 'Dilsiz modda 20 doğru yap'
+    requiredMetricText: 'Dilsiz modda 40 doğru yap'
   },
 
   // --- 👑 3. KADEME: ALTIN & ŞAMPİYON ---
@@ -352,7 +352,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'gold',
     desc: 'Ardı ardına sıfır hatayla 10 soru zincirleri kuran coğrafya makinesi.',
     requiredBadge: '10\'lu Seri Canavarı',
-    requiredMetricText: 'Üst üste 10 doğru cevap ver'
+    requiredMetricText: 'Üst üste 25 doğru cevap ver'
   },
   {
     id: 'arena_gladyatoru',
@@ -361,7 +361,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'gold',
     desc: 'Canlı 1v1 düellolarda 3 maç kazanarak gerçek rakiplere üstünlük sağlayan yarışmacı.',
     requiredBadge: '1v1 Gladyatör',
-    requiredMetricText: '3 Canlı Düello zaferi kazan'
+    requiredMetricText: '10 Canlı Düello zaferi kazan'
   },
   {
     id: 'dilsiz_harita_dehasi',
@@ -388,7 +388,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'gold',
     desc: 'Yapay zeka botuna karşı 10 galibiyet alarak yapay zekayı dize getiren oyuncu.',
     requiredBadge: 'Yapay Zeka Mat Eden',
-    requiredMetricText: 'Yapay zekaya karşı 10 galibiyet al'
+    requiredMetricText: 'Yapay zekaya karşı 20 galibiyet al'
   },
 
   // --- 🛡️ 2. KADEME: GÜMÜŞ & UZMAN ---
@@ -399,7 +399,7 @@ export const ALL_TITLES: UserTitle[] = [
     tier: 'silver',
     desc: 'Yapay zeka antrenman botuna karşı 5 galibiyet kazanan öğrenci.',
     requiredBadge: 'Turing Ustası',
-    requiredMetricText: 'Yapay zekaya karşı 5 galibiyet al'
+    requiredMetricText: 'Yapay zekaya karşı 8 galibiyet al'
   },
   {
     id: 'karadeniz_kaplani',
@@ -523,77 +523,77 @@ export function getTitleProgress(
   switch (title.id) {
     case 'kozmik_cografya_efendisi':
       current = unlockedBadges.length;
-      target = 30;
+      target = 38;
       unit = 'rozet';
       break;
     case 'mutlak_taht_efendisi':
       current = duelWins;
-      target = 100;
+      target = 250;
       unit = 'zafer';
       break;
     case 'kpss_ordinaryusu':
       current = score;
-      target = 5000;
+      target = 20000;
       unit = 'puan';
       break;
     case 'namaGlup_fatih_lord':
       current = categoryMasteryProgress['max_duel_streak'] || 0;
-      target = 10;
+      target = 20;
       unit = 'seri zafer';
       break;
     case 'arena_tanrisi':
       current = duelWins;
-      target = 50;
+      target = 120;
       unit = 'zafer';
       break;
     case 'tahtin_sahibi':
       current = duelWins;
-      target = 25;
+      target = 60;
       unit = 'zafer';
       break;
     case 'duello_krali':
       current = duelWins;
-      target = 10;
+      target = 25;
       unit = 'zafer';
       break;
     case 'arena_gladyatoru':
       current = duelWins;
-      target = 3;
+      target = 10;
       unit = 'zafer';
       break;
     case 'efsanevi_elmas_deha':
       current = unlockedBadges.length;
-      target = 20;
+      target = 22;
       unit = 'rozet';
       break;
     case 'kpss_sampiyonu':
       current = score;
-      target = 1500;
+      target = 4000;
       unit = 'puan';
       break;
     case 'turing_basmuhendisi':
       current = botWins;
-      target = 25;
+      target = 60;
       unit = 'bot zaferi';
       break;
     case 'bot_avcisi_unvan':
       current = botWins;
-      target = 10;
+      target = 20;
       unit = 'bot zaferi';
       break;
     case 'turing_ustasi_unvan':
       current = botWins;
-      target = 5;
+      target = 8;
       unit = 'bot zaferi';
       break;
     case 'seri_canavari_unvan':
       current = categoryMasteryProgress['max_streak'] || 0;
-      target = 10;
+      target = 25;
       unit = 'seri doğru';
       break;
     case 'dilsiz_harita_efendisi':
       current = categoryMasteryProgress['dilsiz_harita'] || 0;
-      target = 20;
+      target = 40;
       unit = 'doğru';
       break;
     case 'dilsiz_harita_dehasi':
@@ -603,7 +603,7 @@ export function getTitleProgress(
       break;
     case 'milimetrik_kartograf':
       current = categoryMasteryProgress['kusursuz_isabet_5km'] || 0;
-      target = 20;
+      target = 40;
       unit = 'tam isabet';
       break;
     case 'kusursuz_nisanci':
@@ -688,10 +688,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Efsanevi Prestij',
     tier: 'mythic',
     tierLevel: 5,
-    desc: '30 veya daha fazla başarı rozeti toplayarak Türkiye coğrafyasında mutlak zirveye ulaştın.',
-    targetCount: 30,
-    reqText: 'Toplam 30 rozet kilidi aç.',
-    trackerKey: 'BadgesCount30',
+    desc: '38 veya daha fazla başarı rozeti toplayarak Türkiye coğrafyasında mutlak zirveye ulaştın.',
+    targetCount: 38,
+    reqText: 'Toplam 38 rozet kilidi aç.',
+    trackerKey: 'BadgesCount38',
     associatedTitle: 'Kozmik Coğrafya Hükümdarı'
   },
   {
@@ -701,10 +701,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'mythic',
     tierLevel: 5,
-    desc: 'Canlı 1v1 düellolarda 100 gerçek zafer kazanarak mutlak arena tahtına adını kazıdın.',
-    targetCount: 100,
-    reqText: 'Canlı düellolarda 100 maç kazan.',
-    trackerKey: 'DuelWins100',
+    desc: 'Canlı 1v1 düellolarda 250 gerçek zafer kazanarak mutlak arena tahtına adını kazıdın.',
+    targetCount: 250,
+    reqText: 'Canlı düellolarda 250 maç kazan.',
+    trackerKey: 'DuelWins250',
     associatedTitle: 'Mutlak Tahtın Sahibi'
   },
   {
@@ -714,10 +714,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Skor Başarımı',
     tier: 'mythic',
     tierLevel: 5,
-    desc: 'Testlerde toplam 5000 puan barajını aşarak coğrafya ansiklopedisi unvanını aldın.',
-    targetCount: 5000,
-    reqText: 'Testlerde 5000 toplam puana ulaş.',
-    trackerKey: 'Score5000',
+    desc: 'Testlerde toplam 20000 puan barajını aşarak coğrafya ansiklopedisi unvanını aldın.',
+    targetCount: 20000,
+    reqText: 'Testlerde 20000 toplam puana ulaş.',
+    trackerKey: 'Score20000',
     associatedTitle: 'KPSS Coğrafya Ordinaryüsü'
   },
   {
@@ -727,10 +727,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'mythic',
     tierLevel: 5,
-    desc: 'Canlı 1v1 düellolarda üst üste 10 maç sıfır mağlubiyetle namağlup seri yakaladın.',
-    targetCount: 10,
-    reqText: 'Üst üste 10 canlı düello kazan.',
-    trackerKey: 'DuelStreak10',
+    desc: 'Canlı 1v1 düellolarda üst üste 20 maç sıfır mağlubiyetle namağlup seri yakaladın.',
+    targetCount: 20,
+    reqText: 'Üst üste 20 canlı düello kazan.',
+    trackerKey: 'DuelStreak20',
     associatedTitle: 'Efsanevi Seri Fatihi'
   },
 
@@ -744,10 +744,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Canlı 1v1 düellolarda 25 zafer kazanarak mutlak arena efsanesi oldun.',
-    targetCount: 25,
-    reqText: 'Canlı düellolarda 25 maç kazan.',
-    trackerKey: 'DuelWins25',
+    desc: 'Canlı 1v1 düellolarda 60 zafer kazanarak mutlak arena efsanesi oldun.',
+    targetCount: 60,
+    reqText: 'Canlı düellolarda 60 maç kazan.',
+    trackerKey: 'DuelWins60',
     associatedTitle: 'Tahtın Sahibi'
   },
   {
@@ -757,10 +757,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 50 galibiyet kazandın.',
-    targetCount: 50,
-    reqText: 'Canlı düellolarda 50 maç kazan.',
-    trackerKey: 'DuelWins50',
+    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 120 galibiyet kazandın.',
+    targetCount: 120,
+    reqText: 'Canlı düellolarda 120 maç kazan.',
+    trackerKey: 'DuelWins120',
     associatedTitle: 'Arena Efsanesi'
   },
   {
@@ -770,10 +770,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Canlı 1v1 düellolarda 10 zaferle arenada zirveye oturdun.',
-    targetCount: 10,
-    reqText: 'Canlı düellolarda 10 maç kazan.',
-    trackerKey: 'DuelWins10',
+    desc: 'Canlı 1v1 düellolarda 25 zaferle arenada zirveye oturdun.',
+    targetCount: 25,
+    reqText: 'Canlı düellolarda 25 maç kazan.',
+    trackerKey: 'DuelWins25b',
     associatedTitle: 'Arena Şampiyonu'
   },
   {
@@ -783,10 +783,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Efsanevi Prestij',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Toplam 20 veya daha fazla rozet kazanarak elit elmas seviyeye ulaştın.',
-    targetCount: 20,
-    reqText: 'Toplam 20 rozet kilidi aç.',
-    trackerKey: 'BadgesCount20',
+    desc: 'Toplam 22 veya daha fazla rozet kazanarak elit elmas seviyeye ulaştın.',
+    targetCount: 22,
+    reqText: 'Toplam 22 rozet kilidi aç.',
+    trackerKey: 'BadgesCount22',
     associatedTitle: 'Efsanevi Harita Dehası'
   },
   {
@@ -796,10 +796,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Skor Başarımı',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Test modunda 1500 puan barajını aştın.',
-    targetCount: 1500,
-    reqText: 'Testlerde 1500 toplam puana ulaş.',
-    trackerKey: 'Score1500',
+    desc: 'Test modunda 4000 puan barajını aştın.',
+    targetCount: 4000,
+    reqText: 'Testlerde 4000 toplam puana ulaş.',
+    trackerKey: 'Score4000',
     associatedTitle: 'KPSS Coğrafya Şampiyonu'
   },
   {
@@ -809,10 +809,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Yapay Zeka Arenası',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Yapay zeka botuna karşı 25 maç kazanarak kusursuz antrenman seviyesine ulaştın.',
-    targetCount: 25,
-    reqText: 'Yapay zekaya karşı 25 galibiyet al.',
-    trackerKey: 'BotWins25',
+    desc: 'Yapay zeka botuna karşı 60 maç kazanarak kusursuz antrenman seviyesine ulaştın.',
+    targetCount: 60,
+    reqText: 'Yapay zekaya karşı 60 galibiyet al.',
+    trackerKey: 'BotWins60',
     associatedTitle: 'Turing Başmühendisi'
   },
   {
@@ -822,10 +822,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Pim Tahmin',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Harita testinde 20 kez 5 km altında kusursuz tam isabet yaptın.',
-    targetCount: 20,
-    reqText: '20 kez 5 km altında tam isabet yap.',
-    trackerKey: 'TamIsabet5km_20',
+    desc: 'Harita testinde 40 kez 5 km altında kusursuz tam isabet yaptın.',
+    targetCount: 40,
+    reqText: '40 kez 5 km altında tam isabet yap.',
+    trackerKey: 'TamIsabet5km_40',
     associatedTitle: 'Milimetrik Kartograf'
   },
   {
@@ -835,10 +835,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Zorlu Mod',
     tier: 'diamond',
     tierLevel: 4,
-    desc: 'Dilsiz harita modunda 20 doğru tahmin yaparak haritayı zihnine kazıdın.',
-    targetCount: 20,
-    reqText: 'Dilsiz modda 20 doğru tahmin yap.',
-    trackerKey: 'BlindMap20',
+    desc: 'Dilsiz harita modunda 40 doğru tahmin yaparak haritayı zihnine kazıdın.',
+    targetCount: 40,
+    reqText: 'Dilsiz modda 40 doğru tahmin yap.',
+    trackerKey: 'BlindMap40',
     associatedTitle: 'Dilsiz Harita Efendisi'
   },
 
@@ -852,10 +852,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'gold',
     tierLevel: 3,
-    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 3 zafer kazandın.',
-    targetCount: 3,
-    reqText: 'Canlı düellolarda 3 maç kazan.',
-    trackerKey: 'DuelWins3',
+    desc: 'Canlı 1v1 düellolarda gerçek rakiplere karşı 10 zafer kazandın.',
+    targetCount: 10,
+    reqText: 'Canlı düellolarda 10 maç kazan.',
+    trackerKey: 'DuelWins10b',
     associatedTitle: '1v1 Gladyatör'
   },
   {
@@ -865,10 +865,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Canlı 1v1 Düello',
     tier: 'gold',
     tierLevel: 3,
-    desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın.',
-    targetCount: 3,
-    reqText: 'Üst üste 3 canlı düello maçı kazan.',
-    trackerKey: 'DuelStreak3'
+    desc: 'Canlı düellolarda üst üste 5 maç kazanarak namağlup seri yakaladın.',
+    targetCount: 5,
+    reqText: 'Üst üste 5 canlı düello maçı kazan.',
+    trackerKey: 'DuelStreak5'
   },
   {
     id: 'seri_canavari',
@@ -877,10 +877,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Seri Başarımı',
     tier: 'gold',
     tierLevel: 3,
-    desc: 'Üst üste 10 doğru cevap verdin.',
-    targetCount: 10,
-    reqText: 'Üst üste 10 doğru cevap ver.',
-    trackerKey: 'Streak10',
+    desc: 'Üst üste 25 doğru cevap verdin.',
+    targetCount: 25,
+    reqText: 'Üst üste 25 doğru cevap ver.',
+    trackerKey: 'Streak25',
     associatedTitle: 'Yenilmez Seri Canavarı'
   },
   {
@@ -890,10 +890,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Yapay Zeka Arenası',
     tier: 'gold',
     tierLevel: 3,
-    desc: 'Yapay zeka botuna karşı 10 galibiyetle antrenman arenasını fethettin.',
-    targetCount: 10,
-    reqText: 'Yapay zekaya karşı 10 galibiyet al.',
-    trackerKey: 'BotWins10',
+    desc: 'Yapay zeka botuna karşı 20 galibiyetle antrenman arenasını fethettin.',
+    targetCount: 20,
+    reqText: 'Yapay zekaya karşı 20 galibiyet al.',
+    trackerKey: 'BotWins20',
     associatedTitle: 'Yapay Zeka Mat Eden'
   },
   {
@@ -1086,10 +1086,10 @@ export const ALL_BADGES: Badge[] = [
     category: 'Yapay Zeka Arenası',
     tier: 'silver',
     tierLevel: 2,
-    desc: 'Yapay zeka botuna karşı 5 maç kazanarak hızını ve bilgini kanıtladın.',
-    targetCount: 5,
-    reqText: 'Yapay zekaya karşı 5 galibiyet al.',
-    trackerKey: 'BotWins5',
+    desc: 'Yapay zeka botuna karşı 8 maç kazanarak hızını ve bilgini kanıtladın.',
+    targetCount: 8,
+    reqText: 'Yapay zekaya karşı 8 galibiyet al.',
+    trackerKey: 'BotWins8',
     associatedTitle: 'Turing Fatihi'
   },
   {

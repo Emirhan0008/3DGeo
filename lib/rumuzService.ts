@@ -1164,6 +1164,8 @@ export function autoSyncStoreToCloud(stateData: {
   isBlindMapMode?: boolean;
   regionalStats?: Record<string, { correct: number; wrong: number }>;
   categoryStats?: Record<string, { correct: number; wrong: number }>;
+  totalXp?: number;
+  dailyStreak?: number;
   missedItems?: Record<string, { id: string; name: string; category: string; region: string; coords: [number, number]; wrongCount: number }>;
 }) {
   if (typeof window === 'undefined') return;

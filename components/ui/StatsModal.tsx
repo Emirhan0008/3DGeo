@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { ALL_BADGES } from '@/lib/data/badgesData';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
+import { RankBar } from '@/components/ui/RankBadge';
 import { 
  Trophy, 
  Flame, 
@@ -56,7 +57,8 @@ export default function StatsModal() {
  setActiveTab,
  isBlindMapMode,
  toggleBlindMapMode,
- resetStats
+ resetStats,
+ totalXp
  } = useAppStore();
 
  const [aiReport, setAiReport] = useState<string | null>(null);
@@ -274,6 +276,11 @@ export default function StatsModal() {
  {/* SUB-TAB 1: OVERVIEW */}
  {activeSubTab === 'overview' && (
  <div className="space-y-3.5 animate-in fade-in duration-200">
+ {/* Rank progression — the always-earning ladder */}
+ <div className="rounded-xl border border-[#c9a24a]/28 bg-[#c9a24a]/8 p-3">
+ <RankBar totalXp={totalXp} />
+ </div>
+
  {/* User Competence Rank Badge */}
  <div className="p-3 border border-[#c9a24a]/25 bg-[#c9a24a]/8 rounded-xl flex items-center justify-between">
  <div>

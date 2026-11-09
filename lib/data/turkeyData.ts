@@ -1,3 +1,5 @@
+import { VERIFIED_IMAGES, illustratedPlate } from './featureImages';
+
 export interface GeoFeature {
   id: string;
   name: string;
@@ -4726,77 +4728,30 @@ export const ALL_GEO_FEATURES: GeoFeature[] = [
   ...CAVES_DATA
 ];
 
-export function getFeatureImageUrl(item?: { id?: string; name?: string; type?: string; category?: string; title?: string } | null): string {
-  if (!item) return 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80';
-  
-  const id = (item.id || '').toLowerCase();
-  const name = (item.name || item.title || '').toLowerCase();
-  const type = (item.type || '').toLowerCase();
+/**
+ * Image for a geography feature.
+ *
+ * Returns a real photograph only when one has been verified for that
+ * exact feature (see lib/data/featureImages.ts). Everything else gets an
+ * engraved SVG plate for its type — deliberately not a stock photo of
+ * somewhere else, because a wrong photo of a real mountain is worse than
+ * an honest illustration in a study app.
+ */
+export function getFeatureImageUrl(
+  item?: {
+    id?: string;
+    name?: string;
+    type?: string;
+    category?: string;
+    title?: string;
+  } | null
+): string {
+  if (!item) return illustratedPlate('mountain');
 
-  // Curated High-Res Turkey Geography Photography
-  if (id.includes('efes') || name.includes('efes')) {
-    return 'https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=800&q=80';
-  }
-  if (id.includes('hierapolis') || name.includes('hierapolis') || name.includes('pamukkale')) {
-    return 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80';
-  }
-  if (id.includes('gobekli') || name.includes('göbeklitepe')) {
-    return 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&q=80';
-  }
-  if (type === 'ancient_city' || name.includes('antik') || name.includes('ören')) {
-    return 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80';
-  }
-  if (type === 'cave' || name.includes('mağara')) {
-    return 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=800&q=80';
-  }
-  if (id.includes('agri') || name.includes('ağrı')) {
-    return 'https://images.unsplash.com/photo-1627916607164-7b20241db935?w=800&q=80';
-  }
-  if (id.includes('erciyes') || name.includes('erciyes')) {
-    return 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80';
-  }
-  if (id.includes('nemrut') || name.includes('nemrut')) {
-    return 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&q=80';
-  }
-  if (id.includes('kackar') || name.includes('kaçkar')) {
-    return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80';
-  }
-  if (name.includes('pamukkale') || name.includes('traverten') || name.includes('salda')) {
-    return 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80';
-  }
-  if (name.includes('kapadokya') || name.includes('peri bacaları')) {
-    return 'https://images.unsplash.com/photo-1609856878074-cf31e21ccb6b?w=800&q=80';
-  }
-  if (name.includes('van gölü') || name.includes('van')) {
-    return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80';
-  }
-  if (name.includes('istanbul') || name.includes('boğaz') || name.includes('çanakkale')) {
-    return 'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800&q=80';
-  }
-  if (type === 'mountain' || name.includes('dağ') || name.includes('volkan')) {
-    return 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80';
-  }
-  if (type === 'river' || name.includes('nehir') || name.includes('ırmak') || name.includes('çayı')) {
-    return 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80';
-  }
-  if (type === 'lake' || name.includes('göl')) {
-    return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80';
-  }
-  if (type === 'pass' || name.includes('geçit') || name.includes('bel')) {
-    return 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=800&q=80';
-  }
-  if (type === 'border_gate' || name.includes('kapı') || name.includes('sınır')) {
-    return 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=800&q=80';
-  }
-  if (type === 'mine' || name.includes('maden') || name.includes('yatak')) {
-    return 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=800&q=80';
-  }
-  if (type === 'plateau' || type === 'plain' || name.includes('ova') || name.includes('plato')) {
-    return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80';
-  }
-  if (type === 'province' || name.includes('il')) {
-    return 'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800&q=80';
-  }
-  return 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80';
+  const id = item.id || '';
+  const verified = VERIFIED_IMAGES[id];
+  if (verified) return verified;
+
+  // Some callers pass only a type (e.g. quiz cards built from a category).
+  return illustratedPlate(item.type || 'mountain');
 }
-

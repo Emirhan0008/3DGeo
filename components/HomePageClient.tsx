@@ -38,6 +38,9 @@ export default function HomePageClient() {
   /* Deep links + browser back/forward: keep the store in step with the URL.
      The Navbar pushes history itself, so this only has to react to it. */
   useEffect(() => {
+    // Daily-return bonus: pays once per calendar day, on first mount.
+    useAppStore.getState().touchDailyStreak();
+
     const syncFromUrl = () => {
       const tab = tabFromPathname(window.location.pathname);
       if (!tab) return;

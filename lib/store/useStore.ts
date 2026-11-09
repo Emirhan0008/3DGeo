@@ -10,6 +10,7 @@ import {
   MultipleChoiceQuestion
 } from '../data/quizQuestions';
 import { ALL_BADGES } from '../data/badgesData';
+import { levelFromXp, XP, dailyBonus, pinXpForDistance, streakBonus } from '../data/rankSystem';
 import type { DuelSession } from '../duelService';
 import { autoSyncStoreToCloud } from '../rumuzService';
 
@@ -162,6 +163,17 @@ export interface AppState {
   totalQuestionsAnswered: number;
   correctAnswersCount: number;
 
+  // Rank progression (XP ladder — never resets, see lib/data/rankSystem.ts)
+  totalXp: number;
+  dailyStreak: number;
+  lastActiveDate: string | null;
+  /** Adds XP and returns the level-up payload, if any. */
+  awardXp: (amount: number, reason?: string) => void;
+  /** Call once per day on mount; pays the daily-return bonus. */
+  touchDailyStreak: () => void;
+  /** Highest level reached so far — used for "new rank" toasts. */
+  highestLevelSeen: number;
+
   // Analytics & Statistics Tracking State
   regionalStats: Record<string, { correct: number; wrong: number }>;
   categoryStats: Record<string, { correct: number; wrong: number }>;
@@ -214,7 +226,10 @@ function saveStatsToLocalStorage(state: AppState) {
       missedItems: state.missedItems,
       missedQuestions: state.missedQuestions,
       duelStats: state.duelStats,
-      botStats: state.botStats
+      botStats: state.botStats,
+      totalXp: state.totalXp,
+      dailyStreak: state.dailyStreak,
+      lastActiveDate: state.lastActiveDate,
     };
     localStorage.setItem('kpss3d_user_stats', JSON.stringify(payload));
     
@@ -237,6 +252,8 @@ function saveStatsToLocalStorage(state: AppState) {
       isBlindMapMode: state.isBlindMapMode,
       regionalStats: state.regionalStats,
       categoryStats: state.categoryStats,
+      totalXp: state.totalXp,
+      dailyStreak: state.dailyStreak,
       missedItems: state.missedItems
     });
   } catch (e) {
@@ -394,11 +411,14 @@ function processBadgeEvaluation(
         if (b.trackerKey === 'TamIsabet' && points === 100) isUnlocked = true;
         else if (b.trackerKey === 'Streak5' && currentStreak >= 5) isUnlocked = true;
         else if (b.trackerKey === 'Streak10' && currentStreak >= 10) isUnlocked = true;
+        else if (b.trackerKey === 'Streak25' && currentStreak >= 25) isUnlocked = true;
+        else if (b.trackerKey === 'TamIsabet5km_40' && (newProgress['TamIsabet5km_40'] || 0) >= 40) isUnlocked = true;
         else if (b.trackerKey === 'Score300' && currentScore >= 300) isUnlocked = true;
-        else if (b.trackerKey === 'Score1500' && currentScore >= 1500) isUnlocked = true;
-        else if (b.trackerKey === 'Score5000' && currentScore >= 5000) isUnlocked = true;
-        else if (b.trackerKey === 'BadgesCount20' && newBadges.length >= 20) isUnlocked = true;
-        else if (b.trackerKey === 'BadgesCount30' && newBadges.length >= 30) isUnlocked = true;
+        else if (b.trackerKey === 'Score500' && currentScore >= 500) isUnlocked = true;
+        else if (b.trackerKey === 'Score4000' && currentScore >= 4000) isUnlocked = true;
+        else if (b.trackerKey === 'Score20000' && currentScore >= 20000) isUnlocked = true;
+        else if (b.trackerKey === 'BadgesCount22' && newBadges.length >= 22) isUnlocked = true;
+        else if (b.trackerKey === 'BadgesCount38' && newBadges.length >= 38) isUnlocked = true;
         else if (b.trackerKey === 'InitialStep') isUnlocked = true;
         else if ((newProgress[b.trackerKey] || 0) >= b.targetCount) isUnlocked = true;
 
@@ -641,6 +661,61 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   latestUnlockedBadge: null,
   clearLatestUnlockedBadge: () => set({ latestUnlockedBadge: null }),
+
+  /* ----------------------------------------------------------------
+     Rank progression
+     XP only ever increases. Level is derived from it, never stored,
+     so the two can't drift apart on a schema change.
+     ---------------------------------------------------------------- */
+  totalXp: 0,
+  dailyStreak: 0,
+  lastActiveDate: null,
+  highestLevelSeen: 1,
+
+  awardXp: (amount, reason) => {
+    const gain = Math.max(0, Math.round(amount || 0));
+    if (gain === 0) return;
+
+    const before = get();
+    const prevLevel = levelFromXp(before.totalXp).level;
+    const nextXp = before.totalXp + gain;
+    const after = levelFromXp(nextXp);
+
+    const patch: Record<string, unknown> = { totalXp: nextXp };
+
+    // Record the best level ever reached so the profile can show a
+    // "new rank unlocked" state without needing a separate event bus.
+    if (after.level > (before.highestLevelSeen || 1)) {
+      patch.highestLevelSeen = after.level;
+    }
+
+    set(patch as Partial<AppState>);
+    saveStatsToLocalStorage(get());
+
+    if (process.env.NODE_ENV !== 'production' && after.level > prevLevel) {
+      console.log(
+        `[rank] level ${prevLevel} → ${after.level} (${after.rank.name}) +${gain} XP${reason ? ` — ${reason}` : ''}`
+      );
+    }
+  },
+
+  touchDailyStreak: () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const s = get();
+    if (s.lastActiveDate === today) return;
+
+    let streak = 1;
+    if (s.lastActiveDate) {
+      const prev = new Date(s.lastActiveDate + 'T00:00:00Z').getTime();
+      const now = new Date(today + 'T00:00:00Z').getTime();
+      const days = Math.round((now - prev) / 86_400_000);
+      streak = days === 1 ? (s.dailyStreak || 0) + 1 : 1;
+    }
+
+    set({ dailyStreak: streak, lastActiveDate: today });
+    // Bonus XP is paid through the same funnel as everything else.
+    get().awardXp(dailyBonus(streak), `günlük seri ${streak}`);
+  },
 
   // Dilsiz Harita (Blind Outline Map) State
   isBlindMapMode: true,
@@ -903,23 +978,23 @@ export const useAppStore = create<AppState>((set, get) => ({
         newBadges.push('Yapay Zeka Çırağı');
         newlyUnlockedBadge = { name: 'Yapay Zeka Çırağı', icon: '🤖', desc: 'Yapay zekaya karşı ilk zaferini kazandın!' };
       }
-      if (!newBadges.includes('Turing Ustası') && newWins >= 5) {
+      if (!newBadges.includes('Turing Ustası') && newWins >= 8) {
         newBadges.push('Turing Ustası');
         newlyUnlockedBadge = { name: 'Turing Ustası', icon: '🧠', desc: 'Yapay zekaya karşı 5 zaferle hızını kanıtladın!' };
       }
-      if (!newBadges.includes('Yapay Zeka Mat Eden') && newWins >= 10) {
+      if (!newBadges.includes('Yapay Zeka Mat Eden') && newWins >= 20) {
         newBadges.push('Yapay Zeka Mat Eden');
         newlyUnlockedBadge = { name: 'Yapay Zeka Mat Eden', icon: '⚡', desc: 'Yapay zekayı 10 kez mat ettin!' };
       }
-      if (!newBadges.includes('Siber Antrenör') && newWins >= 25) {
+      if (!newBadges.includes('Siber Antrenör') && newWins >= 60) {
         newBadges.push('Siber Antrenör');
         newlyUnlockedBadge = { name: 'Siber Antrenör', icon: '🚀', desc: 'Yapay zekaya karşı 25 zaferle antrenman ustası oldun!' };
       }
-      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 20) {
+      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 22) {
         newBadges.push('Efsanevi Coğrafyacı');
         newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '20 rozetle efsanevi elmas prestij seviyesine ulaştın!' };
       }
-      if (!newBadges.includes('Kozmik Coğrafya Hükümdarı') && newBadges.length >= 30) {
+      if (!newBadges.includes('Kozmik Coğrafya Hükümdarı') && newBadges.length >= 38) {
         newBadges.push('Kozmik Coğrafya Hükümdarı');
         newlyUnlockedBadge = { name: 'Kozmik Coğrafya Hükümdarı', icon: '🌌', desc: '30 rozetle mistik kozmik zirveye ulaştın!' };
       }
@@ -953,39 +1028,39 @@ export const useAppStore = create<AppState>((set, get) => ({
         newBadges.push('Arena Çaylağı');
         newlyUnlockedBadge = { name: 'Arena Çaylağı', icon: '⚔️', desc: 'İlk canlı 1v1 gerçek rakip düellonu tamamladın!' };
       }
-      if (!newBadges.includes('1v1 Gladyatör') && newWins >= 3) {
+      if (!newBadges.includes('1v1 Gladyatör') && newWins >= 10) {
         newBadges.push('1v1 Gladyatör');
         newlyUnlockedBadge = { name: '1v1 Gladyatör', icon: '🛡️', desc: 'Canlı düellolarda gerçek rakiplere karşı 3 zafer kazandın!' };
       }
-      if (!newBadges.includes('Düello Şampiyonu') && newWins >= 10) {
+      if (!newBadges.includes('Düello Şampiyonu') && newWins >= 25) {
         newBadges.push('Düello Şampiyonu');
         newlyUnlockedBadge = { name: 'Düello Şampiyonu', icon: '👑', desc: '10 canlı düello zaferiyle KPSS arenasında zirveye oturdun!' };
       }
-      if (!newBadges.includes('Tahtın Sahibi') && newWins >= 25) {
+      if (!newBadges.includes('Tahtın Sahibi') && newWins >= 60) {
         newBadges.push('Tahtın Sahibi');
         newlyUnlockedBadge = { name: 'Tahtın Sahibi', icon: '🏆', desc: '25 canlı düello zaferiyle mutlak arena efsanesi oldun!' };
       }
-      if (!newBadges.includes('50 Düello Zaferi') && newWins >= 50) {
+      if (!newBadges.includes('50 Düello Zaferi') && newWins >= 120) {
         newBadges.push('50 Düello Zaferi');
         newlyUnlockedBadge = { name: '50 Düello Zaferi', icon: '⚔️', desc: 'Canlı düellolarda 50 zaferle arena efsanelerine katıldın!' };
       }
-      if (!newBadges.includes('Mutlak Tahtın Sahibi') && newWins >= 100) {
+      if (!newBadges.includes('Mutlak Tahtın Sahibi') && newWins >= 250) {
         newBadges.push('Mutlak Tahtın Sahibi');
         newlyUnlockedBadge = { name: 'Mutlak Tahtın Sahibi', icon: '🔱', desc: '100 canlı düello zaferiyle mutlak arena tahtına oturdun!' };
       }
-      if (!newBadges.includes('Yenilmez Fatih') && newStreak >= 3) {
+      if (!newBadges.includes('Yenilmez Fatih') && newStreak >= 5) {
         newBadges.push('Yenilmez Fatih');
         newlyUnlockedBadge = { name: 'Yenilmez Fatih', icon: '🔥', desc: 'Canlı düellolarda üst üste 3 maç kazanarak namağlup seri yakaladın!' };
       }
-      if (!newBadges.includes("10'lu Yenilmez Seri") && newStreak >= 10) {
+      if (!newBadges.includes("10'lu Yenilmez Seri") && newStreak >= 20) {
         newBadges.push("10'lu Yenilmez Seri");
         newlyUnlockedBadge = { name: "10'lu Yenilmez Seri", icon: '☀️', desc: 'Canlı düellolarda üst üste 10 maç kazanarak efsanevi namağlup seri yakaladın!' };
       }
-      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 20) {
+      if (!newBadges.includes('Efsanevi Coğrafyacı') && newBadges.length >= 22) {
         newBadges.push('Efsanevi Coğrafyacı');
         newlyUnlockedBadge = { name: 'Efsanevi Coğrafyacı', icon: '💎', desc: '20 rozetle efsanevi elmas prestij seviyesine ulaştın!' };
       }
-      if (!newBadges.includes('Kozmik Coğrafya Hükümdarı') && newBadges.length >= 30) {
+      if (!newBadges.includes('Kozmik Coğrafya Hükümdarı') && newBadges.length >= 38) {
         newBadges.push('Kozmik Coğrafya Hükümdarı');
         newlyUnlockedBadge = { name: 'Kozmik Coğrafya Hükümdarı', icon: '🌌', desc: '30 rozetle mistik kozmik zirveye ulaştın!' };
       }
@@ -998,6 +1073,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
 
     saveStatsToLocalStorage(get());
+
+    // Rank XP for finishing a match. A win is worth several solo answers;
+    // a loss still pays something so playing isn't punished into nothing.
+    {
+      const base = isWin
+        ? (isBotGame ? XP.botWin : XP.duelWin)
+        : isDraw
+          ? (isBotGame ? XP.botDraw : XP.duelDraw)
+          : (isBotGame ? XP.botLoss : XP.duelLoss);
+      const badge = newlyUnlockedBadge ? XP.badgeBounty : 0;
+      get().awardXp(base + badge, isBotGame ? 'bot düellosu' : 'canlı düello');
+    }
   },
 
   submitPinGuess: (userLng, userLat) => {
@@ -1106,6 +1193,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
 
     saveStatsToLocalStorage(get());
+
+    // Rank XP: scaled by distance, plus a streak bonus. Wrong guesses
+    // still pay a token amount so the bar never feels dead.
+    {
+      const base = isGoodGuess ? pinXpForDistance(distanceKm) : XP.wrongAnswer;
+      const bonus = isGoodGuess ? streakBonus(newStreak) : 0;
+      const badge = evalResult.newlyUnlockedBadge ? XP.badgeBounty : 0;
+      get().awardXp(base + bonus + badge, 'harita testi');
+    }
 
     // Smoothly fly and zoom to 7.0x at the target location when answer/guess is revealed
     get().flyToCoords(currentQ.targetCoords, 0, 0, 7.0);
@@ -1221,6 +1317,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
 
     saveStatsToLocalStorage(get());
+
+    // Rank XP: correct answers pay the standard rate plus any streak
+    // bonus; wrong answers pay a token amount so the bar still moves.
+    {
+      const base = isCorrect ? XP.correctAnswer : XP.wrongAnswer;
+      const bonus = isCorrect ? streakBonus(state.streak) : 0;
+      const badge = evalResult.newlyUnlockedBadge ? XP.badgeBounty : 0;
+      get().awardXp(base + bonus + badge, 'test');
+    }
 
     if (currentQ.targetCoords) {
       get().flyToCoords(currentQ.targetCoords, 0, 0, 7.0);
