@@ -4,6 +4,61 @@
 
 ---
 
+## 📅 [2026-11-09] - Antik Haritacılık Teması ve "AI Slop" Temizliği (UI/UX)
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: "arayüz çok AI slop duruyor, premium ama AI slop gözükmeyecek şekilde düzenle" → ardından referans görsel verilerek "buna benzeyen bir arayüz yap, tüm featurelar ve alt menüler uyacak, sadece temayı al"
+
+### Problem
+Arayüzde jenerik mor-mavi gradyanlar, her yere dağılmış glassmorphism, rastgele ikonlar ve tekdüze yuvarlak kartlar vardı. 6 klasik "AI slop" kusurunun tamamı mevcuttu.
+
+### Çözüm Mimarisi
+Tema **token seviyesinde** uygulandı — 18 bileşen tek tek değil, `app/globals.css` içindeki `@theme` bloğunda renk skalası yeniden eşlendi. Böylece mevcut tüm ekranlar otomatik olarak temayı devraldı.
+
+| Eski token | Yeni anlam |
+|---|---|
+| `slate` | Koyu mürekkep yeşili (chrome/zemin) |
+| `indigo` · `purple` · `violet` | Pirinç / altın (mor-mavi gradyanlar tamamen kalktı) |
+| `sky` | Atlas suyu mavi-gri |
+| `emerald` | Adaçayı (başarı) |
+| `rose` | Kiremit (uyarı/hata) |
+| `amber` | Eskitilmiş altın |
+
+### Etkilenen ve Yeni Eklenen Dosyalar
+- **`app/globals.css`** — `@theme` renk skalası; `.hf-panel`, `.hf-plaque`, `.hf-parchment`, `.hf-double-rule`, `.hf-frame`, `.hf-divider`, `.hf-script`, `.hf-serif`, `.hf-label` yüzey/tipografi sınıfları; harita grading'i; Maplibre kontrol/popup/scale stillemesi
+- **`components/ui/MapOrnaments.tsx`** (YENİ) — inline SVG pusula gülü, armiler küre, arazi silüeti, kuzey işareti (harici asset yok)
+- **`components/ui/Navbar.tsx`** — pusula madalyonu, serif sekme etiketleri, aktif sekme kabarık parşömen kart, armiler madalyon
+- **`components/ui/LayerSidebar.tsx`** — pirinç plaket, pusula gülü başlık, omurga süslemesi, kuzey işareti altlık
+- **`components/ui/LayerHintBanner.tsx`** — parşömen/panel teması, HUD altına taşındı
+- **`components/ui/AuthUserButton.tsx`** — pirinç/pill kullanıcı kartı
+- **`components/ui/RotateScreenBanner.tsx`** — parşömen plaket
+- **`components/HomePageClient.tsx`** — levha çerçevesi, yükleme ekranı
+- **`components/map/MapContainer.tsx`** — harita grading'i, parşömen HUD çubuğu, süsleme katmanı, `ScaleControl`, alt motto
+- **`app/layout.tsx`** — SEO metadata (OpenGraph, Twitter, canonical, hreflang); BOM temizlendi
+- **`app/robots.ts` · `app/sitemap.ts`** — yeni rotalar eklendi
+- **`app/{harita-testi,duello,soru-bankasi,hata-defteri,ai-ogretmen,istatistikler}/page.tsx`** (YENİ) — rota kabukları
+- **`components/game/HataDefteriView.tsx`** (YENİ) — `any` tip hatası ve kullanılmayan değişken lint hatası düzeltildi
+
+### Harita Yüzeyi (en kritik iş)
+Harita döşemeleri tema dışıydı. Çözüm: `[data-map-style] .maplibregl-canvas { filter: saturate(2.6) contrast(1.05) brightness(0.9) }` + `%5` krem `multiply` yıkama + `%18` SVG fractal-noise kağıt taneciği. Sonuç: kara parşömen, su gravür arduvaz-mavisi, sınırlar kızıl — **harita sağlayıcısı değişse bile görünüm korunur**.
+
+### Yan Düzeltmeler
+1. **Harita "API KEY REQUIRED" filigranı** — yerel `.env`'deki eski `cb1_...` anahtarı geçersizdi. Vercel'deki geçerli JWT anahtarı `vercel link` + `vercel env pull` ile `.env.local`'e çekildi (gitignore'da).
+2. **`package-lock.json`** — Next'in eksik `@next/swc` platform bağımlılıkları onarıldı.
+3. **`.gitignore`** — `.vercel`, `tsconfig.tsbuildinfo`, `.tmp/` eklendi.
+4. **Dal düzeni** — uzakta `master`/`main` ikiliği vardı; tek `main`'e indirildi, upstream bağlandı.
+5. **Dev/build çakışması** — `next dev` açıkken `next build` çalıştırılınca `.next` bozuluyor ve sahte `JSON.parse` hatası (HTTP 500) veriyor. Artık build öncesi dev durduruluyor.
+
+### Doğrulama
+- `npx tsc --noEmit` → 0 hata
+- `npx eslint .` → 0 hata, 0 uyarı
+- `npx next build` (soğuk, cache temiz) → 12/12 sayfa üretildi
+- 7/7 rota dev modda HTTP 200, konsol hatası 0
+- Görsel kontrol: 1536×864, 820×1180, 390×844
+- Commit: `4687e98`, `0a2fde3`
+
+---
+
 ## 📅 [2026-11-08] - Kapsamlı Arama Motoru (SEO) ve Yapay Zeka Bilgi Motoru Optimizasyonu (GEO - Generative Engine Optimization)
 - **Geliştirici**: AI Agent (AI Studio Ortamı)
 - **Kullanıcı Talebi**: "seo çalışması yap ve spnra google aramalardan ve yapay zeka sonuçlarında daha öne çıkmak için şunlardan bize uygun olanları uygula: Statik Ön-Oluşturma (SSG & Pre-Rendering), Özgün Canonical & Çok Dilli Hiyerarşi, Yapay Zeka Ajan Manifestoları (GEO & ARD), Semantik Yapılandırılmış Veri (Schema.org JSON-LD), Tarama Bütçesi ve Core Web Vitals, Güncel Site Haritası (Sitemap.xml)"
