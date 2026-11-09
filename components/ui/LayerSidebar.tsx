@@ -14,6 +14,7 @@ import {
   Globe2,
   Satellite,
 } from 'lucide-react';
+import { CompassRose, NorthMark } from '@/components/ui/MapOrnaments';
 
 const MAP_STYLES: {
   id: MapStyleType;
@@ -145,14 +146,14 @@ export default function LayerSidebar() {
       id="kpss-layer-sidebar"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`hf-plaque absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#eee5cd] transition-all duration-300 ease-in-out ${
+      className={`hf-plaque hf-double-rule absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#eee5cd] transition-all duration-300 ease-in-out ${
         isExpanded ? 'z-45' : 'z-20'
       } ${
         isExpanded
           ? 'w-[85vw] max-w-xs opacity-100 sm:w-80'
           : isHovered
-            ? 'w-8 opacity-100'
-            : 'w-8 opacity-80 hover:opacity-100'
+            ? 'w-9 opacity-100'
+            : 'w-9 opacity-80 hover:opacity-100'
       }`}
     >
       {!isExpanded ? (
@@ -169,7 +170,9 @@ export default function LayerSidebar() {
           }}
           className="flex h-full w-full cursor-pointer touch-manipulation select-none flex-col items-center justify-between py-2 transition-colors hover:bg-[#c9a24a]/8"
         >
-          <div className="pointer-events-none flex flex-col items-center">
+          {/* top ornament */}
+          <div className="pointer-events-none flex flex-col items-center gap-1">
+            <span className="text-[9px] leading-none text-[#c9a24a]/70">◆</span>
             <div className="relative grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/10 text-[#c9a24a]">
               <Layers className="h-3.5 w-3.5" />
               {activeLayersCount > 0 && (
@@ -187,6 +190,7 @@ export default function LayerSidebar() {
           </div>
 
           <div className="pointer-events-none flex flex-col items-center gap-1">
+            <CompassRose className="h-7 w-7 opacity-55" />
             <ChevronRight className="h-3 w-3 text-[#c9a24a]/70" />
             <button
               onClick={(e) => {
@@ -205,13 +209,13 @@ export default function LayerSidebar() {
         /* ---------- expanded ---------- */
         <div className="flex h-full w-full flex-col">
           {/* header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-[#c9a24a]/18 px-3 py-2.5">
+          <div className="relative flex shrink-0 items-center justify-between border-b border-[#c9a24a]/18 px-3 py-2.5">
             <div className="flex items-center gap-2">
-              <div className="grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/10 text-[#c9a24a]">
-                <Layers className="h-3.5 w-3.5" />
+              <div className="relative grid h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/40 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)]">
+                <CompassRose className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[#f0e6cd]">
+                <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#f0e6cd]">
                   Harita Katmanları
                 </h2>
                 <span className="text-[10px] text-[#8d8768]">
@@ -344,6 +348,13 @@ export default function LayerSidebar() {
                 })}
               </div>
             </section>
+          </div>
+
+          {/* footer ornament */}
+          <div className="flex shrink-0 items-center justify-center gap-2 border-t border-[#c9a24a]/15 px-3 py-1.5">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a24a]/30" />
+            <NorthMark className="h-6 w-6 opacity-60" />
+            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a24a]/30" />
           </div>
         </div>
       )}

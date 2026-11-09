@@ -232,6 +232,93 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(201, 162, 74, 0.35) transparent;
   }
+
+  /* --- parchment surfaces (light-on-dark inversion) -------------- */
+  .hf-parchment {
+    background-image:
+      linear-gradient(180deg, #fbf4e0 0%, #ecdfbc 55%, #e2d1a6 100%);
+    border: 1px solid rgba(74, 56, 18, 0.7);
+    color: #2b2314;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 253, 245, 0.75),
+      inset 0 -8px 18px -12px rgba(90, 70, 24, 0.5),
+      0 2px 4px rgba(40, 28, 8, 0.28),
+      0 14px 30px -14px rgba(20, 14, 4, 0.65);
+  }
+
+  /* Double brass hairline — the "engraved plate" rule */
+  .hf-double-rule {
+    position: relative;
+  }
+
+  .hf-double-rule::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px solid rgba(201, 162, 74, 0.28);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Plate frame: outer vignette ring + corner brackets */
+  .hf-frame::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(201, 162, 74, 0.22);
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  .hf-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    background-image:
+      linear-gradient(#c9a24a, #c9a24a), linear-gradient(#c9a24a, #c9a24a),
+      linear-gradient(#c9a24a, #c9a24a), linear-gradient(#c9a24a, #c9a24a),
+      linear-gradient(#c9a24a, #c9a24a), linear-gradient(#c9a24a, #c9a24a),
+      linear-gradient(#c9a24a, #c9a24a), linear-gradient(#c9a24a, #c9a24a);
+    background-repeat: no-repeat;
+    background-size:
+      34px 1px, 1px 34px, 34px 1px, 1px 34px,
+      34px 1px, 1px 34px, 34px 1px, 1px 34px;
+    background-position:
+      6px 6px, 6px 6px, calc(100% - 6px) 6px, calc(100% - 6px) 6px,
+      6px calc(100% - 6px), 6px calc(100% - 6px),
+      calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+    opacity: 0.55;
+  }
+
+  /* Italic serif voice for motto / caption lines */
+  .hf-script {
+    font-family: var(--font-serif-hf);
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+
+  /* Engraved ornament divider: ─── ◆ ─── */
+  .hf-divider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(201, 162, 74, 0.55);
+  }
+
+  .hf-divider::before,
+  .hf-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(201, 162, 74, 0.45),
+      transparent
+    );
+  }
 }
 
 /* ------------------------------------------------------------------
@@ -242,37 +329,41 @@
 }
 
 /* ------------------------------------------------------------------
-   Map surface — antique cartography treatment
-   A warm grade + paper grain turns any basemap into an atlas plate,
-   so the look survives a provider/API-key change.
+   Map surface — engraved-atlas grading
+   The tiles stay recognisable; contrast and blue saturation are pushed
+   so water reads as deep slate-blue rather than washed grey, while a
+   thin warm wash keeps land on parchment. Works with any tile source.
    ------------------------------------------------------------------ */
-[data-map-style] .maplibregl-canvas {
-  filter: saturate(1.04) contrast(1.02);
+[data-map-style] .maplibregl-canvas,
+[data-map-style] .maplibregl-canvas-container {
+  filter: saturate(2.6) contrast(1.05) brightness(0.9);
 }
 
-[data-map-style='hybrid'] .maplibregl-canvas {
-  filter: saturate(0.98) contrast(1.01);
+[data-map-style='hybrid'] .maplibregl-canvas,
+[data-map-style='hybrid'] .maplibregl-canvas-container {
+  filter: saturate(2.1) contrast(1.02) brightness(0.92);
 }
 
-[data-map-style='satellite'] .maplibregl-canvas {
-  filter: sepia(0.2) saturate(0.78) contrast(1.03) brightness(0.96);
+[data-map-style='satellite'] .maplibregl-canvas,
+[data-map-style='satellite'] .maplibregl-canvas-container {
+  filter: sepia(0.16) saturate(1.1) contrast(1.04) brightness(0.86);
 }
 
-/* Paper grain + vignette laid over the tiles. A warm cream wash under
-   `multiply` turns pale basemap land into parchment while keeping
-   water in the cooler slate-blue of an engraved atlas plate. */
+/* Warm wash + engraved vignette. The wash stays nearly transparent so
+   the ocean keeps its engraved blue; saturation in the canvas filter
+   is what pushes water to slate while land stays parchment. */
 .hf-map-tone {
-  background-color: rgba(240, 225, 186, 0.42);
+  background-color: rgba(238, 228, 198, 0.05);
   background-image:
     radial-gradient(
-      122% 92% at 50% 46%,
-      rgba(255, 246, 224, 0) 56%,
-      rgba(96, 71, 33, 0.26) 100%
+      118% 88% at 50% 46%,
+      rgba(255, 247, 226, 0) 64%,
+      rgba(70, 52, 22, 0.26) 100%
     ),
     radial-gradient(
-      60% 50% at 18% 12%,
+      70% 60% at 12% 8%,
       rgba(120, 92, 44, 0.12),
-      rgba(0, 0, 0, 0) 70%
+      rgba(0, 0, 0, 0) 72%
     );
   mix-blend-mode: multiply;
   opacity: 1;
@@ -284,11 +375,7 @@
   background-image: var(--hf-grain);
   background-size: 180px 180px;
   mix-blend-mode: multiply;
-  opacity: 0.5;
-}
-
-.maplibregl-canvas {
-  filter: var(--hf-map-grade, saturate(1.04) contrast(1.02));
+  opacity: 0.18;
 }
 
 /* iOS & Safari App Pseudo-Fullscreen Mode */
@@ -351,26 +438,54 @@ body.app-pseudo-fullscreen {
   font-size: 18px !important;
 }
 
-/* Maplibre controls — brass hardware */
+/* Maplibre controls — a single parchment instrument plaque */
 .maplibregl-ctrl-bottom-right {
-  bottom: 1.25rem !important;
-  right: 1.25rem !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
   z-index: 25 !important;
 }
 
+.maplibregl-ctrl-bottom-left {
+  bottom: 1.5rem !important;
+  left: 1.5rem !important;
+  z-index: 25 !important;
+}
+
+/* Merge the two right-hand control groups into one plaque */
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl {
+  margin: 0 !important;
+}
+
 .maplibregl-ctrl-group {
-  background: rgba(243, 232, 206, 0.95) !important;
-  border: 1px solid rgba(120, 94, 40, 0.55) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 26px -10px rgba(30, 22, 8, 0.6) !important;
-  backdrop-filter: blur(8px) !important;
+  background-image: linear-gradient(
+    180deg,
+    #f7eed6 0%,
+    #e9dbb6 60%,
+    #e0cfa4 100%
+  ) !important;
+  background-color: #f0e4c8 !important;
+  border: 1px solid rgba(90, 70, 24, 0.6) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 253, 245, 0.7),
+    0 12px 28px -12px rgba(20, 14, 4, 0.75) !important;
+  backdrop-filter: none !important;
   overflow: hidden !important;
 }
 
+.maplibregl-ctrl-group:not(:empty) {
+  margin-bottom: 0.5rem !important;
+}
+
 .maplibregl-ctrl-group button {
-  border-bottom: 1px solid rgba(120, 94, 40, 0.3) !important;
-  width: 34px !important;
-  height: 34px !important;
+  border-bottom: 1px solid rgba(120, 94, 40, 0.28) !important;
+  width: 38px !important;
+  height: 38px !important;
+  background-color: transparent !important;
+}
+
+.maplibregl-ctrl-group button:hover {
+  background-color: rgba(201, 162, 74, 0.22) !important;
 }
 
 .maplibregl-ctrl-group button:last-child {
@@ -378,17 +493,39 @@ body.app-pseudo-fullscreen {
 }
 
 .maplibregl-ctrl-icon {
-  filter: sepia(1) saturate(1.6) brightness(0.55) !important;
+  filter: sepia(1) saturate(2.2) brightness(0.42) !important;
+  opacity: 0.85 !important;
+}
+
+/* Scale bar — brass rule on a parchment tag */
+.maplibregl-ctrl-scale {
+  background-color: rgba(247, 238, 214, 0.92) !important;
+  border: 1px solid rgba(90, 70, 24, 0.55) !important;
+  border-top: none !important;
+  border-radius: 0 0 6px 6px !important;
+  color: #4a3c1e !important;
+  font-family: var(--font-serif-hf) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+  padding: 2px 8px !important;
+  box-shadow: 0 6px 16px -10px rgba(20, 14, 4, 0.7) !important;
 }
 
 .maplibregl-ctrl-attrib {
-  background: rgba(243, 232, 206, 0.85) !important;
+  background: rgba(247, 238, 214, 0.9) !important;
   color: #5c4a25 !important;
-  border-radius: 8px 0 0 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(90, 70, 24, 0.35) !important;
+  font-size: 10px !important;
+  padding: 2px 8px !important;
 }
 
 .maplibregl-ctrl-attrib a {
   color: #6b552a !important;
+}
+
+.maplibregl-ctrl-attrib-button {
+  filter: sepia(1) saturate(2) brightness(0.5) !important;
 }
 
 @keyframes spinSlow {

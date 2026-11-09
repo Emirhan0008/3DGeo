@@ -61,7 +61,7 @@ export default function LayerHintBanner() {
   return (
     <div
       id="layer-initial-hint-banner"
-      className="hf-panel fixed left-3 top-14 z-40 max-w-[290px] rounded-xl p-2.5 text-[#eee5cd] pointer-events-auto sm:left-4 sm:top-16 sm:max-w-xs sm:p-3"
+      className="hf-panel fixed left-3 top-[92px] z-40 max-w-[290px] rounded-xl p-2.5 text-[#eee5cd] pointer-events-auto sm:left-4 sm:top-24 sm:max-w-xs sm:p-3"
     >
       <div className="flex items-start justify-between gap-1.5">
         <div className="flex items-center gap-2">

@@ -11,7 +11,6 @@ import {
   BarChart3,
   Bot,
   Search,
-  Compass,
   Layers,
   Maximize2,
   Minimize2,
@@ -23,6 +22,7 @@ import { useAppFullscreen } from '@/lib/utils';
 import AuthUserButton from './AuthUserButton';
 import GlobalLeaderboardModal from './GlobalLeaderboardModal';
 import FeedbackModal from './FeedbackModal';
+import { CompassRose, ArmillarySphere } from '@/components/ui/MapOrnaments';
 
 type TabDef = {
   tab: ActiveTabType;
@@ -104,15 +104,15 @@ export default function Navbar() {
         className="flex cursor-pointer items-center gap-2"
         onClick={() => handleTabChange('map')}
       >
-        <div className="relative grid h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/55 bg-[radial-gradient(circle_at_30%_25%,#2a3018,#11140a)]">
-          <Compass className="h-4 w-4 text-[#e0bd74]" />
-          <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/5" />
+        <div className="relative grid h-10 w-10 place-items-center rounded-full border border-[#c9a24a]/45 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)] shadow-[inset_0_1px_0_rgba(255,255,255,.08),0_4px_12px_-6px_rgba(0,0,0,.9)]">
+          <CompassRose className="h-8 w-8" />
+          <span className="pointer-events-none absolute inset-[3px] rounded-full border border-[#c9a24a]/20" />
         </div>
         <div className="hidden leading-none sm:block">
-          <div className="hf-serif text-[13px] font-semibold tracking-[0.16em] text-[#f0e6cd]">
-            COĞRAFYA <span className="text-[#c9a24a]">3D</span>
+          <div className="hf-serif text-[14px] font-semibold tracking-[0.18em] text-[#f4ebd4]">
+            COĞRAFYA <span className="text-[#d9b45f]">3D</span>
           </div>
-          <div className="mt-1 text-[9px] uppercase tracking-[0.22em] text-[#8d8768]">
+          <div className="mt-1.5 text-[8.5px] uppercase tracking-[0.24em] text-[#8d8768]">
             Keşfet · Anla · Pekiştir
           </div>
         </div>
@@ -127,11 +127,23 @@ export default function Navbar() {
         key={t.tab}
         onClick={() => handleTabChange(t.tab)}
         title={t.label}
-        className={`relative flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all ${
-          compact ? 'px-2 py-1 text-[10px]' : ''
-        } ${isActive ? 'hf-chip-on' : 'hf-chip'}`}
+        className={`group relative flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border transition-all duration-150 ${
+          compact
+            ? 'px-2 py-1 text-[10px]'
+            : 'px-2.5 py-1.5 text-[12px]'
+        } ${
+          isActive
+            ? 'hf-serif border-[#8a6a1d]/70 bg-[linear-gradient(180deg,#f8f0da,#e5d3a8)] font-semibold text-[#241d0c] shadow-[inset_0_1px_0_rgba(255,255,255,.85),0_4px_10px_-4px_rgba(0,0,0,.75)]'
+            : 'hf-serif border-transparent font-medium text-[#bdb493] hover:border-[#c9a24a]/25 hover:bg-[#c9a24a]/10 hover:text-[#f2e8cf]'
+        }`}
       >
-        <t.Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+        <t.Icon
+          className={`shrink-0 ${
+            compact ? 'h-3 w-3' : 'h-3.5 w-3.5'
+          } ${
+            isActive ? 'text-[#7a5c17]' : 'text-[#a8925a] group-hover:text-[#dcc07d]'
+          }`}
+        />
         <span className={compact ? '' : 'hidden xl:inline'}>
           {compact ? t.short : t.label}
         </span>
@@ -145,11 +157,14 @@ export default function Navbar() {
       <div className="flex w-full items-center justify-between gap-2">
         {brandMark}
 
-        <nav className="hidden items-center gap-1 rounded-full border border-[#c9a24a]/20 bg-[#0c0f08]/70 px-1 py-1 lg:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {TABS.map((t, i) => (
             <Fragment key={t.tab}>
               {i > 0 && (
-                <span className="select-none text-[7px] text-[#c9a24a]/25">◆</span>
+                <span
+                  aria-hidden="true"
+                  className="mx-0.5 h-4 w-px shrink-0 bg-[#c9a24a]/20"
+                />
               )}
               {renderTab(t)}
             </Fragment>
@@ -157,6 +172,9 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Ornament: armillary sphere medallion */}
+          <ArmillarySphere className="hidden h-8 w-8 shrink-0 opacity-50 xl:block" />
+
           {/* Leaderboard */}
           <button
             onClick={() => setIsLeaderboardOpen(true)}
@@ -296,8 +314,9 @@ export default function Navbar() {
   // Standard top bar
   return (
     <>
-      <header className="hf-nav relative z-30 w-full select-none px-2 py-1.5 text-[#eee5cd] sm:px-3">
+      <header className="hf-nav relative z-30 w-full select-none px-2 py-2 text-[#eee5cd] sm:px-3">
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/45 to-transparent" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/25 to-transparent" />
         {renderNavbarContent()}
       </header>
       <GlobalLeaderboardModal
