@@ -146,7 +146,7 @@ export default function LayerSidebar() {
       id="kpss-layer-sidebar"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`hf-plaque hf-double-rule absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#f7f2e3] transition-all duration-300 ease-in-out ${
+      className={`hf-plaque hf-double-rule absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#f5ecd4] transition-all duration-300 ease-in-out ${
         isExpanded ? 'z-45' : 'z-20'
       } ${
         isExpanded
@@ -184,7 +184,7 @@ export default function LayerSidebar() {
           </div>
 
           <div className="pointer-events-none my-1 flex flex-1 items-center justify-center overflow-hidden">
-            <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[9px] text-[#9a9a88]">
+            <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[9px] text-[#b5a06a]">
               Katmanlar{activeLayersCount > 0 ? ` · ${activeLayersCount}` : ''}
             </span>
           </div>
@@ -199,7 +199,7 @@ export default function LayerSidebar() {
                 setIsPinned(true);
               }}
               title="Sabitle"
-              className="pointer-events-auto rounded-full p-0.5 text-[#9a9a88] transition-colors hover:text-[#e2c485]"
+              className="pointer-events-auto rounded-full p-0.5 text-[#b5a06a] transition-colors hover:text-[#e2c485]"
             >
               <Pin className="h-3 w-3" />
             </button>
@@ -215,10 +215,10 @@ export default function LayerSidebar() {
                 <CompassRose className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#f7f2e3]">
+                <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#f5ecd4]">
                   Harita Katmanları
                 </h2>
-                <span className="text-[10px] text-[#9a9a88]">
+                <span className="text-[10px] text-[#b5a06a]">
                   {activeLayersCount} / {totalLayersCount} etkin
                 </span>
               </div>
@@ -231,7 +231,7 @@ export default function LayerSidebar() {
                 className={`rounded-full p-1.5 transition-colors ${
                   isPinned
                     ? 'text-[#e2c485]'
-                    : 'text-[#9a9a88] hover:text-[#e6d3a4]'
+                    : 'text-[#b5a06a] hover:text-[#e6d3a4]'
                 }`}
               >
                 {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
@@ -244,7 +244,7 @@ export default function LayerSidebar() {
                   setSidebarOpen(false);
                 }}
                 title="Kapat"
-                className="rounded-full p-1.5 text-[#9a9a88] transition-colors hover:text-[#e6d3a4]"
+                className="rounded-full p-1.5 text-[#b5a06a] transition-colors hover:text-[#e6d3a4]"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -263,7 +263,7 @@ export default function LayerSidebar() {
                     className={`flex items-center justify-center gap-1 rounded-lg border px-1 py-1.5 text-[10px] font-semibold transition-all ${
                       isOn
                         ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 text-[#f0dba8]'
-                        : 'border-[#c9a24a]/15 text-[#a9a894] hover:border-[#c9a24a]/40 hover:text-[#e6d3a4]'
+                        : 'border-[#c9a24a]/15 text-[#c9b273] hover:border-[#c9a24a]/40 hover:text-[#e6d3a4]'
                     }`}
                   >
                     <style.Icon className="h-3 w-3" />
@@ -283,7 +283,7 @@ export default function LayerSidebar() {
                 </button>
                 <button
                   onClick={clearAllLayers}
-                  className="rounded-md border border-[#c9a24a]/12 px-2 py-1 text-[10px] text-[#a9a894] transition-colors hover:border-[#c9a24a]/35 hover:text-[#e6d3a4]"
+                  className="rounded-md border border-[#c9a24a]/12 px-2 py-1 text-[10px] text-[#c9b273] transition-colors hover:border-[#c9a24a]/35 hover:text-[#e6d3a4]"
                 >
                   Kapat
                 </button>
@@ -294,7 +294,7 @@ export default function LayerSidebar() {
                 className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-semibold transition-colors ${
                   isBlindMapMode
                     ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 text-[#f0dba8]'
-                    : 'border-[#c9a24a]/15 text-[#a9a894] hover:border-[#c9a24a]/40 hover:text-[#e6d3a4]'
+                    : 'border-[#c9a24a]/15 text-[#c9b273] hover:border-[#c9a24a]/40 hover:text-[#e6d3a4]'
                 }`}
               >
                 {isBlindMapMode ? (
@@ -311,7 +311,7 @@ export default function LayerSidebar() {
           <div className="hf-scroll flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-3 text-xs">
             {SECTIONS.map((section) => (
               <section key={section.title} className="space-y-1.5">
-                <h3 className="hf-label px-1 text-[10px] text-[#a98f4e]">
+                <h3 className="hf-label px-1 text-[10px] text-[#c9a24a]">
                   {section.title}
                 </h3>
                 <div className="space-y-0.5 rounded-xl border border-[#c9a24a]/12 bg-black/15 p-1">
@@ -328,7 +328,7 @@ export default function LayerSidebar() {
             ))}
 
             <section className="space-y-1.5 pt-1">
-              <h3 className="hf-label px-1 text-[10px] text-[#9a9a88]">Bölge Filtresi</h3>
+              <h3 className="hf-label px-1 text-[10px] text-[#b5a06a]">Bölge Filtresi</h3>
               <div className="grid grid-cols-2 gap-1 rounded-xl border border-[#c9a24a]/12 bg-black/15 p-1">
                 {REGIONS.map((reg) => {
                   const isOn = selectedRegion === reg;
@@ -339,7 +339,7 @@ export default function LayerSidebar() {
                       className={`truncate rounded-lg border px-2 py-1.5 text-left text-[10px] transition-colors ${
                         isOn
                           ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 font-semibold text-[#f0dba8]'
-                          : 'border-transparent text-[#a9a894] hover:bg-[#c9a24a]/8 hover:text-[#e6d3a4]'
+                          : 'border-transparent text-[#c9b273] hover:bg-[#c9a24a]/8 hover:text-[#e6d3a4]'
                       }`}
                     >
                       {reg}
@@ -376,8 +376,8 @@ function LayerItem({
       onClick={onToggle}
       className={`group flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-lg border border-l-2 px-2 py-1.5 text-left transition-colors ${
         active
-          ? 'border-transparent border-l-[#c9a24a] bg-[#c9a24a]/10 text-[#f7f2e3]'
-          : 'border-transparent border-l-transparent text-[#a9a894] hover:bg-white/[0.03] hover:text-[#e6d3a4]'
+          ? 'border-transparent border-l-[#c9a24a] bg-[#c9a24a]/10 text-[#f5ecd4]'
+          : 'border-transparent border-l-transparent text-[#c9b273] hover:bg-white/[0.03] hover:text-[#e6d3a4]'
       }`}
     >
       <span className="truncate whitespace-nowrap text-[11px] font-medium">
@@ -385,7 +385,7 @@ function LayerItem({
       </span>
       <span
         className={`shrink-0 transition-colors ${
-          active ? 'text-[#dcc07d]' : 'text-[#5f5c47] group-hover:text-[#9a9a88]'
+          active ? 'text-[#dcc07d]' : 'text-[#6e6647] group-hover:text-[#b5a06a]'
         }`}
       >
         {active ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
