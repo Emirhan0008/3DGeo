@@ -508,7 +508,7 @@ export const MOUNTAINS_DATA: GeoFeature[] = [
     subCategory: 'glacial',
     category: 'Kıvrım Dağı (Buzul Var)',
     coordinates: [41.100, 39.200],
-    elevation: 3250,
+    elevation: 3193,
     region: 'Doğu Anadolu',
     description: 'Bingöl, Erzurum ve Muş sınırında yer alan buzul gölleriyle ünlü dağ kütlesi.',
     kpssTips: [
@@ -1778,7 +1778,7 @@ export const LAKES_DATA: GeoFeature[] = [
   },
   {
     id: 'l-acigol-nevsehir',
-    name: 'Acıgöl Mağarı (Nevşehir)',
+    name: 'Acıgöl Mağarası (Nevşehir)',
     type: 'lake',
     subCategory: 'volcanic',
     category: 'Volkanik Mağar Çukuru',
