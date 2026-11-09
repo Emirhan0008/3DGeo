@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
 import Navbar from '@/components/ui/Navbar';
 import LayerSidebar from '@/components/ui/LayerSidebar';
 import FeatureDetailModal from '@/components/ui/FeatureDetailModal';
@@ -14,6 +15,7 @@ import BadgeNotificationToast from '@/components/ui/BadgeNotificationToast';
 import RotateScreenBanner from '@/components/ui/RotateScreenBanner';
 import LayerHintBanner from '@/components/ui/LayerHintBanner';
 import { useAppStore } from '@/lib/store/useStore';
+import { tabFromPathname } from '@/lib/tabRoutes';
 
 // Dynamic import MapContainer with SSR disabled to prevent WebGL window context crashes
 const MapContainer = dynamic(() => import('@/components/map/MapContainer'), {
@@ -29,9 +31,25 @@ const MapContainer = dynamic(() => import('@/components/map/MapContainer'), {
 });
 
 export default function HomePageClient() {
-  const { activeTab, isSidebarOpen, isAiDrawerOpen, closeAllSidebars } = useAppStore();
+  const { activeTab, setActiveTab, setAiDrawerOpen, isSidebarOpen, isAiDrawerOpen, closeAllSidebars } = useAppStore();
 
   const isAnySidebarOpen = isSidebarOpen || isAiDrawerOpen;
+
+  /* Deep links + browser back/forward: keep the store in step with the URL.
+     The Navbar pushes history itself, so this only has to react to it. */
+  useEffect(() => {
+    const syncFromUrl = () => {
+      const tab = tabFromPathname(window.location.pathname);
+      if (!tab) return;
+      setActiveTab(tab);
+      // /ai-ogretmen is a drawer, not a tab screen
+      if (tab === 'ai_tutor') setAiDrawerOpen(true);
+    };
+
+    syncFromUrl();
+    window.addEventListener('popstate', syncFromUrl);
+    return () => window.removeEventListener('popstate', syncFromUrl);
+  }, [setActiveTab, setAiDrawerOpen]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-950 font-sans select-none">

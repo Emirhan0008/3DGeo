@@ -30,6 +30,7 @@ export default function robots(): MetadataRoute.Robots {
           "/hata-defteri",
           "/ai-ogretmen",
           "/istatistikler",
+          "/ezber",
           "/llms.txt",
           "/llms-full.txt",
           "/ai-catalog.json",

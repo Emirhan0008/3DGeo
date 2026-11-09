@@ -23,6 +23,7 @@ import AuthUserButton from './AuthUserButton';
 import GlobalLeaderboardModal from './GlobalLeaderboardModal';
 import FeedbackModal from './FeedbackModal';
 import { CompassRose, ArmillarySphere } from '@/components/ui/MapOrnaments';
+import { TAB_ROUTES } from '@/lib/tabRoutes';
 
 type TabDef = {
   tab: ActiveTabType;
@@ -79,6 +80,12 @@ export default function Navbar() {
 
   const handleTabChange = (tab: ActiveTabType) => {
     setActiveTab(tab);
+
+    // Keep the address bar honest without remounting the map.
+    const nextPath = TAB_ROUTES[tab] ?? '/';
+    if (typeof window !== 'undefined' && window.location.pathname !== nextPath) {
+      window.history.pushState({ tab }, '', nextPath);
+    }
   };
 
   /* ---------------------------------------------------------------- */

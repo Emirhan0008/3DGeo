@@ -162,7 +162,7 @@ export default function StatsModal() {
   };
 
   return (
-    <div className="absolute top-11 sm:top-4 left-1/2 -translate-x-1/2 z-30 w-[96vw] sm:w-[95%] max-w-2xl bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl text-slate-100 p-3 sm:p-4 transition-all max-h-[88vh] overflow-y-auto">
+    <div className="hf-modal hf-modal-rule absolute left-1/2 top-11 z-30 max-h-[88vh] w-[96vw] -translate-x-1/2 overflow-y-auto p-3 transition-all sm:top-4 sm:w-[95%] sm:max-w-2xl sm:p-4">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-2.5">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">

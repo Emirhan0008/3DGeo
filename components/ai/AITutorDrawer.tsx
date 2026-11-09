@@ -112,7 +112,7 @@ export default function AITutorDrawer() {
     <aside
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute right-1 sm:right-2 top-1 sm:top-2 bottom-1 sm:bottom-2 backdrop-blur-2xl border border-indigo-500/40 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] max-h-full ${
+      className={`hf-plaque hf-double-rule absolute right-1 top-1 bottom-1 flex max-h-full flex-col overflow-hidden rounded-xl text-[#eee5cd] transition-all duration-300 ease-in-out sm:right-2 sm:top-2 sm:bottom-2 sm:rounded-2xl h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] ${
         isExpanded ? 'z-45' : 'z-20'
       } ${
         isExpanded
@@ -172,7 +172,7 @@ export default function AITutorDrawer() {
         /* Expanded Content State */
         <div className="w-full h-full flex flex-col animate-in fade-in duration-200">
           {/* Header */}
-          <div className="p-3.5 bg-gradient-to-r from-indigo-950 via-[#09090b] to-purple-950 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-[#c9a24a]/18 bg-[#12150b]/60 p-3.5">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-indigo-300">
                 <Bot className="w-5 h-5 text-indigo-400 animate-pulse" />

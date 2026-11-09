@@ -54,6 +54,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: baseUrl + "/ezber",
+      lastModified: currentDate,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
       url: baseUrl + "/llms.txt",
       lastModified: currentDate,
       changeFrequency: "weekly",

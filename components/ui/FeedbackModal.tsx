@@ -111,7 +111,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-[#09090b] border-2 border-indigo-500/40 rounded-2xl max-w-lg w-full p-4 sm:p-5 text-slate-100 shadow-2xl relative space-y-4 max-h-[92vh] overflow-y-auto"
+        className="hf-modal hf-modal-rule relative max-h-[92vh] w-full max-w-lg space-y-4 overflow-y-auto p-4 sm:p-5"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}

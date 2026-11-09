@@ -771,20 +771,26 @@ export default function DuelMode() {
         onClick={(e) => { if (e.target === e.currentTarget) setActiveTab('map'); }}
         className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
       >
-        <div className="w-full max-w-md max-h-[92vh] overflow-y-auto bg-[#09090b]/95 border border-amber-500/40 rounded-2xl shadow-2xl p-4 sm:p-6 text-white animate-in zoom-in-95 duration-200 my-auto">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
-              <Swords className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
+        <div className="hf-modal hf-modal-rule my-auto max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl p-4 animate-in zoom-in-95 duration-200 sm:p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#c9a24a]/45 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)] shadow-[inset_0_1px_0_rgba(255,255,255,.08)] sm:h-12 sm:w-12">
+              <Swords className="h-5 w-5 text-[#dcc07d] sm:h-6 sm:w-6" />
             </div>
             <div>
-              <h2 className="text-base sm:text-xl font-black text-amber-400">1v1 Canlı KPSS Düellosu</h2>
-              <p className="text-[11px] sm:text-xs text-slate-300">Rumuz ve şifrenizi belirleyerek arenaya adım atın</p>
+              <h2 className="hf-serif text-base font-semibold tracking-wide text-[#e8d7ab] sm:text-xl">
+                1v1 Canlı KPSS Düellosu
+              </h2>
+              <p className="text-[11px] text-[#9a9276] sm:text-xs">
+                Rumuz ve şifrenizi belirleyerek arenaya adım atın
+              </p>
             </div>
           </div>
 
+          <div className="hf-divider mb-4 text-[8px]">◆</div>
+
           <form onSubmit={handleSaveRumuz} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="mb-1 block text-[11px] font-semibold text-[#b7ae8e]">
                 Düello Rumuzu (Kullanıcı Adı)
               </label>
               <input
@@ -793,13 +799,13 @@ export default function DuelMode() {
                 onChange={(e) => setRumuz(e.target.value)}
                 placeholder="Örn: HaritaUstası, CografyaFatihi"
                 maxLength={20}
-                className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 font-bold"
+                className="hf-input font-semibold"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="mb-1 block text-[11px] font-semibold text-[#b7ae8e]">
                 Rumuz Şifresi / PIN (Skorunuzu ve Odanızı Korur)
               </label>
               <input
@@ -808,17 +814,17 @@ export default function DuelMode() {
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="Örn: 1234 veya şifreniz"
                 maxLength={20}
-                className="w-full bg-white/5 border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 font-bold"
+                className="hf-input font-semibold"
                 required
               />
-              <span className="text-[10px] text-slate-400 mt-1 block">
+              <span className="mt-1 block text-[10px] text-[#7d7a63]">
                 * Bu şifre ile aynı rumuzu diğer cihazlardan da kullanabilirsiniz.
               </span>
             </div>
 
             {authError && (
-              <div className="p-2.5 rounded-xl bg-red-500/20 border border-red-400/40 text-red-300 text-xs flex items-center gap-2 font-medium">
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+              <div className="flex items-center gap-2 rounded-xl border border-[#7d402b]/50 bg-[#7d402b]/20 p-2.5 text-xs font-medium text-[#d8a891]">
+                <AlertCircle className="h-4 w-4 shrink-0 text-[#bf7f66]" />
                 <span>{authError}</span>
               </div>
             )}
@@ -827,7 +833,7 @@ export default function DuelMode() {
               <button
                 type="button"
                 onClick={() => setActiveTab('map')}
-                className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-xs rounded-xl transition-all"
+                className="hf-btn-ghost flex-1 py-2.5 text-xs"
               >
                 Vazgeç (Haritaya Dön)
               </button>
@@ -835,10 +841,10 @@ export default function DuelMode() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="hf-btn-brass flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs"
               >
                 {authLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                  <Loader2 className="h-4 w-4 animate-spin text-[#2a2314]" />
                 ) : (
                   <>
                     <span>Arenaya Katıl</span>
