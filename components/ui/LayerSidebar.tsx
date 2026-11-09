@@ -1,22 +1,91 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useAppStore, MapStyleType } from '@/lib/store/useStore';
+import { useAppStore, MapStyleType, type LayerState } from '@/lib/store/useStore';
 import { useAppFullscreen } from '@/lib/utils';
-import { 
-  Layers, 
-  Eye, 
-  EyeOff, 
+import {
+  Layers,
+  Eye,
+  EyeOff,
   X,
   Pin,
   PinOff,
-  ChevronRight
+  ChevronRight,
+  Globe2,
+  Satellite,
 } from 'lucide-react';
 
-const MAP_STYLES: { id: MapStyleType; label: string; icon: string }[] = [
-  { id: 'topographic', label: 'Topografik 3D', icon: '🏔️' },
-  { id: 'hybrid', label: 'Hibrit Siyasi', icon: '🗺️' },
-  { id: 'satellite', label: 'Uydu', icon: '🛰️' },
+const MAP_STYLES: {
+  id: MapStyleType;
+  label: string;
+  Icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  { id: 'topographic', label: 'Topoğrafya', Icon: Layers },
+  { id: 'hybrid', label: 'Siyasi', Icon: Globe2 },
+  { id: 'satellite', label: 'Uydu', Icon: Satellite },
+];
+
+const SECTIONS: {
+  title: string;
+  items: { key: keyof LayerState; label: string }[];
+}[] = [
+  {
+    title: 'Dağ Sistemleri',
+    items: [
+      { key: 'mountainsVolcanic', label: 'Volkanik Dağlar' },
+      { key: 'mountainsFold', label: 'Kıvrım Dağları' },
+      { key: 'mountainsFault', label: 'Kırık Dağlar (Horst)' },
+      { key: 'mountainsGlacial', label: 'Buzul Dağları' },
+    ],
+  },
+  {
+    title: 'Su Kaynakları',
+    items: [
+      { key: 'rivers', label: 'Akarsular & Havzalar' },
+      { key: 'lakes', label: 'Göller & Barajlar' },
+    ],
+  },
+  {
+    title: 'Ovalar & Platolar',
+    items: [
+      { key: 'plainsDelta', label: 'Delta Ovaları' },
+      { key: 'plainsTectonic', label: 'Tektonik Ovalar' },
+      { key: 'plainsKarstic', label: 'Karstik Ovalar (Polyeler)' },
+      { key: 'plateaus', label: 'Platolar (Lav / Tabaka / Aşınım)' },
+    ],
+  },
+  {
+    title: 'Tarih & Antik Kentler',
+    items: [{ key: 'ancientCities', label: 'Antik Kentler & Ören Yerleri' }],
+  },
+  {
+    title: 'Karstik Şekiller & Kıyılar',
+    items: [
+      { key: 'caves', label: 'Önemli Mağaralar' },
+      { key: 'karstics', label: 'Travertenler & Karstik Şekiller' },
+      { key: 'coastal', label: 'Kıyı Tipleri & Tombololar' },
+    ],
+  },
+  {
+    title: 'Sınır, Geçit & Madenler',
+    items: [
+      { key: 'borderGates', label: 'Sınır Kapıları' },
+      { key: 'passes', label: 'Geçitler & Tüneller' },
+      { key: 'mines', label: 'Madenler & Enerji' },
+      { key: 'provinces', label: '81 İl Merkezi' },
+    ],
+  },
+];
+
+const REGIONS = [
+  'Tüm Bölgeler',
+  'Marmara',
+  'Ege',
+  'Akdeniz',
+  'İç Anadolu',
+  'Karadeniz',
+  'Doğu Anadolu',
+  'Güneydoğu Anadolu',
 ];
 
 export default function LayerSidebar() {
@@ -34,7 +103,7 @@ export default function LayerSidebar() {
     selectedRegion,
     setSelectedRegion,
     isBlindMapMode,
-    toggleBlindMapMode
+    toggleBlindMapMode,
   } = useAppStore();
 
   const [isHovered, setIsHovered] = useState(false);
@@ -65,7 +134,8 @@ export default function LayerSidebar() {
   const activeLayersCount = Object.values(layers).filter(Boolean).length;
   const totalLayersCount = Object.keys(layers).length;
 
-  // In fullscreen mode, or when active tab is not exploration map, hide the collapsed edge strip so it NEVER overlaps games or modals
+  // In fullscreen mode, or when active tab is not the exploration map,
+  // hide the collapsed edge strip so it never overlaps games or modals.
   if ((isFullscreen || activeTab !== 'map') && !isExpanded) {
     return null;
   }
@@ -75,21 +145,19 @@ export default function LayerSidebar() {
       id="kpss-layer-sidebar"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`absolute left-1 sm:left-2 top-1 sm:top-2 bottom-1 sm:bottom-2 backdrop-blur-2xl border border-white/15 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 ease-in-out h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] max-h-full ${
+      className={`hf-plaque absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#eee5cd] transition-all duration-300 ease-in-out ${
         isExpanded ? 'z-45' : 'z-20'
       } ${
         isExpanded
-          ? isHovered || isPinned
-            ? 'w-[85vw] max-w-xs sm:w-80 bg-slate-950/95 opacity-100'
-            : 'w-[85vw] max-w-xs sm:w-80 bg-slate-950/85 opacity-90 hover:opacity-100'
+          ? 'w-[85vw] max-w-xs opacity-100 sm:w-80'
           : isHovered
-          ? 'w-7 sm:w-9 bg-slate-950/95 opacity-100'
-          : 'w-7 sm:w-9 bg-slate-950/65 opacity-70 hover:opacity-100'
+            ? 'w-8 opacity-100'
+            : 'w-8 opacity-80 hover:opacity-100'
       }`}
     >
-      {/* Collapsed Ultra-Slim State */}
       {!isExpanded ? (
-        <div 
+        /* ---------- collapsed spine ---------- */
+        <div
           onClick={() => {
             setSidebarOpen(true);
             setIsPinned(true);
@@ -99,27 +167,27 @@ export default function LayerSidebar() {
             setSidebarOpen(true);
             setIsPinned(true);
           }}
-          className="w-full h-full flex flex-col items-center justify-between py-2 sm:py-3 cursor-pointer hover:bg-white/5 active:bg-white/10 transition-all select-none touch-manipulation"
+          className="flex h-full w-full cursor-pointer touch-manipulation select-none flex-col items-center justify-between py-2 transition-colors hover:bg-[#c9a24a]/8"
         >
-          <div className="flex flex-col items-center gap-1.5 pointer-events-none">
-            <div className="relative p-1 sm:p-1.5 bg-indigo-600/25 border border-indigo-500/40 rounded-lg text-indigo-400">
-              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <div className="pointer-events-none flex flex-col items-center">
+            <div className="relative grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/10 text-[#c9a24a]">
+              <Layers className="h-3.5 w-3.5" />
               {activeLayersCount > 0 && (
-                <span className="absolute -top-1 -right-1 px-1 min-w-[14px] h-3.5 bg-indigo-500 text-white font-black text-[8px] rounded-full flex items-center justify-center border border-slate-950">
+                <span className="absolute -right-1 -top-1 grid h-3.5 min-w-3.5 place-items-center rounded-full bg-[#c9a24a] px-0.5 text-[8px] font-bold text-[#221b0c]">
                   {activeLayersCount}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-1 pointer-events-none overflow-hidden">
-            <span className="[writing-mode:vertical-rl] rotate-180 text-[8px] sm:text-[9px] font-black tracking-wider uppercase text-slate-400 hover:text-indigo-300 transition-colors whitespace-nowrap">
-              KATMANLAR {activeLayersCount > 0 ? `(${activeLayersCount})` : ''}
+          <div className="pointer-events-none my-1 flex flex-1 items-center justify-center overflow-hidden">
+            <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[9px] text-[#8d8768]">
+              Katmanlar{activeLayersCount > 0 ? ` · ${activeLayersCount}` : ''}
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-1 pointer-events-none">
-            <ChevronRight className="w-3 h-3 text-indigo-400" />
+          <div className="pointer-events-none flex flex-col items-center gap-1">
+            <ChevronRight className="h-3 w-3 text-[#c9a24a]/70" />
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -127,27 +195,27 @@ export default function LayerSidebar() {
                 setIsPinned(true);
               }}
               title="Sabitle"
-              className="p-0.5 rounded hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-all pointer-events-auto"
+              className="pointer-events-auto rounded-full p-0.5 text-[#8d8768] transition-colors hover:text-[#e2c485]"
             >
-              <Pin className="w-3 h-3" />
+              <Pin className="h-3 w-3" />
             </button>
           </div>
         </div>
       ) : (
-        /* Expanded Full Smooth Scrolling State */
-        <div className="w-full h-full flex flex-col">
-          {/* Header Bar */}
-          <div className="p-3 border-b border-white/10 flex items-center justify-between bg-white/[0.03] shrink-0">
+        /* ---------- expanded ---------- */
+        <div className="flex h-full w-full flex-col">
+          {/* header */}
+          <div className="flex shrink-0 items-center justify-between border-b border-[#c9a24a]/18 px-3 py-2.5">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-indigo-500/20 border border-indigo-500/40 rounded-lg text-indigo-300">
-                <Layers className="w-4 h-4" />
+              <div className="grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/10 text-[#c9a24a]">
+                <Layers className="h-3.5 w-3.5" />
               </div>
               <div>
-                <h2 className="font-extrabold text-xs uppercase tracking-wider text-slate-200">
+                <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[#f0e6cd]">
                   Harita Katmanları
                 </h2>
-                <span className="text-[10px] text-slate-400 font-medium">
-                  {activeLayersCount} / {totalLayersCount} Aktif
+                <span className="text-[10px] text-[#8d8768]">
+                  {activeLayersCount} / {totalLayersCount} etkin
                 </span>
               </div>
             </div>
@@ -155,14 +223,14 @@ export default function LayerSidebar() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsPinned(!isPinned)}
-                title={isPinned ? 'Sabitlemeyi Kaldır' : 'Sabitle'}
-                className={`p-1.5 rounded-lg transition-all border ${
+                title={isPinned ? 'Sabitlemeyi kaldır' : 'Sabitle'}
+                className={`rounded-full p-1.5 transition-colors ${
                   isPinned
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-                    : 'hover:bg-white/10 text-slate-400 hover:text-white border-transparent hover:border-white/20'
+                    ? 'text-[#e2c485]'
+                    : 'text-[#8d8768] hover:text-[#e6d3a4]'
                 }`}
               >
-                {isPinned ? <PinOff className="w-3.5 h-3.5" /> : <Pin className="w-3.5 h-3.5" />}
+                {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
               </button>
 
               <button
@@ -171,45 +239,47 @@ export default function LayerSidebar() {
                   setIsHovered(false);
                   setSidebarOpen(false);
                 }}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-transparent hover:border-white/20"
+                title="Kapat"
+                className="rounded-full p-1.5 text-[#8d8768] transition-colors hover:text-[#e6d3a4]"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
 
-          {/* Quick Actions (All On / All Off & Base Map Style) */}
-          <div className="p-3 border-b border-white/10 bg-slate-900/50 space-y-2 shrink-0">
-            {/* Base Style Tabs */}
+          {/* base style + bulk */}
+          <div className="shrink-0 space-y-2 border-b border-[#c9a24a]/12 px-3 py-2.5">
             <div className="grid grid-cols-3 gap-1">
-              {MAP_STYLES.map((style) => (
-                <button
-                  key={style.id}
-                  onClick={() => setMapStyle(style.id)}
-                  className={`py-1.5 px-2 rounded-lg border text-center transition-all text-[11px] font-semibold flex items-center justify-center gap-1 ${
-                    mapStyle === style.id
-                      ? 'bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-600/30'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300'
-                  }`}
-                >
-                  <span>{style.icon}</span>
-                  <span className="truncate">{style.label}</span>
-                </button>
-              ))}
+              {MAP_STYLES.map((style) => {
+                const isOn = mapStyle === style.id;
+                return (
+                  <button
+                    key={style.id}
+                    onClick={() => setMapStyle(style.id)}
+                    className={`flex items-center justify-center gap-1 rounded-lg border px-1 py-1.5 text-[10px] font-semibold transition-all ${
+                      isOn
+                        ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 text-[#f0dba8]'
+                        : 'border-[#c9a24a]/15 text-[#9a9276] hover:border-[#c9a24a]/40 hover:text-[#e6d3a4]'
+                    }`}
+                  >
+                    <style.Icon className="h-3 w-3" />
+                    <span className="truncate">{style.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Quick Bulk Toggle & Dilsiz Harita */}
-            <div className="flex items-center justify-between gap-1.5 pt-0.5">
+            <div className="flex items-center justify-between gap-1.5">
               <div className="flex items-center gap-1">
                 <button
                   onClick={selectAllLayers}
-                  className="px-2 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 font-bold text-[10px] transition-all"
+                  className="rounded-md border border-[#c9a24a]/30 px-2 py-1 text-[10px] font-semibold text-[#dcc07d] transition-colors hover:bg-[#c9a24a]/12"
                 >
                   Tümünü Aç
                 </button>
                 <button
                   onClick={clearAllLayers}
-                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/10 font-medium text-[10px] transition-all"
+                  className="rounded-md border border-[#c9a24a]/12 px-2 py-1 text-[10px] text-[#9a9276] transition-colors hover:border-[#c9a24a]/35 hover:text-[#e6d3a4]"
                 >
                   Kapat
                 </button>
@@ -217,245 +287,61 @@ export default function LayerSidebar() {
 
               <button
                 onClick={toggleBlindMapMode}
-                className={`px-2.5 py-1 rounded-md border text-[10px] font-bold flex items-center gap-1.5 transition-all ${
+                className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-semibold transition-colors ${
                   isBlindMapMode
-                    ? 'bg-amber-500/25 border-amber-400 text-amber-300 ring-1 ring-amber-400/40'
-                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-slate-200'
+                    ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 text-[#f0dba8]'
+                    : 'border-[#c9a24a]/15 text-[#9a9276] hover:border-[#c9a24a]/40 hover:text-[#e6d3a4]'
                 }`}
               >
-                {isBlindMapMode ? <EyeOff className="w-3 h-3 text-amber-400" /> : <Eye className="w-3 h-3" />}
-                <span>Dilsiz Harita</span>
+                {isBlindMapMode ? (
+                  <EyeOff className="h-3 w-3" />
+                ) : (
+                  <Eye className="h-3 w-3" />
+                )}
+                <span>Dilsiz</span>
               </button>
             </div>
           </div>
 
-          {/* Smooth Scrollable Layers Container */}
-          <div className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-4 text-xs scroll-smooth">
-            {/* 1. DAĞ SİSTEMLERİ */}
-            <section className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                  <span>🏔️</span> Dağ Sistemleri
+          {/* scroll area */}
+          <div className="hf-scroll flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-3 text-xs">
+            {SECTIONS.map((section) => (
+              <section key={section.title} className="space-y-1.5">
+                <h3 className="hf-label px-1 text-[10px] text-[#a98f4e]">
+                  {section.title}
                 </h3>
-              </div>
-              <div className="space-y-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                <LayerItem
-                  label="Volkanik Dağlar"
-                  icon="🌋"
-                  active={layers.mountainsVolcanic}
-                  onToggle={() => toggleLayer('mountainsVolcanic')}
-                  activeColor="text-red-400"
-                />
-                <LayerItem
-                  label="Kıvrım Dağları"
-                  icon="⛰️"
-                  active={layers.mountainsFold}
-                  onToggle={() => toggleLayer('mountainsFold')}
-                  activeColor="text-amber-400"
-                />
-                <LayerItem
-                  label="Kırık Dağlar (Horst)"
-                  icon="⚡"
-                  active={layers.mountainsFault}
-                  onToggle={() => toggleLayer('mountainsFault')}
-                  activeColor="text-yellow-400"
-                />
-                <LayerItem
-                  label="Buzul Dağları"
-                  icon="❄️"
-                  active={layers.mountainsGlacial}
-                  onToggle={() => toggleLayer('mountainsGlacial')}
-                  activeColor="text-cyan-300"
-                />
-              </div>
-            </section>
+                <div className="space-y-0.5 rounded-xl border border-[#c9a24a]/12 bg-black/15 p-1">
+                  {section.items.map((item) => (
+                    <LayerItem
+                      key={item.key}
+                      label={item.label}
+                      active={Boolean(layers[item.key])}
+                      onToggle={() => toggleLayer(item.key)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
 
-            {/* 2. SU KAYNAKLARI */}
-            <section className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-                  <span>🌊</span> Su Kaynakları
-                </h3>
-              </div>
-              <div className="space-y-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                <LayerItem
-                  label="Akarsular &amp; Havzalar"
-                  icon="🌊"
-                  active={layers.rivers}
-                  onToggle={() => toggleLayer('rivers')}
-                  activeColor="text-blue-400"
-                />
-                <LayerItem
-                  label="Göller &amp; Barajlar"
-                  icon="💧"
-                  active={layers.lakes}
-                  onToggle={() => toggleLayer('lakes')}
-                  activeColor="text-cyan-400"
-                />
-              </div>
-            </section>
-
-            {/* 3. OVALAR & PLATOLAR */}
-            <section className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <span>🌾</span> Ovalar &amp; Platolar
-                </h3>
-              </div>
-              <div className="space-y-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                <LayerItem
-                  label="Delta Ovaları"
-                  icon="🌾"
-                  active={layers.plainsDelta}
-                  onToggle={() => toggleLayer('plainsDelta')}
-                  activeColor="text-emerald-400"
-                />
-                <LayerItem
-                  label="Tektonik Ovalar"
-                  icon="🏚️"
-                  active={layers.plainsTectonic}
-                  onToggle={() => toggleLayer('plainsTectonic')}
-                  activeColor="text-orange-400"
-                />
-                <LayerItem
-                  label="Karstik Ovalar (Polyeler)"
-                  icon="🏛️"
-                  active={layers.plainsKarstic}
-                  onToggle={() => toggleLayer('plainsKarstic')}
-                  activeColor="text-lime-400"
-                />
-                <LayerItem
-                  label="Platolar (Lav/Tabaka/Aşınım)"
-                  icon="🏜️"
-                  active={layers.plateaus}
-                  onToggle={() => toggleLayer('plateaus')}
-                  activeColor="text-amber-300"
-                />
-              </div>
-            </section>
-
-            {/* 4. TARİHİ & ANTİK KENTLER */}
-            <section className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                  <span>🏛️</span> Tarihi &amp; Antik Kentler
-                </h3>
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  KPSS
-                </span>
-              </div>
-              <div className="space-y-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                <LayerItem
-                  label="Antik Kentler &amp; Ören Yerleri"
-                  icon="🏛️"
-                  active={layers.ancientCities}
-                  onToggle={() => toggleLayer('ancientCities')}
-                  activeColor="text-amber-300"
-                />
-              </div>
-            </section>
-
-            {/* 5. KARSTİK, MAĞARALAR & KIYILAR */}
-            <section className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                  <span>🕳️</span> Karstik &amp; Mağaralar
-                </h3>
-              </div>
-              <div className="space-y-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                <LayerItem
-                  label="Önemli Mağaralar"
-                  icon="🦇"
-                  active={layers.caves}
-                  onToggle={() => toggleLayer('caves')}
-                  activeColor="text-indigo-400"
-                />
-                <LayerItem
-                  label="Karstik Şekiller &amp; Travertenler"
-                  icon="🕳️"
-                  active={layers.karstics}
-                  onToggle={() => toggleLayer('karstics')}
-                  activeColor="text-purple-300"
-                />
-                <LayerItem
-                  label="Kıyı Tipleri &amp; Tombololar"
-                  icon="🏖️"
-                  active={layers.coastal}
-                  onToggle={() => toggleLayer('coastal')}
-                  activeColor="text-teal-300"
-                />
-              </div>
-            </section>
-
-            {/* 6. ULAŞIM, SINIR & MADENLER */}
-            <section className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-                  <span>🚪</span> Sınır, Geçit &amp; Madenler
-                </h3>
-              </div>
-              <div className="space-y-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                <LayerItem
-                  label="Sınır Kapıları"
-                  icon="🚪"
-                  active={layers.borderGates}
-                  onToggle={() => toggleLayer('borderGates')}
-                  activeColor="text-emerald-400"
-                />
-                <LayerItem
-                  label="Geçitler &amp; Tüneller"
-                  icon="🛣️"
-                  active={layers.passes}
-                  onToggle={() => toggleLayer('passes')}
-                  activeColor="text-purple-400"
-                />
-                <LayerItem
-                  label="Madenler &amp; Enerji Tesisleri"
-                  icon="⛏️"
-                  active={layers.mines}
-                  onToggle={() => toggleLayer('mines')}
-                  activeColor="text-slate-300"
-                />
-                <LayerItem
-                  label="81 İl Merkezi"
-                  icon="📍"
-                  active={layers.provinces}
-                  onToggle={() => toggleLayer('provinces')}
-                  activeColor="text-rose-400"
-                />
-              </div>
-            </section>
-
-            {/* 7. BÖLGESEL ODAKLANMA */}
             <section className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="font-extrabold text-[11px] uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <span>📍</span> Bölge Filtresi
-                </h3>
-              </div>
-              <div className="grid grid-cols-2 gap-1 bg-white/[0.02] p-1.5 rounded-xl border border-white/10">
-                {[
-                  'Tüm Bölgeler',
-                  'Marmara',
-                  'Ege',
-                  'Akdeniz',
-                  'İç Anadolu',
-                  'Karadeniz',
-                  'Doğu Anadolu',
-                  'Güneydoğu Anadolu'
-                ].map((reg) => (
-                  <button
-                    key={reg}
-                    onClick={() => setSelectedRegion(reg)}
-                    className={`px-2 py-1.5 rounded-lg text-[10px] font-semibold border text-left truncate transition-all ${
-                      selectedRegion === reg
-                        ? 'bg-indigo-600 text-white border-indigo-400 font-bold shadow-sm'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10'
-                    }`}
-                  >
-                    {reg}
-                  </button>
-                ))}
+              <h3 className="hf-label px-1 text-[10px] text-[#8d8768]">Bölge Filtresi</h3>
+              <div className="grid grid-cols-2 gap-1 rounded-xl border border-[#c9a24a]/12 bg-black/15 p-1">
+                {REGIONS.map((reg) => {
+                  const isOn = selectedRegion === reg;
+                  return (
+                    <button
+                      key={reg}
+                      onClick={() => setSelectedRegion(reg)}
+                      className={`truncate rounded-lg border px-2 py-1.5 text-left text-[10px] transition-colors ${
+                        isOn
+                          ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 font-semibold text-[#f0dba8]'
+                          : 'border-transparent text-[#9a9276] hover:bg-[#c9a24a]/8 hover:text-[#e6d3a4]'
+                      }`}
+                    >
+                      {reg}
+                    </button>
+                  );
+                })}
               </div>
             </section>
           </div>
@@ -467,33 +353,32 @@ export default function LayerSidebar() {
 
 function LayerItem({
   label,
-  icon,
   active,
   onToggle,
-  activeColor
 }: {
   label: string;
-  icon: string;
   active: boolean;
   onToggle: () => void;
-  activeColor: string;
 }) {
   return (
     <button
       onClick={onToggle}
-      className={`w-full flex items-center justify-between p-1.5 px-2.5 rounded-lg border text-xs transition-all select-none cursor-pointer ${
+      className={`group flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-lg border border-l-2 px-2 py-1.5 text-left transition-colors ${
         active
-          ? 'bg-slate-900/90 border-indigo-500/50 text-slate-100 font-semibold shadow-sm ring-1 ring-indigo-500/30'
-          : 'bg-slate-950/40 border-white/10 text-slate-400 hover:text-slate-200 hover:border-white/20 hover:bg-white/5'
+          ? 'border-transparent border-l-[#c9a24a] bg-[#c9a24a]/10 text-[#f0e6cd]'
+          : 'border-transparent border-l-transparent text-[#9a9276] hover:bg-white/[0.03] hover:text-[#e6d3a4]'
       }`}
     >
-      <div className="flex items-center gap-2 min-w-0 pr-2">
-        <span className="text-sm shrink-0">{icon}</span>
-        <span className="truncate whitespace-nowrap text-[11px] font-medium">{label}</span>
-      </div>
-      <div className={`p-1 rounded-md shrink-0 border ${active ? 'bg-indigo-950/60 border-indigo-400/40' : 'bg-slate-900 border-white/10'}`}>
-        {active ? <Eye className={`w-3.5 h-3.5 ${activeColor}`} /> : <EyeOff className="w-3.5 h-3.5 text-slate-600" />}
-      </div>
+      <span className="truncate whitespace-nowrap text-[11px] font-medium">
+        {label}
+      </span>
+      <span
+        className={`shrink-0 transition-colors ${
+          active ? 'text-[#dcc07d]' : 'text-[#5f5c47] group-hover:text-[#8d8768]'
+        }`}
+      >
+        {active ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+      </span>
     </button>
   );
 }

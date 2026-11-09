@@ -1,12 +1,143 @@
 @import "tailwindcss";
 @import "maplibre-gl/dist/maplibre-gl.css";
 
+/* ==================================================================
+   ANTIQUE CARTOGRAPHY — design system
+   Palette: deep ink-green chrome, brass rules, parchment highlights.
+   The slate/indigo ramps are remapped so every existing screen
+   inherits the theme without touching each component.
+   ================================================================== */
+@theme {
+  /* neutral surface ladder (was slate) */
+  --color-slate-950: #0a0c07;
+  --color-slate-900: #111409;
+  --color-slate-800: #1a1e12;
+  --color-slate-700: #262b18;
+  --color-slate-600: #3b4126;
+  --color-slate-500: #6a6f4e;
+  --color-slate-400: #98906f;
+  --color-slate-300: #c0b795;
+  --color-slate-200: #dcd2b2;
+  --color-slate-100: #eee5cd;
+
+  /* primary accent (was indigo) — brass / gold */
+  --color-indigo-950: #241d0c;
+  --color-indigo-900: #33280f;
+  --color-indigo-800: #453614;
+  --color-indigo-700: #5a4618;
+  --color-indigo-600: #8a6a1d;
+  --color-indigo-500: #a8871f;
+  --color-indigo-400: #c9a24a;
+  --color-indigo-300: #ddc07d;
+  --color-indigo-200: #ebdcb2;
+  --color-indigo-100: #f5ecd4;
+
+  /* purple / violet → brass, so legacy gradients stop reading as AI slop */
+  --color-purple-950: #241d0c;
+  --color-purple-900: #33280f;
+  --color-purple-800: #453614;
+  --color-purple-700: #5a4618;
+  --color-purple-600: #8a6a1d;
+  --color-purple-500: #a8871f;
+  --color-purple-400: #c9a24a;
+  --color-purple-300: #ddc07d;
+  --color-purple-200: #ebdcb2;
+  --color-violet-950: #241d0c;
+  --color-violet-900: #33280f;
+  --color-violet-800: #453614;
+  --color-violet-700: #5a4618;
+  --color-violet-600: #8a6a1d;
+  --color-violet-500: #a8871f;
+  --color-violet-400: #c9a24a;
+  --color-violet-300: #ddc07d;
+
+  /* sky → atlas water */
+  --color-sky-950: #0d1517;
+  --color-sky-900: #142226;
+  --color-sky-800: #1b2f35;
+  --color-sky-700: #244049;
+  --color-sky-600: #30525d;
+  --color-sky-500: #3f6673;
+  --color-sky-400: #6d8c96;
+  --color-sky-300: #9ab0b6;
+  --color-sky-200: #c3d0d2;
+
+  /* emerald → sage (success) */
+  --color-emerald-950: #0a1410;
+  --color-emerald-900: #102019;
+  --color-emerald-800: #172d23;
+  --color-emerald-700: #1f3d2f;
+  --color-emerald-600: #2b5340;
+  --color-emerald-500: #3c6d55;
+  --color-emerald-400: #6d9479;
+  --color-emerald-300: #9db8a4;
+  --color-emerald-200: #c8d8cb;
+
+  /* cyan → slate teal */
+  --color-cyan-950: #0b1414;
+  --color-cyan-900: #112020;
+  --color-cyan-800: #182e2e;
+  --color-cyan-700: #204040;
+  --color-cyan-600: #2d5555;
+  --color-cyan-500: #3f7070;
+  --color-cyan-400: #6d9494;
+  --color-cyan-300: #9cb8b8;
+  --color-cyan-200: #c7d8d8;
+
+  /* rose → terracotta (danger) */
+  --color-rose-950: #1a0e0a;
+  --color-rose-900: #2b1710;
+  --color-rose-800: #402117;
+  --color-rose-700: #5c2f20;
+  --color-rose-600: #7d402b;
+  --color-rose-500: #9c5540;
+  --color-rose-400: #bf7f66;
+  --color-rose-300: #d8a891;
+  --color-rose-200: #eccfc2;
+
+  /* amber / orange → aged gold (keeps the "highlight" semantics warm) */
+  --color-amber-950: #1d1508;
+  --color-amber-900: #2e210c;
+  --color-amber-800: #453213;
+  --color-amber-700: #61471b;
+  --color-amber-600: #8a6626;
+  --color-amber-500: #b8892f;
+  --color-amber-400: #d4a94f;
+  --color-amber-300: #e3c987;
+  --color-amber-200: #f0e0b6;
+
+  /* named tokens */
+  --color-ink-900: #0a0c07;
+  --color-ink-800: #111409;
+  --color-ink-700: #1a1e12;
+  --color-brass: #c9a24a;
+  --color-brass-dim: #8a6a1d;
+  --color-parchment: #efe3c6;
+  --color-parchment-deep: #dcc79b;
+
+  --font-serif-hf: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino,
+    "Book Antiqua", Georgia, "Times New Roman", serif;
+}
+
 @layer base {
-  html, body {
-    background-color: #09090b;
-    color: #f1f5f9;
+  :root {
+    /* Fractal-noise paper grain (SVG turbulence, no image asset). */
+    --hf-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+
+  :where(button, a, input, [role="button"]):focus-visible {
+    outline: 2px solid rgba(201, 162, 74, 0.7);
+    outline-offset: 2px;
+    border-radius: 10px;
+  }
+
+  html,
+  body {
+    background-color: #0a0c07;
+    color: #eee5cd;
     overflow: hidden;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -17,6 +148,147 @@
     margin: 0;
     padding: 0;
   }
+
+  /* Serif voice for structural headings — the single biggest
+     "not an AI template" signal after the palette. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif-hf);
+    letter-spacing: 0.01em;
+  }
+}
+
+@layer components {
+  /* --- surfaces ------------------------------------------------- */
+  .hf-panel {
+    background-image: linear-gradient(180deg, #171a10 0%, #0e1009 100%);
+    border: 1px solid rgba(201, 162, 74, 0.26);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 24px 60px -24px rgba(0, 0, 0, 0.9);
+  }
+
+  .hf-plaque {
+    background-image: linear-gradient(180deg, #1b1f12 0%, #101208 100%);
+    border: 1px solid rgba(201, 162, 74, 0.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+      0 18px 40px -18px rgba(0, 0, 0, 0.95);
+  }
+
+  .hf-nav {
+    background-image: linear-gradient(180deg, #191d12 0%, #0f1209 100%);
+    border-bottom: 1px solid rgba(201, 162, 74, 0.3);
+    box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.95);
+  }
+
+  /* --- typography ----------------------------------------------- */
+  .hf-serif {
+    font-family: var(--font-serif-hf);
+  }
+
+  .hf-label {
+    font-family: var(--font-serif-hf);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* --- controls -------------------------------------------------- */
+  .hf-chip {
+    border: 1px solid transparent;
+    color: #b7ae8e;
+    transition: color 160ms ease, background-color 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .hf-chip:hover {
+    color: #f0e6cd;
+    background-color: rgba(201, 162, 74, 0.09);
+    border-color: rgba(201, 162, 74, 0.22);
+  }
+
+  .hf-chip-on {
+    background-image: linear-gradient(180deg, #f2e7ca 0%, #dcc79b 100%);
+    color: #2a2314;
+    border-color: rgba(201, 162, 74, 0.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      0 6px 16px -8px rgba(201, 162, 74, 0.6);
+  }
+
+  .hf-rule {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(201, 162, 74, 0.45),
+      transparent
+    );
+    height: 1px;
+  }
+
+  .hf-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 162, 74, 0.35) transparent;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Legacy dark panels (arbitrary hex values used inline) → ink surfaces
+   ------------------------------------------------------------------ */
+[class*="bg-[#09090b]"] {
+  background-color: #101208 !important;
+}
+
+/* ------------------------------------------------------------------
+   Map surface — antique cartography treatment
+   A warm grade + paper grain turns any basemap into an atlas plate,
+   so the look survives a provider/API-key change.
+   ------------------------------------------------------------------ */
+[data-map-style] .maplibregl-canvas {
+  filter: saturate(1.04) contrast(1.02);
+}
+
+[data-map-style='hybrid'] .maplibregl-canvas {
+  filter: saturate(0.98) contrast(1.01);
+}
+
+[data-map-style='satellite'] .maplibregl-canvas {
+  filter: sepia(0.2) saturate(0.78) contrast(1.03) brightness(0.96);
+}
+
+/* Paper grain + vignette laid over the tiles. A warm cream wash under
+   `multiply` turns pale basemap land into parchment while keeping
+   water in the cooler slate-blue of an engraved atlas plate. */
+.hf-map-tone {
+  background-color: rgba(240, 225, 186, 0.42);
+  background-image:
+    radial-gradient(
+      122% 92% at 50% 46%,
+      rgba(255, 246, 224, 0) 56%,
+      rgba(96, 71, 33, 0.26) 100%
+    ),
+    radial-gradient(
+      60% 50% at 18% 12%,
+      rgba(120, 92, 44, 0.12),
+      rgba(0, 0, 0, 0) 70%
+    );
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+
+/* Fine paper grain, generated as a tiny repeating noise tile so it
+   never reads as scan-line banding. */
+.hf-grain {
+  background-image: var(--hf-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+.maplibregl-canvas {
+  filter: var(--hf-map-grade, saturate(1.04) contrast(1.02));
 }
 
 /* iOS & Safari App Pseudo-Fullscreen Mode */
@@ -39,43 +311,47 @@ body.app-pseudo-fullscreen {
 
 /* Custom Smooth Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(9, 9, 11, 0.8);
+  background: rgba(10, 12, 7, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(201, 162, 74, 0.3);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(201, 162, 74, 0.55);
 }
 
-/* Maplibre Popup Polish */
+/* Maplibre Popup — parchment card */
 .maplibregl-popup-content {
-  background: rgba(9, 9, 11, 0.95) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 16px !important;
+  background: #f3e8ce !important;
+  color: #262015 !important;
+  border: 1px solid rgba(120, 94, 40, 0.5) !important;
+  border-radius: 14px !important;
   padding: 14px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 22px 45px -14px rgba(20, 14, 4, 0.55) !important;
 }
 
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-  border-bottom-color: rgba(9, 9, 11, 0.95) !important;
+  border-bottom-color: rgba(120, 94, 40, 0.5) !important;
 }
 
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-  border-top-color: rgba(9, 9, 11, 0.95) !important;
+  border-top-color: rgba(120, 94, 40, 0.5) !important;
 }
 
-/* Maplibre Zoom & Control Buttons Polish */
+.maplibregl-popup-close-button {
+  color: #6b5a33 !important;
+  font-size: 18px !important;
+}
+
+/* Maplibre controls — brass hardware */
 .maplibregl-ctrl-bottom-right {
   bottom: 1.25rem !important;
   right: 1.25rem !important;
@@ -83,16 +359,16 @@ body.app-pseudo-fullscreen {
 }
 
 .maplibregl-ctrl-group {
-  background: rgba(9, 9, 11, 0.9) !important;
-  border: 2px solid rgba(255, 255, 255, 0.25) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8) !important;
-  backdrop-filter: blur(16px) !important;
+  background: rgba(243, 232, 206, 0.95) !important;
+  border: 1px solid rgba(120, 94, 40, 0.55) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 26px -10px rgba(30, 22, 8, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
   overflow: hidden !important;
 }
 
 .maplibregl-ctrl-group button {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-bottom: 1px solid rgba(120, 94, 40, 0.3) !important;
   width: 34px !important;
   height: 34px !important;
 }
@@ -102,7 +378,17 @@ body.app-pseudo-fullscreen {
 }
 
 .maplibregl-ctrl-icon {
-  filter: invert(1) brightness(1.8) !important;
+  filter: sepia(1) saturate(1.6) brightness(0.55) !important;
+}
+
+.maplibregl-ctrl-attrib {
+  background: rgba(243, 232, 206, 0.85) !important;
+  color: #5c4a25 !important;
+  border-radius: 8px 0 0 0 !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: #6b552a !important;
 }
 
 @keyframes spinSlow {

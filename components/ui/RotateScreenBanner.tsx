@@ -59,47 +59,52 @@ export default function RotateScreenBanner() {
   if (!isVisible || isFullscreen) return null;
 
   return (
-    <div className="fixed bottom-16 sm:bottom-3 left-1/2 -translate-x-1/2 z-50 w-[94vw] max-w-lg bg-gradient-to-r from-amber-500 via-indigo-600 to-amber-500 text-slate-950 p-0.5 rounded-2xl shadow-2xl animate-bounce">
-      <div className="bg-[#09090b]/95 backdrop-blur-2xl rounded-[14px] p-2.5 sm:p-3 flex items-center justify-between gap-2 text-white border border-amber-400/60 shadow-inner">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="p-1.5 sm:p-2 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40 animate-pulse shrink-0">
-            {isPinGameAlert ? <Maximize2 className="w-5 h-5" /> : <Smartphone className="w-5 h-5 animate-spin-slow" />}
+    <div className="fixed bottom-16 left-1/2 z-50 w-[94vw] max-w-lg -translate-x-1/2 sm:bottom-3">
+      <div className="hf-panel flex items-center justify-between gap-2 rounded-2xl p-2.5 text-[#eee5cd] sm:p-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]">
+            {isPinGameAlert ? (
+              <Maximize2 className="h-4 w-4" />
+            ) : (
+              <Smartphone className="h-4 w-4 animate-spin-slow" />
+            )}
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-black text-amber-300">
-              <RotateCw className="w-3.5 h-3.5 animate-spin" />
-              <span>{isPinGameAlert ? 'HARİTA TESTİ İÇİN TAM EKRAN' : 'EKRANI YAN ÇEVİRİN'}</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 ml-auto">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#e2c485]">
+              <RotateCw className="h-3 w-3 animate-spin" />
+              <span className="hf-label truncate">
+                {isPinGameAlert ? 'Harita Testi için Tam Ekran' : 'Ekranı yan çevirin'}
+              </span>
+              <span className="ml-auto shrink-0 rounded-full border border-[#c9a24a]/30 px-1.5 py-0.5 text-[10px] text-[#b7ae8e]">
                 {timeLeft}s
               </span>
             </div>
-            <p className="text-[10px] sm:text-[11px] text-slate-200 font-medium leading-tight truncate">
-              {isPinGameAlert 
-                ? 'Haritayı geniş görmek için Tam Ekrana geçin ve telefonu yan çevirin.'
-                : 'En iyi harita deneyimi için yatay mod & tam ekran önerilir.'
-              }
+            <p className="truncate text-[10px] font-normal leading-tight text-[#9a9276] sm:text-[11px]">
+              {isPinGameAlert
+                ? 'Haritayı geniş görmek için tam ekrana geçin ve telefonu yan çevirin.'
+                : 'En iyi harita deneyimi için yatay mod ve tam ekran önerilir.'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex shrink-0 items-center gap-1.5">
           <button
             onClick={() => {
               toggleFullscreen();
               setIsVisible(false);
             }}
-            className="px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] flex items-center gap-1 shadow-md active:scale-95 transition-all"
+            className="flex items-center gap-1 rounded-full border border-[#c9a24a]/70 bg-[linear-gradient(180deg,#f2e7ca,#d8c193)] px-2.5 py-1.5 text-[11px] font-bold text-[#2a2314] transition-all active:scale-95"
           >
-            <Maximize2 className="w-3.5 h-3.5" />
+            <Maximize2 className="h-3.5 w-3.5" />
             <span>Tam Ekran</span>
           </button>
 
           <button
             onClick={() => setIsVisible(false)}
-            className="p-1 rounded-lg bg-white/10 hover:bg-rose-500/30 text-slate-300 border border-white/20 transition-all shrink-0"
+            className="shrink-0 rounded-full p-1 text-[#8d8768] transition-colors hover:text-[#d98a6a]"
             title="Kapat"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>

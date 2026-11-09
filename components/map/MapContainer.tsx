@@ -1013,55 +1013,60 @@ export default function MapContainer() {
   const currentTourFeature = ALL_GEO_FEATURES[tourIndex];
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-slate-950">
+    <div className="relative w-full h-full overflow-hidden bg-slate-950" data-map-style={mapStyle}>
       {/* 3D Map Viewport */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
+      {/* Paper tone: warm wash + vignette over the cartography */}
+      <div className="hf-map-tone pointer-events-none absolute inset-0 z-[5]" aria-hidden="true" />
+      {/* Fine paper grain */}
+      <div className="hf-grain pointer-events-none absolute inset-0 z-[6] opacity-40" aria-hidden="true" />
+
       {/* Floating HUD Controls - Compact Hover-Expandable Pill Bar */}
       <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20 flex items-center gap-1 sm:gap-2 pointer-events-auto select-none">
-        <div className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 bg-[#09090b]/85 backdrop-blur-xl border border-white/15 rounded-xl sm:rounded-2xl shadow-2xl">
+        <div className="flex items-center gap-0.5 sm:gap-1 rounded-full border border-[#c9a24a]/25 bg-[#101208]/85 p-1 backdrop-blur-xl shadow-[0_18px_38px_-22px_rgba(0,0,0,0.95)]">
           
           {/* Compass & Zoom Pill */}
           <div 
             onClick={resetCameraToTurkey}
             title="Kuzey yönüne dön ve yakınlaşmayı gör (Tıkla: Odaklan)"
-            className="group flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/5 hover:border-emerald-500/40 text-slate-200 text-xs font-semibold cursor-pointer transition-all duration-300 active:scale-95"
+            className="group flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-transparent text-slate-200 text-xs font-semibold cursor-pointer transition-all duration-300 hover:bg-[#c9a24a]/10 active:scale-95"
           >
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all shrink-0">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 flex items-center justify-center text-[#dcc07d] group-hover:scale-105 transition-all shrink-0">
               <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
             
             {/* Always visible compact badge */}
-            <span className="text-[10px] sm:text-[11px] font-extrabold text-slate-300 group-hover:text-emerald-300">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-[#d9d0b4] group-hover:text-[#f0dba8]">
               {currentZoom}x
             </span>
 
             {/* Expandable Label on Hover */}
             <div className="max-w-0 group-hover:max-w-xs opacity-0 group-hover:opacity-100 overflow-hidden transition-all duration-300 ease-out whitespace-nowrap">
-              <span className="text-[11px] text-slate-300 pl-1 border-l border-white/10">
-                Kuzey Yönü • <strong className="text-emerald-400">Pusula</strong>
+              <span className="text-[11px] text-slate-300 pl-1 border-l border-[#c9a24a]/20">
+                Kuzey Yönü • <strong className="text-[#dcc07d]">Pusula</strong>
               </span>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="w-px h-4 sm:h-5 bg-white/10 mx-0.5" />
+          <div className="w-px h-4 sm:h-5 bg-[#c9a24a]/20 mx-0.5" />
 
           {/* Türkiye'ye Odaklan Button */}
           <button
             onClick={resetCameraToTurkey}
             title="Türkiye Genel Görünümüne Odaklan (Kısayol: T)"
-            className="group relative flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/5 hover:border-sky-500/40 text-slate-200 text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm"
+            className="group relative flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-transparent text-slate-200 text-xs font-bold transition-all duration-300 hover:bg-[#c9a24a]/10 active:scale-95"
           >
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-slate-950 transition-all shrink-0">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 flex items-center justify-center text-[#dcc07d] group-hover:scale-105 transition-all shrink-0">
               <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
 
             {/* Expandable Label on Hover */}
             <div className="max-w-0 group-hover:max-w-xs opacity-0 group-hover:opacity-100 overflow-hidden transition-all duration-300 ease-out whitespace-nowrap">
               <div className="flex items-center gap-1.5 pl-0.5">
-                <span className="text-[11px] text-white font-bold">Türkiye&apos;ye Odaklan</span>
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-sky-500/30 text-sky-200 border border-sky-400/30">T</span>
+                <span className="text-[11px] text-[#f0e6cd] font-bold">Türkiye&apos;ye Odaklan</span>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[#c9a24a]/35 text-[#dcc07d]">T</span>
               </div>
             </div>
           </button>
@@ -1071,33 +1076,33 @@ export default function MapContainer() {
             <button
               onClick={toggleBlindMapMode}
               title={isBlindMapMode ? "Dilsiz Harita Modunu Kapat (Kısayol: D)" : "Dilsiz Harita Modunu Aç - Şehir İsimleri & Sınırlar Gizlenir (Kısayol: D)"}
-              className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full border text-xs font-bold transition-all duration-300 active:scale-95 ${
                 isBlindMapMode
-                  ? 'bg-amber-500/25 border-amber-400/80 text-amber-200 ring-1 ring-amber-400/50 shadow-lg shadow-amber-500/10'
-                  : 'bg-white/5 hover:bg-amber-500/15 border-white/5 hover:border-amber-500/30 text-slate-200'
+                  ? 'bg-[#c9a24a]/18 border-[#c9a24a]/70 text-[#f0dba8]'
+                  : 'border-transparent text-slate-200 hover:bg-[#c9a24a]/10'
               }`}
             >
-              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-all shrink-0 ${
+              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all shrink-0 ${
                 isBlindMapMode 
-                  ? 'bg-amber-400 text-slate-950 font-black scale-105' 
-                  : 'bg-amber-500/20 text-amber-400 group-hover:bg-amber-500 group-hover:text-slate-950'
+                  ? 'bg-[#e0bd74] text-[#221b0c]' 
+                  : 'border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]'
               }`}>
                 <EyeOff className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </div>
 
               {/* Status indicator dot when active */}
               {isBlindMapMode && (
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#e0bd74] shrink-0" />
               )}
 
               {/* Expandable Label on Hover */}
               <div className="max-w-0 group-hover:max-w-xs opacity-0 group-hover:opacity-100 overflow-hidden transition-all duration-300 ease-out whitespace-nowrap">
                 <div className="flex items-center gap-1.5 pl-0.5">
                   <span className="text-[11px] font-bold">
-                    {isBlindMapMode ? 'Dilsiz Harita: AÇIK 🔥' : 'Dilsiz Harita'}
+                    {isBlindMapMode ? 'Dilsiz Harita: Açık' : 'Dilsiz Harita'}
                   </span>
-                  <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
-                    isBlindMapMode ? 'bg-amber-400 text-slate-950' : 'bg-white/10 text-slate-400'
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${
+                    isBlindMapMode ? 'bg-[#e0bd74] text-[#221b0c] border-transparent' : 'border-[#c9a24a]/35 text-[#dcc07d]'
                   }`}>
                     D
                   </span>
@@ -1142,16 +1147,16 @@ export default function MapContainer() {
               }
             }}
             title={isTourActive ? "Animasyon Turunu Durdur (Kısayol: P)" : "3D KPSS Animasyonlu Rehber Turunu Başlat (Kısayol: P)"}
-            className={`hidden sm:flex group items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 shadow-sm ${
+            className={`hidden sm:flex group items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-bold transition-all duration-300 active:scale-95 ${
               isTourActive
-                ? 'bg-gradient-to-r from-emerald-500/30 to-teal-500/30 border-emerald-400/80 text-emerald-200 ring-1 ring-emerald-400 shadow-lg shadow-emerald-500/10'
-                : 'bg-white/5 hover:bg-indigo-500/20 border-white/5 hover:border-indigo-500/40 text-indigo-300'
+                ? 'bg-[#c9a24a]/18 border-[#c9a24a]/70 text-[#f0dba8]'
+                : 'border-transparent text-[#d9d0b4] hover:bg-[#c9a24a]/10'
             }`}
           >
-            <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all shrink-0 ${
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0 ${
               isTourActive 
-                ? 'bg-emerald-400 text-slate-950 font-black animate-pulse' 
-                : 'bg-indigo-500/20 text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white'
+                ? 'bg-[#e0bd74] text-[#221b0c]' 
+                : 'border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]'
             }`}>
               {isTourActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             </div>
@@ -1162,7 +1167,7 @@ export default function MapContainer() {
                 <span className="text-[11px] font-bold text-white">
                   {isTourActive ? 'Turu Durdur' : 'KPSS Animasyon Turu'}
                 </span>
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">P</span>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[#c9a24a]/35 text-[#dcc07d]">P</span>
               </div>
             </div>
           </button>

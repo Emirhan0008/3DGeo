@@ -20,9 +20,9 @@ const MapContainer = dynamic(() => import('@/components/map/MapContainer'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-slate-950 flex flex-col items-center justify-center text-slate-300 gap-3">
-      <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
-      <span className="font-bold text-xs tracking-wider uppercase text-amber-400">
-        3D Türkiye Topoğrafya Motoru Yükleniyor...
+      <div className="w-10 h-10 rounded-full border border-[#c9a24a]/25 border-t-[#c9a24a] animate-spin" />
+      <span className="hf-label text-[10px] text-[#a98f4e]">
+        3D Türkiye Topoğrafya Motoru Yükleniyor
       </span>
     </div>
   ),
@@ -42,6 +42,16 @@ export default function HomePageClient() {
       <main className="relative flex-1 w-full h-full overflow-hidden">
         {/* 3D Map canvas */}
         <MapContainer />
+
+        {/* Brass plate frame — the engraved-atlas border of the reference */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-30 ring-1 ring-inset ring-[#c9a24a]/25"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/35 to-transparent"
+        />
 
         {/* Global Sidebar Dismiss Backdrop: Closes sidebars when tapping on map area without clicking map features or making accidental guesses */}
         {isAnySidebarOpen && (

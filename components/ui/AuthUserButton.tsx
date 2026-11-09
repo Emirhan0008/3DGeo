@@ -511,8 +511,8 @@ export default function AuthUserButton() {
 
   if (loading) {
     return (
-      <div className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-400 flex items-center gap-1 text-xs">
-        <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+      <div className="flex items-center gap-1.5 rounded-full border border-[#c9a24a]/20 px-2.5 py-1 text-[11px] text-[#8d8768]">
+        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#c9a24a]" />
         <span className="hidden sm:inline">Giriş Yapılıyor...</span>
       </div>
     );
@@ -523,18 +523,18 @@ export default function AuthUserButton() {
       {!activeDisplayName ? (
         <button
           onClick={() => setShowAuthModal(true)}
-          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black rounded-lg sm:rounded-xl text-[10px] sm:text-xs shadow-lg shadow-indigo-500/20 border border-amber-300/50 flex items-center gap-1 sm:gap-1.5 transition-all active:scale-95 shrink-0 cursor-pointer"
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#c9a24a]/70 bg-[linear-gradient(180deg,#f2e7ca,#d8c193)] px-2.5 py-1 text-[11px] font-bold text-[#2a2314] shadow-[inset_0_1px_0_rgba(255,255,255,.6)] transition-all hover:brightness-105 active:scale-95"
           title="Nick Gir veya Geçmiş Yükle"
         >
-          <LogIn className="w-3.5 h-3.5 text-amber-300" />
+          <LogIn className="h-3.5 w-3.5 text-[#6b552a]" />
           <span className="hidden xs:inline">Nick Gir</span>
           <span className="xs:hidden">Giriş</span>
         </button>
       ) : (
-        <div className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border border-amber-400/70 rounded-lg sm:rounded-xl p-0.5 sm:p-1 text-xs font-black shrink-0 shadow-lg">
+        <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#c9a24a]/35 bg-[#12150b]/90 py-0.5 pl-0.5 pr-1.5 text-xs shadow-[0_12px_28px_-18px_rgba(0,0,0,.9)]">
           <button
             onClick={() => setShowProfileEditModal(true)}
-            className="flex items-center gap-1.5 sm:gap-2 px-1 sm:px-1.5 py-0.5 hover:bg-white/10 rounded-md sm:rounded-lg transition-all text-left"
+            className="flex items-center gap-1.5 rounded-full px-1 py-0.5 text-left transition-colors hover:bg-[#c9a24a]/10"
             title="Profili Düzenle, Avatarını Değiştir veya Hesabı Yönet"
           >
             <AvatarWithBadgeFrame
@@ -548,13 +548,13 @@ export default function AuthUserButton() {
             />
             <div className="flex flex-col">
               <div className="flex items-center gap-0.5 sm:gap-1">
-                <span className="text-amber-300 font-black truncate max-w-[55px] xs:max-w-[75px] sm:max-w-[100px] text-[10px] sm:text-xs leading-tight">
+                <span className="max-w-[60px] truncate font-semibold leading-tight tracking-wide text-[#e9d7a8] sm:max-w-[100px]">
                   {activeDisplayName}
                 </span>
-                <Settings className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 hover:text-amber-300 transition-colors" />
+                <Settings className="h-3 w-3 text-[#8d8768] transition-colors hover:text-[#c9a24a]" />
               </div>
-              <span className="text-[8px] sm:text-[9px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5 truncate max-w-[65px] sm:max-w-[100px]">
-                <CloudCheck className="w-2 h-2 text-emerald-300 shrink-0" />
+              <span className="flex max-w-[70px] items-center gap-1 truncate text-[9px] leading-tight text-[#a9bd8b] sm:max-w-[105px]">
+                <CloudCheck className="h-2 w-2 shrink-0 text-[#b9c99a]" />
                 <span className="truncate">{equippedTitle}</span>
               </span>
             </div>
@@ -562,7 +562,7 @@ export default function AuthUserButton() {
 
           <button
             onClick={handleSignOut}
-            className="p-1 text-slate-400 hover:text-rose-400 transition-colors border-l border-white/10 pl-1 sm:pl-1.5 pr-0.5 sm:pr-1"
+            className="border-l border-[#c9a24a]/20 p-1 pl-1.5 pr-0.5 text-[#8d8768] transition-colors hover:text-[#d98a6a]"
             title="Oturumu Kapat / Nick Değiştir"
           >
             <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />

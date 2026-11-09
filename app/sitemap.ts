@@ -1,69 +1,75 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://3d-cografya.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://3d-cografya.vercel.app";
   const currentDate = new Date();
 
   return [
     {
-      url: `${baseUrl}`,
+      url: baseUrl,
       lastModified: currentDate,
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 1.0,
       alternates: {
         languages: {
-          tr: `${baseUrl}`,
-          en: `${baseUrl}/?lang=en`,
+          tr: baseUrl,
+          en: baseUrl + "/?lang=en",
         },
       },
     },
     {
-      url: `${baseUrl}/#harita`,
+      url: baseUrl + "/duello",
       lastModified: currentDate,
-      changeFrequency: 'weekly',
+      changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/#duello`,
+      url: baseUrl + "/harita-testi",
       lastModified: currentDate,
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/#hata-defteri`,
+      url: baseUrl + "/soru-bankasi",
       lastModified: currentDate,
-      changeFrequency: 'daily',
+      changeFrequency: "weekly",
       priority: 0.85,
     },
     {
-      url: `${baseUrl}/#soru-bankasi`,
+      url: baseUrl + "/hata-defteri",
       lastModified: currentDate,
-      changeFrequency: 'weekly',
+      changeFrequency: "daily",
       priority: 0.85,
     },
     {
-      url: `${baseUrl}/#ai-koc`,
+      url: baseUrl + "/ai-ogretmen",
       lastModified: currentDate,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/llms.txt`,
+      url: baseUrl + "/istatistikler",
       lastModified: currentDate,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/llms-full.txt`,
+      url: baseUrl + "/llms.txt",
       lastModified: currentDate,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/ai-catalog.json`,
+      url: baseUrl + "/llms-full.txt",
       lastModified: currentDate,
-      changeFrequency: 'monthly',
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: baseUrl + "/ai-catalog.json",
+      lastModified: currentDate,
+      changeFrequency: "monthly",
       priority: 0.6,
-    },
+    }
   ];
 }

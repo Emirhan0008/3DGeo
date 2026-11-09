@@ -61,18 +61,18 @@ export default function LayerHintBanner() {
   return (
     <div
       id="layer-initial-hint-banner"
-      className="fixed top-14 sm:top-16 left-3 sm:left-4 z-40 max-w-[290px] sm:max-w-xs bg-slate-900/95 backdrop-blur-md border border-indigo-500/40 rounded-xl shadow-xl p-2.5 sm:p-3 text-slate-100 animate-in fade-in slide-in-from-top-2 duration-200 pointer-events-auto ring-1 ring-white/10"
+      className="hf-panel fixed left-3 top-14 z-40 max-w-[290px] rounded-xl p-2.5 text-[#eee5cd] pointer-events-auto sm:left-4 sm:top-16 sm:max-w-xs sm:p-3"
     >
       <div className="flex items-start justify-between gap-1.5">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center shrink-0 text-indigo-300 shadow-inner">
-            <Sliders className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]">
+            <Sliders className="h-3.5 w-3.5" />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold text-white">
+            <span className="hf-serif text-xs font-semibold text-[#f0e6cd]">
               Harita Hızlandırıldı
             </span>
-            <span className="px-1 py-0.2 text-[8.5px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded">
+            <span className="hf-label rounded border border-[#c9a24a]/35 px-1 py-0.5 text-[8px] text-[#dcc07d]">
               Hızlı Mod
             </span>
           </div>
@@ -80,29 +80,32 @@ export default function LayerHintBanner() {
 
         <button
           onClick={handleDismiss}
-          className="p-1 text-slate-400 hover:text-white rounded-md hover:bg-white/10 transition-colors shrink-0 -mr-0.5 -mt-0.5 cursor-pointer"
+          className="-mr-0.5 -mt-0.5 shrink-0 cursor-pointer rounded-full p-1 text-[#8d8768] transition-colors hover:text-[#f0e6cd]"
           title="Kapat"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <p className="text-[10.5px] leading-snug text-slate-300 mt-1.5 font-normal">
-        Açılışın hızlı olması için harita temiz başlatıldı. Yer şekillerini dilediğiniz zaman <span className="text-indigo-300 font-semibold">Katmanlar</span> menüsünden açabilirsiniz.
+      <p className="mt-1.5 text-[10.5px] font-normal leading-snug text-[#b7ae8e]">
+        Açılışın hızlı olması için harita temiz başlatıldı. Yer şekillerini
+        dilediğiniz zaman{' '}
+        <span className="font-semibold text-[#dcc07d]">Katmanlar</span>{' '}
+        menüsünden açabilirsiniz.
       </p>
 
-      <div className="mt-2.5 flex items-center justify-between gap-1.5 pt-2 border-t border-white/10">
+      <div className="mt-2.5 flex items-center justify-between gap-1.5 border-t border-[#c9a24a]/15 pt-2">
         <div className="flex items-center gap-1">
           <button
             onClick={handleDismiss}
-            className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-lg text-[11px] font-bold transition-all shadow-sm shadow-indigo-600/30 border border-indigo-400/60 cursor-pointer"
+            className="cursor-pointer rounded-full border border-[#c9a24a]/70 bg-[linear-gradient(180deg,#f2e7ca,#d8c193)] px-3 py-1 text-[11px] font-bold text-[#2a2314] transition-all active:scale-95"
           >
             Anladım
           </button>
 
           <button
             onClick={handleOpenLayers}
-            className="px-2 py-1 bg-white/5 hover:bg-white/10 active:scale-95 text-slate-200 hover:text-white rounded-lg text-[11px] font-medium transition-colors border border-white/10 cursor-pointer"
+            className="cursor-pointer rounded-full border border-[#c9a24a]/20 px-2 py-1 text-[11px] font-medium text-[#b7ae8e] transition-colors hover:border-[#c9a24a]/50 hover:text-[#f0e6cd]"
           >
             Katmanlar
           </button>
@@ -110,7 +113,7 @@ export default function LayerHintBanner() {
 
         <button
           onClick={handleEnableAllLayers}
-          className="text-[9.5px] text-slate-500 hover:text-slate-300 transition-colors underline decoration-slate-600 hover:decoration-slate-400 cursor-pointer px-1 py-0.5"
+          className="cursor-pointer px-1 py-0.5 text-[9.5px] text-[#7d7a63] underline decoration-[#5f5c47] transition-colors hover:text-[#c3b993]"
           title="Tüm katmanları açar (düşük sistemlerde yavaşlama yapabilir)"
         >
           Tümünü Aç
