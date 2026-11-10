@@ -12,6 +12,7 @@ import FlashcardMode from '@/components/game/FlashcardMode';
 import StatsModal from '@/components/ui/StatsModal';
 import AITutorDrawer from '@/components/ai/AITutorDrawer';
 import BadgeNotificationToast from '@/components/ui/BadgeNotificationToast';
+import AppFrame from '@/components/ui/AppFrame';
 import RotateScreenBanner from '@/components/ui/RotateScreenBanner';
 import LayerHintBanner from '@/components/ui/LayerHintBanner';
 import { useAppStore } from '@/lib/store/useStore';
@@ -55,7 +56,10 @@ export default function HomePageClient() {
   }, [setActiveTab, setAiDrawerOpen]);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-950 font-sans select-none">
+    <div
+      className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-950 font-sans select-none"
+      style={{ padding: 20 }}
+    >
       {/* Top Navbar */}
       <Navbar />
 
@@ -107,6 +111,9 @@ export default function HomePageClient() {
         {activeTab === 'flashcards' && <FlashcardMode />}
         {activeTab === 'stats' && <StatsModal />}
       </main>
+
+      {/* Mounted-plate atlas frame around the whole app */}
+      <AppFrame />
     </div>
   );
 }

@@ -1,0 +1,111 @@
+'use client';
+
+import React from 'react';
+
+/* ==================================================================
+   The atlas frame.
+
+   A mounted-plate border: the whole app sits inside a band of aged
+   parchment/leather, exactly like a chart pasted onto a book cover.
+   Four strips are used instead of `border-image` so the texture keeps
+   its natural scale on every edge (border-image would stretch the
+   grain differently on the short sides).
+
+   Purely decorative — pointer-events-none, sits above content, but
+   only the 20px band is visible so it never blocks the UI.
+   ================================================================== */
+
+const BAND = 20; // px
+const TEX = "url('/assets/theme/frame-wood.jpg')";
+
+/**
+ * The grain must read at its own scale. Stretching a 1024² tile across a
+ * 20px band with `cover` turns every stain into a giant blob, so the tile
+ * is repeated at 300px and only a 20px slice shows through.
+ */
+function stripStyle(axis: 'x' | 'y'): React.CSSProperties {
+  // First layer paints on top: the wash sits above the grain.
+  const wash =
+    axis === 'x'
+      ? 'linear-gradient(180deg, rgba(26,17,7,.5), rgba(10,6,2,.82))'
+      : 'linear-gradient(90deg, rgba(26,17,7,.5), rgba(10,6,2,.82))';
+  return {
+    ...(axis === 'x' ? { height: BAND } : { width: BAND }),
+    backgroundImage: `${wash}, ${TEX}`,
+    backgroundSize: '100% 100%, 300px 300px',
+    backgroundPosition: 'center, center',
+    backgroundBlendMode: 'normal, normal',
+  };
+}
+
+export default function AppFrame() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-[60] select-none"
+    >
+      {/* ---- four texture strips ---- */}
+      <div className="absolute inset-x-0 top-0" style={stripStyle('x')} />
+      <div className="absolute inset-x-0 bottom-0" style={stripStyle('x')} />
+      <div className="absolute inset-y-0 left-0" style={stripStyle('y')} />
+      <div className="absolute inset-y-0 right-0" style={stripStyle('y')} />
+
+      {/* ---- warm burnish: keeps the band from going flat black ---- */}
+      <div
+        className="absolute inset-0"
+        style={{
+          boxShadow:
+            'inset 0 0 0 1px rgba(0,0,0,.55), inset 0 2px 0 rgba(201,162,74,.12), inset 0 -2px 0 rgba(201,162,74,.10)',
+        }}
+      />
+
+      {/* ---- the inner edge: brass hairline + recessed shadow ---- */}
+      <div
+        className="absolute"
+        style={{
+          inset: BAND,
+          boxShadow:
+            'inset 0 0 0 1px rgba(201,162,74,.55), inset 0 0 0 3px rgba(20,14,6,.55), inset 0 0 26px rgba(10,8,4,.55)',
+          borderRadius: 3,
+        }}
+      />
+
+      {/* ---- outer bevel: dark edge of the book cover ---- */}
+      <div
+        className="absolute inset-0"
+        style={{
+          boxShadow:
+            'inset 0 0 0 1px rgba(0,0,0,.75), inset 0 0 0 2px rgba(201,162,74,.16)',
+        }}
+      />
+
+      {/* ---- corner studs ---- */}
+      {[
+        { top: 6, left: 6 },
+        { top: 6, right: 6 },
+        { bottom: 6, left: 6 },
+        { bottom: 6, right: 6 },
+      ].map((pos, i) => (
+        <span
+          key={i}
+          className="absolute h-1.5 w-1.5 rounded-full"
+          style={{
+            ...pos,
+            background:
+              'radial-gradient(circle at 32% 30%, #f2e2b4, #c9a24a 45%, #6b4f16 78%, #2a1f0a)',
+            boxShadow: '0 1px 2px rgba(0,0,0,.9)',
+          }}
+        />
+      ))}
+
+      {/* ---- bottom-left armillary + scroll emblem ---- */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/theme/corner-emblem.png"
+        alt=""
+        className="absolute bottom-0 left-0 w-[300px] max-w-[42vw] opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,.75)] sm:w-[360px] lg:w-[400px]"
+        draggable={false}
+      />
+    </div>
+  );
+}

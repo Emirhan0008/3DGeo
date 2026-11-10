@@ -4,6 +4,46 @@
 
 ---
 
+## 📅 [2026-11-10] - Referans Tasarım Birebir: Atlas Çerçevesi, Akordeon Sidebar, Krem AI Paneli
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: Verilen referans görselin (antik atlas / ahşap-parşömen çerçeve, açık akordeon sidebar, krem başlıklı AI paneli) birebir uygulanması. Kullanıcı ayrıca "tuvalin boş kısımları sorun değil, altından harita görünecek" diyerek amblem kompozisyonunun korunmasını istedi.
+
+### Problem
+Tema token seviyesinde doğruydu ama referansın **fiziksel çerçevesi** yoktu: uygulama tam ekran siyah bir zeminde başlıyor, sidebar düz bir liste, AI paneli koyu lacivert başlıklıydı.
+
+### Çözüm
+1. **Atlas çerçevesi** (`components/ui/AppFrame.tsx`, yeni): 20px'lik dört doku şeridi + altın hairline + iç gölge + dış bevel + 4 köşe perçini + sol altta `corner-emblem.png`. `border-image` yerine dört ayrı şerit kullanıldı; doku **300px'lik doğal ölçekte** döşeniyor (`cover` ile 1024²'yi 20px banda sığdırmak lekeleri dev boyuta çıkarıyordu — ölçülmüş hata).
+2. **Akordeon sidebar** (`components/ui/LayerSidebar.tsx`): `▲` işaretli açılır bölümler, `grid-template-rows: 0fr/1fr` ile animasyonlu kapanma, bölüm başına etkin katman sayacı, satır ikonları, krem başlık plakasındaki küre madalyonu, genişlik 320 → **290px**.
+3. **Katman ikonları** (`components/ui/LayerIcons.tsx`, yeni): 18 katman tipi için tek stroke ağırlıklı, `currentColor` kullanan gravür SVG seti + `LAYER_ICONS` registry.
+4. **AI paneli** (`components/ai/AITutorDrawer.tsx`): lacivert → pirinç. Başlık `hf-parchment` krem plaka, sohbet alanına `ai-landscape.jpg` + gradyan perde, balonlar/composer/prompt chip'leri pirinç. Kalan **0** `indigo`/`slate` sınıfı.
+5. **Navbar** (`components/ui/Navbar.tsx`): sekme ayraçları düz çizgi → çift hairline arasında `◆`.
+
+### Ölçülmüş Düzeltmeler
+- **HUD çakışması**: sidebar hover ile genişlerken harita HUD pili plakanın altında kalıyordu. `isSidebarHovered` store alanı eklendi; HUD `left: 322px`'e kayıyor (yalnız `isSidebarOpen` yetmiyordu — hover genişlemesi kalıcı değil).
+- **AI avatarı boştu**: asistan mesaj balonundaki madalyonda ikon eksik kalmış, `Bot` ikonu eklendi.
+
+### Asset Disiplini
+Görselleri kullanıcı üretti; düzeltme/optimizasyon `sharp` ile yapıldı.
+- `parchment.jpg` **1.1 MB → 148 KB**; merkezden %78 kırpma (vinyet atıldı) → blur → linear → median → `recomb` ile kanal bazlı sıcak krem dengesi. Ortalama `#E5DBC1`, vinyet farkı 94 → ~0, siyah çatlak yok (min 137).
+- `corner-emblem.png` **1.9 MB → 819 KB** (1600×893) + WebP 172 KB. **Kompozisyona dokunulmadı** — şeffaf boşluk tasarımın parçası.
+- `frame-wood.jpg` 765 KB/parlaklık 219 → **251 KB**/ortalama 165, vinyet −2.
+
+### Etkilenen Dosyalar
+- `components/ui/AppFrame.tsx` (YENİ), `components/ui/LayerIcons.tsx` (YENİ)
+- `components/HomePageClient.tsx` — `AppFrame` + dış `padding: 20`
+- `components/ui/LayerSidebar.tsx`, `components/ui/Navbar.tsx`, `components/ai/AITutorDrawer.tsx`
+- `components/map/MapContainer.tsx` — HUD `left` geçişi
+- `lib/store/useStore.ts` — `isSidebarHovered` / `setSidebarHovered`
+- `app/globals.css` — `.hf-nav` / `.hf-plaque` dokulu zemin
+- `public/assets/theme/*` — 4 final asset (+ webp)
+
+### Doğrulama
+- `npx tsc --noEmit` temiz, `npx next lint` → "No ESLint warnings or errors".
+- Playwright 1440×900 ve 1248×638'de snapshot alındı; referansla yan yana karşılaştırıldı.
+
+---
+
 ## 📅 [2026-11-09] - Antik Haritacılık Teması ve "AI Slop" Temizliği (UI/UX)
 
 - **Geliştirici**: AI Agent (OpenCode)

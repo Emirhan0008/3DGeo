@@ -14,7 +14,8 @@
 | **Kalıcı Depolama (Lokal)** | LocalStorage (`kpss3d_user_stats`) | Çevrimdışı ilerleme, yerel rozetler, çözülen sorular ve oyun istatistikleri |
 | **Bulut Veritabanı & Auth** | Firebase Firestore + Anonymous/Google Auth | Global liderlik tablosu, rumuz yönetimi, 1v1 gerçek zamanlı düello odaları |
 | **Yapay Zeka (AI)** | `@google/genai` (Gemini 2.5/3.5 Flash) | KPSS Coğrafya Öğretmeni: soru analizi, mazeret/açıklama, akılda kalıcı kodlama üretimi |
-| **Tasarım & UI** | Tailwind CSS v4 + Motion (`motion/react`) | Responsive karanlık tema (slate-950), animasyonlar, Lucide React ikonları |
+| **Tasarım & UI** | Tailwind CSS v4 + Motion (`motion/react`) | Antik atlas teması: koyu mürekkep yeşili zemin, pirinç/altın vurgu, parşömen plakalar, gravür ornamentler |
+| **SEO & GEO** | `lib/seo.ts` + App Router metadata | Tek kaynak metadata üreticisi, Schema.org JSON-LD (`@graph`: WebApplication + Organization), `robots.ts`, `sitemap.ts`, AI ajan manifestoları |
 
 ---
 
@@ -40,7 +41,10 @@ components/
 │   │
 │   ├── MapContainer.tsx     # 3D MapLibre harita motoru (Katman renderları, tıklama, pinleme)
 │   │
-│   ├── LayerSidebar.tsx     # Sol/Açılır katman seçim çekmecesi (Dağlar, Göller, Akarsular, Ovalar vb.)
+│   ├── LayerSidebar.tsx     # Sol/Açılır katman seçim çekmecesi (▲ akordeon bölümler, katman satır ikonları)
+│   ├── LayerIcons.tsx       # 18 katman tipi için gravür tarzı inline SVG seti + LAYER_ICONS registry
+│   ├── AppFrame.tsx         # Atlas çerçevesi: 20px doku şeritleri, altın hairline, köşe perçinleri, sol alt amblem
+│   ├── MapOrnaments.tsx     # Pusula gülü, armiler küre, arazi silüeti, kuzey işareti (inline SVG)
 │   ├── LayerHintBanner.tsx  # Katman ipucu ve aktif katman bilgilendirme şeridi
 │   ├── FeatureDetailModal.tsx # Haritada tıklanan coğrafi noktanın KPSS detay kartı
 │   ├── AITutorDrawer.tsx    # Sağdan açılan yapay zeka KPSS öğretmen sohbet paneli
@@ -54,6 +58,23 @@ components/
 │       ├── FlashcardMode.tsx # Hafıza Kartları & Şifreli Kodlamalar Modu
 │       └── StatsModal.tsx    # Detaylı oyuncu başarı istatistikleri ve rozet vitrini
 ```
+
+---
+
+## 🎨 2b. Atlas Teması ve Görsel Varlıklar (`app/globals.css`, `public/assets/theme/`)
+
+Tema **token seviyesinde** uygulanır (`@theme` bloğu), bileşenler tek tek boyanmaz. Görsel varlıklar üçe ayrılır:
+
+| Dosya | Rol | Teknik kural |
+|---|---|---|
+| `frame-wood.jpg` | Ekran çerçevesi dokusu | 1024², ortalama parlaklık **165**, vinyet ≈ 0. `AppFrame` bunu **300px doğal ölçekte** döşer — `cover` ile 20px banda sığdırmak lekeleri dev boyuta çıkarır |
+| `parchment.jpg` | Plaka/başlık zemini | Sıcak krem, ortalama `#E5DBC1`, min 137 (siyah çatlak yok). `multiply`/düşük opaklıkla kullanılır |
+| `ai-landscape.jpg` | AI paneli arka planı | Üst %30 düz koyu (metin okunurluğu), alt kısımda gravür dağlar; gradyan perde ile örtülür |
+| `corner-emblem.png` | Sol alt küre + parşömen amblemi | **Şeffaf boşluk tasarımın parçasıdır** (altından harita görünür) — kırpılmaz |
+
+`.hf-*` primitifleri (`hf-plaque`, `hf-parchment`, `hf-nav`, `hf-serif`, `hf-label`, `hf-input`, `hf-btn-brass`, `hf-double-rule`, `hf-scroll`) tüm bileşenlerin ortak yüzey/tipografi dili. Yeni bir panel eklerken ham renk yerine bunlar kullanılır.
+
+> **Doku ölçek kuralı (ölçülmüş hata):** bir dokuyu dar bir banda `background-size: cover` ile sığdırmak leke/kontrast ölçeğini bozar. Doku her zaman kendi piksel ölçeğinde döşenir (`300px`, `520px` gibi), bant yalnızca kırpar.
 
 ---
 

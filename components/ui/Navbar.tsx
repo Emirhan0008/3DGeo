@@ -170,8 +170,12 @@ export default function Navbar() {
               {i > 0 && (
                 <span
                   aria-hidden="true"
-                  className="mx-0.5 h-4 w-px shrink-0 bg-[#c9a24a]/20"
-                />
+                  className="mx-1 flex h-4 shrink-0 items-center gap-1"
+                >
+                  <span className="h-3 w-px bg-gradient-to-b from-transparent via-[#c9a24a]/25 to-transparent" />
+                  <span className="text-[6px] leading-none text-[#c9a24a]/45">◆</span>
+                  <span className="h-3 w-px bg-gradient-to-b from-transparent via-[#c9a24a]/25 to-transparent" />
+                </span>
               )}
               {renderTab(t)}
             </Fragment>

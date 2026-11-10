@@ -80,6 +80,10 @@ export interface AppState {
   isSidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
+  /** True while the layer plate is expanded by hover (transient, not pinned).
+   *  The map HUD uses it to step aside when the plate widens. */
+  isSidebarHovered: boolean;
+  setSidebarHovered: (hovered: boolean) => void;
   isAiDrawerOpen: boolean;
   setAiDrawerOpen: (open: boolean) => void;
   closeAllSidebars: () => void;
@@ -439,6 +443,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   isSidebarOpen: false,
   setSidebarOpen: (open) => set({ isSidebarOpen: open }),
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  isSidebarHovered: false,
+  setSidebarHovered: (hovered) => set({ isSidebarHovered: hovered }),
   isAiDrawerOpen: false,
   setAiDrawerOpen: (open) => set({ isAiDrawerOpen: open }),
   closeAllSidebars: () => set({ isSidebarOpen: false, isAiDrawerOpen: false }),

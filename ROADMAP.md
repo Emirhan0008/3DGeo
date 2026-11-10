@@ -15,6 +15,8 @@
 - [x] **Yapay Zeka KPSS Öğretmeni (`AITutorDrawer`)**: Gemini 2.5 Flash entegrasyonu ile soru çözüm açıklaması ve zayıf konu analizi.
 - [x] **Oyunlaştırma & Profil**: XP, Seviye, Rozetler (`badgesData.ts`), Firestore tabanlı Küresel Liderlik Tablosu (`GlobalLeaderboardModal`).
 - [x] **Kapsamlı SEO & GEO (Generative Engine Optimization)**: Sunucu seviyesinde ham HTML ön-oluşturma (SSG), Schema.org JSON-LD (WebApplication, Course, FAQPage, BreadcrumbList), AI Ajan manifestoları (`ai-catalog.json`, `llms.txt`, `llms-full.txt`), dinamik 1200x630 OpenGraph görseli, `robots.ts` ve güncel `sitemap.ts`.
+- [x] **Antik Atlas Teması (Referans Birebir)**: `AppFrame` ile ahşap-parşömen ekran çerçevesi (4 doku şeridi + altın hairline + köşe perçinleri + sol alt küre amblemi), ▲ akordeon katman sidebar'ı (`inert` ile erişilebilir), 18 gravür katman ikonu (`LayerIcons`), krem plakalı AI öğretmen paneli, `◆` ayraçlı navbar. Assetler `sharp` ile optimize edildi (toplam ~1.1 MB tasarruf).
+- [x] **SEO Tek Kaynak Refaktörü**: `lib/seo.ts` (`buildPageMetadata` + WebApplication/Organization/FAQ/Breadcrumb JSON-LD üreticileri), `layout.tsx` metadata artık buradan beslenir, `@graph` JSON-LD, `robots.ts`'e `host` alanı ve 4 AI crawler kuralı, `sitemap.ts` 8 route.
 
 ---
 

@@ -344,7 +344,9 @@ export default function MapContainer() {
     toggleHideLandformsInBlindMode,
     gameCategoryFilter,
     activeDuelSession,
-    activeDuelPlayerKey
+    activeDuelPlayerKey,
+    isSidebarOpen,
+    isSidebarHovered
   } = useAppStore();
 
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -1049,8 +1051,13 @@ export default function MapContainer() {
       </div>
 
       {/* Floating HUD Controls - Compact Hover-Expandable Pill Bar */}
-      {/* left offset clears the collapsed sidebar spine (w-9 at left-2) */}
-      <div className="absolute left-12 top-2 z-20 flex select-none items-center gap-1 pointer-events-auto sm:left-14 sm:top-4 sm:gap-2">
+      {/* left offset clears the collapsed sidebar spine (w-9 at left-2),
+          and steps aside when the 290px layer plate is expanded */}
+      <div
+        className={`absolute left-12 top-2 z-20 flex select-none items-center gap-1 pointer-events-auto transition-[left] duration-300 ease-in-out sm:top-4 sm:gap-2 ${
+          isSidebarOpen || isSidebarHovered ? 'sm:left-[322px]' : 'sm:left-14'
+        }`}
+      >
         <div className="hf-parchment hf-double-rule flex items-center gap-0.5 rounded-full p-1 sm:gap-1">
           
           {/* Compass & Zoom Pill */}

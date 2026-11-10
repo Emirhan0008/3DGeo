@@ -15,6 +15,7 @@ import {
   Satellite,
 } from 'lucide-react';
 import { CompassRose, NorthMark } from '@/components/ui/MapOrnaments';
+import { LAYER_ICONS } from '@/components/ui/LayerIcons';
 
 const MAP_STYLES: {
   id: MapStyleType;
@@ -105,11 +106,23 @@ export default function LayerSidebar() {
     setSelectedRegion,
     isBlindMapMode,
     toggleBlindMapMode,
+    setSidebarHovered,
   } = useAppStore();
 
   const [isHovered, setIsHovered] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Accordion: the first group starts open so the plate never looks empty.
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    SECTIONS.forEach((s, i) => {
+      init[s.title] = i === 0;
+    });
+    return init;
+  });
+  const toggleSection = (title: string) =>
+    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
 
   // Sync state when store closes sidebar
   useEffect(() => {
@@ -119,16 +132,28 @@ export default function LayerSidebar() {
     }
   }, [isSidebarOpen]);
 
+  // Never leave a stale hover flag behind when the plate unmounts
+  // (fullscreen mode or a non-map tab hides it entirely).
+  useEffect(() => {
+    if (isFullscreen || activeTab !== 'map') setSidebarHovered(false);
+  }, [isFullscreen, activeTab, setSidebarHovered]);
+
+  useEffect(() => {
+    return () => setSidebarHovered(false);
+  }, [setSidebarHovered]);
+
   const isExpanded = isHovered || isPinned || isSidebarOpen;
 
   const handleMouseEnter = () => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     setIsHovered(true);
+    setSidebarHovered(true);
   };
 
   const handleMouseLeave = () => {
     hoverTimeoutRef.current = setTimeout(() => {
       setIsHovered(false);
+      setSidebarHovered(false);
     }, 250);
   };
 
@@ -150,7 +175,7 @@ export default function LayerSidebar() {
         isExpanded ? 'z-45' : 'z-20'
       } ${
         isExpanded
-          ? 'w-[85vw] max-w-xs opacity-100 sm:w-80'
+          ? 'w-[85vw] max-w-xs opacity-100 sm:w-[290px]'
           : isHovered
             ? 'w-9 opacity-100'
             : 'w-9 opacity-80 hover:opacity-100'
@@ -209,16 +234,16 @@ export default function LayerSidebar() {
         /* ---------- expanded ---------- */
         <div className="flex h-full w-full flex-col">
           {/* header */}
-          <div className="relative flex shrink-0 items-center justify-between border-b border-[#c9a24a]/18 px-3 py-2.5">
+          <div className="hf-parchment relative flex shrink-0 items-center justify-between border-b border-[#8a6a1d]/45 px-3 py-2.5">
             <div className="flex items-center gap-2">
-              <div className="relative grid h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/40 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)]">
-                <CompassRose className="h-6 w-6" />
+              <div className="relative grid h-9 w-9 place-items-center rounded-full border border-[#8a6a1d]/60 bg-[radial-gradient(circle_at_32%_26%,#f6e9c2,#c9ac74_72%,#8a6a1d)] shadow-[inset_0_1px_0_rgba(255,255,255,.5),0_2px_6px_rgba(0,0,0,.35)]">
+                <CompassRose className="h-6 w-6" tone="#4a3714" />
               </div>
-              <div>
-                <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#f5ecd4]">
-                  Harita Katmanları
+              <div className="leading-tight">
+                <h2 className="hf-serif text-xs font-bold tracking-[0.1em] text-[#2a2314]">
+                  HARİTA KATMANLARI
                 </h2>
-                <span className="text-[10px] text-[#b5a06a]">
+                <span className="text-[10px] font-medium text-[#6f5c33]">
                   {activeLayersCount} / {totalLayersCount} etkin
                 </span>
               </div>
@@ -230,8 +255,8 @@ export default function LayerSidebar() {
                 title={isPinned ? 'Sabitlemeyi kaldır' : 'Sabitle'}
                 className={`rounded-full p-1.5 transition-colors ${
                   isPinned
-                    ? 'text-[#e2c485]'
-                    : 'text-[#b5a06a] hover:text-[#e6d3a4]'
+                    ? 'bg-[#2a2314]/12 text-[#5a4413]'
+                    : 'text-[#6f5c33] hover:bg-[#2a2314]/10 hover:text-[#2a2314]'
                 }`}
               >
                 {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
@@ -244,7 +269,7 @@ export default function LayerSidebar() {
                   setSidebarOpen(false);
                 }}
                 title="Kapat"
-                className="rounded-full p-1.5 text-[#b5a06a] transition-colors hover:text-[#e6d3a4]"
+                className="rounded-full p-1.5 text-[#6f5c33] transition-colors hover:bg-[#2a2314]/10 hover:text-[#2a2314]"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -308,38 +333,80 @@ export default function LayerSidebar() {
           </div>
 
           {/* scroll area */}
-          <div className="hf-scroll flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-3 text-xs">
-            {SECTIONS.map((section) => (
-              <section key={section.title} className="space-y-1.5">
-                <h3 className="hf-label px-1 text-[10px] text-[#c9a24a]">
-                  {section.title}
-                </h3>
-                <div className="space-y-0.5 rounded-xl border border-[#c9a24a]/12 bg-black/15 p-1">
-                  {section.items.map((item) => (
-                    <LayerItem
-                      key={item.key}
-                      label={item.label}
-                      active={Boolean(layers[item.key])}
-                      onToggle={() => toggleLayer(item.key)}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+          <div className="hf-scroll flex-1 overflow-y-auto overscroll-contain px-2.5 py-2 text-xs">
+            {SECTIONS.map((section) => {
+              const isOpen = Boolean(openSections[section.title]);
+              const activeInSection = section.items.filter((i) => layers[i.key]).length;
+              return (
+                <section key={section.title} className="border-b border-[#c9a24a]/12 last:border-b-0">
+                  <button
+                    onClick={() => toggleSection(section.title)}
+                    aria-expanded={isOpen}
+                    className={`group flex w-full items-center gap-2 px-1.5 py-2 text-left transition-colors ${
+                      isOpen ? 'text-[#e8d6a6]' : 'text-[#c2b283] hover:text-[#e8d6a6]'
+                    }`}
+                  >
+                    <span
+                      className={`shrink-0 text-[9px] leading-none text-[#c9a24a] transition-transform duration-200 ${
+                        isOpen ? '' : 'rotate-180'
+                      }`}
+                      aria-hidden="true"
+                    >
+                      ▲
+                    </span>
+                    <span className="hf-label flex-1 truncate text-[10px] font-semibold">
+                      {section.title}
+                    </span>
+                    {activeInSection > 0 && (
+                      <span className="shrink-0 rounded-full border border-[#c9a24a]/30 bg-[#c9a24a]/12 px-1.5 text-[9px] font-bold leading-4 text-[#dcc07d]">
+                        {activeInSection}
+                      </span>
+                    )}
+                  </button>
 
-            <section className="space-y-1.5 pt-1">
-              <h3 className="hf-label px-1 text-[10px] text-[#b5a06a]">Bölge Filtresi</h3>
-              <div className="grid grid-cols-2 gap-1 rounded-xl border border-[#c9a24a]/12 bg-black/15 p-1">
+                  <div
+                    className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                      isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                    }`}
+                    /* Closed groups keep their height animation but must not
+                       stay keyboard-focusable: inert removes them from the tab
+                       order without breaking the 0fr transition. */
+                    inert={!isOpen}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="space-y-px pb-2">
+                        {section.items.map((item) => (
+                          <LayerItem
+                            key={item.key}
+                            iconKey={item.key}
+                            label={item.label}
+                            active={Boolean(layers[item.key])}
+                            onToggle={() => toggleLayer(item.key)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              );
+            })}
+
+            <section className="space-y-1.5 pt-2">
+              <h3 className="hf-label flex items-center gap-2 px-1.5 text-[10px] font-semibold text-[#c2b283]">
+                <span className="text-[9px] leading-none text-[#c9a24a]">◆</span>
+                Bölge Filtresi
+              </h3>
+              <div className="grid grid-cols-2 gap-1 pb-1">
                 {REGIONS.map((reg) => {
                   const isOn = selectedRegion === reg;
                   return (
                     <button
                       key={reg}
                       onClick={() => setSelectedRegion(reg)}
-                      className={`truncate rounded-lg border px-2 py-1.5 text-left text-[10px] transition-colors ${
+                      className={`truncate rounded-md border px-2 py-1.5 text-left text-[10px] transition-colors ${
                         isOn
                           ? 'border-[#c9a24a]/70 bg-[#c9a24a]/15 font-semibold text-[#f0dba8]'
-                          : 'border-transparent text-[#c9b273] hover:bg-[#c9a24a]/8 hover:text-[#e6d3a4]'
+                          : 'border-[#c9a24a]/15 text-[#c2b283] hover:border-[#c9a24a]/35 hover:text-[#e6d3a4]'
                       }`}
                     >
                       {reg}
@@ -363,30 +430,47 @@ export default function LayerSidebar() {
 }
 
 function LayerItem({
+  iconKey,
   label,
   active,
   onToggle,
 }: {
+  iconKey: string;
   label: string;
   active: boolean;
   onToggle: () => void;
 }) {
+  const Icon = LAYER_ICONS[iconKey];
   return (
     <button
       onClick={onToggle}
-      className={`group flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-lg border border-l-2 px-2 py-1.5 text-left transition-colors ${
+      aria-pressed={active}
+      className={`group flex w-full cursor-pointer select-none items-center gap-2 rounded-md border px-2 py-1.5 text-left transition-colors ${
         active
-          ? 'border-transparent border-l-[#c9a24a] bg-[#c9a24a]/10 text-[#f5ecd4]'
-          : 'border-transparent border-l-transparent text-[#c9b273] hover:bg-white/[0.03] hover:text-[#e6d3a4]'
+          ? 'border-[#c9a24a]/35 bg-[#c9a24a]/10 text-[#f5ecd4]'
+          : 'border-transparent text-[#c2b283] hover:border-[#c9a24a]/18 hover:bg-[#c9a24a]/6 hover:text-[#e6d3a4]'
       }`}
     >
-      <span className="truncate whitespace-nowrap text-[11px] font-medium">
+      <span
+        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors ${
+          active
+            ? 'border-[#c9a24a]/55 bg-[#c9a24a]/18 text-[#e6c784]'
+            : 'border-[#c9a24a]/18 text-[#9d9068] group-hover:border-[#c9a24a]/35 group-hover:text-[#c2b283]'
+        }`}
+        aria-hidden="true"
+      >
+        {Icon ? <Icon className="h-3.5 w-3.5" /> : <span className="h-1 w-1 rounded-full bg-current" />}
+      </span>
+
+      <span className="flex-1 truncate whitespace-nowrap text-[11px] font-medium">
         {label}
       </span>
+
       <span
         className={`shrink-0 transition-colors ${
-          active ? 'text-[#dcc07d]' : 'text-[#6e6647] group-hover:text-[#b5a06a]'
+          active ? 'text-[#dcc07d]' : 'text-[#5f5940] group-hover:text-[#b5a06a]'
         }`}
+        aria-hidden="true"
       >
         {active ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
       </span>
