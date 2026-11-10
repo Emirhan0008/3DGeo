@@ -11,7 +11,6 @@ import {
   BarChart3,
   Bot,
   Search,
-  Layers,
   Maximize2,
   Minimize2,
   Swords,
@@ -93,35 +92,35 @@ export default function Navbar() {
   /* ---------------------------------------------------------------- */
 
   const brandMark = (
-    <div className="flex items-center gap-2 shrink-0">
+    <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      {/* The compass medallion IS the logo and the layer toggle. A separate
+          layers button sat next to it and cost 40px of bar width on phones
+          without adding a capability — the sidebar spine opens the same
+          plate, so the two are merged here. */}
       <button
         onClick={toggleSidebar}
         title="Harita katmanlarını aç / kapat"
-        className="relative grid h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/35 bg-[#141709] text-[#c9a24a] transition-colors hover:border-[#c9a24a]/70 hover:text-[#e6c784] active:scale-95"
+        aria-label="Harita katmanlarını aç / kapat"
+        className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#c9a24a]/45 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)] text-[#c9a24a] shadow-[inset_0_1px_0_rgba(255,255,255,.08),0_4px_12px_-6px_rgba(0,0,0,.9)] transition-colors hover:border-[#c9a24a]/75 active:scale-95 sm:h-10 sm:w-10"
       >
-        <Layers className="h-3.5 w-3.5" />
+        <CompassRose className="h-7 w-7 sm:h-8 sm:w-8" />
+        <span className="pointer-events-none absolute inset-[3px] rounded-full border border-[#c9a24a]/20" />
         {activeLayersCount > 0 && (
-          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full border border-[#0f1209] bg-[#c9a24a] px-1 text-[9px] font-bold text-[#221b0c]">
+          <span className="absolute -right-0.5 -top-0.5 grid h-3.5 min-w-3.5 place-items-center rounded-full border border-[#0f1209] bg-[#c9a24a] px-0.5 text-[8px] font-bold text-[#221b0c]">
             {activeLayersCount}
           </span>
         )}
       </button>
 
       <div
-        className="flex cursor-pointer items-center gap-2"
+        className="hidden cursor-pointer leading-none sm:block"
         onClick={() => handleTabChange('map')}
       >
-        <div className="relative grid h-10 w-10 place-items-center rounded-full border border-[#c9a24a]/45 bg-[radial-gradient(circle_at_32%_26%,#2b3118,#0f1209_78%)] shadow-[inset_0_1px_0_rgba(255,255,255,.08),0_4px_12px_-6px_rgba(0,0,0,.9)]">
-          <CompassRose className="h-8 w-8" />
-          <span className="pointer-events-none absolute inset-[3px] rounded-full border border-[#c9a24a]/20" />
+        <div className="hf-serif text-[14px] font-semibold tracking-[0.18em] text-[#f4ebd4]">
+          COĞRAFYA <span className="text-[#d9b45f]">3D</span>
         </div>
-        <div className="hidden leading-none sm:block">
-          <div className="hf-serif text-[14px] font-semibold tracking-[0.18em] text-[#f4ebd4]">
-            COĞRAFYA <span className="text-[#d9b45f]">3D</span>
-          </div>
-          <div className="mt-1.5 text-[8.5px] uppercase tracking-[0.24em] text-[#b5a06a]">
-            Keşfet · Anla · Pekiştir
-          </div>
+        <div className="mt-1.5 text-[8.5px] uppercase tracking-[0.24em] text-[#b5a06a]">
+          Keşfet · Anla · Pekiştir
         </div>
       </div>
     </div>
@@ -136,7 +135,7 @@ export default function Navbar() {
         title={t.label}
         className={`group relative flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border transition-all duration-150 ${
           compact
-            ? 'px-1 py-0.5 text-[9.5px] sm:px-2 sm:py-1 sm:text-[10px]'
+            ? 'flex-1 justify-center px-1 py-1 text-[10px] sm:flex-none sm:px-2 sm:py-1'
             : 'px-2.5 py-1.5 text-[12px]'
         } ${
           isActive
@@ -146,7 +145,7 @@ export default function Navbar() {
       >
         <t.Icon
           className={`shrink-0 ${
-            compact ? 'h-3 w-3' : 'h-3.5 w-3.5'
+            compact ? 'hidden h-3 w-3 sm:block' : 'h-3.5 w-3.5'
           } ${
             isActive ? 'text-[#7a5c17]' : 'text-[#c9a24a] group-hover:text-[#dcc07d]'
           }`}
@@ -170,7 +169,7 @@ export default function Navbar() {
               {i > 0 && (
                 <span
                   aria-hidden="true"
-                  className="mx-1 flex h-4 shrink-0 items-center gap-1"
+                  className="mx-1 hidden h-4 shrink-0 items-center gap-1 2xl:flex"
                 >
                   <span className="h-3 w-px bg-gradient-to-b from-transparent via-[#c9a24a]/25 to-transparent" />
                   <span className="text-[6px] leading-none text-[#c9a24a]/45">◆</span>
@@ -184,7 +183,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-1 shrink-0 sm:gap-1.5">
           {/* Ornament: armillary sphere medallion */}
-          <ArmillarySphere className="hidden h-8 w-8 shrink-0 opacity-50 xl:block" />
+          <ArmillarySphere className="hidden h-8 w-8 shrink-0 opacity-50 2xl:block" />
 
           {/* Leaderboard */}
           <button
@@ -193,7 +192,7 @@ export default function Navbar() {
             className="flex items-center gap-1.5 rounded-full border border-[#c9a24a]/35 px-2 py-1 text-[11px] font-semibold text-[#dcc07d] transition-colors hover:border-[#c9a24a]/75 hover:bg-[#c9a24a]/10 hover:text-[#f3e4bd]"
           >
             <Trophy className="h-3.5 w-3.5" />
-            <span className="hidden lg:inline">Sıralama</span>
+            <span className="hidden xl:inline">Sıralama</span>
           </button>
 
           {/* Search — hidden on phones: the tab rail below already gives the
@@ -211,7 +210,7 @@ export default function Navbar() {
                 onFocus={() => setShowSearchResults(true)}
                 onBlur={() => window.setTimeout(() => setShowSearchResults(false), 140)}
                 placeholder="Ara..."
-                className="hf-serif w-20 rounded-full border border-[#c9a24a]/25 bg-[#0c0f08]/80 py-1 pl-7 pr-2 text-[11px] tracking-wide text-[#f5ecd4] placeholder:text-[#7c7660] focus:border-[#c9a24a]/70 focus:outline-none sm:w-32 sm:pl-8 sm:pr-3 lg:w-44"
+                className="hf-serif w-20 rounded-full border border-[#c9a24a]/25 bg-[#0c0f08]/80 py-1 pl-7 pr-2 text-[11px] tracking-wide text-[#f5ecd4] placeholder:text-[#7c7660] focus:border-[#c9a24a]/70 focus:outline-none sm:w-28 sm:pl-8 sm:pr-3 xl:w-36 2xl:w-44"
               />
             </div>
 
@@ -250,7 +249,7 @@ export default function Navbar() {
             ) : (
               <Maximize2 className="h-3.5 w-3.5" />
             )}
-            <span className="hidden lg:inline">
+            <span className="hidden 2xl:inline">
               {isFullscreen ? 'Çık' : 'Tam Ekran'}
             </span>
           </button>
@@ -277,14 +276,14 @@ export default function Navbar() {
             }`}
           >
             <Bot className="h-3.5 w-3.5" />
-            <span className="hidden xl:inline">AI Asistan</span>
+            <span className="hidden 2xl:inline">AI Asistan</span>
           </button>
         </div>
       </div>
 
       {/* ---------- mobile tab rail ---------- */}
       <div className="hf-rule mt-1 flex lg:hidden sm:mt-1.5" />
-      <div className="hf-scroll mt-0.5 flex w-full items-center justify-between gap-0.5 overflow-x-auto pb-0.5 sm:mt-1 sm:gap-1 lg:hidden">
+      <div className="hf-scroll mt-0.5 flex w-full items-center gap-0 overflow-x-auto pb-0.5 sm:mt-1 sm:gap-1 lg:hidden">
         {TABS.map((t, i) => (
           <Fragment key={t.tab}>
             {i > 0 && (
@@ -326,7 +325,7 @@ export default function Navbar() {
   // Standard top bar
   return (
     <>
-      <header className="hf-nav relative z-30 w-full select-none px-2 py-1.5 text-[#f5ecd4] sm:px-3 sm:py-2">
+      <header className="hf-nav relative z-30 w-full select-none px-1.5 py-1.5 text-[#f5ecd4] sm:px-3 sm:py-2">
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/45 to-transparent" />
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/25 to-transparent" />
         {renderNavbarContent()}

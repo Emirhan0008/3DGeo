@@ -93,9 +93,13 @@ Tema **token seviyesinde** uygulanır (`@theme` bloğu), bileşenler tek tek boy
 
 Değiştirirken `AppFrame`'deki sabit değil **yalnızca** `--hf-band` güncellenir.
 
-> **Köşe sahipliği kuralı:** sol alt köşeyi `corner-emblem.png` sahiplenir. Bu yüzden MapLibre ölçek çubuğu (`bottom-left`) masaüstünde `left: 9rem`, mobilde `bottom: 4.25rem` ile kaydırılır — aksi halde "200 km" etiketi kürenin altında kalır.
+> **Köşe sahipliği kuralı:** sol alt köşe **tamamen** `corner-emblem.png`'e aittir. Bu yüzden `maplibregl.ScaleControl` **hiç kaydedilmez** — "200 km" etiketi küreyle yer kavgasına giriyordu ve kullanıcı istemedi. Amblem `translate-y-[9%]` (mobil) / `[8%]` (lg) ile yalnızca hafifçe alt kenardan taşar; daha fazla itmek kürenin ayağını çerçevenin altına gömüyor (ölçülmüş: %16'da ayak kayboluyordu). Yeni bir sol alt kontrol eklenirse amblemle çakışma test edilmelidir.
+
+> **Kompakt kabuk kuralı:** mobilde sidebar omurgaları çerçeveye **sıfır boşlukla** yapışır (`bottom/left/top: 0`, `rounded-r-xl`), dış boşluk yalnız `sm` üstünde geri gelir. Mobilde katman omurgası 24px, AI şeridi 20px — her piksel haritanın. `main` 390×844'te 378×749.
 
 > **Hover bölgesi kuralı:** sol kenardan sidebar açan tetik alanı `fixed` olmak **zorunda**. `main` `overflow-hidden` olduğu için `absolute` bir tetik alanı kırpılır ve hiç pointer olayı almaz (ölçülmüş hata — hover "çalışmıyor" sanıldı).
+
+> **Navbar genişlik bütçesi:** masaüstünde yedi ayrı unsur (`brandMark` + 6 sekme + ayraçlar + arama + 5 buton) 1024px'e sığmıyordu; 1280px'te **201px**, 1440px'te 41px taşma ölçüldü. Kural: arama kutusu `sm:w-28 / xl:w-36 / 2xl:w-44`, "Sıralama" ve küre süslemesi `xl`, sekme ayraçları + "Tam Ekran" + "AI Asistan" yazıları `2xl`. Yeni bir buton eklemeden önce 1280px'te ölçülür.
 
 ---
 

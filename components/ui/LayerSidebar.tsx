@@ -176,7 +176,7 @@ export default function LayerSidebar() {
         aria-hidden="true"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="fixed bottom-0 left-0 top-0 z-20 w-2 sm:w-3"
+        className="fixed bottom-0 left-0 top-0 z-20 w-1.5 sm:w-3"
       />
 
       <aside
@@ -184,12 +184,12 @@ export default function LayerSidebar() {
         aria-label="Harita katmanları"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`hf-plaque hf-double-rule absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#f5ecd4] transition-all duration-300 ease-in-out ${
+        className={`hf-plaque hf-double-rule absolute bottom-0 left-0 top-0 flex flex-col overflow-hidden rounded-r-xl text-[#f5ecd4] transition-all duration-300 ease-in-out sm:bottom-2 sm:left-2 sm:top-2 sm:rounded-2xl ${
           isExpanded ? 'z-45' : 'z-20'
         } ${
           isExpanded
             ? 'w-[85vw] max-w-xs opacity-100 sm:w-[290px]'
-            : 'w-7 opacity-100 sm:w-9'
+            : 'w-6 opacity-100 sm:w-9'
         }`}
       >
         {!isExpanded ? (
@@ -207,12 +207,12 @@ export default function LayerSidebar() {
             className="flex h-full w-full cursor-pointer touch-manipulation select-none flex-col items-center justify-between py-2 transition-colors hover:bg-[#c9a24a]/10"
           >
             {/* top ornament */}
-            <div className="pointer-events-none flex flex-col items-center gap-1">
-              <span className="text-[9px] leading-none text-[#c9a24a]/80">◆</span>
-              <div className="relative grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/55 bg-[#c9a24a]/15 text-[#dcc07d] shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">
-                <Layers className="h-3.5 w-3.5" />
+            <div className="pointer-events-none flex flex-col items-center gap-0.5 sm:gap-1">
+              <span className="text-[7px] leading-none text-[#c9a24a]/80 sm:text-[9px]">◆</span>
+              <div className="relative grid h-5 w-5 place-items-center rounded-full border border-[#c9a24a]/55 bg-[#c9a24a]/15 text-[#dcc07d] shadow-[inset_0_1px_0_rgba(255,255,255,.08)] sm:h-7 sm:w-7">
+                <Layers className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
                 {activeLayersCount > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-3.5 min-w-3.5 place-items-center rounded-full bg-[#c9a24a] px-0.5 text-[8px] font-bold text-[#221b0c]">
+                  <span className="absolute -right-1 -top-1 grid h-3 min-w-3 place-items-center rounded-full bg-[#c9a24a] px-0.5 text-[7px] font-bold text-[#221b0c] sm:h-3.5 sm:min-w-3.5 sm:text-[8px]">
                     {activeLayersCount}
                   </span>
                 )}
@@ -221,14 +221,14 @@ export default function LayerSidebar() {
 
             {/* vertical label — the discovery cue of the collapsed plate */}
             <div className="pointer-events-none my-1 flex flex-1 items-center justify-center overflow-hidden">
-              <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[10px] font-semibold tracking-[0.22em] text-[#e2cd97]">
+              <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[8px] font-semibold tracking-[0.12em] text-[#e2cd97] sm:text-[10px] sm:tracking-[0.22em]">
                 Katmanlar{activeLayersCount > 0 ? ` · ${activeLayersCount}` : ''}
               </span>
             </div>
 
-            <div className="pointer-events-none flex flex-col items-center gap-1">
-              <ChevronRight className="h-3.5 w-3.5 text-[#dcc07d]" />
-              <CompassRose className="h-7 w-7 opacity-60" />
+            <div className="pointer-events-none flex flex-col items-center gap-0.5 sm:gap-1">
+              <ChevronRight className="h-3 w-3 text-[#dcc07d] sm:h-3.5 sm:w-3.5" />
+              <CompassRose className="h-4 w-4 opacity-60 sm:h-7 sm:w-7" />
               <button
                 onClick={(e) => {
                   e.stopPropagation();

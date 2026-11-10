@@ -4,6 +4,44 @@
 
 ---
 
+## 📅 [2026-11-10] - Kompakt Mobil Kabuk, Pusula Logosu ve Ölçek Çubuğunun Kaldırılması
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: (1) Mobilde kapalı sidebar'lar daha da daralsın, (2) sidebar ile dış çerçeve arasında boşluk kalmasın, (3) sol alttaki "km" ölçek yazısı kaldırılsın, (4) navbar altındaki katman/HUD menüsü daha kompakt olsun, (5) navbar taşmasın, (6) logo pusula olsun, (7) küre+parşömen biraz yukarı çıksın.
+
+### Yapılanlar
+
+1. **Kapalı omurgalar daraldı** — katman sidebar'ı `w-7` → **`w-6`** (24px), AI şeridi `w-6` → **`w-5`** (20px). Hover tetik alanı da `w-2` → `w-1.5`.
+2. **Omurga çerçeveye yapıştı** — mobilde `bottom/left/top: 0` ve `rounded-r-xl`; dış boşluk yalnız `sm` üstünde geri geliyor (`sm:bottom-2 sm:left-2 sm:top-2 sm:rounded-2xl`). AI şeridi aynı mantıkla `rounded-l-xl` ve `sm:` ile boşluk alıyor.
+3. **Ölçek çubuğu kaldırıldı** — `maplibregl.ScaleControl` hiç kaydedilmiyor; sol alt köşe artık tamamen küre amblemine ait. Boşta kalan `.maplibregl-ctrl-bottom-left` konumlandırması ve medya sorguları CSS'ten silindi.
+4. **HUD kompaktlaştı** — pil `left-12` → **`left-7`** (daralan omurgaya göre), iç boşluk `p-1` → `p-0.5`, ikon daireleri `h-6` → `h-5`, yazı `11px` → `10px`; hepsi `sm:` ile masaüstü ölçüsüne dönüyor. Pil yüksekliği mobilde 44 → **36px**.
+5. **Navbar taşması** — iki ayrı yuvarlak (katman butonu + pusula madalyonu) **tek pusula düğmesinde birleşti**; katman sayacı artık onun köşesinde. Böylece 40px kazanıldı ve logo istendiği gibi pusula oldu. Sekme rayında mobilde ikonlar gizlenip etiketler `flex-1` ile eşit dağılıyor; `◆` ayraçları yalnız `sm` üstünde.
+6. **Masaüstü taşması (ölçülmüş, önceden fark edilmemiş)** — 1280px'te sağ grup satırı **201px** aşıyordu, 1440px'te 41px. Kırılım noktaları gerçek genişliklere göre yeniden dağıtıldı: sekme ayraçları ve "Tam Ekran"/"AI Asistan" yazıları `2xl`, "Sıralama" ve küre süslemesi `xl`, arama `sm:w-28 → xl:w-36 → 2xl:w-44`. 1280px'te içerik 1122/1232, 1440px'te 1122/1392 — taşma **0**.
+7. **Amblem yukarı alındı** — `translate-y` `20%`/`16%` → **`16%`/`12%`**; önceki değer kürenin kendi ayağını çerçevenin altına gömüyordu.
+
+### Doğrulama (Playwright, ölçülmüş)
+| Ekran | Header | Navbar taşması | Katman omurgası | AI şeridi | HUD |
+|---|---|---|---|---|---|
+| 320×700 | 83px | 0 | 24px | 20px | 36px |
+| 360×740 | 83px | 0 | 24px | 20px | 36px |
+| 390×844 | 83px | 0 | 24px | 20px | 36px |
+| 768×1024 | 95px | 0 | 36px | 36px | 48px |
+| 1280 | — | 0 (1122/1232) | 36px | 36px | 48px |
+| 1440×900 | 57px | 0 (1122/1392) | 36px | 36px | 48px |
+
+- `.maplibregl-ctrl-scale` DOM'da **yok** (ölçek çubuğu kaldırıldı).
+- `npx tsc --noEmit` temiz, `npx next lint` → "No ESLint warnings or errors".
+
+### Etkilenen Dosyalar
+- `components/ui/Navbar.tsx` — birleşik pusula logosu, kompakt sekme rayı, kırılım noktaları
+- `components/ui/LayerSidebar.tsx` — `w-6` omurga, çerçeveye yapışma, küçük rozet/etiket
+- `components/ai/AITutorDrawer.tsx` — `w-5` şerit, çerçeveye yapışma, küçük ikonlar
+- `components/map/MapContainer.tsx` — `ScaleControl` kaldırıldı, HUD `left-7` + kompakt ölçüler
+- `components/ui/AppFrame.tsx` — amblem `translate-y-[16%] sm:translate-y-[12%]`
+- `app/globals.css` — `.maplibregl-ctrl-bottom-left` kuralları silindi
+
+---
+
 ## 📅 [2026-11-10] - Mobil Responsive Onarımı, Amblem Hizası ve Sidebar Hover'ın Geri Gelmesi
 
 - **Geliştirici**: AI Agent (OpenCode)

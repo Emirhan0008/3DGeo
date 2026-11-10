@@ -18,7 +18,8 @@
 - [x] **Antik Atlas Teması (Referans Birebir)**: `AppFrame` ile ahşap-parşömen ekran çerçevesi (4 doku şeridi + altın hairline + köşe perçinleri + sol alt küre amblemi), ▲ akordeon katman sidebar'ı (`inert` ile erişilebilir), 18 gravür katman ikonu (`LayerIcons`), krem plakalı AI öğretmen paneli, `◆` ayraçlı navbar. Assetler `sharp` ile optimize edildi (toplam ~1.1 MB tasarruf).
 - [x] **SEO Tek Kaynak Refaktörü**: `lib/seo.ts` (`buildPageMetadata` + WebApplication/Organization/FAQ/Breadcrumb JSON-LD üreticileri), `layout.tsx` metadata artık buradan beslenir, `@graph` JSON-LD, `robots.ts`'e `host` alanı ve 4 AI crawler kuralı, `sitemap.ts` 8 route.
 - [x] **Mobil Responsive Onarımı**: Çerçeve bandı `--hf-band` değişkenine taşındı (mobil 6px / `sm`+ 12px), sidebar omurgası `w-7 sm:w-9`, AI şeridi `w-6 sm:w-9`, navbar'da arama + geri bildirim mobilde gizlendi, sekme etiketleri kısaltıldı. Harita alanı 360px'te 336×621 → **348×646**, 390px'te 366×725 → **378×750**; yatay taşma 0.
-- [x] **Sidebar Hover & Dikey Şerit**: Sol kenara `fixed` 12px hover bölgesi (`absolute` iken `overflow-hidden` kırpıyordu), kapalı omurgada dikey "KATMANLAR" etiketi 10px/kalın/parlak, küre+parşömen amblemi `translate-y-[20%]` ile aşağı alındı, ölçek çubuğu amblemle çakışmayacak şekilde kaydırıldı.
+- [x] **Sidebar Hover & Dikey Şerit**: Sol kenara `fixed` 12px hover bölgesi (`absolute` iken `overflow-hidden` kırpıyordu), kapalı omurgada dikey "KATMANLAR" etiketi 10px/kalın/parlak, küre+parşömen amblemi aşağı alındı.
+- [x] **Kompakt Mobil Kabuk**: Mobilde omurgalar 24px/20px ve çerçeveye sıfır boşlukla yapışık (`rounded-r-xl` / `rounded-l-xl`), HUD pili `left-7` + 36px yüksekliğe indi, `ScaleControl` tamamen kaldırıldı (sol alt köşe küre amblemine ait), navbar'da katman butonu + pusula madalyonu tek **pusula logosunda** birleşti, sekme ikonları mobilde gizlenip etiketler eşit dağıldı. Masaüstü taşması da düzeltildi (1280px'te 201px → 0).
 
 ---
 

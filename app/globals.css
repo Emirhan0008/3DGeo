@@ -659,28 +659,8 @@ body.app-pseudo-fullscreen {
   z-index: 25 !important;
 }
 
-.maplibregl-ctrl-bottom-left {
-  bottom: 1.5rem !important;
-  left: 1.5rem !important;
-  z-index: 25 !important;
-}
-
-/* The armillary emblem owns the bottom-left corner from `md` up — keep the
-   scale rule to its right so the sphere never covers the numbers. */
-@media (min-width: 768px) {
-  .maplibregl-ctrl-bottom-left {
-    left: 9rem !important;
-  }
-}
-
-/* On phones the emblem is a tall crop of the same corner, so the rule lifts
-   above the sphere instead of sliding sideways off-screen. */
-@media (max-width: 767px) {
-  .maplibregl-ctrl-bottom-left {
-    bottom: 4.25rem !important;
-    left: 2.5rem !important;
-  }
-}
+/* No ScaleControl is registered: the bottom-left corner belongs to the
+   armillary emblem, and a "200 km" tag there only fought it for space. */
 
 /* Merge the two right-hand control groups into one plaque */
 .maplibregl-ctrl-bottom-right .maplibregl-ctrl {
@@ -728,7 +708,8 @@ body.app-pseudo-fullscreen {
   opacity: 0.85 !important;
 }
 
-/* Scale bar — brass rule on a parchment tag */
+/* Scale bar — dead since the ScaleControl was removed; kept in case a future
+   screen wants the brass tag back at a different corner. */
 .maplibregl-ctrl-scale {
   background-color: rgba(247, 238, 214, 0.92) !important;
   border: 1px solid rgba(90, 70, 24, 0.55) !important;

@@ -112,7 +112,7 @@ export default function AITutorDrawer() {
  <aside
  onMouseEnter={handleMouseEnter}
  onMouseLeave={handleMouseLeave}
- className={`hf-plaque hf-double-rule absolute right-1 top-1 bottom-1 flex max-h-full flex-col overflow-hidden rounded-xl text-[#f7f2e3] transition-all duration-300 ease-in-out sm:right-2 sm:top-2 sm:bottom-2 sm:rounded-2xl h-[calc(100%-0.5rem)] sm:h-[calc(100%-1rem)] ${
+ className={`hf-plaque hf-double-rule absolute right-0 top-0 bottom-0 flex max-h-full flex-col overflow-hidden rounded-l-xl text-[#f7f2e3] transition-all duration-300 ease-in-out sm:right-2 sm:top-2 sm:bottom-2 sm:rounded-2xl sm:h-[calc(100%-1rem)] ${
  isExpanded ? 'z-45' : 'z-20'
  } ${
  isExpanded
@@ -120,8 +120,8 @@ export default function AITutorDrawer() {
  ? 'w-[85vw] max-w-sm sm:w-96 bg-[#0d1614]/95 opacity-100'
  : 'w-[85vw] max-w-sm sm:w-96 bg-[#0d1614]/88 opacity-85 hover:opacity-100'
  : isHovered
- ? 'w-6 sm:w-9 bg-[#0d1614]/95 opacity-100'
- : 'w-6 sm:w-9 bg-[#0d1614]/80 opacity-80 hover:opacity-100'
+ ? 'w-5 sm:w-9 bg-[#0d1614]/95 opacity-100'
+ : 'w-5 sm:w-9 bg-[#0d1614]/80 opacity-80 hover:opacity-100'
  }`}
 >
  {/* Collapsed Strip State */}
@@ -139,21 +139,21 @@ export default function AITutorDrawer() {
  className="w-full h-full flex flex-col items-center justify-between py-2 sm:py-3 cursor-pointer hover:bg-white/5 active:bg-white/10 transition-all select-none touch-manipulation"
 >
  <div className="flex flex-col items-center gap-1.5 pointer-events-none">
- <div className="p-1 sm:p-1.5 rounded-lg border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]">
- <Bot className="h-3.5 w-3.5 text-[#dcc07d] sm:h-4 sm:w-4" />
+ <div className="rounded-md border border-[#c9a24a]/40 bg-[#c9a24a]/12 p-0.5 text-[#dcc07d] sm:rounded-lg sm:p-1.5">
+ <Bot className="h-3 w-3 text-[#dcc07d] sm:h-4 sm:w-4" />
  </div>
  <div className="p-0.5 rounded-full bg-[#c9a24a]/10 text-[#c9a24a] text-[8px]">
- <Sparkles className="w-2.5 h-2.5" />
+ <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
  </div>
  </div>
 
  <div className="flex-1 flex items-center justify-center my-1 overflow-hidden select-none pointer-events-none">
- <span className="[writing-mode:vertical-rl] rotate-180 hf-label text-[8px] sm:text-[9px] font-semibold text-[#cdb878] hover:text-[#f2e8cf] transition-colors whitespace-nowrap max-h-36 overflow-hidden">AI EĞİTMEN
+ <span className="[writing-mode:vertical-rl] rotate-180 hf-label text-[7.5px] sm:text-[9px] font-semibold tracking-[0.1em] text-[#cdb878] hover:text-[#f2e8cf] transition-colors whitespace-nowrap max-h-36 overflow-hidden sm:tracking-normal">AI EĞİTMEN
  </span>
  </div>
 
  <div className="flex flex-col items-center gap-1 pointer-events-none">
- <ChevronLeft className="w-3 h-3 animate-bounce text-[#c9a24a]" />
+ <ChevronLeft className="w-2.5 h-2.5 sm:w-3 sm:h-3 animate-bounce text-[#c9a24a]" />
  <button
  onClick={(e) => {
  e.stopPropagation();

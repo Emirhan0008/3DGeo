@@ -104,14 +104,14 @@ export default function AppFrame() {
       ))}
 
       {/* ---- bottom-left armillary + scroll emblem ----
-          Nudged below the viewport edge so the sphere reads as a corner
-          vignette instead of a sticker floating over the map. Smaller on
-          phones, where it would otherwise sit on the scale bar. */}
+          Nudged just below the viewport edge so the sphere reads as a corner
+          vignette instead of a sticker floating over the map — but only a
+          little, or the sphere's own stand gets swallowed by the frame. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/assets/theme/corner-emblem.png"
         alt=""
-        className="absolute bottom-0 left-0 w-[190px] max-w-[46vw] translate-y-[20%] opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,.75)] sm:w-[330px] sm:translate-y-[16%] lg:w-[390px]"
+        className="absolute bottom-0 left-0 w-[190px] max-w-[46vw] translate-y-[9%] opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,.75)] sm:w-[330px] sm:translate-y-[9%] lg:w-[390px] lg:translate-y-[8%]"
         draggable={false}
       />
     </div>
