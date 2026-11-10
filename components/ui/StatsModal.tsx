@@ -178,9 +178,11 @@ export default function StatsModal() {
  size="md"
  />
  <div className="min-w-0">
- <h2 className="font-black text-xs sm:text-base text-white tracking-wide truncate">AKILLI KPSS COĞRAFYA TEŞHİS &amp; ANALİZ PANOSU
+ <h2 className="truncate font-black text-xs text-white tracking-wide sm:text-base">
+ <span className="sm:hidden">KPSS Analiz Panosu</span>
+ <span className="hidden sm:inline">AKILLI KPSS COĞRAFYA TEŞHİS &amp; ANALİZ PANOSU</span>
  </h2>
- <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium truncate">Soru, harita ve 1v1 canlı düello testlerinizden elde edilen kişisel gelişim verileri
+ <p className="hidden truncate text-[10px] font-medium text-slate-400 sm:block">Soru, harita ve 1v1 canlı düello testlerinizden elde edilen kişisel gelişim verileri
  </p>
  </div>
  </div>
@@ -205,53 +207,57 @@ export default function StatsModal() {
  </div>
 
  {/* Sub Navigation Tabs inside Analytics */}
- <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 mb-3 overflow-x-auto text-xs">
+ <div className="mb-3 flex items-center gap-0.5 overflow-hidden rounded-xl border border-white/10 bg-white/5 p-0.5 text-xs sm:gap-1 sm:p-1">
  <button
  onClick={() => setActiveSubTab('overview')}
- className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+ className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg px-1 py-1.5 font-extrabold transition-all sm:gap-0.5 sm:px-1.5 ${
  activeSubTab === 'overview'
  ? 'bg-indigo-600 text-white shadow-md'
  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
  }`}
 >
- <BarChart3 className="w-3.5 h-3.5" />
- <span>Genel Görünüm</span>
+ <BarChart3 className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
+ <span className="hidden truncate sm:inline">Genel Görünüm</span>
+ <span className="truncate sm:hidden">Genel</span>
  </button>
 
  <button
  onClick={() => setActiveSubTab('duel_stats')}
- className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+ className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg px-1 py-1.5 font-extrabold transition-all sm:gap-0.5 sm:px-1.5 ${
  activeSubTab === 'duel_stats'
  ? 'bg-rose-600 text-white shadow-md'
  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
  }`}
 >
- <Swords className="w-3.5 h-3.5 text-rose-300" />
- <span>1v1 Düello Karnesi</span>
+ <Swords className="h-3 w-3 shrink-0 text-rose-300 sm:h-3.5 sm:w-3.5" />
+ <span className="hidden truncate sm:inline">Düello Karnesi</span>
+ <span className="truncate sm:hidden">Düello</span>
  </button>
 
  <button
  onClick={() => setActiveSubTab('regions')}
- className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+ className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg px-1 py-1.5 font-extrabold transition-all sm:gap-0.5 sm:px-1.5 ${
  activeSubTab === 'regions'
  ? 'bg-indigo-600 text-white shadow-md'
  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
  }`}
 >
- <Layers className="w-3.5 h-3.5" />
- <span>Bölge &amp; Konu</span>
+ <Layers className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
+ <span className="hidden truncate sm:inline">Bölge &amp; Konu</span>
+ <span className="truncate sm:hidden">Bölge</span>
  </button>
 
  <button
  onClick={() => setActiveSubTab('weakspots')}
- className={`flex-1 py-1.5 px-2.5 rounded-lg font-extrabold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+ className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg px-1 py-1.5 font-extrabold transition-all sm:gap-0.5 sm:px-1.5 ${
  activeSubTab === 'weakspots'
  ? 'bg-amber-600 text-white shadow-md'
  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
  }`}
 >
- <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
- <span>Hata Defteri ({totalMissedCount})</span>
+ <AlertTriangle className="h-3 w-3 shrink-0 text-amber-300 sm:h-3.5 sm:w-3.5" />
+ <span className="hidden truncate sm:inline">Hata Defteri ({totalMissedCount})</span>
+ <span className="truncate sm:hidden">Hata</span>
  </button>
 
  <button
@@ -262,14 +268,15 @@ export default function StatsModal() {
  setActiveSubTab('ai_report');
  }
  }}
- className={`flex-1 py-1.5 px-2.5 rounded-lg font-black transition-all whitespace-nowrap flex items-center justify-center gap-1.5 border ${
+ className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg border px-1 py-1.5 font-black transition-all sm:gap-0.5 sm:px-1.5 ${
  activeSubTab === 'ai_report'
  ? 'bg-amber-500 text-slate-950 border-amber-300 font-extrabold shadow-md'
  : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
  }`}
 >
- <Sparkles className="w-3.5 h-3.5 text-amber-400" />
- <span>AI Teşhis</span>
+ <Sparkles className="h-3 w-3 shrink-0 text-amber-400 sm:h-3.5 sm:w-3.5" />
+ <span className="hidden truncate sm:inline">AI Teşhis</span>
+ <span className="truncate sm:hidden">AI</span>
  </button>
  </div>
 
@@ -821,7 +828,7 @@ export default function StatsModal() {
  </div>
 
  {/* Badge Category Filter Pills */}
- <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[11px]">
+ <div className="flex flex-wrap items-center gap-1 pb-1 text-[11px]">
  <button
  onClick={() => setBadgeFilter('all')}
  className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap ${
@@ -896,7 +903,7 @@ export default function StatsModal() {
 
  <div className="flex-1 min-w-0">
  <div className="flex items-center justify-between gap-1">
- <span className={`font-extrabold text-xs truncate ${isUnlocked ? 'text-amber-300' : 'text-slate-300'}`}>
+ <span className={`font-extrabold text-xs leading-tight line-clamp-2 ${isUnlocked ? 'text-amber-300' : 'text-slate-300'}`}>
  {badge.name}
  </span>
  {isUnlocked && (

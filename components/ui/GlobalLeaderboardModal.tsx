@@ -142,54 +142,60 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
 
         {/* Tab Selection & Privacy Toggle */}
         <div className="px-3.5 sm:px-4 pt-3 pb-2 flex flex-col md:flex-row items-center justify-between gap-2 border-b border-white/10 bg-black/40">
-          {/* Main 3 Requested Tabs */}
-          <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+          {/* Main tabs — four chips on a 390px phone ran 236px past the edge,
+              so the last one was unreachable. Mobile gets one short label per
+              chip in an equal flex row; `md` restores the descriptive copy. */}
+          <div className="flex w-full items-center gap-0.5 overflow-hidden rounded-xl md:w-auto md:items-center md:gap-2 md:overflow-visible">
             <button
               onClick={() => setActiveTab('total')}
-              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-xl border px-1.5 py-1.5 text-xs font-black transition-all md:flex-none md:gap-1.5 md:px-3 ${
                 activeTab === 'total' || activeTab === 'score'
                   ? 'hf-btn-brass border-[#c9a24a]/70'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
-              <Trophy className="w-3.5 h-3.5" />
-              <span>🏆 Toplam Skor</span>
+              <Trophy className="h-3 w-3 shrink-0 md:h-3.5 md:w-3.5" />
+              <span className="hidden truncate md:inline">🏆 Toplam Skor</span>
+              <span className="truncate md:hidden">Skor</span>
             </button>
 
             <button
               onClick={() => setActiveTab('kpss_test')}
-              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-xl border px-1.5 py-1.5 text-xs font-black transition-all md:flex-none md:gap-1.5 md:px-3 ${
                 activeTab === 'kpss_test'
                   ? 'border-[#6d9479]/60 bg-[#3c6d55]/25 text-[#c8d8cb]'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
-              <BookOpenCheck className="w-3.5 h-3.5" />
-              <span>📝 KPSS Testi</span>
+              <BookOpenCheck className="h-3 w-3 shrink-0 md:h-3.5 md:w-3.5" />
+              <span className="hidden truncate md:inline">📝 KPSS Testi</span>
+              <span className="truncate md:hidden">KPSS</span>
             </button>
 
             <button
               onClick={() => setActiveTab('duels')}
-              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-xl border px-1.5 py-1.5 text-xs font-black transition-all md:flex-none md:gap-1.5 md:px-3 ${
                 activeTab === 'duels'
                   ? 'hf-btn-brass border-[#c9a24a]/70'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
-              <Swords className="w-3.5 h-3.5" />
-              <span>⚔️ Harita Düelloları</span>
+              <Swords className="h-3 w-3 shrink-0 md:h-3.5 md:w-3.5" />
+              <span className="hidden truncate md:inline">⚔️ Harita Düelloları</span>
+              <span className="truncate md:hidden">Düello</span>
             </button>
 
             <button
               onClick={() => setActiveTab('streak')}
-              className={`py-1.5 px-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 border shrink-0 cursor-pointer ${
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-xl border px-1.5 py-1.5 text-xs font-black transition-all md:flex-none md:gap-1.5 md:px-2.5 ${
                 activeTab === 'streak'
                   ? 'border-[#bf7f66]/55 bg-[#9c5540]/25 text-[#eccfc2]'
                   : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
               }`}
             >
-              <Flame className="w-3.5 h-3.5" />
-              <span>🔥 Seri Zafer</span>
+              <Flame className="h-3 w-3 shrink-0 md:h-3.5 md:w-3.5" />
+              <span className="hidden truncate md:inline">🔥 Seri Zafer</span>
+              <span className="truncate md:hidden">Seri</span>
             </button>
           </div>
 
@@ -403,14 +409,14 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                 </div>
               ) : (
                 <div>
-                  <div className="text-xs sm:text-sm font-black text-amber-400 flex items-center justify-end gap-1">
+                  <div className="flex items-center justify-end gap-1 whitespace-nowrap text-xs font-black text-amber-400 sm:text-sm">
                     <span>{entry.rankingScore || entry.score}</span>
                     <span className="text-[9px] font-bold text-amber-300/80">güç</span>
                   </div>
-                  <div className="text-[9px] text-slate-300 flex items-center justify-end gap-1 font-semibold">
-                    <span>{entry.score} ham p</span>
+                  <div className="flex items-center justify-end gap-1 whitespace-nowrap text-[9px] font-semibold text-slate-300">
+                    <span>{entry.score}<span className="hidden sm:inline"> ham p</span></span>
                     {entry.totalDuels > 0 && (
-                      <span className="px-1 rounded bg-indigo-500/30 text-indigo-300 text-[8px] font-bold">
+                      <span className="rounded bg-indigo-500/30 px-1 text-[8px] font-bold text-indigo-300">
                         %{entry.winRatePct} WR
                       </span>
                     )}
@@ -432,7 +438,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                   }`}
                 >
                   {/* Rank & User Info (Col 5) */}
-                  <div className="col-span-5 sm:col-span-5 flex items-center gap-2 min-w-0">
+                  <div className="col-span-6 sm:col-span-5 flex items-center gap-1.5 min-w-0 sm:gap-2">
                     <div className="shrink-0">{rankBadge}</div>
 
                     <AvatarWithBadgeFrame
@@ -473,7 +479,7 @@ export default function GlobalLeaderboardModal({ isOpen, onClose }: GlobalLeader
                   </div>
 
                   {/* Score Column (Col 3 / sm:Col 2) */}
-                  <div className="col-span-3 sm:col-span-2 text-right">
+                  <div className="col-span-4 sm:col-span-2 text-right">
                     {entry.isUnranked ? (
                       <span className="text-xs font-bold text-slate-500">0 p</span>
                     ) : (

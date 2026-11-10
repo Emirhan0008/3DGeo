@@ -205,7 +205,7 @@ export default function PinGuessGame() {
         className="flex items-center justify-between border-b border-white/10 pb-1 mb-1 gap-1"
         title="Çift Tıklayarak Küçültebilirsiniz"
       >
-        <div className="flex items-center gap-1 overflow-x-auto shrink-0">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto scrollbar-none">
           <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-black text-[9px] sm:text-xs border border-indigo-400/40">
             KONUM {safeIndex + 1}/{filteredQuestions.length}
           </span>

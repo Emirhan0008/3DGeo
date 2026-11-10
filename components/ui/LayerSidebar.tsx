@@ -354,7 +354,7 @@ export default function LayerSidebar() {
                   <button
                     onClick={() => toggleSection(section.title)}
                     aria-expanded={isOpen}
-                    className={`group flex w-full items-center gap-2 px-1.5 py-2 text-left transition-colors ${
+                    className={`group flex w-full items-center gap-1.5 px-1.5 py-1.5 text-left transition-colors ${
                       isOpen ? 'text-[#e8d6a6]' : 'text-[#c2b283] hover:text-[#e8d6a6]'
                     }`}
                   >
@@ -458,14 +458,14 @@ function LayerItem({
     <button
       onClick={onToggle}
       aria-pressed={active}
-      className={`group flex w-full cursor-pointer select-none items-center gap-2 rounded-md border px-2 py-1.5 text-left transition-colors ${
+      className={`group flex w-full cursor-pointer select-none items-center gap-1.5 rounded-md border px-2 py-1 text-left transition-colors ${
         active
           ? 'border-[#c9a24a]/35 bg-[#c9a24a]/10 text-[#f5ecd4]'
           : 'border-transparent text-[#c2b283] hover:border-[#c9a24a]/18 hover:bg-[#c9a24a]/6 hover:text-[#e6d3a4]'
       }`}
     >
       <span
-        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors ${
+        className={`grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border transition-colors ${
           active
             ? 'border-[#c9a24a]/55 bg-[#c9a24a]/18 text-[#e6c784]'
             : 'border-[#c9a24a]/18 text-[#9d9068] group-hover:border-[#c9a24a]/35 group-hover:text-[#c2b283]'

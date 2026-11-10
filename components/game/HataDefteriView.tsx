@@ -111,7 +111,7 @@ export default function HataDefteriView() {
  />
  <X className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500' />
  </div>
- <div className='flex gap-2 overflow-x-auto pb-2'>
+ <div className='flex flex-wrap gap-2 pb-2'>
  {categories.map(cat => (
  <button
  key={cat}

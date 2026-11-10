@@ -84,7 +84,10 @@ export default function FlashcardMode() {
  <div className="absolute top-11 sm:top-4 left-1/2 -translate-x-1/2 z-20 w-[95vw] sm:w-[92%] max-w-lg max-h-[88vh] overflow-y-auto bg-[#09090b]/95 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl text-slate-100 p-3 sm:p-4 transition-all">
  {/* Category Filter Pills & Close Button */}
  <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2 sm:mb-3 gap-2">
- <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto text-xs py-0.5 scrollbar-none">
+ {/* 9 categories ran 615px wide in a 287px slot on a phone — a scroller
+ that hid 328px of them. They wrap into even rows on mobile instead, so
+ every category is reachable without swiping blind. */}
+ <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1 text-xs py-0.5 sm:gap-1.5"> 
  {['Hepsi', '81 İl & Şehirler', 'Dağlar', 'Akarsular', 'Göller', 'Sınır Kapıları', 'Geçitler', 'Ovalar & Platolar', 'Madenler'].map((cat) => (
  <button
  key={cat}
@@ -198,12 +201,12 @@ export default function FlashcardMode() {
  </div>
 
  {/* Navigation & Controls */}
- <div className="flex items-center justify-between gap-2 mt-3">
+ <div className="mt-3 flex items-center gap-1.5 sm:gap-2">
  <button
  onClick={handlePrev}
- className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 transition-all"
+ className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:bg-white/10"
 >
- <ChevronLeft className="w-5 h-5" />
+ <ChevronLeft className="h-4 w-4" />
  </button>
 
  <button
@@ -211,29 +214,29 @@ export default function FlashcardMode() {
  setSelectedFeature(currentItem);
  flyToCoords(currentItem.coordinates, 65, 30, 10);
  }}
- className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-white/10 transition-all"
+ className="flex h-9 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-white/10 bg-white/5 px-2 text-[11px] font-bold text-slate-200 transition-all hover:bg-white/10 sm:px-3 sm:text-xs"
 >
- <Compass className="w-3.5 h-3.5 text-amber-400" />
- <span>3D Haritada Göster</span>
+ <Compass className="h-3.5 w-3.5 shrink-0 text-amber-400" />
+ <span className="truncate">Haritada Göster</span>
  </button>
 
  <button
  onClick={() => toggleLearned(currentItem.id)}
- className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+ className={`flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 text-[11px] font-bold transition-all sm:px-3 sm:text-xs ${
  isCurrentLearned
  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
  : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'
  }`}
 >
- <Check className="w-3.5 h-3.5" />
+ <Check className="h-3.5 w-3.5 shrink-0" />
  <span>{isCurrentLearned ? 'Öğrenildi' : 'Öğrendim'}</span>
  </button>
 
  <button
  onClick={handleNext}
- className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 transition-all"
+ className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:bg-white/10"
 >
- <ChevronRight className="w-5 h-5" />
+ <ChevronRight className="h-4 w-4" />
  </button>
  </div>
  </div>

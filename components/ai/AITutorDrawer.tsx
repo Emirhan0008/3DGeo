@@ -171,23 +171,28 @@ export default function AITutorDrawer() {
  /* Expanded Content State */
  <div className="w-full h-full flex flex-col animate-in fade-in duration-200">
  {/* Header */}
- <div className="hf-parchment flex items-center justify-between border-b border-[#8a6a1d]/45 p-3">
- <div className="flex items-center gap-2">
- <div className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#8a6a1d]/60 bg-[#2b2413]">
- <Bot className="h-4 w-4 text-[#e0c37f]" />
+ <div className="hf-parchment flex items-center justify-between gap-2 border-b border-[#8a6a1d]/45 p-2.5 sm:p-3">
+ <div className="flex min-w-0 items-center gap-2">
+ <div className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#8a6a1d]/60 bg-[#2b2413] sm:h-9 sm:w-9">
+ <Bot className="h-3.5 w-3.5 text-[#e0c37f] sm:h-4 sm:w-4" />
  </div>
- <div>
- <div className="flex items-center gap-1.5">
- <h3 className="hf-serif text-xs font-bold tracking-[0.06em] text-[#2a2314] sm:text-[13px]">KPSS AI COĞRAFYA EĞİTMENİ
+ <div className="min-w-0">
+ <div className="flex min-w-0 items-center gap-1.5">
+ {/* Title + pill shared one row with no `min-w-0`, so on a 390px
+ drawer the two stacked into three wrapped lines. */}
+ <h3 className="hf-serif truncate text-[11px] font-bold tracking-[0.06em] text-[#2a2314] sm:text-[13px]">
+ <span className="sm:hidden">AI COĞRAFYA EĞİTMENİ</span>
+ <span className="hidden sm:inline">KPSS AI COĞRAFYA EĞİTMENİ</span>
  </h3>
- <span className="rounded-full border border-[#8a6a1d]/55 bg-[#f4e6bd] px-2 py-0.5 text-[9px] font-bold tracking-[0.1em] text-[#5a4413]">YAKINDA
+ <span className="shrink-0 rounded-full border border-[#8a6a1d]/55 bg-[#f4e6bd] px-1.5 py-0.5 text-[8px] font-bold tracking-[0.1em] text-[#5a4413] sm:px-2 sm:text-[9px]">YAKINDA
  </span>
  </div>
- <p className="text-[10px] font-medium text-[#6f5c33]">Yakında Hizmetinizde Olacaktır</p>
+ <p className="truncate text-[9px] font-medium text-[#6f5c33] sm:text-[10px]">Yakında Hizmetinizde Olacaktır
+ </p>
  </div>
  </div>
 
- <div className="flex items-center gap-1">
+ <div className="flex shrink-0 items-center gap-1">
  <button
  onClick={() => setIsPinned(!isPinned)}
  title={isPinned ? 'Sabitlemeyi Kaldır (Hover Modu)' : 'Ekrana Sabitle'}
@@ -216,12 +221,15 @@ export default function AITutorDrawer() {
  {/* Coming Soon Notice Banner */}
  <div className="flex items-center gap-2 border-b border-[#c9a24a]/18 bg-[#c9a24a]/8 p-2.5 text-xs text-[#e6d9b6]">
  <Sparkles className="h-4 w-4 shrink-0 text-[#c9a24a]" />
- <span className="font-bold text-[11px]">Yapay Zeka KPSS Asistanı modülü geliştirilmektedir. Çok yakında soru çözümleri ve kişiselleştirilmiş coğrafya koçluğu ile aktif olacaktır!
+ <span className="text-[11px] font-bold leading-snug">
+ <span className="sm:hidden">Modül geliştirilmektedir — çok yakında soru çözümü ve kişisel koçluk.</span>
+ <span className="hidden sm:inline">Yapay Zeka KPSS Asistanı modülü geliştirilmektedir. Çok yakında soru çözümleri ve kişiselleştirilmiş coğrafya koçluğu ile aktif olacaktır!</span>
  </span>
  </div>
 
- {/* Quick Prompts */}
- <div className="hf-scroll flex items-center gap-1.5 overflow-x-auto border-b border-[#c9a24a]/15 bg-black/20 p-2.5 text-[10px]">
+ {/* Quick Prompts — wraps instead of scrolling. A horizontal strip put 4 of
+ the 6 examples off-screen at 390px with nothing hinting they existed. */}
+ <div className="flex flex-wrap items-center gap-1.5 border-b border-[#c9a24a]/15 bg-black/20 p-2 text-[10px] sm:p-2.5">
  <span className="flex shrink-0 items-center gap-1 font-bold text-[#c9a24a]">
  <Lightbulb className="w-3 h-3" /> Örnek:
  </span>
@@ -230,7 +238,7 @@ export default function AITutorDrawer() {
  key={idx}
  onClick={() => handleSend(q)}
  disabled={loading}
- className="whitespace-nowrap rounded-lg border border-[#c9a24a]/22 bg-[#c9a24a]/6 px-2 py-1 font-medium text-[#d8c8a2] transition-all hover:border-[#c9a24a]/45 hover:bg-[#c9a24a]/12 hover:text-[#f2e8cf]"
+ className={`whitespace-nowrap rounded-lg border border-[#c9a24a]/22 bg-[#c9a24a]/6 px-2 py-1 font-medium text-[#d8c8a2] transition-all hover:border-[#c9a24a]/45 hover:bg-[#c9a24a]/12 hover:text-[#f2e8cf] ${idx >= 3 ? 'hidden sm:inline-flex' : ''}`}
 >
  {q}
  </button>

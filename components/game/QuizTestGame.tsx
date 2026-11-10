@@ -273,7 +273,7 @@ export default function QuizTestGame() {
         className="flex items-center justify-between border-b border-white/10 pb-1 mb-1 gap-1"
         title="Çift Tıklayarak Küçültebilirsiniz"
       >
-        <div className="flex items-center gap-1 overflow-x-auto shrink-0">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto scrollbar-none">
           <span className={`px-1.5 py-0.5 rounded ${
             isMissedMode ? 'bg-amber-500/30 text-amber-300 border-amber-400/50' : 'bg-emerald-500/30 text-emerald-300 border-emerald-400/40'
           } font-black text-[9px] sm:text-xs border flex items-center gap-1`}>

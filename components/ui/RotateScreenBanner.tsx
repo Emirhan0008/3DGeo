@@ -60,43 +60,47 @@ export default function RotateScreenBanner() {
 
   return (
     <div className="fixed bottom-16 left-1/2 z-50 w-[94vw] max-w-lg -translate-x-1/2 sm:bottom-3">
-      <div className="hf-panel flex items-center justify-between gap-2 rounded-2xl p-2.5 text-[#f7f2e3] sm:p-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d]">
-            {isPinGameAlert ? (
-              <Maximize2 className="h-4 w-4" />
-            ) : (
-              <Smartphone className="h-4 w-4 animate-spin-slow" />
-            )}
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#e2c485]">
-              <RotateCw className="h-3 w-3 animate-spin" />
-              <span className="hf-label truncate">
-                {isPinGameAlert ? 'Harita Testi için Tam Ekran' : 'Ekranı yan çevirin'}
-              </span>
-              <span className="ml-auto shrink-0 rounded-full border border-[#c9a24a]/30 px-1.5 py-0.5 text-[10px] text-[#c9c2a6]">
-                {timeLeft}s
-              </span>
-            </div>
-            <p className="truncate text-[10px] font-normal leading-tight text-[#a9a894] sm:text-[11px]">
-              {isPinGameAlert
-                ? 'Haritayı geniş görmek için tam ekrana geçin ve telefonu yan çevirin.'
-                : 'En iyi harita deneyimi için yatay mod ve tam ekran önerilir.'}
-            </p>
-          </div>
+      {/* One rule: every child is either `min-w-0` (can ellipsis) or
+          `shrink-0` (never squeezes). Phones get icon + one short line +
+          icon-only action, which is the whole payload; the explanatory
+          sentence only appears once there is width for it. */}
+      <div className="hf-panel flex items-center gap-2 rounded-2xl p-2 text-[#f7f2e3] sm:p-3">
+        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/12 text-[#dcc07d] sm:h-9 sm:w-9">
+          {isPinGameAlert ? (
+            <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          ) : (
+            <Smartphone className="h-3.5 w-3.5 animate-spin-slow sm:h-4 sm:w-4" />
+          )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 text-[10.5px] font-semibold text-[#e2c485]">
+            <RotateCw className="hidden h-3 w-3 shrink-0 animate-spin sm:block" />
+            <span className="hf-label min-w-0 truncate">
+              {isPinGameAlert ? 'Tam ekran önerilir' : 'Ekranı yan çevirin'}
+            </span>
+            <span className="shrink-0 rounded-full border border-[#c9a24a]/30 px-1.5 py-0.5 text-[9px] tabular-nums text-[#c9c2a6]">
+              {timeLeft}s
+            </span>
+          </div>
+          <p className="mt-0.5 hidden truncate text-[11px] leading-tight text-[#a9a894] sm:block">
+            {isPinGameAlert
+              ? 'Haritayı geniş görmek için tam ekrana geçin ve telefonu yan çevirin.'
+              : 'En iyi harita deneyimi için yatay mod ve tam ekran önerilir.'}
+          </p>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
           <button
             onClick={() => {
               toggleFullscreen();
               setIsVisible(false);
             }}
-            className="flex items-center gap-1 rounded-full border border-[#c9a24a]/70 bg-[linear-gradient(180deg,#f2e7ca,#d8c193)] px-2.5 py-1.5 text-[11px] font-bold text-[#2a2314] transition-all active:scale-95"
+            title="Tam Ekran"
+            className="flex items-center gap-1 rounded-full border border-[#c9a24a]/70 bg-[linear-gradient(180deg,#f2e7ca,#d8c193)] p-1.5 text-[11px] font-bold text-[#2a2314] transition-all active:scale-95 sm:px-2.5 sm:py-1.5"
           >
             <Maximize2 className="h-3.5 w-3.5" />
-            <span>Tam Ekran</span>
+            <span className="hidden sm:inline">Tam Ekran</span>
           </button>
 
           <button

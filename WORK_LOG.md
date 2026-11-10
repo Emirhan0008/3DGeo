@@ -4,6 +4,46 @@
 
 ---
 
+## 📅 [2026-11-10] - Menü ve Alt Menü Kompaktlaştırması (Taşmasız Sekme/Çip Rayları)
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: Menülerdeki ve alt menülerdeki arayüzler kontrol edilsin, snapshot alınıp analiz edilsin; butonlar/divler/kutular daha kompakt olsun, kayma ve taşma olmasın, derli toplu görünsün.
+
+### Yaklaşım
+Playwright ile 360/390/1440 genişliklerinde her sekme açıldı ve **gerçek `scrollWidth - clientWidth > 2`** ölçümü yapıldı (bkz. `.tmp/final.py`, `.tmp/duel.py`). Kırpılmış öğeler iki sınıfa ayrıldı: (a) yatay kaydırıcıda **gizli kalan** içerik → gerçek hata, (b) bilinçli `truncate`/`line-clamp` → tasarım kararı. Yalnız (a) sınıfı düzeltildi.
+
+### Düzeltilen gerçek taşmalar (ölçülmüş)
+| Panel | Önce | Çözüm |
+|---|---|---|
+| Analiz alt-sekmeleri (5 çip) | 308px taşıyor, "AI Teşhis" ulaşılamıyordu | Mobilde kısa etiket (Genel/Düello/Bölge/Hata/AI) + `flex-1`, `sm` üstünde tam metin; `overflow-x-auto` → `overflow-hidden` |
+| Sıralama ana sekmeleri (4 çip) | 236px taşıyor, "Seri Zafer" kesikti | Mobilde tek kısa etiket + eşit `flex-1`; `md` üstünde açıklayıcı metin |
+| Sıralama oyuncu satırı | "ham p" satırı ikiye kırılıyordu | Kolon oranı `col-span-5/3` → `6/4`, `whitespace-nowrap` + "ham p" `hidden sm:inline` |
+| Ezber kategori çipleri (9 adet) | 615px genişlik 287px yuvaya sığmıyor | `flex-wrap` (alt satıra sarar) |
+| Ezber alt kontrol satırı | "3D Haritada Göster" iki satıra kırıp satır tabanını kaydırıyordu | `h-9` sabit yükseklik, etiket "Haritada Göster", `min-w-0 flex-1` |
+| AI çekmecesi başlığı | 3 satıra kırılıyordu | `min-w-0` + `truncate`; mobilde "AI COĞRAFYA EĞİTMENİ" |
+| AI örnek soruları (6) | Yatay şeritte 4'ü ekran dışındaydı | `flex-wrap`; mobilde ilk 3 gösterilir (sohbet alanını yemesin) |
+| Harita/KPSS üst araç çubuğu | `shrink-0` yüzünden sağdaki ikon grubu kart dışına taşıyordu | `min-w-0 flex-1 overflow-x-auto` |
+| Düello lobi kategori seçicisi | 170px kalıyordu → "Genel Karma (Tün" kırpık | Mobilde tam genişlik satır, `sm` üstünde tek satır |
+| Düello lobi mod sekmeleri | Yatay kaydırıcı | `flex-wrap`; mobilde "Rastgele (2P)", "Katıl", "Bot" |
+| Profil kademe filtreleri (3 yer) | Yatay kaydırıcı | `flex-wrap` |
+| Hata Defteri kategori rayı | Yatay kaydırıcı | `flex-wrap` |
+
+### Kompaktlaştırma
+- **Katman sidebar'ı**: bölüm başlığı `py-2` → `py-1.5`, satır `py-1.5` → `py-1`, ikon çemberi `20px` → `18px`, `gap-2` → `gap-1.5`.
+- **Döndürme/tam ekran bandı**: ikon + tek kısa satır + ikon-only "Tam Ekran"; açıklama cümlesi yalnız `sm` üstünde. Önceden 3 sekmede de başlık kırpılıyordu.
+
+### Kural (ölçülmüş)
+Bir yatay satırda her çocuk iki sınıftan biridir: **`min-w-0`** (kısalabilir, ellipsis hakkı var) veya **`shrink-0`** (asla sıkışmaz). Üçüncü bir durum yok — `shrink-0` verilmiş bir blok genişliği aşarsa kardeşini dışarı iter.
+
+### Doğrulama
+- Playwright 360/390/1440: analiz, sıralama, AI çekmecesi, geri bildirim, Ezber, Harita, KPSS ve düello alt panellerinde **0 gerçek taşma**. Kalan tek kayıt `pointer-events-none absolute inset-0 z-[7] overflow-hidden` (+40px) → harita dokusu katmanı, beklenen durum.
+- `npx tsc --noEmit` temiz, `npx next lint` → "No ESLint warnings or errors".
+
+### Etkilenen Dosyalar
+`components/ui/StatsModal.tsx`, `GlobalLeaderboardModal.tsx`, `RotateScreenBanner.tsx`, `LayerSidebar.tsx`, `ProfileEditModal.tsx`, `components/ai/AITutorDrawer.tsx`, `components/game/FlashcardMode.tsx`, `PinGuessGame.tsx`, `QuizTestGame.tsx`, `DuelMode.tsx`, `HataDefteriView.tsx`
+
+---
+
 ## 📅 [2026-11-10] - Kompakt Mobil Kabuk, Pusula Logosu ve Ölçek Çubuğunun Kaldırılması
 
 - **Geliştirici**: AI Agent (OpenCode)

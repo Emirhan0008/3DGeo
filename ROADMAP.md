@@ -20,6 +20,7 @@
 - [x] **Mobil Responsive Onarımı**: Çerçeve bandı `--hf-band` değişkenine taşındı (mobil 6px / `sm`+ 12px), sidebar omurgası `w-7 sm:w-9`, AI şeridi `w-6 sm:w-9`, navbar'da arama + geri bildirim mobilde gizlendi, sekme etiketleri kısaltıldı. Harita alanı 360px'te 336×621 → **348×646**, 390px'te 366×725 → **378×750**; yatay taşma 0.
 - [x] **Sidebar Hover & Dikey Şerit**: Sol kenara `fixed` 12px hover bölgesi (`absolute` iken `overflow-hidden` kırpıyordu), kapalı omurgada dikey "KATMANLAR" etiketi 10px/kalın/parlak, küre+parşömen amblemi aşağı alındı.
 - [x] **Kompakt Mobil Kabuk**: Mobilde omurgalar 24px/20px ve çerçeveye sıfır boşlukla yapışık (`rounded-r-xl` / `rounded-l-xl`), HUD pili `left-7` + 36px yüksekliğe indi, `ScaleControl` tamamen kaldırıldı (sol alt köşe küre amblemine ait), navbar'da katman butonu + pusula madalyonu tek **pusula logosunda** birleşti, sekme ikonları mobilde gizlenip etiketler eşit dağıldı. Masaüstü taşması da düzeltildi (1280px'te 201px → 0).
+- [x] **Menü ve Alt Menü Kompaktlaştırması**: Sekme/çip raylarındaki 12 gerçek taşma ölçümle bulunup giderildi (analiz alt-sekmeleri 308px, sıralama 236px, Ezber kategorileri 328px, düello kategori seçicisi…). Kural `ARCHITECTURE.md` §2b'ye yazıldı: ya `flex-wrap`, ya mobil kısa etiket + `flex-1` — yatay kaydırıcı sekme rayı yasak. 360/390/1440'ta 0 taşma.
 
 ---
 

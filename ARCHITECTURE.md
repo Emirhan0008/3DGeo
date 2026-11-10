@@ -76,6 +76,19 @@ Tema **token seviyesinde** uygulanır (`@theme` bloğu), bileşenler tek tek boy
 
 > **Doku ölçek kuralı (ölçülmüş hata):** bir dokuyu dar bir banda `background-size: cover` ile sığdırmak leke/kontrast ölçeğini bozar. Doku her zaman kendi piksel ölçeğinde döşenir (`300px`, `520px` gibi), bant yalnızca kırpar.
 
+### Menü / sekme rayı düzeni — taşma kuralı
+
+Sekme, çip ve filtre raylarında **iki seçenek** vardır; üçüncüsü yoktur:
+
+| Durum | Davranış | Ne zaman |
+|---|---|---|
+| Etiketler sığıyor | `flex-wrap` | Ezber kategorileri, rozet filtreleri, profil kademeleri, Hata Defteri, düello mod sekmeleri |
+| Etiketler sığmıyor | mobilde **kısa etiket** + `flex-1` eşit satır, `sm`/`md` üstünde tam metin | Analiz alt-sekmeleri, sıralama ana sekmeleri, düello alt sekmeleri |
+
+**Yatay kaydırıcı (`overflow-x-auto`) sekme rayı olarak kullanılmaz.** Ölçüldü: 5 çipli analiz rayı 390px'te 308px, 4 çipli sıralama rayı 236px taşıyordu ve son çip erişilemiyordu — kaydırıcı olduğunu gösteren hiçbir görsel ipucu yoktu.
+
+Satır içi kural: her çocuk ya `min-w-0` (kısalabilir, `truncate`/`line-clamp` hakkı var) ya da `shrink-0` (asla sıkışmaz). Yüksekliği değişen butonlar komşularının taban çizgisini kaydırır — kontrol satırları `h-9` gibi sabit yükseklik kullanır.
+
 ### Çerçeve kalınlığı — `--hf-band`
 
 Çerçeve bandı tek bir CSS değişkeninde yaşar (`app/globals.css` `:root`):

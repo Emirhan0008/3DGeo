@@ -1025,7 +1025,10 @@ export default function DuelMode() {
             {/* Ayarlar Grid'i: Soru Sayısı & Kategori Seçimi */}
             <div className="space-y-2 mb-2.5">
               {/* Soru Sayısı & Kategori Seçimi Compact */}
-              <div className="flex items-center gap-2">
+              {/* Phone gets two rows: the native <select> only had ~170px left
+                  beside the 10/20/30 group, so its label was clipped to
+                  "Genel Karma (Tün". Full width on mobile, one row from sm. */}
+              <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
                 <div className="shrink-0">
                   <div className="grid grid-cols-3 gap-1">
                     {([10, 20, 30] as const).map((count) => (
@@ -1063,7 +1066,7 @@ export default function DuelMode() {
 
             {/* Mod Seçim Tabları */}
             <div className="border-t border-white/10 pt-3">
-              <div className="flex border-b border-white/10 mb-3 overflow-x-auto scrollbar-none gap-1">
+              <div className="mb-3 flex flex-wrap gap-1 border-b border-white/10">
                 <button
                   onClick={() => setLobbyTab('quick')}
                   className={`px-3 py-1.5 text-xs font-extrabold rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
@@ -1073,7 +1076,7 @@ export default function DuelMode() {
                   }`}
                 >
                   <Zap className="w-3.5 h-3.5" />
-                  <span>Rastgele Rakip ({selectedMaxPlayers}P)</span>
+                  <span>Rastgele<span className="hidden sm:inline"> Rakip</span> ({selectedMaxPlayers}P)</span>
                 </button>
 
                 <button
@@ -1097,7 +1100,8 @@ export default function DuelMode() {
                   }`}
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>Odaya Katıl</span>
+                  <span className="hidden sm:inline">Odaya Katıl</span>
+                  <span className="sm:hidden">Katıl</span>
                 </button>
 
                 <button
@@ -1109,7 +1113,8 @@ export default function DuelMode() {
                   }`}
                 >
                   <Bot className="w-3.5 h-3.5" />
-                  <span>Yapay Zeka Botu</span>
+                  <span className="hidden sm:inline">Yapay Zeka Botu</span>
+                  <span className="sm:hidden">Bot</span>
                 </button>
               </div>
 

@@ -441,7 +441,7 @@ export default function ProfileEditModal({
             </div>
 
             {/* Kademe Filtreleme Sekmeleri */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
+            <div className="flex flex-wrap items-center gap-1 pb-1 text-[10px] font-bold">
               {[
                 { id: 'all', label: `Tümü (${AVATAR_ICONS.length})` },
                 { id: 'mythic', label: '🌌 5. Kademe' },
@@ -639,7 +639,7 @@ export default function ProfileEditModal({
             </div>
 
             {/* Ünvan Kademe Filtreleme Sekmeleri */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
+            <div className="flex flex-wrap items-center gap-1 pb-1 text-[10px] font-bold">
               {[
                 { id: 'all', label: `Tümü (${ALL_TITLES.length})` },
                 { id: 'mythic', label: '🌌 5. Kademe' },
@@ -792,7 +792,7 @@ export default function ProfileEditModal({
             </div>
 
             {/* Rozet Kademe Filtreleme Sekmeleri */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
+            <div className="flex flex-wrap items-center gap-1 pb-1 text-[10px] font-bold">
               {[
                 { id: 'all', label: `Tümü (${ALL_BADGES.length})` },
                 { id: 'mythic', label: '🌌 5. Kademe' },
