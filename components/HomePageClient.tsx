@@ -58,7 +58,7 @@ export default function HomePageClient() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-950 font-sans select-none"
-      style={{ padding: 20 }}
+      style={{ padding: 12 }}
     >
       {/* Top Navbar */}
       <Navbar />

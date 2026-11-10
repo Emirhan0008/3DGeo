@@ -167,65 +167,77 @@ export default function LayerSidebar() {
   }
 
   return (
-    <aside
-      id="kpss-layer-sidebar"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={`hf-plaque hf-double-rule absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#f5ecd4] transition-all duration-300 ease-in-out ${
-        isExpanded ? 'z-45' : 'z-20'
-      } ${
-        isExpanded
-          ? 'w-[85vw] max-w-xs opacity-100 sm:w-[290px]'
-          : isHovered
-            ? 'w-9 opacity-100'
-            : 'w-9 opacity-80 hover:opacity-100'
-      }`}
-    >
-      {!isExpanded ? (
-        /* ---------- collapsed spine ---------- */
-        <div
-          onClick={() => {
-            setSidebarOpen(true);
-            setIsPinned(true);
-          }}
-          onTouchEnd={(e) => {
-            e.preventDefault();
-            setSidebarOpen(true);
-            setIsPinned(true);
-          }}
-          className="flex h-full w-full cursor-pointer touch-manipulation select-none flex-col items-center justify-between py-2 transition-colors hover:bg-[#c9a24a]/8"
-        >
-          {/* top ornament */}
-          <div className="pointer-events-none flex flex-col items-center gap-1">
-            <span className="text-[9px] leading-none text-[#c9a24a]/70">◆</span>
-            <div className="relative grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/40 bg-[#c9a24a]/10 text-[#c9a24a]">
-              <Layers className="h-3.5 w-3.5" />
-              {activeLayersCount > 0 && (
-                <span className="absolute -right-1 -top-1 grid h-3.5 min-w-3.5 place-items-center rounded-full bg-[#c9a24a] px-0.5 text-[8px] font-bold text-[#221b0c]">
-                  {activeLayersCount}
-                </span>
-              )}
+    <>
+      {/* Hover hot zone: the decorative frame band on the left edge opens the
+          plate on mouse-over, so the sidebar is discoverable without a click.
+          `fixed` because the map wrapper clips overflow; exactly as wide as
+          the frame band so it never steals clicks from the map. */}
+      <div
+        aria-hidden="true"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="fixed bottom-0 left-0 top-0 z-20 w-3"
+      />
+
+      <aside
+        id="kpss-layer-sidebar"
+        aria-label="Harita katmanları"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className={`hf-plaque hf-double-rule absolute bottom-2 left-2 top-2 flex flex-col overflow-hidden rounded-2xl text-[#f5ecd4] transition-all duration-300 ease-in-out ${
+          isExpanded ? 'z-45' : 'z-20'
+        } ${
+          isExpanded
+            ? 'w-[85vw] max-w-xs opacity-100 sm:w-[290px]'
+            : 'w-9 opacity-100'
+        }`}
+      >
+        {!isExpanded ? (
+          /* ---------- collapsed spine ---------- */
+          <div
+            onClick={() => {
+              setSidebarOpen(true);
+              setIsPinned(true);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              setSidebarOpen(true);
+              setIsPinned(true);
+            }}
+            className="flex h-full w-full cursor-pointer touch-manipulation select-none flex-col items-center justify-between py-2 transition-colors hover:bg-[#c9a24a]/10"
+          >
+            {/* top ornament */}
+            <div className="pointer-events-none flex flex-col items-center gap-1">
+              <span className="text-[9px] leading-none text-[#c9a24a]/80">◆</span>
+              <div className="relative grid h-7 w-7 place-items-center rounded-full border border-[#c9a24a]/55 bg-[#c9a24a]/15 text-[#dcc07d] shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">
+                <Layers className="h-3.5 w-3.5" />
+                {activeLayersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-3.5 min-w-3.5 place-items-center rounded-full bg-[#c9a24a] px-0.5 text-[8px] font-bold text-[#221b0c]">
+                    {activeLayersCount}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="pointer-events-none my-1 flex flex-1 items-center justify-center overflow-hidden">
-            <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[9px] text-[#b5a06a]">
-              Katmanlar{activeLayersCount > 0 ? ` · ${activeLayersCount}` : ''}
-            </span>
-          </div>
+            {/* vertical label — the discovery cue of the collapsed plate */}
+            <div className="pointer-events-none my-1 flex flex-1 items-center justify-center overflow-hidden">
+              <span className="hf-label [writing-mode:vertical-rl] rotate-180 whitespace-nowrap text-[10px] font-semibold tracking-[0.22em] text-[#e2cd97]">
+                Katmanlar{activeLayersCount > 0 ? ` · ${activeLayersCount}` : ''}
+              </span>
+            </div>
 
-          <div className="pointer-events-none flex flex-col items-center gap-1">
-            <CompassRose className="h-7 w-7 opacity-55" />
-            <ChevronRight className="h-3 w-3 text-[#c9a24a]/70" />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setSidebarOpen(true);
-                setIsPinned(true);
-              }}
-              title="Sabitle"
-              className="pointer-events-auto rounded-full p-0.5 text-[#b5a06a] transition-colors hover:text-[#e2c485]"
-            >
+            <div className="pointer-events-none flex flex-col items-center gap-1">
+              <ChevronRight className="h-3.5 w-3.5 text-[#dcc07d]" />
+              <CompassRose className="h-7 w-7 opacity-60" />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSidebarOpen(true);
+                  setIsPinned(true);
+                }}
+                title="Sabitle"
+                className="pointer-events-auto rounded-full p-0.5 text-[#c0a970] transition-colors hover:text-[#e2c485]"
+              >
               <Pin className="h-3 w-3" />
             </button>
           </div>
@@ -425,7 +437,8 @@ export default function LayerSidebar() {
           </div>
         </div>
       )}
-    </aside>
+      </aside>
+    </>
   );
 }
 

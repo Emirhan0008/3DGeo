@@ -15,13 +15,13 @@ import React from 'react';
    only the 20px band is visible so it never blocks the UI.
    ================================================================== */
 
-const BAND = 20; // px
+const BAND = 12; // px — thin enough to read as a mounted plate, not a window frame
 const TEX = "url('/assets/theme/frame-wood.jpg')";
 
 /**
  * The grain must read at its own scale. Stretching a 1024² tile across a
- * 20px band with `cover` turns every stain into a giant blob, so the tile
- * is repeated at 300px and only a 20px slice shows through.
+ * narrow band with `cover` turns every stain into a giant blob, so the tile
+ * is repeated at 300px and only a slice shows through.
  */
 function stripStyle(axis: 'x' | 'y'): React.CSSProperties {
   // First layer paints on top: the wash sits above the grain.
@@ -81,14 +81,14 @@ export default function AppFrame() {
 
       {/* ---- corner studs ---- */}
       {[
-        { top: 6, left: 6 },
-        { top: 6, right: 6 },
-        { bottom: 6, left: 6 },
-        { bottom: 6, right: 6 },
+        { top: 4, left: 4 },
+        { top: 4, right: 4 },
+        { bottom: 4, left: 4 },
+        { bottom: 4, right: 4 },
       ].map((pos, i) => (
         <span
           key={i}
-          className="absolute h-1.5 w-1.5 rounded-full"
+          className="absolute h-1 w-1 rounded-full"
           style={{
             ...pos,
             background:
