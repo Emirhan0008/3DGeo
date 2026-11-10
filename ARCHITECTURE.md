@@ -116,6 +116,19 @@ Değiştirirken `AppFrame`'deki sabit değil **yalnızca** `--hf-band` güncelle
 
 ---
 
+### İlk giriş tanıtım turu — `OnboardingTour`
+
+`components/ui/OnboardingTour.tsx`, kabuğa `HomePageClient` içinde mount edilir. Dört adım: hoş geldin → harita kullanımı → oyun modları → rozet/kademe ilişkisi.
+
+| Kural | Uygulama |
+|---|---|
+| Yalnız ilk giriş | `kpss3d_onboarding_v1` bayrağı; varsa tur açılmaz |
+| Eski oyuncuya gösterilmez | `hasProgress()` puan / soru / pin / düello zaferi / fazladan rozet arar; bulursa bayrağı yazıp susar |
+| Zorunlu değil | `Atla`, X, Esc, arka plan tıklaması — hepsi kapatır |
+| Tekrar izlenebilir | `window.dispatchEvent(new CustomEvent('kpss3d:open-onboarding'))`; Navbar pusula düğmesi bunu yapar |
+
+> **Bayrak kuralı:** `hasProgress()` yalnızca `kpss3d_user_stats` içindeki **oyun** alanlarına bakar. `avatarIcon`/`equippedTitle` varsayılan olduğu için ilk açılışta da yazılır — bunları "eski kullanıcı" saymak turu tüm yeni kullanıcılardan gizler (bu tuzak ölçüldü).
+
 ### Giyilebilir katmanlar — üç aile, beş kademe, tek sembol dili
 
 Profilde dört ayrı şey giyilir ve **karıştırılmamaları** gerekir. Ayrımı renk değil **silüet** yapar; renk yalnızca kademeyi söyler. Kaynak: `components/ui/wearables/`.

@@ -15,6 +15,7 @@ import BadgeNotificationToast from '@/components/ui/BadgeNotificationToast';
 import AppFrame from '@/components/ui/AppFrame';
 import RotateScreenBanner from '@/components/ui/RotateScreenBanner';
 import LayerHintBanner from '@/components/ui/LayerHintBanner';
+import OnboardingTour from '@/components/ui/OnboardingTour';
 import { useAppStore } from '@/lib/store/useStore';
 import { tabFromPathname } from '@/lib/tabRoutes';
 
@@ -103,6 +104,7 @@ export default function HomePageClient() {
         <AITutorDrawer />
         <BadgeNotificationToast />
         <RotateScreenBanner />
+        <OnboardingTour />
 
         {/* Tab Specific Gamification Overlays */}
         {activeTab === 'pin_game' && <PinGuessGame />}

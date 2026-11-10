@@ -4,6 +4,43 @@
 
 ---
 
+## 📅 [2026-11-11] - İlk Girişe Özel Opsiyonel Tanıtım Turu (Onboarding)
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: "Sadece ilk giriş için opsiyonel bir onboarding yap."
+
+### Davranış kuralları (dördü de test edildi)
+| Kural | Uygulama |
+|---|---|
+| Yalnızca **ilk** giriş | `localStorage` bayrağı `kpss3d_onboarding_v1`. Bayrak varsa hiç açılmaz |
+| Yalnızca **veri yoksa** | `hasProgress()`: puan, soru sayısı, pin tahmini, düello zaferi veya fazladan rozet varsa tur atlanır ve bayrak yazılır — eski oyuncuya "hoş geldin" denmez |
+| Tamamen **opsiyonel** | Her adımda `Atla`; ayrıca X, Esc ve arka plan tıklaması kapatır. Zorunlu adım, kilitli buton yok |
+| **Tekrar izlenebilir** | Navbar'daki pusula düğmesi `kpss3d:open-onboarding` olayını fırlatır; tur baştan açılır |
+
+### Yeni dosya
+- `components/ui/OnboardingTour.tsx` — 4 adım: **Hoş geldin** (harita üzerinden öğrenme) → **Harita** (katman omurgası + üst bar araması) → **Oyunlar** (Harita Testi / Düello / KPSS Testi / Ezber) → **Birikim** (rozet → kademe → görünüm; son adımda `TierMark` ile kademe merdiveni).
+
+### Değişen dosyalar
+- **`HomePageClient.tsx`**: `<OnboardingTour />` kabuğa eklendi (harita altında, `AppFrame`'in altında).
+- **`Navbar.tsx`**: pusula düğmesi (mobilde gizli — üst bar dar), `Compass` ikonu.
+
+### Tasarım notları
+- Atlas temasıyla aynı dil: `hf-panel` / `hf-serif` / `hf-label` / `hf-btn-brass` / `hf-btn-ghost`. Yeni renk veya yeni font eklenmedi.
+- 390px'te tek sütun, kart `max-h-[88vh]` + `overflow-y-auto`; 1440'ta aynı kart ortada, nokta göstergesi görünür.
+- Tur açıkken `body.overflow = hidden` — mobilde arka plan titremiyor.
+- İlk açılış **1100ms gecikmeli**: harita önce boyanıyor, tur beyaz ekranın üstüne binmiyor.
+
+### Ölçülmüş hatalar
+| Hata | Belirti | Düzeltme |
+|---|---|---|
+| `Record<string, any>` ile veri okuma | TypeScript `any` kuralına aykırı | `StoredProgressShape` tipi tanımlandı |
+| Tur açıkken sayfa kayması | Mobilde arka plan kayıyordu | `body` scroll kilidi eklendi |
+
+### Doğrulama
+Playwright ile 9 senaryo (port 3005): yeni kullanıcıda açılıyor · `Başla` kapatıyor · bayrak `seen` yazılıyor · yenilemede **açılmıyor** · masaüstünde açılıyor · veri olan kullanıcıda **açılmıyor** · navbar tekrar açıyor · Esc kapatıyor · Atla kapatıyor. `npx tsc --noEmit` ve `npx next build` temiz.
+
+---
+
 ## 📅 [2026-11-11] - Giyilebilir Sembol Sistemi: Üç Aile, Beş Kademe, Emojisiz SVG
 
 - **Geliştirici**: AI Agent (OpenCode)

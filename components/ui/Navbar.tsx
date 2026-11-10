@@ -16,6 +16,7 @@ import {
   Swords,
   Trophy,
   MessageSquarePlus,
+  Compass,
 } from 'lucide-react';
 import { useAppFullscreen } from '@/lib/utils';
 import AuthUserButton from './AuthUserButton';
@@ -255,6 +256,19 @@ export default function Navbar() {
           </button>
 
           <AuthUserButton />
+
+          {/* Tanıtım turu — ilk girişte kendiliğinden açılır, buradan
+              istenirse tekrar izlenir. Mobilde gizli: üst bar dar. */}
+          <button
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent('kpss3d:open-onboarding'))
+            }
+            title="Tanıtım turunu izle"
+            aria-label="Tanıtım turunu izle"
+            className="hidden h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/25 text-[#a89f7e] transition-colors hover:border-[#c9a24a]/60 hover:text-[#e6d3a4] sm:grid"
+          >
+            <Compass className="h-3.5 w-3.5" />
+          </button>
 
           {/* Feedback */}
           <button
