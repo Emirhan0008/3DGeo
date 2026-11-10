@@ -120,8 +120,8 @@ export default function AITutorDrawer() {
  ? 'w-[85vw] max-w-sm sm:w-96 bg-[#0d1614]/95 opacity-100'
  : 'w-[85vw] max-w-sm sm:w-96 bg-[#0d1614]/88 opacity-85 hover:opacity-100'
  : isHovered
- ? 'w-7 sm:w-9 bg-[#0d1614]/95 opacity-100'
- : 'w-7 sm:w-9 bg-[#0d1614]/80 opacity-80 hover:opacity-100'
+ ? 'w-6 sm:w-9 bg-[#0d1614]/95 opacity-100'
+ : 'w-6 sm:w-9 bg-[#0d1614]/80 opacity-80 hover:opacity-100'
  }`}
 >
  {/* Collapsed Strip State */}

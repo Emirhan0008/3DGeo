@@ -4,6 +4,47 @@
 
 ---
 
+## 📅 [2026-11-10] - Mobil Responsive Onarımı, Amblem Hizası ve Sidebar Hover'ın Geri Gelmesi
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: (1) Farenin üzerine gelmesiyle açılan sidebar artık sadece tuşla açılıyordu, (2) kapalıyken dikey "Katmanlar" yazan bar kaybolmuştu, (3) kenarlar çok genişti, (4) küre ve parşömenler biraz daha aşağı inmeliydi, (5) telefonlarda ekran çok küçülmüştü.
+
+### Problem — ölçülen teşhis
+1. **Hover kodu silinmemişti ama tetiklenmiyordu.** Sol kenardaki açma bölgesi `absolute` idi ve `main`'in `overflow-hidden`'ı onu kırpıyordu; 6px'lik kenarda hiç pointer olayı alınmıyordu.
+2. **Dikey şerit duruyordu, okunmuyordu.** `9px` + `#b5a06a` + `opacity-80` üçlüsü etiketi zeminin içine gömüyordu.
+3. **Mobilde harita alanı 366×725'ti (390×844 ekranda).** 12px çerçeve + iki 36px omurga = %27 kayıp. Sekme rayı 360px'te taşıyor, sağdaki buton grubu (177px) kesiliyordu.
+
+### Çözüm
+1. **Hover** (`components/ui/LayerSidebar.tsx`): kenara `fixed bottom-0 left-0 top-0 w-2 sm:w-3` hover bölgesi eklendi. Doğrulandı: sol kenar hover `36 → 290`, fare ayrılınca `36`, spine hover `290`.
+2. **Dikey etiket**: `10px`, kalın, `#e2cd97`, `tracking-[0.22em]`; üst madalyon `#c9a24a/55` + iç gölge, alt ok `#dcc07d`; `opacity-80` tamamen kaldırıldı.
+3. **Çerçeve** (`app/globals.css`, `AppFrame.tsx`, `HomePageClient.tsx`): bant `BAND` sabitinden `--hf-band` CSS değişkenine taşındı — mobilde **6px**, `sm` ve üstünde **12px**. Hem dört doku şeridi hem `inset` hairline hem dış `padding` aynı değeri okuyor. Köşe perçinleri 6 → 4px.
+4. **Amblem** (`AppFrame.tsx`): `w-[190px] sm:w-[330px] lg:w-[390px]`, `translate-y-[20%] sm:translate-y-[16%]` ile alt kenardan taşıyor — çerçeveye yaslanmış bir köşe vinyeti gibi duruyor, haritanın ortasında "çıkartma" gibi değil.
+5. **Omurgalar**: katman omurgası `w-7 sm:w-9`, AI şeridi `w-6 sm:w-9`.
+6. **Navbar** (`Navbar.tsx`): mobilde arama kutusu ve geri bildirim butonu gizlendi (`hidden sm:block` / `sm:grid`); sekme rayındaki `◆` ayraçları yalnız `sm` üstünde; kompakt sekme `px-1 py-0.5 text-[9.5px]`; "Harita Testi" mobil etiketi "Harita"; "Sıralama" ve "Tam Ekran" yazıları `lg`'ye taşındı (tablet'te 768px'te taşma vardı); header dikey boşluk `py-1.5 sm:py-2`.
+7. **Ölçek çubuğu** (`globals.css`): amblem köşeyi sahiplendiği için `.maplibregl-ctrl-bottom-left` `md` üstünde `left: 9rem`'e, mobilde `bottom: 4.25rem; left: 2.5rem`'e alındı — "200 km" etiketi kürenin altında kalmıyor.
+
+### Doğrulama (Playwright, ölçülmüş)
+| Cihaz | Harita alanı (öncesi → sonrası) | Yatay taşma |
+|---|---|---|
+| Android 360×740 | 336×621 → **348×646** | 0 |
+| iPhone 390×844 | 366×725 → **378×750** | 0 |
+| Tablet 768×1024 | — | 0 (navbar artık taşmıyor) |
+| Masaüstü 1440×900 | 1416×819 | 0 |
+
+- Sidebar: `36 → 290 → 36` (hover), pin ve X yolları da test edildi.
+- Çerçeve bandı: ölçülen `12px` (masaüstü), `6px` (mobil).
+- `npx tsc --noEmit` temiz, `npx next lint` → "No ESLint warnings or errors".
+
+### Etkilenen Dosyalar
+- `app/globals.css` — `--hf-band` değişkeni + medya sorguları, ölçek çubuğu konumu
+- `components/ui/AppFrame.tsx` — `var(--hf-band)`, amblem boyutu/konumu
+- `components/ui/LayerSidebar.tsx` — `fixed` hover bölgesi, dikey etiket, omurga genişliği
+- `components/ui/Navbar.tsx` — mobil sıkıştırma
+- `components/ai/AITutorDrawer.tsx` — mobil şerit genişliği
+- `components/HomePageClient.tsx` — `padding: var(--hf-band)`
+
+---
+
 ## 📅 [2026-11-10] - Referans Tasarım Birebir: Atlas Çerçevesi, Akordeon Sidebar, Krem AI Paneli
 
 - **Geliştirici**: AI Agent (OpenCode)

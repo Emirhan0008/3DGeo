@@ -43,7 +43,7 @@ components/
 │   │
 │   ├── LayerSidebar.tsx     # Sol/Açılır katman seçim çekmecesi (▲ akordeon bölümler, katman satır ikonları)
 │   ├── LayerIcons.tsx       # 18 katman tipi için gravür tarzı inline SVG seti + LAYER_ICONS registry
-│   ├── AppFrame.tsx         # Atlas çerçevesi: 20px doku şeritleri, altın hairline, köşe perçinleri, sol alt amblem
+│   ├── AppFrame.tsx         # Atlas çerçevesi: `var(--hf-band)` doku şeritleri, altın hairline, köşe perçinleri, sol alt amblem
 │   ├── MapOrnaments.tsx     # Pusula gülü, armiler küre, arazi silüeti, kuzey işareti (inline SVG)
 │   ├── LayerHintBanner.tsx  # Katman ipucu ve aktif katman bilgilendirme şeridi
 │   ├── FeatureDetailModal.tsx # Haritada tıklanan coğrafi noktanın KPSS detay kartı
@@ -67,7 +67,7 @@ Tema **token seviyesinde** uygulanır (`@theme` bloğu), bileşenler tek tek boy
 
 | Dosya | Rol | Teknik kural |
 |---|---|---|
-| `frame-wood.jpg` | Ekran çerçevesi dokusu | 1024², ortalama parlaklık **165**, vinyet ≈ 0. `AppFrame` bunu **300px doğal ölçekte** döşer — `cover` ile 20px banda sığdırmak lekeleri dev boyuta çıkarır |
+| `frame-wood.jpg` | Ekran çerçevesi dokusu | 1024², ortalama parlaklık **165**, vinyet ≈ 0. `AppFrame` bunu **300px doğal ölçekte** döşer — `cover` ile dar banda sığdırmak lekeleri dev boyuta çıkarır |
 | `parchment.jpg` | Plaka/başlık zemini | Sıcak krem, ortalama `#E5DBC1`, min 137 (siyah çatlak yok). `multiply`/düşük opaklıkla kullanılır |
 | `ai-landscape.jpg` | AI paneli arka planı | Üst %30 düz koyu (metin okunurluğu), alt kısımda gravür dağlar; gradyan perde ile örtülür |
 | `corner-emblem.png` | Sol alt küre + parşömen amblemi | **Şeffaf boşluk tasarımın parçasıdır** (altından harita görünür) — kırpılmaz |
@@ -75,6 +75,27 @@ Tema **token seviyesinde** uygulanır (`@theme` bloğu), bileşenler tek tek boy
 `.hf-*` primitifleri (`hf-plaque`, `hf-parchment`, `hf-nav`, `hf-serif`, `hf-label`, `hf-input`, `hf-btn-brass`, `hf-double-rule`, `hf-scroll`) tüm bileşenlerin ortak yüzey/tipografi dili. Yeni bir panel eklerken ham renk yerine bunlar kullanılır.
 
 > **Doku ölçek kuralı (ölçülmüş hata):** bir dokuyu dar bir banda `background-size: cover` ile sığdırmak leke/kontrast ölçeğini bozar. Doku her zaman kendi piksel ölçeğinde döşenir (`300px`, `520px` gibi), bant yalnızca kırpar.
+
+### Çerçeve kalınlığı — `--hf-band`
+
+Çerçeve bandı tek bir CSS değişkeninde yaşar (`app/globals.css` `:root`):
+
+| Ekran | `--hf-band` | Gerekçe |
+|---|---|---|
+| `< 640px` | **6px** | 390px'lik ekranda 12px bant + iki 36px omurga haritanın %27'sini yiyordu |
+| `≥ 640px` | **12px** | Monte edilmiş plaka hissi; daha ince olunca doku okunmuyor |
+
+Üç yer aynı değişkeni okur, bu yüzden bant ile içerik arasında boşluk kayması olmaz:
+
+1. `AppFrame` dört doku şeridinin kalınlığı (`height`/`width`)
+2. `AppFrame` iç hairline'ın `inset` değeri
+3. `HomePageClient` dış `padding`
+
+Değiştirirken `AppFrame`'deki sabit değil **yalnızca** `--hf-band` güncellenir.
+
+> **Köşe sahipliği kuralı:** sol alt köşeyi `corner-emblem.png` sahiplenir. Bu yüzden MapLibre ölçek çubuğu (`bottom-left`) masaüstünde `left: 9rem`, mobilde `bottom: 4.25rem` ile kaydırılır — aksi halde "200 km" etiketi kürenin altında kalır.
+
+> **Hover bölgesi kuralı:** sol kenardan sidebar açan tetik alanı `fixed` olmak **zorunda**. `main` `overflow-hidden` olduğu için `absolute` bir tetik alanı kırpılır ve hiç pointer olayı almaz (ölçülmüş hata — hover "çalışmıyor" sanıldı).
 
 ---
 

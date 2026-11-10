@@ -15,10 +15,13 @@ import React from 'react';
    only the 20px band is visible so it never blocks the UI.
    ================================================================== */
 
-const BAND = 12; // px — thin enough to read as a mounted plate, not a window frame
 const TEX = "url('/assets/theme/frame-wood.jpg')";
 
 /**
+ * The band thickness lives in CSS (`--hf-band`) so it can shrink on phones
+ * without duplicating the component: 6px on small screens (every pixel of map
+ * counts there), 12px from `sm` up.
+ *
  * The grain must read at its own scale. Stretching a 1024² tile across a
  * narrow band with `cover` turns every stain into a giant blob, so the tile
  * is repeated at 300px and only a slice shows through.
@@ -30,7 +33,9 @@ function stripStyle(axis: 'x' | 'y'): React.CSSProperties {
       ? 'linear-gradient(180deg, rgba(26,17,7,.5), rgba(10,6,2,.82))'
       : 'linear-gradient(90deg, rgba(26,17,7,.5), rgba(10,6,2,.82))';
   return {
-    ...(axis === 'x' ? { height: BAND } : { width: BAND }),
+    ...(axis === 'x'
+      ? { height: 'var(--hf-band)' }
+      : { width: 'var(--hf-band)' }),
     backgroundImage: `${wash}, ${TEX}`,
     backgroundSize: '100% 100%, 300px 300px',
     backgroundPosition: 'center, center',
@@ -63,7 +68,7 @@ export default function AppFrame() {
       <div
         className="absolute"
         style={{
-          inset: BAND,
+          inset: 'var(--hf-band)',
           boxShadow:
             'inset 0 0 0 1px rgba(201,162,74,.55), inset 0 0 0 3px rgba(20,14,6,.55), inset 0 0 26px rgba(10,8,4,.55)',
           borderRadius: 3,
@@ -98,12 +103,15 @@ export default function AppFrame() {
         />
       ))}
 
-      {/* ---- bottom-left armillary + scroll emblem ---- */}
+      {/* ---- bottom-left armillary + scroll emblem ----
+          Nudged below the viewport edge so the sphere reads as a corner
+          vignette instead of a sticker floating over the map. Smaller on
+          phones, where it would otherwise sit on the scale bar. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/assets/theme/corner-emblem.png"
         alt=""
-        className="absolute bottom-0 left-0 w-[300px] max-w-[42vw] opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,.75)] sm:w-[360px] lg:w-[400px]"
+        className="absolute bottom-0 left-0 w-[190px] max-w-[46vw] translate-y-[20%] opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,.75)] sm:w-[330px] sm:translate-y-[16%] lg:w-[390px]"
         draggable={false}
       />
     </div>

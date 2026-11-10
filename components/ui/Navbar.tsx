@@ -34,7 +34,7 @@ type TabDef = {
 
 const TABS: TabDef[] = [
   { tab: 'map', label: 'Keşif', short: 'Keşif', Icon: Map },
-  { tab: 'pin_game', label: 'Harita Testi', short: 'Harita Testi', Icon: MapPin },
+  { tab: 'pin_game', label: 'Harita Testi', short: 'Harita', Icon: MapPin },
   { tab: 'duel', label: 'Düello', short: 'Düello', Icon: Swords },
   { tab: 'quiz_test', label: 'KPSS Testi', short: 'KPSS', Icon: HelpCircle },
   { tab: 'flashcards', label: 'Ezber', short: 'Ezber', Icon: BookOpen },
@@ -136,7 +136,7 @@ export default function Navbar() {
         title={t.label}
         className={`group relative flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border transition-all duration-150 ${
           compact
-            ? 'px-2 py-1 text-[10px]'
+            ? 'px-1 py-0.5 text-[9.5px] sm:px-2 sm:py-1 sm:text-[10px]'
             : 'px-2.5 py-1.5 text-[12px]'
         } ${
           isActive
@@ -182,7 +182,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 sm:gap-1.5">
           {/* Ornament: armillary sphere medallion */}
           <ArmillarySphere className="hidden h-8 w-8 shrink-0 opacity-50 xl:block" />
 
@@ -193,11 +193,12 @@ export default function Navbar() {
             className="flex items-center gap-1.5 rounded-full border border-[#c9a24a]/35 px-2 py-1 text-[11px] font-semibold text-[#dcc07d] transition-colors hover:border-[#c9a24a]/75 hover:bg-[#c9a24a]/10 hover:text-[#f3e4bd]"
           >
             <Trophy className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Sıralama</span>
+            <span className="hidden lg:inline">Sıralama</span>
           </button>
 
-          {/* Search */}
-          <div className="relative">
+          {/* Search — hidden on phones: the tab rail below already gives the
+              only navigation a 360px screen can hold. */}
+          <div className="relative hidden sm:block">
             <div className="relative flex items-center">
               <Search className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-[#b5a06a]" />
               <input
@@ -210,7 +211,7 @@ export default function Navbar() {
                 onFocus={() => setShowSearchResults(true)}
                 onBlur={() => window.setTimeout(() => setShowSearchResults(false), 140)}
                 placeholder="Ara..."
-                className="hf-serif w-24 rounded-full border border-[#c9a24a]/25 bg-[#0c0f08]/80 py-1 pl-8 pr-3 text-[11px] tracking-wide text-[#f5ecd4] placeholder:text-[#7c7660] focus:border-[#c9a24a]/70 focus:outline-none sm:w-36 md:w-44"
+                className="hf-serif w-20 rounded-full border border-[#c9a24a]/25 bg-[#0c0f08]/80 py-1 pl-7 pr-2 text-[11px] tracking-wide text-[#f5ecd4] placeholder:text-[#7c7660] focus:border-[#c9a24a]/70 focus:outline-none sm:w-32 sm:pl-8 sm:pr-3 lg:w-44"
               />
             </div>
 
@@ -249,7 +250,7 @@ export default function Navbar() {
             ) : (
               <Maximize2 className="h-3.5 w-3.5" />
             )}
-            <span className="hidden md:inline">
+            <span className="hidden lg:inline">
               {isFullscreen ? 'Çık' : 'Tam Ekran'}
             </span>
           </button>
@@ -260,7 +261,7 @@ export default function Navbar() {
           <button
             onClick={() => setIsFeedbackOpen(true)}
             title="Geri bildirim gönder"
-            className="grid h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/25 text-[#a89f7e] transition-colors hover:border-[#c9a24a]/60 hover:text-[#e6d3a4]"
+            className="hidden h-8 w-8 place-items-center rounded-full border border-[#c9a24a]/25 text-[#a89f7e] transition-colors hover:border-[#c9a24a]/60 hover:text-[#e6d3a4] sm:grid"
           >
             <MessageSquarePlus className="h-3.5 w-3.5" />
           </button>
@@ -282,12 +283,12 @@ export default function Navbar() {
       </div>
 
       {/* ---------- mobile tab rail ---------- */}
-      <div className="hf-rule mt-1.5 flex lg:hidden" />
-      <div className="hf-scroll mt-1 flex w-full items-center gap-1 overflow-x-auto pb-0.5 lg:hidden">
+      <div className="hf-rule mt-1 flex lg:hidden sm:mt-1.5" />
+      <div className="hf-scroll mt-0.5 flex w-full items-center justify-between gap-0.5 overflow-x-auto pb-0.5 sm:mt-1 sm:gap-1 lg:hidden">
         {TABS.map((t, i) => (
           <Fragment key={t.tab}>
             {i > 0 && (
-              <span className="select-none text-[7px] text-[#c9a24a]/25">◆</span>
+              <span className="hidden select-none text-[7px] text-[#c9a24a]/25 sm:inline">◆</span>
             )}
             {renderTab(t, true)}
           </Fragment>
@@ -325,7 +326,7 @@ export default function Navbar() {
   // Standard top bar
   return (
     <>
-      <header className="hf-nav relative z-30 w-full select-none px-2 py-2 text-[#f5ecd4] sm:px-3">
+      <header className="hf-nav relative z-30 w-full select-none px-2 py-1.5 text-[#f5ecd4] sm:px-3 sm:py-2">
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/45 to-transparent" />
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/25 to-transparent" />
         {renderNavbarContent()}

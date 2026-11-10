@@ -176,7 +176,7 @@ export default function LayerSidebar() {
         aria-hidden="true"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="fixed bottom-0 left-0 top-0 z-20 w-3"
+        className="fixed bottom-0 left-0 top-0 z-20 w-2 sm:w-3"
       />
 
       <aside
@@ -189,7 +189,7 @@ export default function LayerSidebar() {
         } ${
           isExpanded
             ? 'w-[85vw] max-w-xs opacity-100 sm:w-[290px]'
-            : 'w-9 opacity-100'
+            : 'w-7 opacity-100 sm:w-9'
         }`}
       >
         {!isExpanded ? (

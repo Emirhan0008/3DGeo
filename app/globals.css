@@ -219,6 +219,17 @@
   :root {
     /* Fractal-noise paper grain (SVG turbulence, no image asset). */
     --hf-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+
+    /* Mounted-plate frame thickness. Phones get the thinnest readable band:
+       at 390px wide the 12px band plus two 36px spines were eating 27% of
+       the map. Both the frame strips and the app padding read this value. */
+    --hf-band: 6px;
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --hf-band: 12px;
+    }
   }
 
   :where(button, a, input, [role="button"]):focus-visible {
@@ -652,6 +663,23 @@ body.app-pseudo-fullscreen {
   bottom: 1.5rem !important;
   left: 1.5rem !important;
   z-index: 25 !important;
+}
+
+/* The armillary emblem owns the bottom-left corner from `md` up — keep the
+   scale rule to its right so the sphere never covers the numbers. */
+@media (min-width: 768px) {
+  .maplibregl-ctrl-bottom-left {
+    left: 9rem !important;
+  }
+}
+
+/* On phones the emblem is a tall crop of the same corner, so the rule lifts
+   above the sphere instead of sliding sideways off-screen. */
+@media (max-width: 767px) {
+  .maplibregl-ctrl-bottom-left {
+    bottom: 4.25rem !important;
+    left: 2.5rem !important;
+  }
 }
 
 /* Merge the two right-hand control groups into one plaque */
