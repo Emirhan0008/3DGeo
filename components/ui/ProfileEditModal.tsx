@@ -10,10 +10,18 @@ import {
   getPrestigeTier,
   getTitleProgress,
   getTitleTierStyle,
-  getAvatarOutlineFilter,
   BadgeTier
 } from '@/lib/data/badgesData';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
+import { WearableEmblem, TierMark } from '@/components/ui/wearables/WearableEmblem';
+import {
+  AVATAR_GLYPHS,
+  TITLE_GLYPHS,
+  BADGE_GLYPHS,
+  TIER_LABELS,
+  avatarToken,
+  glyphFromAvatarToken
+} from '@/lib/data/wearableGlyphs';
 import { 
   changeRumuzNickname, 
   updateRumuzCustomization, 
@@ -35,6 +43,51 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+
+/** Shared section header: icon + title + one-line role, badge stacks on
+ *  mobile so long titles never collide with the tier chip. */
+function SectionHeader({
+  icon,
+  tone,
+  title,
+  role,
+  desc,
+  border,
+  badge,
+}: {
+  icon: React.ReactNode;
+  tone: 'indigo' | 'purple' | 'amber' | 'cyan' | 'blue';
+  title: string;
+  role: string;
+  desc: string;
+  border: string;
+  badge?: React.ReactNode;
+}) {
+  const tones = {
+    indigo: { chip: 'bg-indigo-600', title: 'text-indigo-200', accent: 'text-indigo-400/80' },
+    purple: { chip: 'bg-purple-600', title: 'text-purple-200', accent: 'text-purple-400/80' },
+    amber: { chip: 'bg-amber-600', title: 'text-amber-200', accent: 'text-amber-400/80' },
+    cyan: { chip: 'bg-cyan-600', title: 'text-cyan-200', accent: 'text-cyan-400/80' },
+    blue: { chip: 'bg-blue-600', title: 'text-blue-200', accent: 'text-blue-400/80' }
+  }[tone];
+
+  return (
+    <div className={`flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between border-b pb-2 ${border}`}>
+      <div className="flex items-start gap-2 min-w-0">
+        <div className={`w-6 h-6 mt-0.5 rounded-lg ${tones.chip} text-white flex items-center justify-center shadow-md shrink-0`}>
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <h3 className={`font-black text-sm tracking-wide uppercase ${tones.title}`}>
+            {title} <span className={`${tones.accent} font-bold normal-case`}>— {role}</span>
+          </h3>
+          <p className="text-[10px] text-slate-400 font-medium leading-snug">{desc}</p>
+        </div>
+      </div>
+      {badge ? <div className="shrink-0 self-start sm:self-auto">{badge}</div> : null}
+    </div>
+  );
+}
 
 interface ProfileEditModalProps {
   isOpen: boolean;
@@ -133,7 +186,7 @@ export default function ProfileEditModal({
   const [inspectedItem, setInspectedItem] = useState<{
     type: 'avatar' | 'title' | 'badge';
     title: string;
-    icon: string;
+    glyph?: string;
     tier: string;
     tierLevel: number;
     isUnlocked: boolean;
@@ -145,6 +198,12 @@ export default function ProfileEditModal({
   if (!isOpen) return null;
 
   const prestige = getPrestigeTier(unlockedBadges, duelStats.duelWins, equippedTitle);
+  const prestigeTitleGlyph =
+    TITLE_GLYPHS[ALL_TITLES.find((t) => t.name === prestige.title)?.id || ''] || 'laurel';
+  const currentAvatarGlyph =
+    glyphFromAvatarToken(avatarIcon) ||
+    AVATAR_GLYPHS[AVATAR_ICONS.find((i) => i.icon === avatarIcon)?.id || ''] ||
+    'compass';
 
   // Filter badges by tier
   const tierBadges = {
@@ -299,26 +358,33 @@ export default function ProfileEditModal({
         {/* Modal Header with Live Avatar Preview & Quick Summary */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5 pr-8">
           <div className="flex items-center gap-3 min-w-0">
-            <AvatarWithBadgeFrame
-              rumuz={newRumuzInput || currentRumuz}
-              unlockedBadges={unlockedBadges}
-              duelWins={duelStats.duelWins}
-              avatarIcon={avatarIcon}
-              avatarBg={avatarBg}
-              equippedTitle={equippedTitle}
-              size="lg"
-              showBadgePin={true}
-            />
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="font-black text-base text-white tracking-wide truncate">
-                  {newRumuzInput || currentRumuz}
-                </h2>
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-500/30 shrink-0">
-                  {prestige.pinIcon} {prestige.title}
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 mt-0.5 truncate">
+            <span className="shrink-0">
+              <AvatarWithBadgeFrame
+                rumuz={newRumuzInput || currentRumuz}
+                unlockedBadges={unlockedBadges}
+                duelWins={duelStats.duelWins}
+                avatarIcon={avatarIcon}
+                avatarBg={avatarBg}
+                equippedTitle={equippedTitle}
+                size="lg"
+                showBadgePin={true}
+              />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-black text-base text-white tracking-wide truncate">
+                {newRumuzInput || currentRumuz}
+              </h2>
+              <span className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-500/30 max-w-full">
+                <WearableEmblem
+                  family="badge"
+                  tier={prestige.tierLevel}
+                  glyph={prestigeTitleGlyph}
+                  className="h-3.5 w-3.5 shrink-0"
+                  strokeWidth={2.4}
+                />
+                <span className="truncate">{prestige.title}</span>
+              </span>
+              <p className="text-xs text-slate-300 mt-1 truncate">
                 Kuşanılan: <strong className="text-amber-300 font-extrabold">{equippedTitle}</strong>
               </p>
             </div>
@@ -363,6 +429,83 @@ export default function ProfileEditModal({
         {/* ALL-IN-ONE COMPACT CONTENT */}
         <div className="space-y-4 text-xs">
 
+          {/* GIYILEBILIR LEJANDI — üç katmanın ne olduğu ve beş kademenin
+              görsel dili. Tekrar eden "5. Kademe" çipleri yerine tek yer. */}
+          <div className="rounded-2xl border border-[#c9a24a]/35 bg-black/35 p-3 space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#e3c987]">
+                Giyilebilir Katmanlar
+              </span>
+              <span className="text-[10px] text-slate-400 font-medium">
+                Üçü farklı şeydir — biri görünüm, biri kimlik, biri başarı.
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[
+                {
+                  family: 'avatar' as const,
+                  tier: 3,
+                  glyph: 'lion',
+                  title: 'Avatar İkonu',
+                  role: 'Sadece görünüm',
+                  desc: 'Profil resmin. Puan ya da rozet vermez, sadece karakterini gösterir.',
+                  accent: 'border-indigo-400/40 bg-indigo-500/10',
+                  label: 'text-indigo-200'
+                },
+                {
+                  family: 'title' as const,
+                  tier: 3,
+                  glyph: 'crown',
+                  title: 'Resmi Ünvan',
+                  role: 'Kimlik / saygınlık',
+                  desc: 'Adının altında görünen isim. Zirvede tek ünvan kuşanılır, puan eklemez.',
+                  accent: 'border-amber-400/40 bg-amber-500/10',
+                  label: 'text-amber-200'
+                },
+                {
+                  family: 'badge' as const,
+                  tier: 3,
+                  glyph: 'trophy',
+                  title: 'Başarı Rozeti',
+                  role: 'Kanıt / koleksiyon',
+                  desc: 'Bir hedefi tamamladığının kanıtı. Rozetler kademeni ve ünvanlarını açar.',
+                  accent: 'border-cyan-400/40 bg-cyan-500/10',
+                  label: 'text-cyan-200'
+                }
+              ].map((card) => (
+                <div key={card.family} className={`rounded-xl border p-2 flex items-start gap-2 ${card.accent}`}>
+                  <WearableEmblem family={card.family} tier={card.tier} glyph={card.glyph} className="h-9 w-9 shrink-0" />
+                  <div className="min-w-0">
+                    <div className={`text-[11px] font-black ${card.label}`}>{card.title}</div>
+                    <div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{card.role}</div>
+                    <p className="text-[9.5px] text-slate-300 leading-snug mt-0.5">{card.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-white/10 pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#e3c987]">Kademe Merdiveni</span>
+                <span className="text-[10px] text-slate-400">Şekil, renk ve efekt birlikte değişir — 4 ile 5 karışmaz.</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                {[1, 2, 3, 4, 5].map((t) => (
+                  <div key={t} className="rounded-lg border border-white/10 bg-white/5 px-1.5 py-1.5 flex items-center gap-1.5">
+                    <TierMark tier={t} className="h-6 w-6 shrink-0" />
+                    <div className="min-w-0">
+                      <div className="text-[9.5px] font-black text-slate-100 leading-none">
+                        {TIER_LABELS[t].name}
+                      </div>
+                      <div className="text-[8px] text-slate-400 leading-tight mt-0.5">{TIER_LABELS[t].short}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* ITEM INSPECTOR DIALOG / BANNER (Reveals exactly how to unlock and current progress on click/hover) */}
           {inspectedItem && (
             <div className="p-3.5 rounded-xl border border-[#c9a24a]/50 bg-[#c9a24a]/10 space-y-2 animate-in fade-in zoom-in-95 duration-150 relative">
@@ -375,14 +518,13 @@ export default function ProfileEditModal({
               </button>
 
               <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${
-                  inspectedItem.tierLevel === 5 ? 'bg-[linear-gradient(180deg,#e3c987,#c9a24a)] text-[#221b0c] font-semibold ring-2 ring-[#c9a24a]/60' :
-                  inspectedItem.tierLevel === 4 ? 'bg-[linear-gradient(180deg,#9db8a4,#6d9479)] text-[#0a1410] font-semibold ring-1 ring-[#9db8a4]/60' :
-                  inspectedItem.tierLevel === 3 ? 'bg-amber-400 text-slate-950 font-black' :
-                  inspectedItem.tierLevel === 2 ? 'bg-slate-200 text-slate-950 font-black' :
-                  'bg-amber-800 text-amber-100'
-                }`}>
-                  {inspectedItem.icon}
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-black/40 border border-white/10">
+                  <WearableEmblem
+                    family={inspectedItem.type === 'avatar' ? 'avatar' : inspectedItem.type === 'title' ? 'title' : 'badge'}
+                    tier={inspectedItem.tierLevel}
+                    glyph={inspectedItem.glyph}
+                    className="h-10 w-10"
+                  />
                 </div>
 
                 <div className="flex-1 min-w-0 pr-6">
@@ -423,33 +565,31 @@ export default function ProfileEditModal({
 
           {/* 1. KATEGORİ: AVATAR İKONU SEÇİMİ */}
           <div className="p-3.5 rounded-2xl border border-[#c9a24a]/30 bg-[#c9a24a]/8 space-y-3">
-            <div className="flex items-center justify-between border-b border-indigo-500/30 pb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-md">
-                  <Palette className="w-3.5 h-3.5" />
-                </div>
-                <div>
-                  <h3 className="font-black text-sm text-indigo-200 tracking-wide uppercase">
-                    1. Avatar İkonu
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">Karakterini temsil eden bir obje seç</p>
-                </div>
-              </div>
-              <span className="text-[10px] text-amber-300 font-black bg-amber-500/15 px-2.5 py-1 rounded-lg border border-amber-500/30 shadow-sm">
-                Kademen: {userHighestAvatarTier === 'mythic' ? '🌌 5. Kademe' : userHighestAvatarTier === 'diamond' ? '💎 4. Kademe' : userHighestAvatarTier === 'gold' ? '👑 3. Kademe' : userHighestAvatarTier === 'silver' ? '🛡️ 2. Kademe' : userHighestAvatarTier === 'bronze' ? '🐣 1. Kademe' : '🌱 Başlangıç'}
-              </span>
-            </div>
+            <SectionHeader
+              icon={<Palette className="w-3.5 h-3.5" />}
+              tone="indigo"
+              title="1. Avatar İkonu"
+              role="sadece görünüm"
+              desc="Profilindeki sembol. Puan veya rozet kazandırmaz, yalnızca seni temsil eder."
+              border="border-indigo-500/30"
+              badge={
+                <span className="text-[10px] text-amber-300 font-black bg-amber-500/15 px-2.5 py-1 rounded-lg border border-amber-500/30 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                  <TierMark tier={userHighestAvatarTier === 'mythic' ? 5 : userHighestAvatarTier === 'diamond' ? 4 : userHighestAvatarTier === 'gold' ? 3 : userHighestAvatarTier === 'silver' ? 2 : userHighestAvatarTier === 'bronze' ? 1 : 0} className="h-4 w-4" />
+                  Kademen: {TIER_LABELS[userHighestAvatarTier === 'mythic' ? 5 : userHighestAvatarTier === 'diamond' ? 4 : userHighestAvatarTier === 'gold' ? 3 : userHighestAvatarTier === 'silver' ? 2 : userHighestAvatarTier === 'bronze' ? 1 : 0].short}
+                </span>
+              }
+            />
 
             {/* Kademe Filtreleme Sekmeleri */}
             <div className="flex flex-wrap items-center gap-1 pb-1 text-[10px] font-bold">
               {[
-                { id: 'all', label: `Tümü (${AVATAR_ICONS.length})` },
-                { id: 'mythic', label: '🌌 5. Kademe' },
-                { id: 'diamond', label: '💎 4. Kademe' },
-                { id: 'gold', label: '👑 3. Kademe' },
-                { id: 'silver', label: '🛡️ 2. Kademe' },
-                { id: 'bronze', label: '🐣 1. Kademe' },
-                { id: 'starter', label: '🌱 Başlangıç' }
+                { id: 'all', label: `Tümü (${AVATAR_ICONS.length})`, tier: 0 },
+                { id: 'mythic', label: '5 · Kozmik', tier: 5 },
+                { id: 'diamond', label: '4 · Elmas', tier: 4 },
+                { id: 'gold', label: '3 · Altın', tier: 3 },
+                { id: 'silver', label: '2 · Gümüş', tier: 2 },
+                { id: 'bronze', label: '1 · Bronz', tier: 1 },
+                { id: 'starter', label: 'Başlangıç', tier: 0 }
               ].map((tab) => {
                 const isActive = avatarTierFilter === tab.id;
                 const isUserCurrent = userHighestAvatarTier === tab.id;
@@ -457,7 +597,7 @@ export default function ProfileEditModal({
                   <button
                     key={tab.id}
                     onClick={() => setAvatarTierFilter(tab.id as typeof avatarTierFilter)}
-                    className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-2 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer inline-flex items-center gap-1 ${
                       isActive
                         ? 'hf-btn-brass border-[#c9a24a]/60'
                         : isUserCurrent
@@ -465,6 +605,7 @@ export default function ProfileEditModal({
                         : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
+                    {tab.tier > 0 && <TierMark tier={tab.tier} className="h-3.5 w-3.5" />}
                     {tab.label} {isUserCurrent && tab.id !== 'all' && '★'}
                   </button>
                 );
@@ -478,7 +619,9 @@ export default function ProfileEditModal({
                 const isDuelMet = !item.minDuelWinsRequired || duelStats.duelWins >= item.minDuelWinsRequired;
                 const isScoreMet = !item.minScoreRequired || totalCareerScore >= item.minScoreRequired;
                 const isUnlocked = isBadgesMet && isDuelMet && isScoreMet;
-                const isSelected = avatarIcon === item.icon;
+                const itemGlyph = AVATAR_GLYPHS[item.id];
+                const itemToken = avatarToken(itemGlyph || 'compass');
+                const isSelected = avatarIcon === itemToken || avatarIcon === item.icon;
 
                 const itemTierLevel = item.tier === 'mythic' ? 5 : item.tier === 'diamond' ? 4 : item.tier === 'gold' ? 3 : item.tier === 'silver' ? 2 : item.tier === 'bronze' ? 1 : 0;
 
@@ -494,18 +637,10 @@ export default function ProfileEditModal({
                   ? `Coğrafya harita testlerini çözerek ve düellolara katılarak en az ${item.minBadgesRequired} farklı başarı rozeti kazanın.`
                   : 'Bu avatar başlangıç seviyesinde tüm kullanıcılara açıktır.';
 
-                const iconScaleClass = itemTierLevel === 5
-                  ? 'text-xl sm:text-2xl scale-105'
-                  : itemTierLevel === 4
-                  ? 'text-lg sm:text-xl scale-100'
-                  : itemTierLevel === 3
-                  ? 'text-lg sm:text-xl scale-100'
-                  : 'text-base sm:text-lg scale-95';
-
                 const inspectData = {
                   type: 'avatar' as const,
                   title: item.label,
-                  icon: item.icon,
+                  glyph: itemGlyph,
                   tier: `${itemTierLevel}. Kademe (${item.tier.toUpperCase()})`,
                   tierLevel: itemTierLevel,
                   isUnlocked,
@@ -520,7 +655,7 @@ export default function ProfileEditModal({
                     onMouseEnter={() => setInspectedItem(inspectData)}
                     onClick={() => {
                       if (isUnlocked) {
-                        handleSelectAvatarIcon(item.icon);
+                        handleSelectAvatarIcon(itemToken);
                       }
                       setInspectedItem(inspectData);
                     }}
@@ -538,12 +673,12 @@ export default function ProfileEditModal({
                         ✓
                       </span>
                     )}
-                    <span
-                      className={`my-0.5 leading-none select-none transition-transform hover:scale-125 ${iconScaleClass}`}
-                      style={{ filter: getAvatarOutlineFilter(avatarBg, isUnlocked ? itemTierLevel : 0) }}
-                    >
-                      {item.icon}
-                    </span>
+                    <WearableEmblem
+                      family="avatar"
+                      tier={isUnlocked ? itemTierLevel : 0}
+                      glyph={itemGlyph}
+                      className="my-0.5 h-7 w-7 shrink-0 transition-transform hover:scale-110"
+                    />
                     <span className="text-[8px] font-bold truncate max-w-full text-center leading-none">
                       {item.label}
                     </span>
@@ -568,19 +703,14 @@ export default function ProfileEditModal({
 
           {/* 2. KATEGORİ: AVATAR EFEKTİ & PARILTI */}
           <div className="p-3.5 rounded-2xl border border-[#c9a24a]/30 bg-[#c9a24a]/8 space-y-3">
-            <div className="flex items-center justify-between border-b border-purple-500/30 pb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center shadow-md">
-                  <Sparkles className="w-3.5 h-3.5" />
-                </div>
-                <div>
-                  <h3 className="font-black text-sm text-purple-200 tracking-wide uppercase">
-                    2. Avatar Efekti &amp; Parıltı
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">Avatarının etrafını saran parlak aura ve neon outline çizgisi</p>
-                </div>
-              </div>
-            </div>
+            <SectionHeader
+              icon={<Sparkles className="w-3.5 h-3.5" />}
+              tone="purple"
+              title="2. Avatar Efekti"
+              role="aura"
+              desc="Avatarının dış hattını boyayan ışık. Oyunu etkilemez; kademen yükseldikçe daha güçlü görünür."
+              border="border-purple-500/30"
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
               {AVATAR_THEMES.map((theme) => {
@@ -596,10 +726,15 @@ export default function ProfileEditModal({
                     }`}
                   >
                     <span
-                      className="text-xl leading-none shrink-0 select-none"
+                      className="shrink-0 select-none"
                       style={{ filter: theme.outlineFilter }}
                     >
-                      {avatarIcon || '🦁'}
+                      <WearableEmblem
+                        family="avatar"
+                        tier={theme.tierLevel}
+                        glyph={currentAvatarGlyph}
+                        className="h-9 w-9"
+                      />
                     </span>
                     <div className="min-w-0 text-left">
                       <span className="text-xs font-bold text-slate-200 block truncate">{theme.name}</span>
@@ -621,32 +756,30 @@ export default function ProfileEditModal({
 
           {/* 3. KATEGORİ: KUŞANILABİLİR RESMİ ÜNVANLAR */}
           <div className="p-3.5 rounded-2xl border border-[#c9a24a]/40 bg-[#c9a24a]/10 space-y-3">
-            <div className="flex items-center justify-between border-b border-amber-500/30 pb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-md">
-                  <Crown className="w-3.5 h-3.5 text-amber-100" />
-                </div>
-                <div>
-                  <h3 className="font-black text-sm text-amber-200 tracking-wide uppercase">
-                    3. Resmi Ünvanlar
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">Profilinde ve liderlik tablosunda adının altında sergilenen resmi ünvan</p>
-                </div>
-              </div>
-              <span className="text-[10px] text-amber-300 font-black bg-amber-500/15 px-2.5 py-1 rounded-lg border border-amber-500/30 shadow-sm">
-                Kademen: {userHighestTitleTier === 'mythic' ? '🌌 5. Kademe' : userHighestTitleTier === 'diamond' ? '💎 4. Kademe' : userHighestTitleTier === 'gold' ? '👑 3. Kademe' : userHighestTitleTier === 'silver' ? '🛡️ 2. Kademe' : '🌱 1. Kademe'}
-              </span>
-            </div>
+            <SectionHeader
+              icon={<Crown className="w-3.5 h-3.5 text-amber-100" />}
+              tone="amber"
+              title="3. Resmi Ünvanlar"
+              role="kimlik"
+              desc="Adının altında görünen isim. Aynı anda tek ünvan kuşanılır; puan vermez, saygınlık verir."
+              border="border-amber-500/30"
+              badge={
+                <span className="text-[10px] text-amber-300 font-black bg-amber-500/15 px-2.5 py-1 rounded-lg border border-amber-500/30 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                  <TierMark tier={userHighestTitleTier === 'mythic' ? 5 : userHighestTitleTier === 'diamond' ? 4 : userHighestTitleTier === 'gold' ? 3 : userHighestTitleTier === 'silver' ? 2 : 1} className="h-4 w-4" />
+                  Kademen: {TIER_LABELS[userHighestTitleTier === 'mythic' ? 5 : userHighestTitleTier === 'diamond' ? 4 : userHighestTitleTier === 'gold' ? 3 : userHighestTitleTier === 'silver' ? 2 : 1].short}
+                </span>
+              }
+            />
 
             {/* Ünvan Kademe Filtreleme Sekmeleri */}
             <div className="flex flex-wrap items-center gap-1 pb-1 text-[10px] font-bold">
               {[
-                { id: 'all', label: `Tümü (${ALL_TITLES.length})` },
-                { id: 'mythic', label: '🌌 5. Kademe' },
-                { id: 'diamond', label: '💎 4. Kademe' },
-                { id: 'gold', label: '👑 3. Kademe' },
-                { id: 'silver', label: '🛡️ 2. Kademe' },
-                { id: 'bronze', label: '🌱 1. Kademe' }
+                { id: 'all', label: `Tümü (${ALL_TITLES.length})`, tier: 0 },
+                { id: 'mythic', label: '5 · Kozmik', tier: 5 },
+                { id: 'diamond', label: '4 · Elmas', tier: 4 },
+                { id: 'gold', label: '3 · Altın', tier: 3 },
+                { id: 'silver', label: '2 · Gümüş', tier: 2 },
+                { id: 'bronze', label: '1 · Bronz', tier: 1 }
               ].map((tab) => {
                 const isActive = titleTierFilter === tab.id;
                 const isUserCurrent = userHighestTitleTier === tab.id;
@@ -654,7 +787,7 @@ export default function ProfileEditModal({
                   <button
                     key={tab.id}
                     onClick={() => setTitleTierFilter(tab.id as typeof titleTierFilter)}
-                    className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-2 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer inline-flex items-center gap-1 ${
                       isActive
                         ? 'bg-amber-500 border-amber-300 text-slate-950 font-black shadow-md shadow-amber-500/30'
                         : isUserCurrent
@@ -662,6 +795,7 @@ export default function ProfileEditModal({
                         : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
+                    {tab.tier > 0 && <TierMark tier={tab.tier} className="h-3.5 w-3.5" />}
                     {tab.label} {isUserCurrent && tab.id !== 'all' && '★'}
                   </button>
                 );
@@ -697,7 +831,7 @@ export default function ProfileEditModal({
                 const inspectData = {
                   type: 'title' as const,
                   title: titleObj.name,
-                  icon: titleObj.icon,
+                  glyph: TITLE_GLYPHS[titleObj.id],
                   tier: tierStyle.tierName,
                   tierLevel,
                   isUnlocked,
@@ -723,7 +857,12 @@ export default function ProfileEditModal({
                   >
                     <div className="flex items-center justify-between gap-1.5">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="text-base shrink-0">{titleObj.icon}</span>
+                        <WearableEmblem
+                          family="title"
+                          tier={tierLevel}
+                          glyph={TITLE_GLYPHS[titleObj.id]}
+                          className="h-7 w-7 shrink-0"
+                        />
                         <div className="min-w-0">
                           <div className="flex items-center gap-1 flex-wrap">
                             <span className={`font-black text-xs truncate ${isUnlocked ? tierStyle.textClass : 'text-slate-200'}`}>
@@ -774,32 +913,30 @@ export default function ProfileEditModal({
 
           {/* 4. KATEGORİ: KADEMELİ ROZETLER GALERİSİ */}
           <div className="p-3.5 rounded-2xl border border-[#3f7070]/40 bg-[#3f7070]/8 space-y-3">
-            <div className="flex items-center justify-between border-b border-cyan-500/30 pb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-cyan-600 text-white flex items-center justify-center shadow-md">
-                  <Medal className="w-3.5 h-3.5 text-cyan-100" />
-                </div>
-                <div>
-                  <h3 className="font-black text-sm text-cyan-200 tracking-wide uppercase">
-                    4. Başarı Rozetleri ({unlockedBadges.length}/{ALL_BADGES.length})
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">KPSS harita testleri ve düellolarla kazanılan başarı madalyonları</p>
-                </div>
-              </div>
-              <span className="text-[10px] text-cyan-300 font-black bg-cyan-500/15 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm">
-                Kademen: {userHighestBadgeTier === 'mythic' ? '🌌 5. Kademe' : userHighestBadgeTier === 'diamond' ? '💎 4. Kademe' : userHighestBadgeTier === 'gold' ? '👑 3. Kademe' : userHighestBadgeTier === 'silver' ? '🛡️ 2. Kademe' : '🌱 1. Kademe'}
-              </span>
-            </div>
+            <SectionHeader
+              icon={<Medal className="w-3.5 h-3.5 text-cyan-100" />}
+              tone="cyan"
+              title={`4. Başarı Rozetleri (${unlockedBadges.length}/${ALL_BADGES.length})`}
+              role="kanıt"
+              desc="Tamamladığın hedeflerin madalyonları. Rozet sayın kademeni, kademen de açılan avatar ve ünvanları belirler."
+              border="border-cyan-500/30"
+              badge={
+                <span className="text-[10px] text-cyan-300 font-black bg-cyan-500/15 px-2.5 py-1 rounded-lg border border-cyan-500/30 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                  <TierMark tier={userHighestBadgeTier === 'mythic' ? 5 : userHighestBadgeTier === 'diamond' ? 4 : userHighestBadgeTier === 'gold' ? 3 : userHighestBadgeTier === 'silver' ? 2 : 1} className="h-4 w-4" />
+                  Kademen: {TIER_LABELS[userHighestBadgeTier === 'mythic' ? 5 : userHighestBadgeTier === 'diamond' ? 4 : userHighestBadgeTier === 'gold' ? 3 : userHighestBadgeTier === 'silver' ? 2 : 1].short}
+                </span>
+              }
+            />
 
             {/* Rozet Kademe Filtreleme Sekmeleri */}
             <div className="flex flex-wrap items-center gap-1 pb-1 text-[10px] font-bold">
               {[
-                { id: 'all', label: `Tümü (${ALL_BADGES.length})` },
-                { id: 'mythic', label: '🌌 5. Kademe' },
-                { id: 'diamond', label: '💎 4. Kademe' },
-                { id: 'gold', label: '👑 3. Kademe' },
-                { id: 'silver', label: '🛡️ 2. Kademe' },
-                { id: 'bronze', label: '🌱 1. Kademe' }
+                { id: 'all', label: `Tümü (${ALL_BADGES.length})`, tier: 0 },
+                { id: 'mythic', label: '5 · Kozmik', tier: 5 },
+                { id: 'diamond', label: '4 · Elmas', tier: 4 },
+                { id: 'gold', label: '3 · Altın', tier: 3 },
+                { id: 'silver', label: '2 · Gümüş', tier: 2 },
+                { id: 'bronze', label: '1 · Bronz', tier: 1 }
               ].map((tab) => {
                 const isActive = badgeTierFilter === tab.id;
                 const isUserCurrent = userHighestBadgeTier === tab.id;
@@ -807,7 +944,7 @@ export default function ProfileEditModal({
                   <button
                     key={tab.id}
                     onClick={() => setBadgeTierFilter(tab.id as typeof badgeTierFilter)}
-                    className={`px-2.5 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-2 py-1 rounded-lg border whitespace-nowrap transition-all cursor-pointer inline-flex items-center gap-1 ${
                       isActive
                         ? 'border-[#3f6673]/70 bg-[#30525d]/40 text-[#c3d0d2] font-semibold'
                         : isUserCurrent
@@ -815,6 +952,7 @@ export default function ProfileEditModal({
                         : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
+                    {tab.tier > 0 && <TierMark tier={tab.tier} className="h-3.5 w-3.5" />}
                     {tab.label} {isUserCurrent && tab.id !== 'all' && '★'}
                   </button>
                 );
@@ -849,7 +987,7 @@ export default function ProfileEditModal({
                         const inspectData = {
                           type: 'badge' as const,
                           title: badge.name,
-                          icon: badge.icon,
+                          glyph: BADGE_GLYPHS[badge.id],
                           tier: tierStyle.tierName,
                           tierLevel,
                           isUnlocked,
@@ -876,7 +1014,12 @@ export default function ProfileEditModal({
                             }`}
                           >
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="text-base shrink-0">{badge.icon}</span>
+                              <WearableEmblem
+                                family="badge"
+                                tier={tierLevel}
+                                glyph={BADGE_GLYPHS[badge.id]}
+                                className="h-6 w-6 shrink-0"
+                              />
                               <div className="min-w-0">
                                 <span className={`font-black text-[11px] truncate block ${isUnlocked ? tierStyle.textClass : 'text-slate-300'}`}>
                                   {badge.name}

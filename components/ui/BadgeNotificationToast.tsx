@@ -3,6 +3,9 @@
 import React, { useEffect } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { Sparkles, X } from 'lucide-react';
+import { ALL_BADGES } from '@/lib/data/badgesData';
+import { WearableEmblem } from '@/components/ui/wearables/WearableEmblem';
+import { BADGE_GLYPHS, tierLevelOf } from '@/lib/data/wearableGlyphs';
 
 export default function BadgeNotificationToast() {
   const { latestUnlockedBadge, clearLatestUnlockedBadge } = useAppStore();
@@ -19,6 +22,10 @@ export default function BadgeNotificationToast() {
 
   if (!latestUnlockedBadge) return null;
 
+  const badgeEntry = ALL_BADGES.find((b) => b.name === latestUnlockedBadge.name);
+  const badgeGlyph = badgeEntry ? BADGE_GLYPHS[badgeEntry.id] : undefined;
+  const badgeTier = badgeEntry ? tierLevelOf(badgeEntry.tier) : 3;
+
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 max-w-sm w-full">
       <div className="relative overflow-hidden p-4 rounded-2xl bg-[#09090b]/95 border-2 border-amber-400/80 shadow-2xl shadow-amber-500/20 backdrop-blur-2xl text-white">
@@ -28,8 +35,13 @@ export default function BadgeNotificationToast() {
 
         <div className="flex items-start justify-between gap-3 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/30 shrink-0 animate-bounce">
-              {latestUnlockedBadge.icon || '🏆'}
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400/25 to-orange-500/15 border border-amber-300/40 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+              <WearableEmblem
+                family="badge"
+                tier={badgeTier}
+                glyph={badgeGlyph}
+                className="h-10 w-10"
+              />
             </div>
 
             <div>

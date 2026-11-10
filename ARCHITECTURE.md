@@ -116,6 +116,45 @@ Değiştirirken `AppFrame`'deki sabit değil **yalnızca** `--hf-band` güncelle
 
 ---
 
+### Giyilebilir katmanlar — üç aile, beş kademe, tek sembol dili
+
+Profilde dört ayrı şey giyilir ve **karıştırılmamaları** gerekir. Ayrımı renk değil **silüet** yapar; renk yalnızca kademeyi söyler. Kaynak: `components/ui/wearables/`.
+
+| Katman | Ne işe yarar | Aile silüeti (`WearableEmblem family=`) | Veri |
+|---|---|---|---|
+| **Avatar ikonu** | Yalnız görünüm. Puan/rozet vermez | **Halka** — avatarın kendisi çember içinde | `AVATAR_ICONS` + `AVATAR_GLYPHS` |
+| **Avatar efekti** | Aura; avatarın dış hattını boyar | (ayrı çizim, `AVATAR_THEMES`) | `AVATAR_THEMES` |
+| **Resmi ünvan** | Kimlik/saygınlık. Aynı anda tek ünvan | **Plaka/banner** — yatay şerit | `ALL_TITLES` + `TITLE_GLYPHS` |
+| **Başarı rozeti** | Kanıt/koleksiyon. Kademeyi bunlar açar | **Madalyon** — dikey, madalya gövdesi | `ALL_BADGES` + `BADGE_GLYPHS` |
+
+Kademe geometrisi (`48×48` plaka, `<WearableEmblem tier={1..5}>`):
+
+| Kademe | Rozet (madalyon) | Ünvan (plaka) | Avatar (halka) |
+|---|---|---|---|
+| 1 Bronz | yuvarlak + 4 köşe noktası | düz plaka + 4 perçin | halka + 4 köşe noktası |
+| 2 Gümüş | kalkan | kırlangıç kuyruğu | çift halka |
+| 3 Altın | 8 köşe yıldız | kırlangıç kuyruğu + kalın üst şerit | ışınlı halka (8 ışın) |
+| 4 Elmas | **altıgen kesim** (soğuk, yörünge yok) | altıgen kesim | **sekizgen** (köşe kırıklı) |
+| 5 Kozmik | **12 köşe patlama + 2 yörünge elipsi** | şerit + yörünge elipsi | kesikli halka + 2 yörünge elipsi |
+
+> **4 → 5 kuralı (ürün kararı):** beşinci kademe, dördüncünün süslenmiş hâli **değildir**. Geometri değişir (altıgen → patlama), renk değişir (cyan → fuchsia/cyan çift ton), ve yalnızca 5. kademede **yörünge elipsi** eklenir. 24px'te bile ayırt edilebilir olması şarttır; bu yüzden 4. kademeye yörünge/dash eklenmez.
+
+**Glif katmanı ayrı tutulur.** `lib/data/wearableGlyphs.ts` yalnızca `id → glyph` eşlemesidir; `badgesData.ts` oyun dengesi (eşikler, tracker anahtarları, isimler) olarak kalır. Sanat yönü değişince oyun dengesi dosyasına dokunulmaz. Emoji `icon` alanı **geriye dönük uyumluluk** için durur.
+
+| Dosya | Sorumluluk |
+|---|---|
+| `components/ui/wearables/glyphs.tsx` | ~120 içerik glifi, `24×24` ızgara, `{ s: stroke[], f: fill[] }` |
+| `components/ui/wearables/WearableEmblem.tsx` | Aile çerçeveleri, kademe paleti, `TierMark`, `glyphFromEmoji` |
+| `lib/data/wearableGlyphs.ts` | `AVATAR/TITLE/BADGE_GLYPHS`, `TIER_LABELS`, `g:` token yardımcıları |
+| `components/ui/ProfileEditModal.tsx` | Seçim arayüzü: lejant + kademe merdiveni + `SectionHeader` |
+| `components/ui/AvatarWithBadgeFrame.tsx` | Avatar halkası, ünvan pin madalyonu, sıralama/rekor madalyaları |
+
+**Ölçek kuralı (ölçülmüş hata):** glif 24×24, plaka 48×48. Glifi `scale(0.8–0.9)` ile küçültmek onu okunamaz yapıyordu; güncel dönüşüm `1.4–1.55`. Yeni glif eklerken plakanın **iç %60'ına** sığdır — çerçeve çizgisine değen glif 24px'te lekeye dönüşür.
+
+**Avatar token migration:** `avatarIcon` alanı iki biçim taşır. Yeni kayıtlar `g:<glyph>` yazar; eski `localStorage` kayıtları ham emojidir. Okuma sırası: `g:` token → `AVATAR_ICONS` emoji eşleşmesi → `glyphFromEmoji` → tek harf fallback. Bu zincir kırılırsa eski kullanıcıların avatarları boş kalır — `AvatarWithBadgeFrame` içindeki sıra korunmalıdır.
+
+**Aile içi tekillik:** bir ailede aynı glif iki kez kullanılmaz (`AVATAR_GLYPHS` 64/64, `TITLE_GLYPHS` 29/29, `BADGE_GLYPHS` 36/36 tekil). Aileler arası tekrar serbesttir (ör. `crown` hem ünvanda hem rozette), çünkü silüet farklıdır.
+
 ## 🌐 3. 3D Harita Motoru Mimarisi (`MapContainer.tsx`)
 
 1. **Projeksiyon & Koordinatlar**:

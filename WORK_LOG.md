@@ -4,6 +4,49 @@
 
 ---
 
+## 📅 [2026-11-11] - Giyilebilir Sembol Sistemi: Üç Aile, Beş Kademe, Emojisiz SVG
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: Avatar ikonu, avatar efekti, ünvan, başarı rozeti ve kademenin ne işe yaradığı net görünsün; SVG'ler birbirine benzemesin ("şu anda her kategoride aynı SVG'ler var"); 4. ve 5. kademe arasında net fark olsun ki 5. kademe için oynansın — bu kural tüm giyilebilir öğeler için geçerli.
+
+### Yaklaşım
+Ayrımı **silüet** yapar, renk değil. Üç aile üç ayrı gövde kullanır ve bir daha karışmaz:
+
+| Aile | Silüet | Evrim |
+|---|---|---|
+| Rozet | **madalyon** (dikey) | daire → kalkan → 8 köşe yıldız → altıgen kesim → 12 köşe patlama + yörünge |
+| Ünvan | **plaka/banner** (yatay) | düz plaka → kırlangıç kuyruğu → altıgen → şerit + yörünge |
+| Avatar | **halka** | halka + köşe noktaları → çift çember → ışınlı halka → sekizgen → kesikli halka + yörünge |
+
+**4 → 5 kuralı:** 5. kademe, 4'ün süslenmiş hâli değil — geometri (altıgen → patlama), renk (cyan → fuchsia/cyan çift ton) ve efekt (yalnızca 5'te yörünge elipsi) birlikte değişir. 4. kademeye yörünge eklenmez ki fark korunsun. 24px'te bile ayırt edilir.
+
+### Yeni dosyalar
+| Dosya | İçerik |
+|---|---|
+| `components/ui/wearables/glyphs.tsx` | ~120 SVG içerik glifi, `24×24`, `{ s: stroke[], f: fill[] }` |
+| `components/ui/wearables/WearableEmblem.tsx` | Aile çerçeveleri + kademe paleti + `TierMark` + `glyphFromEmoji` |
+| `lib/data/wearableGlyphs.ts` | `AVATAR_GLYPHS` (64), `TITLE_GLYPHS` (29), `BADGE_GLYPHS` (36), `TIER_LABELS`, `g:` token yardımcıları |
+
+### Değişen dosyalar
+- **`ProfileEditModal.tsx`**: "Giyilebilir Katmanlar" lejantı (3 kart: *sadece görünüm / kimlik / kanıt*), "Kademe Merdiveni" şeridi (5 kademe, `TierMark` ile), başlıklar `SectionHeader`'a taşındı (`— sadece görünüm / aura / kimlik / kanıt` rol etiketleri), tüm kademe filtre çipleri `TierMark` + kısa etiket (`5 · Kozmik`), avatar/ünvan/rozet gridleri SVG'ye çevrildi.
+- **`AvatarWithBadgeFrame.tsx`**: emoji kaldırıldı. Avatar halkası, ünvan pin madalyonu ve sıralama/rekor madalyaları artık `WearableEmblem`.
+- **`StatsModal.tsx`**, **`BadgeNotificationToast.tsx`**: rozet ikonları `WearableEmblem` (açık/kilitli durumu kademe 0 ile gösterilir).
+- **`badgesData.ts`**: `tierName`/`tierLabel` metinlerindeki emoji kaldırıldı → `5 · Kozmik`, `4 · Elmas`, … (emoji `icon` alanı geriye dönük uyumluluk için **korundu**).
+
+### Ölçülmüş hatalar (tekrar etmemek için)
+| Hata | Belirti | Düzeltme |
+|---|---|---|
+| Glif ölçeği çok küçük | `scale(0.8–0.9)` ile semboller 48px plakada okunamıyordu, hepsi "aynı" görünüyordu | `1.4–1.55`'e çıkarıldı, glif plakanın iç %60'ına oturuyor |
+| Kademe farkı yalnız renkte | 4 ve 5 aynı şekil, farklı ton → 24px'te ayırt edilemiyordu | Geometri de değişiyor; 5'e özel yörünge elipsi |
+| Emoji → `g:` token geçişi | Eski `localStorage` kayıtları boş avatar gösteriyordu | Okuma zinciri: `g:` token → `AVATAR_ICONS` emoji eşleşmesi → `glyphFromEmoji` → tek harf fallback |
+| Bölüm başlığı taşması | 390px'te başlık + "Kademen: 5. Kademe" çipi üst üste biniyordu | `SectionHeader`: mobilde dikey yığma, `sm` üstünde yan yana |
+
+### Doğrulama
+- `npx tsc --noEmit` temiz, `npx next build` temiz (13/13 statik sayfa).
+- Playwright ile 390 ve 1440 snapshot: profil modalı lejant, kademe merdiveni, avatar/ünvan/rozet bölümleri; 24/32/48/96px kademe merdiveni; üç ailenin 6 kademe × 14 glif ızgarası. Aile içi glif tekilliği betikle doğrulandı (64/29/36, tekrar yok).
+
+---
+
 ## 📅 [2026-11-10] - Menü ve Alt Menü Kompaktlaştırması (Taşmasız Sekme/Çip Rayları)
 
 - **Geliştirici**: AI Agent (OpenCode)

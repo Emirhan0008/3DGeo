@@ -21,6 +21,7 @@
 - [x] **Sidebar Hover & Dikey Şerit**: Sol kenara `fixed` 12px hover bölgesi (`absolute` iken `overflow-hidden` kırpıyordu), kapalı omurgada dikey "KATMANLAR" etiketi 10px/kalın/parlak, küre+parşömen amblemi aşağı alındı.
 - [x] **Kompakt Mobil Kabuk**: Mobilde omurgalar 24px/20px ve çerçeveye sıfır boşlukla yapışık (`rounded-r-xl` / `rounded-l-xl`), HUD pili `left-7` + 36px yüksekliğe indi, `ScaleControl` tamamen kaldırıldı (sol alt köşe küre amblemine ait), navbar'da katman butonu + pusula madalyonu tek **pusula logosunda** birleşti, sekme ikonları mobilde gizlenip etiketler eşit dağıldı. Masaüstü taşması da düzeltildi (1280px'te 201px → 0).
 - [x] **Menü ve Alt Menü Kompaktlaştırması**: Sekme/çip raylarındaki 12 gerçek taşma ölçümle bulunup giderildi (analiz alt-sekmeleri 308px, sıralama 236px, Ezber kategorileri 328px, düello kategori seçicisi…). Kural `ARCHITECTURE.md` §2b'ye yazıldı: ya `flex-wrap`, ya mobil kısa etiket + `flex-1` — yatay kaydırıcı sekme rayı yasak. 360/390/1440'ta 0 taşma.
+- [x] **Giyilebilir Sembol Sistemi (Üç Aile / Beş Kademe)**: Avatar ikonu, avatar efekti, ünvan ve rozet artık silüetle ayrılıyor — sırasıyla **halka**, aura, **plaka** ve **madalyon**. Kademeler geometri + renk + efekt üçlüsüyle değişiyor; 4 (altıgen kesim) ile 5 (12 köşe patlama + yörünge elipsi) 24px'te bile karışmıyor. 129 sembolün tamamı ~120 SVG glife çevrildi (emoji kalmadı, eski kayıtlar `g:` token zinciriyle taşındı). Profil modalına "Giyilebilir Katmanlar" lejantı ve "Kademe Merdiveni" şeridi eklendi. Kural `ARCHITECTURE.md` §2b'de.
 
 ---
 

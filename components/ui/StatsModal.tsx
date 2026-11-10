@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useAppStore } from '@/lib/store/useStore';
 import { ALL_BADGES } from '@/lib/data/badgesData';
+import { WearableEmblem } from '@/components/ui/wearables/WearableEmblem';
+import { BADGE_GLYPHS, tierLevelOf } from '@/lib/data/wearableGlyphs';
 import AvatarWithBadgeFrame from '@/components/ui/AvatarWithBadgeFrame';
 import { RankBar } from '@/components/ui/RankBadge';
 import { 
@@ -895,10 +897,15 @@ export default function StatsModal() {
  }`}
 >
  <div className="flex items-start gap-2.5">
- <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0 ${
- isUnlocked ? 'bg-[linear-gradient(180deg,#e3c987,#c9a24a)] text-[#221b0c] font-semibold shadow-md' : 'bg-white/8 text-[#6a6f4e]'
+ <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+ isUnlocked ? 'bg-[linear-gradient(180deg,#e3c987,#c9a24a)] shadow-md' : 'bg-white/8'
  }`}>
- {badge.icon}
+ <WearableEmblem
+ family="badge"
+ tier={isUnlocked ? tierLevelOf(badge.tier) : 0}
+ glyph={BADGE_GLYPHS[badge.id]}
+ className="h-7 w-7"
+ />
  </div>
 
  <div className="flex-1 min-w-0">

@@ -1181,7 +1181,7 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
         textClass: 'text-fuchsia-200 font-black',
         borderClass: 'border-2 border-fuchsia-400 ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(217,70,239,0.7)]',
         bgClass: 'bg-gradient-to-tr from-purple-950/90 via-slate-950 to-cyan-950/90',
-        tierName: '🌌 5. Kademe (Mistik)',
+        tierName: '5 · Kozmik',
         tierNumber: 5,
         glowShadow: 'shadow-[0_0_20px_rgba(217,70,239,0.7)]'
       };
@@ -1191,7 +1191,7 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
         textClass: 'text-cyan-200 font-black',
         borderClass: 'border-2 border-cyan-300 ring-2 ring-purple-400 shadow-[0_0_16px_rgba(6,182,212,0.6)]',
         bgClass: 'bg-gradient-to-tr from-cyan-950/90 via-indigo-950 to-purple-950/90',
-        tierName: '💎 4. Kademe (Elmas)',
+        tierName: '4 · Elmas',
         tierNumber: 4,
         glowShadow: 'shadow-[0_0_16px_rgba(6,182,212,0.6)]'
       };
@@ -1201,7 +1201,7 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
         textClass: 'text-amber-300 font-bold',
         borderClass: 'border-2 border-amber-300 ring-2 ring-amber-400/70 shadow-[0_0_14px_rgba(245,158,11,0.5)]',
         bgClass: 'bg-gradient-to-tr from-amber-950 via-yellow-950 to-slate-900',
-        tierName: '👑 3. Kademe (Altın)',
+        tierName: '3 · Altın',
         tierNumber: 3,
         glowShadow: 'shadow-[0_0_14px_rgba(245,158,11,0.5)]'
       };
@@ -1211,7 +1211,7 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
         textClass: 'text-slate-100 font-bold',
         borderClass: 'border-2 border-slate-200 ring-1 ring-slate-300/70 shadow-[0_0_10px_rgba(203,213,225,0.4)]',
         bgClass: 'bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950',
-        tierName: '🛡️ 2. Kademe (Gümüş)',
+        tierName: '2 · Gümüş',
         tierNumber: 2,
         glowShadow: 'shadow-[0_0_10px_rgba(203,213,225,0.4)]'
       };
@@ -1221,7 +1221,7 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
         textClass: 'text-amber-300 font-semibold',
         borderClass: 'border-2 border-amber-500 ring-1 ring-amber-700/60 shadow-[0_0_8px_rgba(180,83,9,0.3)]',
         bgClass: 'bg-gradient-to-tr from-amber-950/50 to-slate-950',
-        tierName: '🐣 1. Kademe (Bronz)',
+        tierName: '1 · Bronz',
         tierNumber: 1,
         glowShadow: 'shadow-[0_0_8px_rgba(180,83,9,0.3)]'
       };
@@ -1232,7 +1232,7 @@ export function getTitleTierStyle(tier: BadgeTier | 'starter'): TitleTierStyleIn
         textClass: 'text-slate-300 font-normal',
         borderClass: 'border-2 border-slate-600/80 shadow-none',
         bgClass: 'bg-slate-950',
-        tierName: '🌱 Başlangıç',
+        tierName: 'Başlangıç',
         tierNumber: 0,
         glowShadow: 'shadow-none'
       };
@@ -1316,7 +1316,7 @@ export function getDuelPrestigeTier(
     return {
       tier: 'mythic',
       tierLevel: 5,
-      tierLabel: '🌌 Mistik Kozmik Zirve',
+      tierLabel: '5 · Kozmik Zirve',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-fuchsia-400 border-2 border-cyan-300 shadow-[0_0_35px_rgba(217,70,239,0.85),0_0_18px_rgba(6,182,212,0.7)] animate-pulse',
@@ -1337,7 +1337,7 @@ export function getDuelPrestigeTier(
     return {
       tier: 'diamond',
       tierLevel: 4,
-      tierLabel: '💎 Elmas Zirve',
+      tierLabel: '4 · Elmas Zirve',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-cyan-400 border-2 border-indigo-400 shadow-[0_0_28px_rgba(6,182,212,0.85),0_0_14px_rgba(168,85,247,0.6)] animate-pulse',
@@ -1357,7 +1357,7 @@ export function getDuelPrestigeTier(
     return {
       tier: 'gold',
       tierLevel: 3,
-      tierLabel: '👑 Altın Şampiyon',
+      tierLabel: '3 · Altın Şampiyon',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-amber-400 border-2 border-yellow-300 shadow-[0_0_22px_rgba(245,158,11,0.8)] animate-pulse',
@@ -1377,7 +1377,7 @@ export function getDuelPrestigeTier(
     return {
       tier: 'silver',
       tierLevel: 2,
-      tierLabel: '🛡️ Gümüş Uzman',
+      tierLabel: '2 · Gümüş Uzman',
       title: activeTitle,
       badgeCount: Math.max(duelWins, unlockedBadges.length),
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-slate-300 border-2 border-slate-400 shadow-[0_0_14px_rgba(203,213,225,0.6)]',
@@ -1396,7 +1396,7 @@ export function getDuelPrestigeTier(
   return {
     tier: 'starter',
     tierLevel: 0,
-    tierLabel: '🌱 Başlangıç',
+    tierLabel: 'Başlangıç',
     title: activeTitle,
     badgeCount: duelWins,
     frameBorderClass: 'outline outline-1 outline-offset-1 outline-slate-600 border border-slate-700 shadow-sm',
@@ -1440,7 +1440,7 @@ export function getPrestigeTier(
     return {
       tier: 'mythic',
       tierLevel: 5,
-      tierLabel: '🌌 Mistik Kozmik Zirve',
+      tierLabel: '5 · Kozmik Zirve',
       title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-fuchsia-400 border-2 border-cyan-300 shadow-[0_0_35px_rgba(217,70,239,0.85),0_0_18px_rgba(6,182,212,0.7)] animate-pulse',
@@ -1461,7 +1461,7 @@ export function getPrestigeTier(
     return {
       tier: 'diamond',
       tierLevel: 4,
-      tierLabel: '💎 Elmas Zirve',
+      tierLabel: '4 · Elmas Zirve',
       title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-cyan-400 border-2 border-indigo-400 shadow-[0_0_28px_rgba(6,182,212,0.85),0_0_14px_rgba(168,85,247,0.6)] animate-pulse',
@@ -1481,7 +1481,7 @@ export function getPrestigeTier(
     return {
       tier: 'gold',
       tierLevel: 3,
-      tierLabel: '👑 Altın Şampiyon',
+      tierLabel: '3 · Altın Şampiyon',
       title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-amber-400 border-2 border-yellow-300 shadow-[0_0_22px_rgba(245,158,11,0.8)] animate-pulse',
@@ -1501,7 +1501,7 @@ export function getPrestigeTier(
     return {
       tier: 'silver',
       tierLevel: 2,
-      tierLabel: '🛡️ Gümüş Uzman',
+      tierLabel: '2 · Gümüş Uzman',
       title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-slate-300 border-2 border-slate-400 shadow-[0_0_14px_rgba(203,213,225,0.6)]',
@@ -1521,7 +1521,7 @@ export function getPrestigeTier(
     return {
       tier: 'bronze',
       tierLevel: 1,
-      tierLabel: '🐣 Bronz Çırak',
+      tierLabel: '1 · Bronz Çırak',
       title: activeTitleName,
       badgeCount: count,
       frameBorderClass: 'outline outline-2 outline-offset-2 outline-amber-600 border-2 border-amber-700 shadow-[0_0_10px_rgba(180,83,9,0.45)]',
@@ -1540,7 +1540,7 @@ export function getPrestigeTier(
   return {
     tier: 'starter',
     tierLevel: 0,
-    tierLabel: '🌱 Başlangıç',
+    tierLabel: 'Başlangıç',
     title: activeTitleName,
     badgeCount: count,
     frameBorderClass: 'outline outline-1 outline-offset-1 outline-slate-600 border border-slate-700 shadow-sm',

@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getPrestigeTier, getDuelPrestigeTier, getAvatarOutlineFilter } from '@/lib/data/badgesData';
+import { getPrestigeTier, getDuelPrestigeTier, getAvatarOutlineFilter, ALL_TITLES, AVATAR_ICONS } from '@/lib/data/badgesData';
 import { getCachedUserMedalInfo, subscribeToLeaderboardMedals } from '@/lib/rumuzService';
+import { WearableEmblem, glyphFromEmoji } from '@/components/ui/wearables/WearableEmblem';
+import { AVATAR_GLYPHS, TITLE_GLYPHS, glyphFromAvatarToken } from '@/lib/data/wearableGlyphs';
 
 interface AvatarWithBadgeFrameProps {
   rumuz: string;
@@ -58,52 +60,22 @@ export default function AvatarWithBadgeFrame({
   const resolvedIsRecord = explicitIsRecord !== undefined ? explicitIsRecord : cachedMedals.isRecordStreakHolder;
   const resolvedSpecialMedal = explicitSpecialMedal !== undefined ? explicitSpecialMedal : cachedMedals.specialMedal;
 
-  const prestige = isDuelMode 
+  const prestige = isDuelMode
     ? getDuelPrestigeTier(duelWins, duelStreak, unlockedBadges, equippedTitle)
     : getPrestigeTier(unlockedBadges, duelWins, equippedTitle);
 
-  const displayIcon = avatarIcon || (activeName?.trim()?.[0] || 'K').toUpperCase();
-  const isEmojiIcon = avatarIcon && avatarIcon.length > 0;
+  /* Avatar glyph resolution order:
+     1. new token (`g:galaxy`)         — written by ProfileEditModal
+     2. legacy emoji matched to AVATAR_ICONS — old localStorage saves
+     3. single-letter fallback          — brand-new profiles                */
+  const legacyEntry = avatarIcon ? AVATAR_ICONS.find((item) => item.icon === avatarIcon) : undefined;
+  const avatarGlyph =
+    glyphFromAvatarToken(avatarIcon) ||
+    (legacyEntry ? AVATAR_GLYPHS[legacyEntry.id] : glyphFromEmoji(avatarIcon));
 
-  // Determine bottom-left special medals (Can hold both rank medal and record streak medal)
-  const activeMedals: Array<{ id: string; icon: string; title: string; filter: string }> = [];
-
-  // 1. Rank / Placement Medal
-  if (resolvedSpecialMedal === 'gold' || resolvedRank === 1) {
-    activeMedals.push({
-      id: 'gold',
-      icon: '🥇',
-      title: '🥇 1.lik Şampiyonluk Altın Madalyası (Global Lider)',
-      filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 1px #fff)'
-    });
-  } else if (resolvedSpecialMedal === 'silver' || resolvedRank === 2) {
-    activeMedals.push({
-      id: 'silver',
-      icon: '🥈',
-      title: '🥈 2.lik Gümüş Madalyası (Global 2.lik)',
-      filter: 'drop-shadow(0 0 4px rgba(203, 213, 225, 0.9)) drop-shadow(0 0 1px #fff)'
-    });
-  } else if (resolvedSpecialMedal === 'bronze' || resolvedRank === 3) {
-    activeMedals.push({
-      id: 'bronze',
-      icon: '🥉',
-      title: '🥉 3.lük Bronz Madalyası (Global 3.lük)',
-      filter: 'drop-shadow(0 0 4px rgba(217, 119, 6, 0.9)) drop-shadow(0 0 1px #fff)'
-    });
-  }
-
-  // 2. Record Streak Medal (⚡)
-  if (resolvedIsRecord || resolvedSpecialMedal === 'record') {
-    // Avoid duplicate if record is already added
-    if (!activeMedals.some(m => m.id === 'record')) {
-      activeMedals.push({
-        id: 'record',
-        icon: '⚡',
-        title: '⚡ Zafer Serisi Rekortmen Madalyası (Tüm Zamanlar Seri Rekoru Sahibi)',
-        filter: 'drop-shadow(0 0 5px rgba(249, 115, 22, 1)) drop-shadow(0 0 1px #fff)'
-      });
-    }
-  }
+  const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
+  const titleEntry = ALL_TITLES.find((t) => t.name === activeTitle || t.name === equippedTitle);
+  const pinGlyph = titleEntry ? TITLE_GLYPHS[titleEntry.id] : 'laurel';
 
   // Transparent object sticker outline filter (No rectangular or circular box)
   const activeOutlineFilter = getAvatarOutlineFilter(avatarBg, prestige.tierLevel);
@@ -112,46 +84,49 @@ export default function AvatarWithBadgeFrame({
     xs: {
       container: 'w-5 h-5',
       avatarText: 'text-xs',
-      emojiScale: 'scale-100',
-      pin: '-top-1 -right-1 text-[8px]',
-      medalContainer: '-bottom-1.5 -left-1 text-[8px] gap-0.5',
+      pin: '-top-1 -right-1',
+      pinBox: 'w-2.5 h-2.5',
+      medalContainer: '-bottom-1.5 -left-1',
+      medalBox: 'w-2.5 h-2.5',
       titleText: 'text-[9px]'
     },
     sm: {
       container: 'w-7 h-7 sm:w-8 sm:h-8',
       avatarText: 'text-base sm:text-lg',
-      emojiScale: 'scale-105',
-      pin: '-top-1 -right-1 text-[10px]',
-      medalContainer: '-bottom-1.5 -left-1.5 text-[10px] gap-0.5',
+      pin: '-top-1 -right-1',
+      pinBox: 'w-3 h-3 sm:w-3.5 sm:h-3.5',
+      medalContainer: '-bottom-1.5 -left-1.5',
+      medalBox: 'w-3 h-3',
       titleText: 'text-[10px]'
     },
     md: {
       container: 'w-10 h-10',
       avatarText: 'text-xl sm:text-2xl',
-      emojiScale: 'scale-105',
-      pin: '-top-1.5 -right-1.5 text-xs',
-      medalContainer: '-bottom-2 -left-1.5 text-xs gap-0.5',
+      pin: '-top-1.5 -right-1.5',
+      pinBox: 'w-4 h-4',
+      medalContainer: '-bottom-2 -left-1.5',
+      medalBox: 'w-3.5 h-3.5',
       titleText: 'text-[10px] sm:text-[11px]'
     },
     lg: {
       container: 'w-13 h-13 sm:w-14 sm:h-14',
       avatarText: 'text-2xl sm:text-3xl',
-      emojiScale: 'scale-110',
-      pin: '-top-1.5 -right-1.5 text-sm',
-      medalContainer: '-bottom-2.5 -left-2 text-sm gap-0.5',
+      pin: '-top-1.5 -right-1.5',
+      pinBox: 'w-5 h-5',
+      medalContainer: '-bottom-2.5 -left-2',
+      medalBox: 'w-4 h-4',
       titleText: 'text-xs'
     },
     xl: {
       container: 'w-16 h-16 sm:w-20 sm:h-20',
       avatarText: 'text-4xl sm:text-5xl',
-      emojiScale: 'scale-115',
-      pin: '-top-2 -right-2 text-base',
-      medalContainer: '-bottom-3 -left-2 text-base gap-1',
+      pin: '-top-2 -right-2',
+      pinBox: 'w-6 h-6 sm:w-7 sm:h-7',
+      medalContainer: '-bottom-3 -left-2',
+      medalBox: 'w-5 h-5',
       titleText: 'text-xs sm:text-sm'
     }
   }[size];
-
-  const activeTitle = prestige.title || equippedTitle || '3D Coğrafyacı Çırağı';
 
   const tierScaleClass = prestige.tierLevel === 5
     ? 'scale-110'
@@ -167,57 +142,80 @@ export default function AvatarWithBadgeFrame({
 
   return (
     <div className={`inline-flex flex-col items-center justify-center p-0.5 ${className}`}>
-      {/* 
-        SADECE OBJE & TRANSPARAN ARKAPLAN (Kutulanma/Dörtgen/Daire Çerçeve Yok)
-        Kademeye göre zarif ölçeklenen, dış hatları net outline çizgili transparan obje
-      */}
       <div
         className={`relative inline-flex items-center justify-center flex-shrink-0 select-none bg-transparent transition-transform duration-200 ${sizeClasses.container} ${tierScaleClass}`}
         title={`${rumuz} • ${activeTitle} (${prestige.tierLabel} • ${prestige.badgeCount} Rozet, ${duelWins} Zafer)`}
       >
-        {/* Merkez Obje / Avatar İkonu (Transparan, Kenarlarını Zengin Saran Outline Çizgili) */}
-        <span
-          className={`leading-none flex items-center justify-center select-none font-black tracking-tight transition-all ${sizeClasses.avatarText} ${isEmojiIcon ? sizeClasses.emojiScale : 'text-white'}`}
-          style={{
-            filter: activeOutlineFilter,
-            WebkitTextStroke: isEmojiIcon ? undefined : '1px #ffffff'
-          }}
-        >
-          {displayIcon}
-        </span>
-
-        {/* Sağ Üst Başlık / Rozet İğnesi (Transparan Sticker Tarzı İnce Beyaz Outline Çizgili) */}
-        {showBadgePin && (
+        {/* Avatar ring (family: avatar) + content glyph. The ring is what
+            separates an avatar from a badge medallion or a title banner. */}
+        {avatarGlyph ? (
           <span
-            className={`absolute ${sizeClasses.pin} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10 leading-none select-none`}
-            style={{
-              filter: 'drop-shadow(1px 0 0 #ffffff) drop-shadow(-1px 0 0 #ffffff) drop-shadow(0 1px 0 #ffffff) drop-shadow(0 -1px 0 #ffffff) drop-shadow(0 0 2px rgba(0,0,0,0.8))'
-            }}
-            title={`${prestige.pinBadgeName} • ${activeTitle} (${prestige.tierLabel})`}
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ filter: activeOutlineFilter }}
           >
-            {prestige.pinIcon}
+            <WearableEmblem
+              family="avatar"
+              tier={prestige.tierLevel}
+              glyph={avatarGlyph}
+              className="h-full w-full"
+            />
+          </span>
+        ) : (
+          <span
+            className={`leading-none flex items-center justify-center select-none font-black tracking-tight transition-all ${sizeClasses.avatarText} text-white`}
+            style={{
+              filter: activeOutlineFilter,
+              WebkitTextStroke: '1px #ffffff'
+            }}
+          >
+            {(activeName?.trim()?.[0] || 'K').toUpperCase()}
           </span>
         )}
 
-        {/* Sol Alt Özel Kullanıcı Madalyaları (1., 2., 3. ve Rekortmen Kullanıcılar İçin - Sola Yaslı Yan Yana) */}
-        {activeMedals.length > 0 && (
-          <div
-            className={`absolute ${sizeClasses.medalContainer} flex items-center cursor-pointer z-10 leading-none select-none`}
+        {/* Equipped-title pin: badge medallion of the title's concept */}
+        {showBadgePin && (
+          <span
+            className={`absolute ${sizeClasses.pin} ${sizeClasses.pinBox} flex items-center justify-center cursor-pointer transform hover:scale-125 transition-transform z-10`}
+            style={{
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.85)) drop-shadow(0 0 3px rgba(0,0,0,0.6))'
+            }}
+            title={`${prestige.pinBadgeName} • ${activeTitle} (${prestige.tierLabel})`}
           >
-            {activeMedals.map((m) => (
-              <span
-                key={m.id}
-                className="transform hover:scale-125 transition-transform animate-bounce-subtle"
-                style={{
-                  filter: m.filter
-                }}
-                title={m.title}
-              >
-                {m.icon}
-              </span>
-            ))}
-          </div>
+            <WearableEmblem
+              family="badge"
+              tier={prestige.tierLevel}
+              glyph={pinGlyph}
+              className="h-full w-full"
+              strokeWidth={2.2}
+            />
+          </span>
         )}
+
+        {/* Placement / record medals keep their own frame so they never
+            blend into the avatar ring. */}
+        {(() => {
+          const medals: Array<{ id: string; tier: number; glyph: string; title: string }> = [];
+          if (resolvedSpecialMedal === 'gold' || resolvedRank === 1) {
+            medals.push({ id: 'gold', tier: 3, glyph: 'medal', title: '1.lik — Global Lider (Altın)' });
+          } else if (resolvedSpecialMedal === 'silver' || resolvedRank === 2) {
+            medals.push({ id: 'silver', tier: 2, glyph: 'medal', title: '2.lik — Global Gümüş' });
+          } else if (resolvedSpecialMedal === 'bronze' || resolvedRank === 3) {
+            medals.push({ id: 'bronze', tier: 1, glyph: 'medal', title: '3.lük — Global Bronz' });
+          }
+          if (resolvedIsRecord || resolvedSpecialMedal === 'record') {
+            medals.push({ id: 'record', tier: 4, glyph: 'bolt', title: 'Zafer serisi rekoru sahibi' });
+          }
+          if (medals.length === 0) return null;
+          return (
+            <div className={`absolute ${sizeClasses.medalContainer} flex items-center gap-0.5 cursor-pointer z-10`}>
+              {medals.map((m) => (
+                <span key={m.id} className={`${sizeClasses.medalBox} transform hover:scale-125 transition-transform`} title={m.title}>
+                  <WearableEmblem family="badge" tier={m.tier} glyph={m.glyph} className="h-full w-full" strokeWidth={2.4} />
+                </span>
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       {showTitleBadge && (
