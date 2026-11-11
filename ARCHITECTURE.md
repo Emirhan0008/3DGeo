@@ -116,7 +116,34 @@ Değiştirirken `AppFrame`'deki sabit değil **yalnızca** `--hf-band` güncelle
 
 ---
 
-### İlk giriş tanıtım turu — `OnboardingTour`
+### İlk giriş tanıtım turu — `OnboardingTour` (spotlight)
+
+`components/ui/OnboardingTour.tsx` kabuğa `HomePageClient` içinde mount edilir. Tur **metin kartı değil spotlight turudur**: her adım arayüzdeki gerçek bir öğeyi hedefler, geri kalanı karartılıp bulanıklaştırılır, kart hedefin yanına konumlanır.
+
+**Adım modeli.** `Step` tipinde `selectors?: string[]` (ilk *görünür* aday seçilir) ve `placement?: 'bottom' | 'top' | 'left' | 'right' | 'center'` bulunur. `selectors` boşsa adım ortalanmış tam örtüyle gösterilir (hoş geldin).
+
+**Ölçüm.** `getBoundingClientRect()` → 8px pay → viewport'a kırpma. Hedef ekran dışındaysa `scrollIntoView({ block: 'nearest' })`; görünürse hiç kaydırmaz, ölçüm döngüsü oluşmaz. `resize` ve `scroll` (capture) `requestAnimationFrame` ile yeniden ölçer; yazı tipi geç yüklenirse 260ms'lik ikinci ölçüm devreye girer.
+
+**Örtü.** Hedef deliği gerçek DOM boşluğudur — `box-shadow` ile taklit edilmez. Dört parça (`top`/`bottom`/`left`/`right`) `rgba(3,5,10,.78)` + `backdrop-blur-[3px]` taşır: hem karartma hem bulanıklık. Halka `z-[72]`, kart `z-[73]`, halka tıklama katmanı `z-[71]` (hedefin altındaki butona kazara basılmasın diye).
+
+**Kart konumu.** Tercih edilen kenar `ch`/`cw` + 14px boşluk için yetmiyorsa `bottom → top → right → left` sırasıyla ters çevrilir, sonra 12px kenar payıyla viewport'a kenetlenir. Kart hedefi asla örtmez.
+
+**Gizli hedef.** Telefonda arama alanı ve AI düğmesi yoktur. Bu adımlar atlanmaz; tam örtü + kart içinde "bu ekran genişliğinde gizli" notu gösterilir — sıra numarası zıplamaz.
+
+| Kural | Uygulama |
+|---|---|
+| Yalnız ilk giriş | `kpss3d_onboarding_v1` bayrağı; varsa tur açılmaz |
+| Eski oyuncuya gösterilmez | `hasProgress()` puan / soru / pin / düello zaferi / fazladan rozet arar; bulursa bayrağı yazıp susar |
+| Zorunlu değil | `Atla`, X, Esc, örtü tıklaması — hepsi kapatır |
+| Tekrar izlenebilir | `window.dispatchEvent(new CustomEvent('kpss3d:open-onboarding'))`; Navbar pusula düğmesi bunu yapar |
+| Erişilebilirlik | Odak tuzağı: Tab/Shift+Tab kart içinde döner; `role="dialog"` + `aria-modal` |
+| Banner çakışması | Tur açılınca `kpss3d:dismiss-layer-hint` fırlatılır; `LayerHintBanner` susar |
+
+> **Bayrak kuralı:** `hasProgress()` yalnızca `kpss3d_user_stats` içindeki **oyun** alanlarına bakar. `avatarIcon`/`equippedTitle` varsayılan olduğu için ilk açılışta da yazılır — bunları "eski kullanıcı" saymak turu tüm yeni kullanıcılardan gizler (bu tuzak ölçüldü).
+>
+> **Spotlight tuzağı:** Deliği `box-shadow: 0 0 0 9999px` ile açmak cazip ama yanlış — hedefin üstünde görünmez bir tıklama alanı bırakır, altındaki butona basılamaz. Dört parçalı gerçek örtü kullanılır.
+
+
 
 `components/ui/OnboardingTour.tsx`, kabuğa `HomePageClient` içinde mount edilir. Dört adım: hoş geldin → harita kullanımı → oyun modları → rozet/kademe ilişkisi.
 

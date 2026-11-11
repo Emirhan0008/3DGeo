@@ -4,6 +4,57 @@
 
 ---
 
+## 📅 [2026-11-11] - Tanıtım Turu: Statik Kartlardan Spotlight Turuna
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Geri Bildirimi**: "Onboarding ekranı sadece yazıyla olmuş; ben featureları gezdiren, gezdirdiği yere focuslanıp diğer yerleri bulanıklaştıran bir sistem istiyordum."
+
+### Ne değişti
+Önceki sürüm ortada duran, 4 adımlı **metin kartıydı**. Bu bir tur değil, sunumdu: kullanıcı arayüzü görmüyordu. Yeni sürüm **6 adımlı spotlight turu**:
+
+| # | Hedef (gerçek öğe) | Seçici | Ne anlatır |
+|---|---|---|---|
+| 1 | — (tam örtü, ortada) | — | Hoş geldin; turun nasıl çalıştığı |
+| 2 | Pusula / katman düğmesi | `button[title="Harita katmanlarını aç / kapat"]` | Katman omurgası |
+| 3 | Tab rayı | `button[title="Harita Testi"]` | Dört oyun modu |
+| 4 | Üst bar araması | `input[placeholder="Ara..."]` | İsim yazıp uçma |
+| 5 | AI asistanı | `button[title="Yapay zeka KPSS asistanı"]` | Harita bağlamlı öğretmen |
+| 6 | Profil / avatar | `Nick Gir` veya `Profili Düzenle…` | Rozet → kademe → görünüm |
+
+### Spotlight mimarisi
+- Hedef `getBoundingClientRect()` ile ölçülür, 8px nefes payı eklenir, viewport'a kırpılır.
+- Geri kalan **dört dikdörtgen örtü** ile kapatılır (`top` / `bottom` / `left` / `right`). Delik `box-shadow` ile değil gerçek DOM boşluğuyla açılır — böylece hedefin üstünde tıklama katmanı kalmaz ve öğe gerçekten görünür.
+- Örtüde `backdrop-blur-[3px]` + `rgba(3,5,10,.78)` — **hem karartma hem bulanıklık**; kullanıcının istediği "diğer yerler bulanık" şartı bu.
+- Hedefin çevresine kehribar halka (`z-[72]`), kart `z-[73]`.
+- Kartın yeri her adımda hesaplanır: tercih edilen kenar sığmıyorsa `bottom → top → right → left` sırasıyla tersine çevrilir, sonra viewport'a kenetlenir. Kart hiçbir durumda hedefi örtmez (test: `overlap: false`).
+
+### Adım atlama yerine dürüst davranış
+Telefonda arama alanı ve AI düğmesi gizli. Bu adımlar **atlanmıyor**; spotlight yerine tam örtü + kartın içinde "Bu öğe bu ekran genişliğinde gizli — geniş ekranda üst barda görünür." notu çıkıyor. Tur 6 adımda sabit kalır, sıra numarası zıplamaz.
+
+### Ek düzeltmeler
+| Hata | Belirti | Düzeltme |
+|---|---|---|
+| Katman ipucu banner'ı turla çakışıyor | İkisi aynı anda "katmanları aç" diyordu | Tur açılınca `kpss3d:dismiss-layer-hint` olayı fırlatılır; `LayerHintBanner` dinler ve susar |
+| Tab ile arkaya kaçış | Odak karartılmış arayüze gidebiliyordu | Odak tuzağı: Tab/Shift+Tab kartın içinde döner |
+| Halkaya tıklama boşa gidiyordu | Hedefin altındaki butona kazara basılıyordu | Halka üstünde `z-[71]` tıklama katmanı — tıklama turu ilerletir |
+| `resize` sonrası eski ölçü | Halka yanlış yerde kalıyordu | `resize` + `scroll` (capture) dinlenir, `requestAnimationFrame` ile yeniden ölçülür |
+
+### Doğrulama (Playwright, port 3005)
+- **Masaüstü (1440×900)**: 5 hedefin tamamı `OK=True` — halka hedefin tam −8px dışında, 4 örtü parçası, `blur(3px)`, kart/hedef çakışması yok, kart viewport içinde.
+- **Mobil (390×844)**: pusula ve tab rayı spotlight'lanıyor; arama alanı gizli olduğu için tam örtü + açıklama notu.
+- **Yeniden boyutlandırma**: 390 → 1200'de halka arama alanına taşındı (tur bozulmadı).
+- **Klavye**: ← geri, Esc kapatır, Tab karttan çıkmaz (14 basışta 0 kaçış).
+- **Halka tıklaması**: 2/6 → 3/6.
+- **Banner**: tur sırasında `0` görünür öğe.
+- **`Başla`**: 6. adımda kapatır, bayrak `seen`, `body.overflow` temizlenir.
+- `npx tsc --noEmit`, `npx eslint` ve `npx next build` temiz.
+
+### Değişen dosyalar
+- `components/ui/OnboardingTour.tsx` — spotlight mimarisi, 6 adım, ölçüm/konumlandırma, odak tuzağı.
+- `components/ui/LayerHintBanner.tsx` — `kpss3d:dismiss-layer-hint` olayını dinler.
+
+---
+
 ## 📅 [2026-11-11] - İlk Girişe Özel Opsiyonel Tanıtım Turu (Onboarding)
 
 - **Geliştirici**: AI Agent (OpenCode)

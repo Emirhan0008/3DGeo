@@ -56,6 +56,15 @@ export default function LayerHintBanner() {
     handleDismiss();
   };
 
+  /* Tanıtım turu katman omurgasını kendisi anlatıyor: tur açılınca
+     bu banner susar, ikisi aynı anda konuşmaz. */
+  useEffect(() => {
+    const onTourDismiss = () => handleDismiss();
+    window.addEventListener('kpss3d:dismiss-layer-hint', onTourDismiss);
+    return () =>
+      window.removeEventListener('kpss3d:dismiss-layer-hint', onTourDismiss);
+  }, []);
+
   if (!isVisible || activeTab !== 'map') return null;
 
   return (

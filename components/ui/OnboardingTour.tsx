@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from 'react';
 import {
   Compass,
   Layers,
@@ -9,33 +15,42 @@ import {
   ArrowRight,
   ArrowLeft,
   X,
-  Sparkles
+  Sparkles,
+  Search,
+  Bot
 } from 'lucide-react';
 import { TierMark } from '@/components/ui/wearables/WearableEmblem';
 import { TIER_LABELS } from '@/lib/data/wearableGlyphs';
 
 /* ==================================================================
-   İlk giriş tanıtım turu — **opsiyonel**.
+   İlk giriş tanıtım turu — **opsiyonel spotlight turu**.
+
+   Kart sadece yazmaz: her adım arayüzdeki gerçek bir öğeyi hedefler,
+   etrafındaki her şey karartılıp bulanıklaştırılır, kart hedefin
+   yanına konumlanır. Hedef görünmüyorsa (ör. telefonda gizli arama
+   alanı) o adım ortalanmış tam örtüyle gösterilir — tur kesilmez.
 
    Kurallar:
-   1. Yalnızca ilk girişte, yalnızca veri yoksa açılır. Daha önce
-      oynamış birine gösterilmez (bkz. `hasProgress`).
-   2. Her adımda `Atla` var; X, Esc ve arka plan tıklaması da kapatır.
-   3. Kapandıktan sonra bir daha kendiliğinden açılmaz — bayrak
-      `localStorage`'a yazılır.
-   4. İsteyen Navbar'daki pusula düğmesinden tekrar açabilir
-      (`kpss3d:open-onboarding` olayı).
+   1. Yalnızca ilk girişte, yalnızca veri yoksa açılır (hasProgress).
+   2. Her adımda `Atla`; X, Esc ve örtü tıklaması da kapatır.
+   3. Kapandıktan sonra kendiliğinden açılmaz (kpss3d_onboarding_v1).
+   4. Navbar pusula düğmesi `kpss3d:open-onboarding` ile tekrar açar.
    ================================================================== */
 
 const STORAGE_KEY = 'kpss3d_onboarding_v1';
 export const OPEN_ONBOARDING_EVENT = 'kpss3d:open-onboarding';
+
+type Placement = 'bottom' | 'top' | 'left' | 'right' | 'center';
 
 type Step = {
   eyebrow: string;
   title: string;
   body: string;
   Icon: React.ComponentType<{ className?: string }>;
-  points: { label: string; text: string }[];
+  /** Aday seçiciler — ilk *görünür* olan hedef seçilir. */
+  selectors?: string[];
+  placement?: Placement;
+  hint?: string;
   showTiers?: boolean;
 };
 
@@ -43,50 +58,57 @@ const STEPS: Step[] = [
   {
     eyebrow: 'Hoş geldin',
     title: 'Türkiye’yi 3D haritada öğren',
-    body: 'KPSS coğrafyası burada haritanın kendisi üzerinden çalışılır: dağ, ova, akarsu, geçit — hepsi yerinde durur. Okumak yerine görürsün.',
+    body: 'Bu tur, arayüzü gezdirecek: her adımda bir öğe aydınlanacak, gerisi bulanıklaşacak. Zorunlu değil — istediğin an çıkabilirsin.',
     Icon: Compass,
-    points: [
-      { label: 'Keşif', text: 'Haritayı döndür, yakınlaş, bir yeryüzü şekline tıkla.' },
-      { label: 'Başlangıç', text: 'Hiçbir şey ezberletilmez; önce bakman yeter.' }
-    ]
+    placement: 'center',
+    hint: 'Klavye: ← → gezin, Esc çıkar'
   },
   {
-    eyebrow: 'Harita',
-    title: 'Sol kenar katmanları, üst bar aramayı açar',
-    body: 'Harita sade başlar. Katmanları açtıkça dağlar, platolar, akarsular ve geçitler haritaya işlenir. Bir ismi arayıp doğrudan üzerine uçabilirsin.',
+    eyebrow: 'Katman omurgası',
+    title: 'Haritayı pusuladan katmanlandır',
+    body: 'Harita sade başlar. Bu düğme katman panelini açar; dağ, plato, akarsu ve geçitleri tek tek haritaya işlersin.',
     Icon: Layers,
-    points: [
-      { label: 'Katmanlar', text: 'Sol omurgadaki düğme; istediğin zaman aç/kapat.' },
-      { label: 'Arama', text: 'Üst bardaki alan; yazdığın yer uçar ve kartı açılır.' }
-    ]
+    selectors: ['button[title="Harita katmanlarını aç / kapat"]'],
+    placement: 'bottom'
   },
   {
-    eyebrow: 'Oyunlar',
-    title: 'Dört mod, tek amaç: hatırlamak',
-    body: 'Öğrendiğini ölçmenin dört yolu var. İstediğin yerde başla, istediğin kadar oyna — hiçbiri zorunlu değil.',
+    eyebrow: 'Oyun modları',
+    title: 'Dört mod — dördü de isteğe bağlı',
+    body: 'Bu ray modlar arasında geçiş yapar. Harita Testi yeri işaretletir, Düello canlı 1v1’dir, KPSS Testi klasik sorudur, Ezber kısa tekrardır.',
     Icon: Gamepad2,
-    points: [
-      { label: 'Harita Testi', text: 'Sorulan yeri haritada işaretle, km cinsinden hata puanı al.' },
-      { label: 'Düello', text: 'Canlı 1v1; aynı soruyu aynı anda yarışarak çöz.' },
-      { label: 'KPSS Testi', text: 'Klasik çoktan seçmeli sorular, açıklamalı çözüm.' },
-      { label: 'Ezber', text: 'Akılda kalıcı kodlama kartları; kısa tekrar.' }
-    ]
+    selectors: ['button[title="Harita Testi"]'],
+    placement: 'bottom'
+  },
+  {
+    eyebrow: 'Arama',
+    title: 'Bir isim yaz, harita oraya uçsun',
+    body: 'Dağ, ova, göl adı yazdığında sonuç listesi açılır; seçtiğin yer haritada uçar ve bilgi kartı gelir.',
+    Icon: Search,
+    selectors: ['input[placeholder="Ara..."]'],
+    placement: 'bottom'
+  },
+  {
+    eyebrow: 'AI öğretmen',
+    title: 'Takıldığın yeri asistana sor',
+    body: 'Bu düğme KPSS coğrafya asistanını açar. “Neden bu geçit önemli?” gibi soruları haritadaki bağlamıyla yanıtlar.',
+    Icon: Bot,
+    selectors: ['button[title="Yapay zeka KPSS asistanı"]'],
+    placement: 'bottom'
   },
   {
     eyebrow: 'Birikim',
     title: 'Rozet kademeyi, kademe görünümü açar',
-    body: 'Her tamamladığın hedef bir rozet verir. Rozetler kademeni yükseltir, kademe yeni avatar, ünvan ve çerçeve açar. Profilde dördü ayrı ayrı seçilir.',
+    body: 'Her tamamlanan hedef bir rozet verir. Rozetler kademeni yükseltir; kademe yeni avatar, ünvan ve çerçeve açar. Hepsi buradaki profil düğmesinde seçilir.',
     Icon: Award,
-    points: [
-      { label: 'Rozet', text: 'Kanıt — hedefi tamamladığının işareti.' },
-      { label: 'Ünvan', text: 'Kimlik — adının altında görünen isim.' },
-      { label: 'Avatar', text: 'Görünüm — yalnızca seni temsil eder, puan vermez.' }
+    selectors: [
+      'button[title="Nick Gir veya Geçmiş Yükle"]',
+      'button[title="Profili Düzenle, Avatarını Değiştir veya Hesabı Yönet"]'
     ],
+    placement: 'bottom',
     showTiers: true
   }
 ];
 
-/** Kayıtlı veriden yalnızca "oynamış" anlamına gelen alanlar. */
 type StoredProgressShape = {
   score?: number;
   quizScore?: number;
@@ -126,14 +148,40 @@ function rememberSeen() {
   }
 }
 
+type Hole = { top: number; left: number; width: number; height: number };
+
+function sameHole(a: Hole | null, b: Hole | null) {
+  if (!a || !b) return a === b;
+  return (
+    Math.abs(a.top - b.top) < 0.6 &&
+    Math.abs(a.left - b.left) < 0.6 &&
+    Math.abs(a.width - b.width) < 0.6 &&
+    Math.abs(a.height - b.height) < 0.6
+  );
+}
+
 export default function OnboardingTour() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(0);
+  const [hole, setHole] = useState<Hole | null>(null);
+  const [card, setCard] = useState<{ top: number; left: number } | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const primaryRef = useRef<HTMLButtonElement | null>(null);
 
   const close = useCallback(() => {
     setIsOpen(false);
     rememberSeen();
+    /* Tur katman omurgasını zaten anlattı: aynı anda açılan
+       LayerHintBanner turdan sonra tekrar "katmanları aç" demesin. */
+    try {
+      localStorage.setItem('kpss3d_layer_hint_seen_v2', 'true');
+    } catch {
+      /* storage kapalıysa banner yine çıkar; zararsız */
+    }
+  }, []);
+
+  const next = useCallback(() => {
+    setStep((s) => (s >= STEPS.length - 1 ? s : s + 1));
   }, []);
 
   /* İlk giriş kontrolü — harita boyansın diye kısa gecikmeyle. */
@@ -145,7 +193,10 @@ export default function OnboardingTour() {
         rememberSeen();
         return;
       }
-      timer = window.setTimeout(() => setIsOpen(true), 1100);
+      timer = window.setTimeout(() => {
+        setStep(0);
+        setIsOpen(true);
+      }, 1100);
     } catch {
       /* localStorage erişilemezse tur gösterilmez */
     }
@@ -164,7 +215,7 @@ export default function OnboardingTour() {
     return () => window.removeEventListener(OPEN_ONBOARDING_EVENT, reopen);
   }, []);
 
-  /* Tur açıkken sayfa kaymasın (mobilde arka plan titremesi). */
+  /* Tur açıkken sayfa kaymasın. */
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
@@ -172,6 +223,13 @@ export default function OnboardingTour() {
     return () => {
       document.body.style.overflow = prev;
     };
+  }, [isOpen]);
+
+  /* Tur açılınca katman ipucu banner'ı susar: tur aynı konuyu
+     anlatıyor, ikisi üst üste binmesin. */
+  useEffect(() => {
+    if (!isOpen) return;
+    window.dispatchEvent(new CustomEvent('kpss3d:dismiss-layer-hint'));
   }, [isOpen]);
 
   /* Klavye: Esc kapatır, oklar gezinir. */
@@ -183,7 +241,7 @@ export default function OnboardingTour() {
         close();
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        setStep((s) => Math.min(STEPS.length - 1, s + 1));
+        next();
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         setStep((s) => Math.max(0, s - 1));
@@ -191,7 +249,172 @@ export default function OnboardingTour() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, close]);
+  }, [isOpen, close, next]);
+
+  /* Odak tuzağı: Tab ile arkadaki karartılmış arayüze kaçış olmasın.
+     Tur bir dialog; odak kartın içinde dönmeli. */
+  useEffect(() => {
+    if (!isOpen) return;
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const root = cardRef.current;
+      if (!root) return;
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((n) => !n.hasAttribute('disabled') && n.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && (active === first || !root.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !root.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onTab);
+    return () => window.removeEventListener('keydown', onTab);
+  }, [isOpen]);
+
+  /* Hedefi ölç: görünür olan ilk aday seçilir, viewport'a kırpılır. */
+  useEffect(() => {
+    if (!isOpen) {
+      setHole(null);
+      return;
+    }
+
+    let frame = 0;
+    const measure = () => {
+      const s = STEPS[step];
+      if (!s.selectors?.length) {
+        setHole((prev) => (prev === null ? prev : null));
+        return;
+      }
+
+      const vh = window.innerHeight;
+      let el: Element | null = null;
+      for (const sel of s.selectors) {
+        const found = Array.from(document.querySelectorAll(sel)).find((n) => {
+          const r = n.getBoundingClientRect();
+          return r.width > 4 && r.height > 4 && r.bottom > 0 && r.top < vh;
+        });
+        if (found) {
+          el = found;
+          break;
+        }
+      }
+
+      if (!el) {
+        setHole(null);
+        return;
+      }
+
+      const r = el.getBoundingClientRect();
+      /* Hedef ekran dışındaysa getir; görünürse scrollIntoView hiç
+         kaydırmaz, bu yüzden döngü oluşmaz. */
+      if (r.top < 0 || r.bottom > vh) {
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+
+      const pad = 8;
+      const vw = window.innerWidth;
+      const top = Math.max(4, r.top - pad);
+      const left = Math.max(4, r.left - pad);
+      const right = Math.min(vw - 4, r.right + pad);
+      const bottom = Math.min(vh - 4, r.bottom + pad);
+      const nextHole: Hole = {
+        top,
+        left,
+        width: Math.max(0, right - left),
+        height: Math.max(0, bottom - top)
+      };
+      setHole((prev) => (sameHole(prev, nextHole) ? prev : nextHole));
+    };
+
+    measure();
+    /* Yazı tipleri / harita geç yüklenirse ikinci ölçüm. */
+    const settle = window.setTimeout(measure, 260);
+
+    const onViewport = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(measure);
+    };
+    window.addEventListener('resize', onViewport);
+    window.addEventListener('scroll', onViewport, true);
+    return () => {
+      window.clearTimeout(settle);
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('resize', onViewport);
+      window.removeEventListener('scroll', onViewport, true);
+    };
+  }, [isOpen, step]);
+
+  /* Kartı hedefin yanına yerleştir: sığmayan tarafı tersine çevir. */
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const el = cardRef.current;
+    if (!el) return;
+
+    const cw = el.offsetWidth;
+    const ch = el.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const gap = 14;
+    const m = 12;
+
+    if (!hole) {
+      setCard({ top: Math.max(m, (vh - ch) / 2), left: Math.max(m, (vw - cw) / 2) });
+      return;
+    }
+
+    const space: Record<'bottom' | 'top' | 'left' | 'right', number> = {
+      bottom: vh - (hole.top + hole.height),
+      top: hole.top,
+      left: hole.left,
+      right: vw - (hole.left + hole.width)
+    };
+    const fits = (p: 'bottom' | 'top' | 'left' | 'right') =>
+      p === 'bottom' || p === 'top' ? space[p] >= ch + gap + m : space[p] >= cw + gap + m;
+
+    const pref = STEPS[step].placement;
+    const order: Array<'bottom' | 'top' | 'left' | 'right'> = [
+      ...(pref && pref !== 'center' ? [pref] : []),
+      'bottom',
+      'top',
+      'right',
+      'left'
+    ];
+    const chosen: 'bottom' | 'top' | 'left' | 'right' =
+      order.find(fits) ?? (space.bottom >= space.top ? 'bottom' : 'top');
+
+    let top = 0;
+    let left = 0;
+    if (chosen === 'bottom') {
+      top = hole.top + hole.height + gap;
+      left = hole.left + hole.width / 2 - cw / 2;
+    } else if (chosen === 'top') {
+      top = hole.top - gap - ch;
+      left = hole.left + hole.width / 2 - cw / 2;
+    } else if (chosen === 'left') {
+      top = hole.top + hole.height / 2 - ch / 2;
+      left = hole.left - gap - cw;
+    } else {
+      top = hole.top + hole.height / 2 - ch / 2;
+      left = hole.left + hole.width + gap;
+    }
+
+    const clampedTop = Math.min(Math.max(m, top), Math.max(m, vh - ch - m));
+    const clampedLeft = Math.min(Math.max(m, left), Math.max(m, vw - cw - m));
+    setCard((prev) =>
+      prev && Math.abs(prev.top - clampedTop) < 0.6 && Math.abs(prev.left - clampedLeft) < 0.6
+        ? prev
+        : { top: clampedTop, left: clampedLeft }
+    );
+  }, [isOpen, hole, step]);
 
   useEffect(() => {
     if (isOpen) primaryRef.current?.focus();
@@ -203,25 +426,98 @@ export default function OnboardingTour() {
   const isLast = step === STEPS.length - 1;
   const { Icon } = current;
 
+  const shade = 'absolute bg-[rgba(3,5,10,0.78)] backdrop-blur-[3px]';
+
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-6"
+      className="fixed inset-0 z-[70]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-title"
     >
-      {/* Arka plan: haritayı karartır, tıklama turu kapatır */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"
-        onClick={close}
-        aria-hidden="true"
-      />
+      {/* ---------- Örtü: hedefin dışındaki her yer karartılır + bulanır ---------- */}
+      {hole ? (
+        <>
+          <div
+            className={shade}
+            style={{ left: 0, right: 0, top: 0, height: hole.top }}
+            onClick={close}
+            aria-hidden="true"
+          />
+          <div
+            className={shade}
+            style={{ left: 0, right: 0, top: hole.top + hole.height, bottom: 0 }}
+            onClick={close}
+            aria-hidden="true"
+          />
+          <div
+            className={shade}
+            style={{ left: 0, width: hole.left, top: hole.top, height: hole.height }}
+            onClick={close}
+            aria-hidden="true"
+          />
+          <div
+            className={shade}
+            style={{
+              left: hole.left + hole.width,
+              right: 0,
+              top: hole.top,
+              height: hole.height
+            }}
+            onClick={close}
+            aria-hidden="true"
+          />
 
-      <div className="hf-panel relative z-10 max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-[0_24px_60px_-20px_rgba(0,0,0,.8)]">
+          {/* Spotlight halkası — hedefin sınırını çizer */}
+          <div
+            className="pointer-events-none absolute z-[72] rounded-[10px] border-2 border-[#e2c485] shadow-[0_0_0_1px_rgba(0,0,0,.55),0_0_32px_rgba(226,196,133,.35)]"
+            style={{
+              top: hole.top,
+              left: hole.left,
+              width: hole.width,
+              height: hole.height
+            }}
+            aria-hidden="true"
+          />
+
+          {/* Halkaya tıklamak turu ilerletir (alt öğeye kazara dokunulmasın) */}
+          <div
+            className="absolute z-[71] cursor-pointer"
+            style={{
+              top: hole.top,
+              left: hole.left,
+              width: hole.width,
+              height: hole.height
+            }}
+            onClick={next}
+            title="Devam et"
+            aria-hidden="true"
+          />
+        </>
+      ) : (
+        <div
+          className="absolute inset-0 bg-[rgba(3,5,10,0.78)] backdrop-blur-[3px]"
+          onClick={close}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* ---------- Kart ---------- */}
+      <div
+        ref={cardRef}
+        className="hf-panel absolute z-[73] overflow-y-auto rounded-2xl shadow-[0_24px_60px_-20px_rgba(0,0,0,.85)]"
+        style={{
+          top: card?.top ?? 12,
+          left: card?.left ?? 12,
+          width: 'min(400px, calc(100vw - 24px))',
+          maxHeight: 'calc(100vh - 24px)',
+          visibility: card ? 'visible' : 'hidden'
+        }}
+      >
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a24a]/60 to-transparent" />
 
         {/* Üst şerit */}
-        <div className="flex items-center justify-between gap-2 border-b border-[#c9a24a]/15 px-3.5 py-2.5 sm:px-4">
+        <div className="flex items-center justify-between gap-2 border-b border-[#c9a24a]/15 px-3.5 py-2.5">
           <div className="flex items-center gap-1.5">
             <span className="hf-label rounded border border-[#c9a24a]/35 px-1.5 py-0.5 text-[9px] text-[#dcc07d]">
               Tanıtım Turu
@@ -242,45 +538,45 @@ export default function OnboardingTour() {
         </div>
 
         {/* Gövde */}
-        <div className="px-4 pb-1 pt-4 sm:px-5 sm:pt-5">
-          <div className="flex items-start gap-3">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#c9a24a]/45 bg-[#c9a24a]/12 text-[#e2c485]">
-              <Icon className="h-5 w-5" />
+        <div className="px-4 pb-1 pt-3.5">
+          <div className="flex items-start gap-2.5">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#c9a24a]/45 bg-[#c9a24a]/12 text-[#e2c485]">
+              <Icon className="h-[18px] w-[18px]" />
             </div>
             <div className="min-w-0">
-              <div className="hf-label text-[9.5px] uppercase tracking-[0.18em] text-[#b8a068]">
+              <div className="hf-label text-[9px] uppercase tracking-[0.18em] text-[#b8a068]">
                 {current.eyebrow}
               </div>
               <h2
                 id="onboarding-title"
-                className="hf-serif mt-0.5 text-[17px] font-semibold leading-snug text-[#f7f2e3] sm:text-xl"
+                className="hf-serif mt-0.5 text-[15.5px] font-semibold leading-snug text-[#f7f2e3]"
               >
                 {current.title}
               </h2>
             </div>
           </div>
 
-          <p className="mt-3 text-[12px] leading-relaxed text-[#c9c2a6] sm:text-[12.5px]">
+          <p className="mt-2.5 text-[12px] leading-relaxed text-[#c9c2a6]">
             {current.body}
           </p>
 
-          <ul className="mt-3 space-y-1.5">
-            {current.points.map((p) => (
-              <li
-                key={p.label}
-                className="flex items-start gap-2 rounded-lg border border-[#c9a24a]/15 bg-black/25 px-2.5 py-1.5"
-              >
-                <span className="mt-[3px] h-1 w-1 shrink-0 rotate-45 bg-[#c9a24a]/80" />
-                <span className="text-[11px] leading-snug text-[#c9c2a6]">
-                  <strong className="font-semibold text-[#e8dcbb]">{p.label}:</strong>{' '}
-                  {p.text}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {current.hint && (
+            <p className="mt-2 flex items-center gap-1.5 text-[10.5px] text-[#8f8a72]">
+              <span className="h-1 w-1 rotate-45 bg-[#c9a24a]/70" />
+              {current.hint}
+            </p>
+          )}
+
+          {/* Hedef bu ekran genişliğinde yoksa (ör. telefonda arama alanı
+              gizli) turu kesmek yerine neden aydınlatma olmadığını söyle. */}
+          {!hole && current.selectors?.length ? (
+            <p className="mt-2 rounded-md border border-[#c9a24a]/20 bg-black/30 px-2 py-1.5 text-[10.5px] leading-snug text-[#a9a184]">
+              Bu öğe bu ekran genişliğinde gizli — geniş ekranda üst barda görünür.
+            </p>
+          ) : null}
 
           {current.showTiers && (
-            <div className="mt-3 rounded-lg border border-[#c9a24a]/20 bg-black/30 p-2">
+            <div className="mt-2.5 rounded-lg border border-[#c9a24a]/20 bg-black/30 p-2">
               <div className="mb-1.5 flex items-center gap-1.5">
                 <Sparkles className="h-3 w-3 text-[#dcc07d]" />
                 <span className="hf-label text-[9px] uppercase tracking-[0.16em] text-[#b8a068]">
@@ -290,7 +586,7 @@ export default function OnboardingTour() {
               <div className="flex items-center justify-between gap-1">
                 {[1, 2, 3, 4, 5].map((t) => (
                   <div key={t} className="flex min-w-0 flex-col items-center gap-0.5">
-                    <TierMark tier={t} className="h-6 w-6 sm:h-7 sm:w-7" />
+                    <TierMark tier={t} className="h-6 w-6" />
                     <span className="text-[8.5px] font-semibold uppercase tracking-wide text-[#9a9070]">
                       {TIER_LABELS[t].name}
                     </span>
@@ -301,8 +597,8 @@ export default function OnboardingTour() {
           )}
         </div>
 
-        {/* Alt şerit: noktalar + eylemler */}
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#c9a24a]/15 px-3.5 py-3 sm:px-4">
+        {/* Alt şerit */}
+        <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#c9a24a]/15 px-3.5 py-2.5">
           <button
             onClick={close}
             className="cursor-pointer rounded-full px-2 py-1 text-[10.5px] font-medium text-[#8b8f7f] underline decoration-[#5f5c47] transition-colors hover:text-[#c9c2a6]"
@@ -312,7 +608,7 @@ export default function OnboardingTour() {
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-1 sm:flex" aria-hidden="true">
+            <div className="flex items-center gap-1" aria-hidden="true">
               {STEPS.map((s, i) => (
                 <button
                   key={s.title}
@@ -338,7 +634,7 @@ export default function OnboardingTour() {
 
             <button
               ref={primaryRef}
-              onClick={() => (isLast ? close() : setStep((s) => s + 1))}
+              onClick={() => (isLast ? close() : next())}
               className="hf-btn-brass flex items-center gap-1.5 px-3 py-1.5 text-[11.5px]"
             >
               {isLast ? 'Başla' : 'İleri'}
