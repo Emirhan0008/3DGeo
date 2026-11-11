@@ -120,9 +120,21 @@ Değiştirirken `AppFrame`'deki sabit değil **yalnızca** `--hf-band` güncelle
 
 `components/ui/OnboardingTour.tsx` kabuğa `HomePageClient` içinde mount edilir. Tur **metin kartı değil spotlight turudur**: her adım arayüzdeki gerçek bir öğeyi hedefler, geri kalanı karartılıp bulanıklaştırılır, kart hedefin yanına konumlanır.
 
-**Adım modeli.** `Step` tipinde `selectors?: string[]` (ilk *görünür* aday seçilir) ve `placement?: 'bottom' | 'top' | 'left' | 'right' | 'center'` bulunur. `selectors` boşsa adım ortalanmış tam örtüyle gösterilir (hoş geldin).
+**Adım modeli.** `Step` tipi 13 adımdan oluşur ve şu alanları taşır: `chapter` (bölüm etiketi), `selectors?: string[]` (ilk *görünür* aday seçilir), `placement`, `bullets?: {label, text}[]` (taranabilir maddeler), `showTiers`, `recap`, `openSidebar` (tur bu adımda katman panelini açar), `desktopOnly` (dar ekranda listeden çıkar), `interactive` (hedefin üstüne tıklama katmanı konmaz — kullanıcı deneyebilir). `selectors` boşsa adım ortalanmış tam örtüyle gösterilir (hoş geldin, özet).
 
-**Ölçüm.** `getBoundingClientRect()` → 8px pay → viewport'a kırpma. Hedef ekran dışındaysa `scrollIntoView({ block: 'nearest' })`; görünürse hiç kaydırmaz, ölçüm döngüsü oluşmaz. `resize` ve `scroll` (capture) `requestAnimationFrame` ile yeniden ölçer; yazı tipi geç yüklenirse 260ms'lik ikinci ölçüm devreye girer.
+**Bölümler.** Başlangıç → Harita (2) → Katmanlar (3) → Keşif → Oyunlar → Analiz → Topluluk → Yardım → Birikim → Bitti. Kartın üstünde `chapter` ve `n/total` ile dolan ilerleme çubuğu bulunur.
+
+**Adım listesi filtrelenir.** `steps = useMemo(() => isNarrow ? STEPS.filter(s => !s.desktopOnly) : STEPS, [isNarrow])`. Masaüstünde 13, dar ekranda 11 adım. `useMemo` zorunludur: her render'da yeni dizi üretilirse aşağıdaki effect'ler her render'da tetiklenir ve mobilde tur hiç açılmaz (ölçüldü).
+
+**Etkileşimli adımlar.** `interactive: true` ise spotlight deliğinin üstüne `z-[71]` tıklama katmanı **konmaz**; hedef gerçekten tıklanabilir kalır (tur içinde katman açıp kapatma). Tur ilerletmek için karttaki `İleri` kullanılır.
+
+**Katman paneli oyunu.** `openSidebar` olan adımlarda `useAppStore.getState().setSidebarOpen(true)` çağrılır; bölüm bitince `sidebarBeforeTour` değerine döner. Turdan önce panel açıksa açık, kapalıysa kapalı kalır.
+
+**Ölçüm.** `getBoundingClientRect()` → 8px pay → viewport'a kırpma. Hedef ekran dışındaysa `scrollIntoView({ block: 'nearest' })`; görünürse hiç kaydırmaz, ölçüm döngüsü oluşmaz. `resize` ve `scroll` (capture) `requestAnimationFrame` ile yeniden ölçer.
+
+> **Ölçüm tuzağı:** Katman paneli 300ms'de açılıyor. Tek `setTimeout` ile ölçmek animasyon ortasında yakalanmaya yol açar — panel 36px'te ölçülüp açıldıktan sonra halka 52px'te donuyordu (ölçüldü). Bu yüzden adım değişiminde ~1 saniye boyunca her karede ölçülür; `sameHole` aynı değerleri yuttuğu için maliyeti yoktur.
+
+**Kart genişliği ve yana yerleşim.** Hedef ince-uzun bir şeritse (telefonda katman omurgası 24×759px) üst/alt boşluk kalmaz ve kart hedefi örter. `layout` hesabı bunu görür: `narrowTarget` + `Math.max(bottomRoom, topRoom) < 300` ise kart `forceSide` ile yana geçer ve kalan genişliğe daralır (400 → ~340px).
 
 **Örtü.** Hedef deliği gerçek DOM boşluğudur — `box-shadow` ile taklit edilmez. Dört parça (`top`/`bottom`/`left`/`right`) `rgba(3,5,10,.78)` + `backdrop-blur-[3px]` taşır: hem karartma hem bulanıklık. Halka `z-[72]`, kart `z-[73]`, halka tıklama katmanı `z-[71]` (hedefin altındaki butona kazara basılmasın diye).
 

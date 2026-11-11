@@ -4,6 +4,59 @@
 
 ---
 
+## 📅 [2026-11-12] - Tanıtım Turu Detaylandırıldı: 13 Adım, Bölümler, Etkileşimli Katman Paneli
+
+- **Geliştirici**: AI Agent (OpenCode)
+- **Kullanıcı Talebi**: "Daha detaylı bir onboarding."
+
+### Ne değişti
+6 adımlı tur **13 adıma** çıktı ve bölümlere ayrıldı: Başlangıç → Harita (2) → Katmanlar (3) → Keşif → Oyunlar → Analiz → Topluluk → Yardım → Birikim → Bitti.
+
+| # | Bölüm | Hedef | Ne anlatır |
+|---|---|---|---|
+| 1 | Başlangıç | tam örtü | Süre, gezinme, tekrar izleme |
+| 2 | Harita | `.maplibregl-ctrl-bottom-right .maplibregl-ctrl-group` | Döndür/yakınlaş, şekle tıkla |
+| 3 | Harita | pusula düğmesi | Katman girişi ve rozet |
+| 4 | Katmanlar | `#kpss-layer-sidebar` | Panelin üç katmanı (altlık/toplu işlem/gruplar) |
+| 5 | Katmanlar | `#kpss-layer-sidebar .hf-scroll` | Altı katman grubu — **etkileşimli** |
+| 6 | Katmanlar | son `section` | Bölge filtresi + dilsiz mod — **etkileşimli** |
+| 7 | Keşif | `input[placeholder="Ara..."]` | Arama davranışı |
+| 8 | Oyunlar | `header nav` / mobil ray | Dört mod + Analiz |
+| 9 | Analiz | `button[title="Analiz"]` | Hata defteri |
+| 10 | Topluluk | `button[title="Global sıralama tablosu"]` | Sıralama ve nick |
+| 11 | Yardım | AI asistanı | Öğretmen gibi kullanma |
+| 12 | Birikim | profil düğmesi | Rozet → kademe, `TierMark` merdiveni |
+| 13 | Bitti | tam örtü | 5 satırlık "nerede ne var" dizini |
+
+### Yeni yetenekler
+- **Bölüm etiketi + ilerleme çubuğu.** Kartın üstünde `Katmanlar 4/13` ve dolan bir çubuk var; kullanıcı turun neresinde olduğunu görüyor.
+- **`bullets`.** Her adım 2-3 kısa madde taşıyor (`Fiziki`, `Beşeri`, `Sınav provası` gibi) — düz paragraf yerine taranabilir bilgi.
+- **Etkileşimli adımlar.** `interactive: true` olan adımlarda hedefin üstüne tıklama katmanı **konmaz**: kullanıcı tur sırasında gerçekten katman açıp kapatabilir, bölge filtresine basabilir. Tur ilerlemez (`5 → 5` ölçüldü).
+- **Katman paneli tur içinde açılır.** `openSidebar` olan adımlarda store üzerinden panel açılır; bölüm bitince eski duruma döner — kullanıcı turdan sonra paneli kapalı bulur.
+- **Mobilde adım listesi filtrelenir.** Yalnız panel içi olan 2 adım (`desktopOnly`) dar ekranda listeden çıkar: 13 → 11 adım. Aynı "geniş ekranda görünür" notunu üç kez göstermek turu yavaşlatıyordu.
+- **Dar hedefte kart yana geçer.** Telefonda katman şeridi 24×759px; kart üstte/alt alta sığmıyor. `layout` hesabı hedefin ince-uzun olduğunu görüp kartı yana alır ve kalan genişliğe daraltır (400 → ~340px).
+
+### Ölçülmüş hatalar (üçü de gerçek)
+| Hata | Belirti | Düzeltme |
+|---|---|---|
+| Panel animasyonu ortasında ölçüm | Katman paneli 8ms'de 36px genişlikte yakalanıp 290px'e açıldıktan sonra halka 52px'te donuyordu | Ölçüm tek `setTimeout` yerine ~1s boyunca `requestAnimationFrame` döngüsünde; `sameHole` aynı değerleri yuttuğu için maliyetsiz |
+| `steps` dizisi her render'da yeniden üretiliyordu | Mobilde tur **hiç açılmadı**; effect her render'da tetiklenip store'u yazıyordu (sonsuz döngü) | `useMemo([isNarrow])` |
+| Katlanmış grupta katman tıklanamıyor | `grid-rows-[0fr]` + `inert` → tıklama hedefi yok | Test başlığa önce tıklayıp grubu açıyor; turda kullanıcı da aynısını yapar |
+| İnce-uzun hedef kartı örtüyor | Mobil katman şeridinde kart hedefi kapatıyordu | `layout.forceSide` ile yana yerleşim + genişlik daraltma |
+
+### Doğrulama (Playwright, port 3005)
+- **Masaüstü 1440×900**: 13/13 adım `OK` — halka hedefin −8px dışında, `blur(3px)`, kart/hedef çakışması yok, kart viewport içinde.
+- **Mobil 390×844**: 11/11 adım `OK`, kart hiç taşmıyor.
+- **Etkileşim**: 5. adımda katman açıldı (`aria-pressed=true`), tur ilerlemedi (5 → 5).
+- **Panel geri dönüşü**: arama adımında panel genişliği 36px (kapalı).
+- **Kapanış**: son buton `Başla`, dialog 0, bayrak `seen`, `body.overflow` temiz.
+- `npx tsc --noEmit`, `npx eslint`, `npx next build` temiz.
+
+### Değişen dosyalar
+- `components/ui/OnboardingTour.tsx` — 13 adım, bölümler, `bullets`, `interactive`, `openSidebar`, `useMemo` adım listesi, `layout` yana yerleşim.
+
+---
+
 ## 📅 [2026-11-11] - Tanıtım Turu: Statik Kartlardan Spotlight Turuna
 
 - **Geliştirici**: AI Agent (OpenCode)
